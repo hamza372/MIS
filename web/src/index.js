@@ -3,12 +3,18 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers'
 
 import Routes from './routes'
+import { saveDB } from './util/localStorage';
 
-const store = createStore(reducer);
+const store = createStore(reducer, applyMiddleware(thunkMiddleware));
+
+store.subscribe(() => {
+	saveDB(store.getState())
+})
 
 ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 registerServiceWorker();
