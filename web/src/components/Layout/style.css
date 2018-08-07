@@ -1,0 +1,31 @@
+html,body, #root, .layout{
+	height: 100%;
+	width: 100%;
+	margin: 0;
+}
+
+.layout>div:nth-child(2) {
+	height: calc(100% - 80px);
+}
+
+.header {
+	display: flex;
+	height: 80px;
+	background-color: #222;
+	color: white;
+	align-items: center;
+	font-size: 1.5rem;
+}
+
+.header>div {
+	padding: 10px;
+}
+
+.header a {
+	text-decoration: none;
+	color: white;
+}
+
+.header .profile {
+	margin-left: auto;
+}

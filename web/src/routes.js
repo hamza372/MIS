@@ -2,12 +2,16 @@ import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
-import App from './pages/App'
+import Landing from 'modules/Landing'
+import TeacherList from 'modules/Teacher/List'
 
 export default ({ store }) => (
 	<Provider store={store}>
 		<BrowserRouter>
-			<Route path="/" component={App} />
+			<Switch>
+				<Route exact path="/" component={Landing} />
+				<Route path="/teacher" component={TeacherList} />
+			</Switch>
 		</BrowserRouter>
 	</Provider>
 )
