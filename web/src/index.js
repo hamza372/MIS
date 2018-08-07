@@ -8,7 +8,7 @@ import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers'
 
 import Routes from './routes'
-import { saveDB } from './util/localStorage';
+import { saveDB } from 'utils/localStorage';
 
 const store = createStore(reducer, applyMiddleware(thunkMiddleware));
 
