@@ -1,5 +1,22 @@
 import { v4 } from 'node-uuid'
 
+export const MERGE = "MERGE"
+export const createMerge = (path, value) => {
+	return {
+		type: MERGE,
+		path,
+		value
+	}
+}
+
+export const DELETE = "DELETE"
+export const createDelete = (path) => {
+	return {
+		type: DELETE,
+		path
+	}
+}
+
 export const CREATE_TEACHER = 'CREATE_TEACHER'
 export const createTeacher = (Name, Sex, Birthday, Email, Password, CNIC, Phone) => {
 

@@ -18,7 +18,7 @@ const TeacherList = (props) => {
 		<div className="teacher-list">
 			<Title>Teachers</Title>
 			<List create={'/teacher/new'} createText={"Add new Teacher"}>
-				{Object.values(props.teachers).map(teacher => <TeacherStub teacher={teacher} />)}
+				{Object.values(props.teachers).map(teacher => <TeacherStub key={teacher.id} teacher={teacher} />)}
 			</List>
 		</div>
 	</Layout>

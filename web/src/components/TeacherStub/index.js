@@ -3,8 +3,9 @@ import Link from 'components/Link'
 
 const TeacherStub = ({ teacher }) => {
 
+	console.log(teacher)
 	return <div className="teacher-stub">
-		<Link to={`/teacher/${teacher.ID}`}>{teacher.name}</Link>
+		<Link to={`/teacher/${teacher.id}`}>{teacher.Name}</Link>
 	</div>
 }
 

@@ -1,45 +1,33 @@
-import { combineReducers } from 'redux'
-import { CREATE_TEACHER, DELETE_TEACHER, UPDATE_TEACHER } from '../actions'
+import Dynamic from '@ironbay/dynamic'
+import { MERGE, DELETE } from '../actions'
+import { loadDB } from 'utils/localStorage'
 
-const initialState = {
+
+const initialState = loadDB() || {
 	available: true,
 	teachers: { },
 	queuedWrites: []
 }
+console.log(initialState)
 
-// this function accepts current state, and action
-// and returns the "new state" of the application.
+// we need to know what the shape of the data is somewhere...
+// initialState probably not good enough.
 
 const rootReducer = (state = initialState, action) => {
 
+	console.log(action)
 	switch(action.type) {
-		case CREATE_TEACHER:
-			return {
-				...state,
-				teachers: {
-					...state.teachers,
-					[action.payload.ID]: action.payload
-				}
-			}
-		case UPDATE_TEACHER:
-			return {
-				...state,
-				teachers: {
-					...state.teachers,
-					[action.payload.ID]: {...state.teachers[action.payload.ID], ...action.payload}
-				}
-			}
-		case DELETE_TEACHER:
-			const { [action.payload.ID]: deleted_teacher, ...teachers } = this.state.teachers;
-			console.log("DELETING", deleted_teacher)
-			return {
-				...state,
-				teachers 
-			}
+		case MERGE:
+			const next = Dynamic.put(state, action.path, action.value)
+			console.log(next)
+			return next;
+		
+		case DELETE:
+			return Dynamic.delete(state, action.path)
+
 		default: 
 			return state;
 	}
-	return state;
 }
 
 export default rootReducer;

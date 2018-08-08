@@ -1,8 +1,8 @@
-
 export const loadDB = () => {
 	try {
 		const serialized = localStorage.getItem('db');
 		if (serialized === null) {
+			console.log('null')
 			return undefined;
 		}
 
