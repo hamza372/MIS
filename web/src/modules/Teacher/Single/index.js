@@ -57,8 +57,8 @@ class SingleTeacher extends Component {
 		const id = v4();
 
 		this.props.save({
+			id,
 			...this.state.profile,
-			id
 		})
 		console.log('save')
 	}
@@ -140,6 +140,6 @@ class SingleTeacher extends Component {
 
 export default connect(state => ({ teachers: state.teachers }) , dispatch => ({ 
 	save: (teacher) => {
-		dispatch(createMerge(["teachers"], { [teacher.id]: teacher }));
+		dispatch(createMerge(["teachers", teacher.id], teacher));
 	}
  }))(SingleTeacher);

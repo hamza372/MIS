@@ -1,12 +1,13 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGE, DELETE } from '../actions'
 import { loadDB } from 'utils/localStorage'
+import moment from 'moment'
 
 
 const initialState = loadDB() || {
 	available: true,
 	teachers: { },
-	queuedWrites: []
+	queued: []
 }
 console.log(initialState)
 
@@ -18,12 +19,19 @@ const rootReducer = (state = initialState, action) => {
 	console.log(action)
 	switch(action.type) {
 		case MERGE:
+		{
 			const next = Dynamic.put(state, action.path, action.value)
-			console.log(next)
-			return next;
+			const qnext = Dynamic.put(next, ["queued", moment().unix() * 1000], action)
+			console.log(qnext)
+			return qnext;
+		}
 		
 		case DELETE:
-			return Dynamic.delete(state, action.path)
+		{
+			const next = Dynamic.delete(state, action.path)
+			const qnext = Dynamic.put(next, ["queued", moment().unix() * 1000], action);
+			return qnext;
+		}
 
 		default: 
 			return state;
