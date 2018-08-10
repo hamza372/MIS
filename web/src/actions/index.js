@@ -14,3 +14,7 @@ export const createDelete = (path) => {
 		path
 	}
 }
+
+// this is only produced by the server. 
+// it will tell us it hsa confirmed sync up to { date: timestamp }
+export const CONFIRM_SYNC = "CONFIRM_SYNC"

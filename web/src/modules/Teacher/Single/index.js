@@ -138,8 +138,8 @@ class SingleTeacher extends Component {
 	}
 }
 
-export default connect(state => ({ teachers: state.teachers }) , dispatch => ({ 
+export default connect(state => ({ teachers: state.db.teachers }) , dispatch => ({ 
 	save: (teacher) => {
-		dispatch(createMerge(["teachers", teacher.id], teacher));
+		dispatch(createMerge(["db", "teachers", teacher.id], teacher));
 	}
  }))(SingleTeacher);

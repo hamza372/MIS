@@ -8,6 +8,9 @@ defmodule Sarkar.Application do
 	def start(_type, _args) do
 		# List all child processes to be supervised
 		children = [
+			{ Registry, keys: :duplicate, name: Sarkar.ConnectionRegistry },
+			{ Registry, keys: :unique, name: Sarkar.SchoolRegistry },
+			{ DynamicSupervisor, name: Sarkar.SchoolSupervisor, strategy: :one_for_one },
 			Sarkar.Server
 		]
 
