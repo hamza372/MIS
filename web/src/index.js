@@ -9,22 +9,17 @@ import reducer from './reducers'
 
 import Routes from './routes'
 import { saveDB } from 'utils/localStorage';
-import Syncr from 'syncr'
+import Syncr, {syncrware } from 'syncr'
 
-const store = createStore(reducer, applyMiddleware(thunkMiddleware));
-const syncr = new Syncr(`ws://localhost:8080/ws?school_id=${store.getState().school_id}&client_id=${store.getState().client_id}`, (msg) => {
+const store = createStore(reducer, applyMiddleware(thunkMiddleware, syncrware({ getSyncr: () => syncr })));
+const host = '192.168.0.237'
+const syncr = new Syncr(`ws://${host}:8080/ws?school_id=${store.getState().school_id}&client_id=${store.getState().client_id}`, (msg) => {
 	store.dispatch(msg);
 })
 
 store.subscribe(() => {
 	const state = store.getState();
 	saveDB(state)
-
-	syncr.send(JSON.stringify({
-		type: "SYNC",
-		school_id: state.school_id,
-		payload: state.queued
-	}))
 })
 
 ReactDOM.render(<Routes store={store} />, document.getElementById('root'));

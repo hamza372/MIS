@@ -24,4 +24,4 @@ const TeacherList = (props) => {
 	</Layout>
 }
 
-export default connect(state => state.db)(TeacherList);
+export default connect(state => ({ teachers: state.db.teachers }))(TeacherList);

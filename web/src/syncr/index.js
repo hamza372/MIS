@@ -1,23 +1,50 @@
-import sleep from 'utils/sleep' 
+import { MERGE, DELETE, QueueUp, INIT_SYNC, createInitSync} from 'actions'
+import moment from 'moment'
 
-// if the action is a write action.
-// should keep an array of all of these which should be 
-// flushed over websocket if/when there is an available connection.
-// this should also be saved/loaded to/from local storage 
-const middleware = store => next => action => {
-	console.log('middletest', action)
-	return next(action);
+export const syncrware = factory => store => next => action => {
+	console.log('syncrware', action)
+
+	const result = next(action);
+	const state = store.getState();
+
+	//if  we run a MERGE or DELETE action, we should sync. 
+	if(action.type === MERGE || action.type === DELETE) {
+		// if we're offline then we should also dispatch an action to queue the action
+
+		factory.getSyncr().send(JSON.stringify({
+			type: "SYNC",
+			school_id: state.school_id,
+			payload: {
+				[action.path]: {
+					action,
+					date: moment().unix() * 1000
+				}
+			}
+		}))
+		.then(res => console.log('result!'))
+		.catch(err => store.dispatch(QueueUp(action)))
+	}
+
+	if(action.type === INIT_SYNC) {
+		factory.getSyncr().send(JSON.stringify({
+			type: "SYNC",
+			school_id: state.school_id,
+			payload: state.queued
+		}))
+	}
+
+	return result;
 }
 
 export default class Syncr {
 
-	constructor(url, onMessage) {
+	constructor(url, dispatch) {
 
 		this.url = url;
 		this.ready = false;
 		this.ws = undefined;
 		this.pingInterval = undefined;
-		this.onMessage = onMessage;
+		this.dispatch = dispatch;
 
 		this.connect()
 
@@ -29,10 +56,10 @@ export default class Syncr {
 		this.ws.onopen = () => {
 			console.log('ws open')
 			this.ready = true;
-
 			clearInterval(this.pingInterval);
-
 			this.pingInterval = setInterval(() => this.ping(), 5000)
+
+			this.dispatch(createInitSync())
 			
 		}
 
@@ -46,10 +73,10 @@ export default class Syncr {
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
 			console.log('got message', msg);
-			this.onMessage(msg);
+			this.dispatch(msg);
 
-			// first i send my updates
-			// then i receive the new snapshot
+			// first I send my updates
+			// then I receive the new snapshot
 			// server needs to know my client id
 			// and the last update i received
 

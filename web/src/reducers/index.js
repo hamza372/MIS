@@ -1,5 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGE, DELETE, CONFIRM_SYNC } from '../actions'
+import { MERGE, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT } from '../actions'
 import { loadDB } from 'utils/localStorage'
 import moment from 'moment'
 import { v4 } from 'node-uuid'
@@ -23,31 +23,37 @@ const rootReducer = (state = initialState, action) => {
 	switch(action.type) {
 		case MERGE:
 		{
-			const next = Dynamic.put(state, action.path, action.value)
-			const qnext = Dynamic.put(next, ["queued", action.path], {action, date: moment().unix() * 1000})
-			console.log(qnext)
-			return qnext;
+			return {...Dynamic.put(state, action.path, action.value)}
 		}
 		
 		case DELETE:
 		{
-			const next = Dynamic.delete(state, action.path)
-			const qnext = Dynamic.put(next, ["queued", action.path], {action, date: moment().unix() * 1000});
-			return qnext;
+			return {...Dynamic.delete(state, action.path)}
+		}
+
+		case QUEUE:
+		{
+
+			return {...Dynamic.put(state, ["queued", action.payload.path], {action: action.payload, date: moment().unix() * 1000})};
 		}
 
 		case CONFIRM_SYNC: 
 		{
 			const last = action.date;
 			// remove all queued writes less than this last date.
-			const newQ = Object.values(state.queued)
+			const newQ = Object.keys(state.queued)
 				.filter(t => state.queued[t].date > last)
 				.reduce((agg, curr) => {
 					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
 				}, {})
 
-			return Dynamic.put(state, ["queued"], newQ);
+			return {...Dynamic.put(state, ["queued"], newQ)};
+		}
 
+		case SNAPSHOT:
+		{
+			console.log('got snapshot', action.db)
+			return {...Dynamic.put(state, ["db"], action.db)}
 		}
 
 		default: 
