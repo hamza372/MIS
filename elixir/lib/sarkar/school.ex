@@ -1,17 +1,21 @@
 defmodule Sarkar.School do
 	use GenServer
 
+	def init(args) do
+		{:ok, args}
+	end
+
 	def start_link({school_id}) do
 		IO.puts "initting school"
 		IO.inspect school_id
 
 		# state is school_id, map of writes, map of db.
-		# map of writes: (path) -> date
-		# maybe another thing we should include is 
-		# each clients status
+		# TODO: map of writes: (path) -> date
+
+		db = Sarkar.Store.School.load(school_id)
 
 		IO.puts "starting school under registry id #{school_id}"
-		GenServer.start_link(__MODULE__, {school_id, %{}, %{}}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		GenServer.start_link(__MODULE__, {school_id, %{}, db}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
@@ -33,18 +37,19 @@ defmodule Sarkar.School do
 
 		{nextDb, last_date} = Enum.reduce(changes, {db, 0}, fn {path_key, payload}, {agg_db, max_date} -> 
 			%{ action: %{path: path, type: type, value: value}, date: date} = payload
-			IO.inspect date
 
 			[prefix | p ] = path
-			IO.inspect prefix
 
 			{Dynamic.put(agg_db, p, value), max(date, max_date)}
 		end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
-		# future: think about just sending the changes.
+		# TODO: think about just sending the changes.
 
-		broadcast(school_id, snapshot(nextDb))
+		broadcast(school_id, client_id, snapshot(nextDb))
+		Sarkar.Store.School.save(school_id, nextDb)
+
+
 		{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
 	end
 
@@ -76,11 +81,12 @@ defmodule Sarkar.School do
 		{:via, Registry, {Sarkar.SchoolRegistry, school_id}}
 	end
 
-	defp broadcast(school_id, message) do
-		entries = Registry.lookup(Sarkar.ConnectionRegistry, school_id)
-		for {pid, client_id} <- entries do
-			send(pid, {:broadcast, message})
-		end
+	defp broadcast(school_id, sender_id, message) do
+
+		Registry.lookup(Sarkar.ConnectionRegistry, school_id)
+		|> Enum.filter(fn {pid, client_id}-> client_id != sender_id end)
+		|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, message}) end)
+
 	end
 
 end
