@@ -8,6 +8,7 @@ const initialState = loadDB() || {
 	school_id: "test_school",
 	client_id: v4(),
 	queued: { },
+	acceptSnapshot: false,
 	db: {
 		teachers: { },
 	}
@@ -34,12 +35,18 @@ const rootReducer = (state = initialState, action) => {
 		case QUEUE:
 		{
 
-			return {...Dynamic.put(state, ["queued", action.payload.path], {action: action.payload, date: moment().unix() * 1000})};
+			const next = Dynamic.put(state, ["queued", action.payload.path], {action: action.payload, date: moment().unix() * 1000});
+			return {
+				...next,
+				acceptSnapshot: false
+			}
 		}
 
 		case CONFIRM_SYNC: 
 		{
 			const last = action.date;
+			// action = {db: {}, date: number}
+
 			// remove all queued writes less than this last date.
 			const newQ = Object.keys(state.queued)
 				.filter(t => state.queued[t].date > last)
@@ -47,13 +54,21 @@ const rootReducer = (state = initialState, action) => {
 					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
 				}, {})
 
-			return {...Dynamic.put(state, ["queued"], newQ)};
+			const next = Dynamic.put(state, ["queued"], newQ);
+			return {
+				...next,
+				acceptSnapshot: true
+			}
 		}
 
 		case SNAPSHOT:
 		{
-			console.log('got snapshot', action.db)
-			return {...Dynamic.put(state, ["db"], action.db)}
+			if(state.acceptSnapshot && Object.keys(action.db).length > 0) {
+				console.log('applying snapshot')
+				return {...Dynamic.put(state, ["db"], action.db)}
+			}
+
+			return state;
 		}
 
 		default: 

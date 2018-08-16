@@ -2,7 +2,6 @@ import { MERGE, DELETE, QueueUp, INIT_SYNC, createInitSync} from 'actions'
 import moment from 'moment'
 
 export const syncrware = factory => store => next => action => {
-	console.log('syncrware', action)
 
 	const result = next(action);
 	const state = store.getState();
@@ -54,7 +53,6 @@ export default class Syncr {
 		this.ws = new WebSocket(this.url);
 
 		this.ws.onopen = () => {
-			console.log('ws open')
 			this.ready = true;
 			clearInterval(this.pingInterval);
 			this.pingInterval = setInterval(() => this.ping(), 5000)
@@ -72,7 +70,6 @@ export default class Syncr {
 
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
-			console.log('got message', msg);
 			this.dispatch(msg);
 
 			// first I send my updates

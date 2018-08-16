@@ -10,24 +10,11 @@ defmodule Sarkar.School do
 		# maybe another thing we should include is 
 		# each clients status
 
-		# clients should have a few different status
-		# on each connection, the client needs to send its queued up updates, even if its length 0
-		# client state before sending its update is "CONNECTED_AWAITING_SYNC"
-		# after sending its update, we reply with snapshot and set state to "CONNECTED_RECEIVED_SYNC"
-		# after the client applies the snapshot, it should send confirmation "SNAPSHOT_APPLIED"
-		# once it sends confirmation, we set status to "CONNECTED_UP_TO_DATE"
-		# once disconnected/terminted, state is set to "DISCONNECTED"
-		# each state should be a tuple with a date
-
 		IO.puts "starting school under registry id #{school_id}"
-		GenServer.start_link(__MODULE__, {school_id, %{}, %{}, %{}}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		GenServer.start_link(__MODULE__, {school_id, %{}, %{}}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
-
-	def init_conn(school_id, client_id) do
-		GenServer.call(via(school_id), {:init_conn, client_id})
-	end
 
 	def sync_changes(school_id, client_id, changes) do
 		GenServer.call(via(school_id), {:sync_changes, client_id, changes})
@@ -35,16 +22,7 @@ defmodule Sarkar.School do
 
 	# SERVER
 
-	def handle_call({:init_conn, client_id}, _from, {school_id, writes, clients, db} = state) do
-		{:reply, :ok, {school_id, writes, Map.put(clients, client_id, :CONNECTED_AWAITING_SYNC), db}}
-
-	end
-
-	def handle_call({:snapshot_applied, client_id}, _from, {school_id, writes, clients, db} = state) do
-		{:reply, :ok, {school_id, writes, Map.put(clients, client_id, :UP_TO_DATE), db}}
-	end
-
-	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, clients, db} = state) do
+	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, db} = state) do
 		IO.inspect changes
 
 		# map of changes.
@@ -66,9 +44,8 @@ defmodule Sarkar.School do
 		# at this point we need to send the new snapshot to all clients that are up to date.
 		# future: think about just sending the changes.
 
-		broadcast(school_id, clients, snapshot(nextDb))
-		nextClients = Map.put(clients, client_id, :RECEIVED_SYNC)
-		{:reply, confirm_sync(last_date, nextDb), {school_id, writes, Map.put(clients, client_id, :RECEIVED_SYNC), nextDb}}
+		broadcast(school_id, snapshot(nextDb))
+		{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
 	end
 
 	def handle_call(a, b, c) do 
@@ -99,16 +76,10 @@ defmodule Sarkar.School do
 		{:via, Registry, {Sarkar.SchoolRegistry, school_id}}
 	end
 
-	defp broadcast(school_id, client_states, message) do
+	defp broadcast(school_id, message) do
 		entries = Registry.lookup(Sarkar.ConnectionRegistry, school_id)
 		for {pid, client_id} <- entries do
-			case Map.get(client_states, client_id) do
-				:CONNECTED_AWAITING_SYNC -> IO.puts "just awaitinn an initial sync"
-				:RECEIVED_SYNC -> 
-					IO.puts "waiting for this guy to ack the snapshot... but why bother"
-					send(pid, {:broadcast, message})
-				other -> IO.inspect other
-			end
+			send(pid, {:broadcast, message})
 		end
 	end
 

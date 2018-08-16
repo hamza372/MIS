@@ -26,9 +26,6 @@ defmodule Sarkar.Websocket do
 		# make sure school genserver is started
 		DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
 
-		# init conn 
-		Sarkar.School.init_conn(school_id, client_id)
-
 		{:ok, state}
 	end
 
@@ -38,8 +35,6 @@ defmodule Sarkar.Websocket do
 	end
 
 	def websocket_handle({:text, content}, %{school_id: school_id, client_id: client_id} = state) do
-		IO.inspect content
-
 		%{
 			type: type,
 			payload: payload
