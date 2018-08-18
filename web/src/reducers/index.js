@@ -1,5 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGE, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT } from '../actions'
+import { MERGE, MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOGIN } from '../actions'
 import { loadDB } from 'utils/localStorage'
 import moment from 'moment'
 import { v4 } from 'node-uuid'
@@ -11,6 +11,7 @@ const initialState = loadDB() || {
 	acceptSnapshot: false,
 	db: {
 		teachers: { },
+		users: { } // username: passwordhash, permissions, etc
 	}
 }
 console.log(initialState)
@@ -25,6 +26,14 @@ const rootReducer = (state = initialState, action) => {
 		case MERGE:
 		{
 			return {...Dynamic.put(state, action.path, action.value)}
+		}
+
+		case MERGES:
+		{
+			return action.merges.reduce((agg, curr) => {
+				return {...Dynamic.put(agg, curr.path, curr.value)}
+			}, state);
+
 		}
 		
 		case DELETE:
@@ -56,7 +65,7 @@ const rootReducer = (state = initialState, action) => {
 
 			const next = Dynamic.put(state, ["queued"], newQ);
 			return {
-				...next,
+				...Dynamic.put(next, ["db"], action.db),
 				acceptSnapshot: true
 			}
 		}
@@ -67,6 +76,12 @@ const rootReducer = (state = initialState, action) => {
 				console.log('applying snapshot')
 				return {...Dynamic.put(state, ["db"], action.db)}
 			}
+
+			return state;
+		}
+
+		case LOGIN:
+		{
 
 			return state;
 		}

@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { createMerge } from 'actions'
+import { createMerge, createMerges } from 'actions'
+import { hash } from 'utils'
 
 import Layout from 'components/Layout'
 import Former from 'utils/former'
@@ -24,7 +25,7 @@ const blankTeacher = {
 	Password: "",
 	Married: false,
 	Phone: "",
-	Salary: undefined,
+	Salary: 0,
 	Active: true,
 
 	ManCNIC: "",
@@ -56,14 +57,27 @@ class SingleTeacher extends Component {
 
 		const id = v4();
 
-		this.props.save({
-			id,
-			...this.state.profile,
-		})
+		if(this.state.profile.Password.length !=128) {
+			hash(this.state.profile.Password).then(hashed => {
+				this.props.save({
+					id,
+					...this.state.profile,
+					Password: hashed
+				})
+			})
+		}
+		else {
+			this.props.save({
+				id,
+				...this.state.profile,
+			})
+		}
 		console.log('save')
 	}
 
 	render() {
+
+		console.log(this.state.profile.Salary)
 
 		return <Layout>
 			<div className="single-teacher">
@@ -89,7 +103,7 @@ class SingleTeacher extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="text" {...this.former.super_handle(["Password"])} placeholder="Password" />
+						<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
 					</div>
 					<div className="row">
 						<label>Married</label>
@@ -140,6 +154,15 @@ class SingleTeacher extends Component {
 
 export default connect(state => ({ teachers: state.db.teachers }) , dispatch => ({ 
 	save: (teacher) => {
-		dispatch(createMerge(["db", "teachers", teacher.id], teacher));
+		//dispatch(createMerge(["db", "teachers", teacher.id], teacher))
+
+		dispatch(createMerges([
+			{path: ["db", "teachers", teacher.id], value: teacher},
+			{path: ["db", "users", teacher.id], value: {
+				username: teacher.Username,
+				password: teacher.Password,
+				type: "teacher"
+			}}
+		]))
 	}
  }))(SingleTeacher);

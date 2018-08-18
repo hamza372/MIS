@@ -6,16 +6,12 @@ defmodule Sarkar.School do
 	end
 
 	def start_link({school_id}) do
-		IO.puts "initting school"
-		IO.inspect school_id
+		IO.puts "initting school #{school_id}"
 
 		# state is school_id, map of writes, map of db.
 		# TODO: map of writes: (path) -> date
 
-		db = Sarkar.Store.School.load(school_id)
-
-		IO.puts "starting school under registry id #{school_id}"
-		GenServer.start_link(__MODULE__, {school_id, %{}, db}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		GenServer.start_link(__MODULE__, {school_id, %{}, Sarkar.Store.School.load(school_id)}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
@@ -27,7 +23,6 @@ defmodule Sarkar.School do
 	# SERVER
 
 	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, db} = state) do
-		IO.inspect changes
 
 		# map of changes.
 		# key is path separated by comma
@@ -39,18 +34,19 @@ defmodule Sarkar.School do
 			%{ action: %{path: path, type: type, value: value}, date: date} = payload
 
 			[prefix | p ] = path
-
 			{Dynamic.put(agg_db, p, value), max(date, max_date)}
 		end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
 		# TODO: think about just sending the changes.
 
-		broadcast(school_id, client_id, snapshot(nextDb))
-		Sarkar.Store.School.save(school_id, nextDb)
-
-
-		{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+		case length(Map.keys(changes)) do
+			0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+			_ -> 
+				broadcast(school_id, client_id, snapshot(nextDb))
+				Sarkar.Store.School.save(school_id, nextDb)
+				{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+		end
 	end
 
 	def handle_call(a, b, c) do 
@@ -88,5 +84,4 @@ defmodule Sarkar.School do
 		|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, message}) end)
 
 	end
-
 end

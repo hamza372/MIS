@@ -8,12 +8,11 @@ defmodule Sarkar.Websocket do
 			|> Enum.map(fn [a, b] -> {a, b} end)
 			|> Map.new
 
-		IO.puts "websocket connected"
 		{:cowboy_websocket, req, %{school_id: school_id, client_id: client_id}}
 	end
 
 	# there are going to be 2 types of requests.
-	# actually maybe only one for now.
+	# actually maybe only one for now
 	# send their updates, get a snapshot back.
 	# and also register a new school - this will need some sales access...
 	# will need a db of sales logins, and/or a sales portal.
@@ -24,7 +23,11 @@ defmodule Sarkar.Websocket do
 		{:ok, _} = Registry.register(Sarkar.ConnectionRegistry, school_id, client_id)
 
 		# make sure school genserver is started
-		DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
+		# but don't restart if dont need to. 
+		case Registry.lookup(Sarkar.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok, state}
+			[] -> DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
 
 		{:ok, state}
 	end
@@ -52,7 +55,6 @@ defmodule Sarkar.Websocket do
 	end
 
 	def websocket_info({:broadcast, json}, state) do
-		IO.puts "broadcasting"
 		{:reply, {:text, Poison.encode!(json)}, state}
 	end
 
@@ -62,7 +64,6 @@ defmodule Sarkar.Websocket do
 
 
 	def terminate(_reason, _req, _state) do
-		IO.puts "websocket terminate"
 		:ok
 	end
 

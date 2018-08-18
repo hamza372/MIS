@@ -7,6 +7,16 @@ export const createMerge = (path, value) => {
 	}
 }
 
+export const MERGES = "MERGES"
+export const createMerges= (merges) => {
+	// merges is a list of path, value
+
+	return {
+		type: MERGES,
+		merges
+	}
+}
+
 export const DELETE = "DELETE"
 export const createDelete = (path) => {
 	return {
@@ -32,3 +42,15 @@ export const INIT_SYNC = "INIT_SYNC"
 export const createInitSync = () => ({
 	type: INIT_SYNC
 })
+
+export const LOGIN = "LOGIN"
+export const createLogin = (school_id, username, password) => {
+
+	return {
+		type: LOGIN,
+		school_id,
+		username,
+		password
+	}
+
+}
