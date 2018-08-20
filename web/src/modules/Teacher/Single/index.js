@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { createMerge, createMerges } from 'actions'
+import { createMerges } from 'actions'
 import { hash } from 'utils'
 
 import Layout from 'components/Layout'
@@ -57,7 +57,7 @@ class SingleTeacher extends Component {
 
 		const id = v4();
 
-		if(this.state.profile.Password.length !=128) {
+		if(this.state.profile.Password.length !== 128) { // hack...
 			hash(this.state.profile.Password).then(hashed => {
 				this.props.save({
 					id,
@@ -76,8 +76,6 @@ class SingleTeacher extends Component {
 	}
 
 	render() {
-
-		console.log(this.state.profile.Salary)
 
 		return <Layout>
 			<div className="single-teacher">

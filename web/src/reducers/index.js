@@ -11,7 +11,12 @@ const initialState = loadDB() || {
 	acceptSnapshot: false,
 	db: {
 		teachers: { },
-		users: { } // username: passwordhash, permissions, etc
+		users: { } // username: passwordhash, permissions, etc. 
+	},
+	// this part of the tree i want to obscure.
+	// but will get to that later
+	auth: {
+		username: undefined
 	}
 }
 console.log(initialState)
@@ -82,6 +87,21 @@ const rootReducer = (state = initialState, action) => {
 
 		case LOGIN:
 		{
+
+			const user = Object.values(state.db.users)
+				.find(u => u.username === action.username)
+
+			if(action.password === user.password) {
+				console.log("matched password")
+
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						username: user.username
+					}
+				}
+			}
 
 			return state;
 		}

@@ -26,7 +26,8 @@ class Login extends Component {
 	}
 
 	onLogin = () => {
-		this.props.login(this.state.login.school, this.state.login.username, this.state.login.password)
+		console.log('dispatching')
+		this.props.login(this.state.login)
 	}
 
 	render() {
@@ -43,5 +44,7 @@ class Login extends Component {
 }
 
 export default connect(state => state, dispatch => ({
-	login: createLogin
+	login: (login) => {
+		dispatch(createLogin(login.school, login.username, login.password))
+	}
 }))(Login);

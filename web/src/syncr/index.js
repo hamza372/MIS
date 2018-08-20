@@ -1,43 +1,9 @@
-import { MERGE, DELETE, QueueUp, INIT_SYNC, createInitSync} from 'actions'
-import moment from 'moment'
-
-export const syncrware = factory => store => next => action => {
-
-	const result = next(action);
-	const state = store.getState();
-
-	//if  we run a MERGE or DELETE action, we should sync. 
-	if(action.type === MERGE || action.type === DELETE) {
-		// if we're offline then we should also dispatch an action to queue the action
-
-		factory.getSyncr().send(JSON.stringify({
-			type: "SYNC",
-			school_id: state.school_id,
-			payload: {
-				[action.path]: {
-					action,
-					date: moment().unix() * 1000
-				}
-			}
-		}))
-		.then(res => console.log('result!'))
-		.catch(err => store.dispatch(QueueUp(action)))
-	}
-
-	if(action.type === INIT_SYNC) {
-		factory.getSyncr().send(JSON.stringify({
-			type: "SYNC",
-			school_id: state.school_id,
-			payload: state.queued
-		}))
-	}
-
-	return result;
-}
+import {createInitSync} from 'actions'
+import { v4 } from 'node-uuid'
 
 export default class Syncr {
 
-	constructor(url, dispatch) {
+	constructor(url, school_id, dispatch) {
 
 		this.url = url;
 		this.ready = false;
@@ -45,8 +11,9 @@ export default class Syncr {
 		this.pingInterval = undefined;
 		this.dispatch = dispatch;
 
-		this.connect()
+		this.pending = new Map(); // key: uuid, value: promise
 
+		this.connect();
 	}
 
 	async connect() {
@@ -70,18 +37,14 @@ export default class Syncr {
 
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
-			this.dispatch(msg);
 
-			// first I send my updates
-			// then I receive the new snapshot
-			// server needs to know my client id
-			// and the last update i received
-
-			// this is either going to be a snapshot
-			// or idk what else.
-			// either way, it will have a type
-			// also need a way for the server to say "ok ive processed your queued messages up til date x"
-			// then we can remove those from our queue
+			if(msg.key) {
+				this.pending.get(msg.key).resolve(msg.payload)
+				this.pending.delete(msg.key);
+			}
+			else {
+				this.dispatch(msg);
+			}
 		}
 	}
 
@@ -92,16 +55,29 @@ export default class Syncr {
 	}
 
 	ping() {
-		this.send("ping")
+		if(this.ready)
+			this.ws.send("ping")
 	}
 
 	async send(message) {
 		if(!this.ready) {
-			// we want batched update behaviour from the queue, so this is not good.
 			throw new Error("not ready");
 		}
 
-		this.ws.send(message);
+		// make a key
+		// create promise, put in map
+		// when its returned, trigger it.
+		const key = v4();
+		return new Promise((resolve, reject) => {
+
+			this.pending.set(key, {resolve, reject});
+
+			this.ws.send(JSON.stringify({
+				key,
+				payload: message
+			}));
+		});
+
 	}
 
 }

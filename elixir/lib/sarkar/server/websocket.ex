@@ -3,12 +3,13 @@ defmodule Sarkar.Websocket do
 
 	def init(req, state) do
 
-		query = %{"school_id" => school_id, "client_id" => client_id} = String.split(req.qs, ["&", "="])
-			|> Enum.chunk_every(2)
-			|> Enum.map(fn [a, b] -> {a, b} end)
-			|> Map.new
+		# query = %{"school_id" => school_id, "client_id" => client_id} = String.split(req.qs, ["&", "="])
+		# 	|> Enum.chunk_every(2)
+		# 	|> Enum.map(fn [a, b] -> {a, b} end)
+		# 	|> Map.new
 
-		{:cowboy_websocket, req, %{school_id: school_id, client_id: client_id}}
+		#{:cowboy_websocket, req, %{school_id: school_id, client_id: client_id}}
+		{:cowboy_websocket, req, %{}}
 	end
 
 	# there are going to be 2 types of requests.
@@ -32,21 +33,77 @@ defmodule Sarkar.Websocket do
 		{:ok, state}
 	end
 
+	def websocket_init(state) do
+		{:ok, state}
+	end
+
 
 	def websocket_handle({:text, "ping"}, state) do
 		{:ok, state}
 	end
 
+
+	def websocket_handle({:text, content}, state) do
+		json = Poison.decode!(content, [keys: :atoms])
+
+		handle_json(json, state)
+	end
+
+	def handle_json(%{key: message_key, payload: %{type: type, payload: payload} = action}, state) do
+		case handle_action(action, state) do
+			{:reply, msg, state} -> {:reply, {:text, Poison.encode!(%{key: message_key, payload: msg})}, state}
+			other -> 
+				IO.puts "unexpected return from handle_action"
+				IO.inspect other
+				{:ok, state}
+		end
+	end
+
+	def handle_json(json, state) do
+		IO.inspect json
+
+		{:ok, state}
+	end
+
+	def handle_action(%{type: "AUTH", payload: %{school_id: school_id, client_id: client_id, password: password}}, state) do
+		case Sarkar.Auth.login({school_id, password}) do
+			{:ok, token, db} -> {:reply, %{type: "success", token: token, db: db}, %{school_id: school_id, client_id: client_id}}
+			{:error, message} -> {:reply, %{type: "error", message: message}, %{}}
+		end
+	end
+
+	def handle_action(%{type: "CREATE_SCHOOL", payload: %{school_id: school_id, password: password}}) do
+		case Sarkar.Auth.create({school_id, password}) do
+			{:ok} -> {:reply, %{type: "success"}, state}
+			{:error, message} -> {:reply, %{type: "error", message: message}, state}
+		end
+	end
+
+	def handle_action(%{type: "SYNC", payload: payload}, state) do
+		res = Sarkar.School.sync_changes(school_id, client_id, payload)
+		{:reply, res, state}
+	end
+
+	def handle_action(%{type: type, payload: payload}, state) do
+		IO.puts "type is not SYNC"
+		IO.inspect type
+		IO.inspect payload
+		{:ok, state}
+	end
+
 	def websocket_handle({:text, content}, %{school_id: school_id, client_id: client_id} = state) do
 		%{
-			type: type,
-			payload: payload
+			key: message_key,
+			payload: %{
+				type: type,
+				payload: payload
+			}
 		} = msg = Poison.decode!(content, [keys: :atoms])
 
 		case type do
 			"SYNC" -> 
 				res = Sarkar.School.sync_changes(school_id, client_id, payload)
-				{:reply, {:text, Poison.encode!(res)}, state}
+				{:reply, {:text, Poison.encode!(%{key: message_key, payload: res})}, state}
 			other -> 
 				IO.puts "type is not SYNC"
 				IO.puts other

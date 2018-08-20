@@ -1,3 +1,5 @@
+import { hash } from 'utils'
+
 export const MERGE = "MERGE"
 export const createMerge = (path, value) => {
 	return {
@@ -44,13 +46,18 @@ export const createInitSync = () => ({
 })
 
 export const LOGIN = "LOGIN"
-export const createLogin = (school_id, username, password) => {
+export const createLogin = (school_id, username, password) => dispatch => {
 
-	return {
-		type: LOGIN,
-		school_id,
-		username,
-		password
-	}
+	console.log('create login')
+
+	hash(password)
+		.then(hashed => {
+			dispatch({
+				type: LOGIN,
+				school_id,
+				username,
+				password: hashed
+			})
+		})
 
 }
