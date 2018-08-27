@@ -1,12 +1,38 @@
+import { v4 } from 'node-uuid'
+
+const initState = {
+	client_id: v4(),
+	queued: { },
+	acceptSnapshot: false,
+	db: {
+		teachers: { },
+		users: { } // username: passwordhash, permissions, etc. 
+	},
+	// this part of the tree i want to obscure.
+	// but will get to that later
+	auth: {
+		school_id: undefined,
+		token: undefined,
+		username: undefined,
+		attempt_failed: false,
+		loading: false
+	},
+	connected: false
+}
+
 export const loadDB = () => {
 	try {
 		const serialized = localStorage.getItem('db');
 		if (serialized === null) {
 			console.log('null')
-			return undefined;
+			return initState;
 		}
 
-		return JSON.parse(serialized);
+		return {
+			...initState,
+			...JSON.parse(serialized),
+			connected: false
+		}
 	}
 	catch(err) {
 		console.error(err)

@@ -1,30 +1,8 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGE, MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOGIN } from '../actions'
-import { loadDB } from 'utils/localStorage'
+import { MERGE, MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOCAL_LOGIN, ON_CONNECT, ON_DISCONNECT, SCHOOL_LOGIN, LOGIN_FAIL, LOGIN_SUCCEED } from '../actions'
 import moment from 'moment'
-import { v4 } from 'node-uuid'
 
-const initialState = loadDB() || {
-	school_id: "test_school",
-	client_id: v4(),
-	queued: { },
-	acceptSnapshot: false,
-	db: {
-		teachers: { },
-		users: { } // username: passwordhash, permissions, etc. 
-	},
-	// this part of the tree i want to obscure.
-	// but will get to that later
-	auth: {
-		username: undefined
-	}
-}
-console.log(initialState)
-
-// we need to know what the shape of the data is somewhere...
-// initialState probably not good enough.
-
-const rootReducer = (state = initialState, action) => {
+const rootReducer = (state, action) => {
 
 	console.log(action)
 	switch(action.type) {
@@ -85,11 +63,21 @@ const rootReducer = (state = initialState, action) => {
 			return state;
 		}
 
-		case LOGIN:
+		case LOCAL_LOGIN:
 		{
 
 			const user = Object.values(state.db.users)
 				.find(u => u.username === action.username)
+
+			if(user === undefined) {
+				return {
+					...state,
+					auth: {
+						...state.auth,
+						attempt_failed: true
+					}
+				}
+			}
 
 			if(action.password === user.password) {
 				console.log("matched password")
@@ -103,7 +91,61 @@ const rootReducer = (state = initialState, action) => {
 				}
 			}
 
-			return state;
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					attempt_failed: true
+				}
+			}
+
+		}
+
+		case ON_CONNECT: 
+		{
+			return {...state, connected: true}
+		}
+
+		case ON_DISCONNECT:
+		{
+			return {...state, connected: false }
+		}
+
+		case SCHOOL_LOGIN: 
+		{
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					loading: true
+				}
+			}
+		}
+
+		case LOGIN_SUCCEED: 
+		{
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					loading: false,
+					token: action.token,
+					attempt_failed: false
+				},
+				db: action.db
+			}
+		}
+
+		case LOGIN_FAIL: 
+		{
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					loading: false,
+					attempt_failed: true
+				}
+			}
 		}
 
 		default: 

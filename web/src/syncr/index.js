@@ -1,9 +1,10 @@
-import {createInitSync} from 'actions'
+import { connected, disconnected } from 'actions'
+import sleep from 'utils/sleep'
 import { v4 } from 'node-uuid'
 
 export default class Syncr {
 
-	constructor(url, school_id, dispatch) {
+	constructor(url, dispatch) {
 
 		this.url = url;
 		this.ready = false;
@@ -24,12 +25,16 @@ export default class Syncr {
 			clearInterval(this.pingInterval);
 			this.pingInterval = setInterval(() => this.ping(), 5000)
 
-			this.dispatch(createInitSync())
+			this.dispatch(connected())
 			
 		}
 
-		this.ws.onclose = (e) => {
+		this.ws.onclose = async (e) => {
+			if(this.ready) {
+				this.dispatch(disconnected())
+			}
 			this.cleanup();
+			await sleep(5);
 			this.connect();
 		}
 
@@ -39,7 +44,14 @@ export default class Syncr {
 			const msg = JSON.parse(event.data)
 
 			if(msg.key) {
-				this.pending.get(msg.key).resolve(msg.payload)
+				const promise = this.pending.get(msg.key);
+				console.log(msg)
+				if(msg.payload.type === "failure") {
+					promise.reject(msg.payload.payload)
+				}
+				else {
+					promise.resolve(msg.payload.payload)
+				}
 				this.pending.delete(msg.key);
 			}
 			else {
@@ -49,7 +61,7 @@ export default class Syncr {
 	}
 
 	cleanup() {
-		this._ready = false;
+		this.ready = false;
 		clearInterval(this.pingInterval)
 		this.ws = undefined;
 	}

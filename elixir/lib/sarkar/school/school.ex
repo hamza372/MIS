@@ -20,6 +20,10 @@ defmodule Sarkar.School do
 		GenServer.call(via(school_id), {:sync_changes, client_id, changes})
 	end
 
+	def get_db(school_id) do
+		GenServer.call(via(school_id), {:get_db})
+	end
+
 	# SERVER
 
 	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, db} = state) do
@@ -47,6 +51,10 @@ defmodule Sarkar.School do
 				Sarkar.Store.School.save(school_id, nextDb)
 				{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
 		end
+	end
+
+	def handle_call({:get_db}, _from, {school_id, writes, db} = state) do
+		{:reply, db, state}
 	end
 
 	def handle_call(a, b, c) do 

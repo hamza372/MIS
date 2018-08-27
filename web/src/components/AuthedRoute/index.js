@@ -1,15 +1,17 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-const AuthedRoute = ({ component: Component, username, ...rest }) => {
+const AuthedRoute = ({ component, school, username, token, ...rest }) => {
 
-	if(username) {
-		console.log('logged in!')
-		return <Component {...rest} />
+	if(token && username) {
+		return <Route component={component} {...rest} />
+	}
+	else if(token) {
+		return <Redirect to="/login" />
 	}
 	else {
-		return <Redirect to="/login" />
+		return <Redirect to="/school-login" />
 	}
 
 }
