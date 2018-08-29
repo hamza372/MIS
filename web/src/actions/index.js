@@ -113,12 +113,17 @@ export const connected = () => (dispatch, getState, syncr) => {
 
 	const state = getState();
 
+	console.log(state.auth)
 	if(state.auth.school_id && state.auth.token) {
+		console.log('in here')
 		syncr
 			.send({
 				type: "VERIFY",
-				school_id: state.auth.school_id,
-				token: state.auth.token
+				payload: {
+					school_id: state.auth.school_id,
+					token: state.auth.token,
+					client_id: state.client_id
+				}
 			})
 			.then(res => {
 				console.log(res)
@@ -178,7 +183,7 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 		// if it worked....
 		// we should get back a token and the db.
 		
-		dispatch(createLoginSucceed(res.db, res.token))
+		dispatch(createLoginSucceed(school_id, res.db, res.token))
 		// dispatch set_token action
 		// dispatch set_db action
 	})
@@ -192,5 +197,5 @@ export const LOGIN_FAIL = "LOGIN_FAIL"
 export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
-export const createLoginSucceed = (db, token) => ({ type: LOGIN_SUCCEED, db, token })
+export const createLoginSucceed = (school_id, db, token) => ({ type: LOGIN_SUCCEED, school_id, db, token })
 

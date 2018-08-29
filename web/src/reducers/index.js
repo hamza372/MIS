@@ -130,7 +130,8 @@ const rootReducer = (state, action) => {
 					...state.auth,
 					loading: false,
 					token: action.token,
-					attempt_failed: false
+					attempt_failed: false,
+					school_id: action.school_id
 				},
 				db: action.db
 			}
