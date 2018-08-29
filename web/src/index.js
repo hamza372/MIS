@@ -11,10 +11,12 @@ import Routes from './routes'
 import { saveDB, loadDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
-const host = '192.168.0.237'
+const debug_host = 'ws://192.168.0.237'
+
+const host = process.env.REACT_APP_MIS_HOST || debug_host;
 const initialState = loadDB();
 
-const syncr = new Syncr(`ws://${host}:8080/ws`, (msg) => { store.dispatch(msg); }) // is there a better way to dispatch
+const syncr = new Syncr(`${host}/ws`, (msg) => { store.dispatch(msg); }) // is there a better way to dispatch
 const store = createStore(reducer, initialState, applyMiddleware(thunkMiddleware.withExtraArgument(syncr)));
 
 // connect syncr to store better. 

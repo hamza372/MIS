@@ -1,5 +1,6 @@
 import { hash } from 'utils'
 import moment from 'moment'
+import { v4 } from 'node-uuid'
 
 const SYNC = "SYNC"
 
@@ -180,12 +181,27 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 	})
 	.then(res => {
 		console.log(res)
-		// if it worked....
-		// we should get back a token and the db.
 		
 		dispatch(createLoginSucceed(school_id, res.db, res.token))
-		// dispatch set_token action
-		// dispatch set_db action
+
+		if(Object.keys(res.db.users).length === 0 && false) {
+			// we need to dispatch an admin create user action.
+
+			// actually, we should take them to a create-user page.
+			// not just make one on the client magically.
+			// this create-user page should only be available if 
+			// no teachers exist on the client
+			const user_id = v4();
+
+			dispatch(createMerges([
+				{path: ["db", "users", user_id], value: {
+					username: "admin",
+					password: "changeme",
+					type: "super_admin"
+				}}
+			]))
+		}
+
 	})
 	.catch(err => {
 		console.error(err)

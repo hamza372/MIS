@@ -4,7 +4,8 @@ defmodule Sarkar.Auth do
 		case Postgrex.query(Sarkar.School.DB,
 			"INSERT INTO auth (id, password) values ($1, $2)", 
 			[school_id, hash(password, 52)]) do
-				{:ok, res} -> {:ok, "created #{school_id} with password #{password}"}
+				{:ok, res} -> 
+					{:ok, "created #{school_id} with password #{password}"}
 				{:error, err} -> 
 					IO.inspect err
 					{:error, "login failed"}

@@ -124,15 +124,17 @@ const rootReducer = (state, action) => {
 
 		case LOGIN_SUCCEED: 
 		{
+			const auth = {
+				...state.auth,
+				loading: false,
+				token: action.token,
+				attempt_failed: false,
+				school_id: action.school_id
+			};
+
 			return {
 				...state,
-				auth: {
-					...state.auth,
-					loading: false,
-					token: action.token,
-					attempt_failed: false,
-					school_id: action.school_id
-				},
+				auth,
 				db: action.db
 			}
 		}

@@ -6,7 +6,8 @@ const initState = {
 	acceptSnapshot: false,
 	db: {
 		teachers: { },
-		users: { } // username: passwordhash, permissions, etc. 
+		admins: { }, // should teachers/admins be merged into one table, with admins as a type of teacher w more scope. are any of the fields different.
+		users: { } // username: passwordhash, permissions, etc.  
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
