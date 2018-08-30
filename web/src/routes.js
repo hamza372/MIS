@@ -15,7 +15,8 @@ export default ({ store }) => (
 		<BrowserRouter>
 			<Switch>
 				<AuthedRoute exact path="/" component={Landing} />
-				<AuthedRoute path="/teacher/:id" component={TeacherSingle} />
+				<Route path="/faculty/first" component={TeacherSingle} />
+				<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
 				<AuthedRoute path="/teacher" component={TeacherList} />
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />

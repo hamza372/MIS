@@ -43,14 +43,15 @@ export default class Syncr {
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
 
+			console.log("server", msg.type)
+
 			if(msg.key) {
 				const promise = this.pending.get(msg.key);
-				console.log(msg)
-				if(msg.payload.type === "failure") {
-					promise.reject(msg.payload.payload)
+				if(msg.type === "failure") {
+					promise.reject(msg.payload)
 				}
 				else {
-					promise.resolve(msg.payload.payload)
+					promise.resolve(msg.payload)
 				}
 				this.pending.delete(msg.key);
 			}
@@ -79,6 +80,7 @@ export default class Syncr {
 		// make a key
 		// create promise, put in map
 		// when its returned, trigger it.
+		console.log("server", message)
 		const key = v4();
 		return new Promise((resolve, reject) => {
 

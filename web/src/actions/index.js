@@ -105,6 +105,19 @@ export const QueueUp = (action) => {
 	}
 }
 
+export const MERGE_FACULTY = "MERGE_FACULTY"
+export const createFacultyMerge = (faculty) => dispatch => {
+
+	dispatch(createMerges([
+		{path: ["db", "faculty", faculty.id], value: faculty},
+		{path: ["db", "users", faculty.id], value: {
+			username: faculty.Username,
+			password: faculty.Password,
+			type: faculty.Admin ? "admin" : "teacher"
+		}}
+	]))
+}
+
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
 export const connected = () => (dispatch, getState, syncr) => { 
@@ -114,9 +127,7 @@ export const connected = () => (dispatch, getState, syncr) => {
 
 	const state = getState();
 
-	console.log(state.auth)
 	if(state.auth.school_id && state.auth.token) {
-		console.log('in here')
 		syncr
 			.send({
 				type: "VERIFY",
@@ -127,7 +138,6 @@ export const connected = () => (dispatch, getState, syncr) => {
 				}
 			})
 			.then(res => {
-				console.log(res)
 				return syncr.send({
 					type: SYNC,
 					school_id: state.school_id,
@@ -146,7 +156,7 @@ export const connected = () => (dispatch, getState, syncr) => {
 export const disconnected = () => ({ type: ON_DISCONNECT })
 
 export const LOCAL_LOGIN = "LOCAL_LOGIN"
-export const createLogin = (school_id, username, password) => dispatch => {
+export const createLogin = (username, password) => dispatch => {
 
 	hash(password)
 		.then(hashed => {
@@ -184,24 +194,23 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 		
 		dispatch(createLoginSucceed(school_id, res.db, res.token))
 
-		if(Object.keys(res.db.users).length === 0 && false) {
-			// we need to dispatch an admin create user action.
+		// if(Object.keys(res.db.users).length === 0 && false) {
+		// 	// we need to dispatch an admin create user action.
 
-			// actually, we should take them to a create-user page.
-			// not just make one on the client magically.
-			// this create-user page should only be available if 
-			// no teachers exist on the client
-			const user_id = v4();
+		// 	// actually, we should take them to a create-user page.
+		// 	// not just make one on the client magically.
+		// 	// this create-user page should only be available if 
+		// 	// no teachers exist on the client
+		// 	const user_id = v4();
 
-			dispatch(createMerges([
-				{path: ["db", "users", user_id], value: {
-					username: "admin",
-					password: "changeme",
-					type: "super_admin"
-				}}
-			]))
-		}
-
+		// 	dispatch(createMerges([
+		// 		{path: ["db", "users", user_id], value: {
+		// 			username: "admin",
+		// 			password: "changeme",
+		// 			type: "super_admin"
+		// 		}}
+		// 	]))
+		// }
 	})
 	.catch(err => {
 		console.error(err)

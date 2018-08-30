@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { createMerges } from 'actions'
+import { Redirect } from 'react-router-dom';
+
+import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
 import Layout from 'components/Layout'
@@ -34,7 +36,9 @@ const blankTeacher = {
 	Qualification: "",
 	Experience: "",
 	HireDate: moment(),
+	Admin: false
 }
+// should be a dropdown of choices. not just teacher or admin.
 
 class SingleTeacher extends Component {
 
@@ -44,9 +48,9 @@ class SingleTeacher extends Component {
 
 		const id = props.match.params.id;
 
-
 		this.state = {
-			profile: id === 'new' ? blankTeacher : props.teachers[id] || blankTeacher,
+			profile: id === 'new' ? blankTeacher : props.faculty[id] || blankTeacher,
+			redirect: false
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -57,6 +61,8 @@ class SingleTeacher extends Component {
 
 		const id = v4();
 
+		const is_first = this.props.match.path.indexOf("first") >= 0;
+
 		if(this.state.profile.Password.length !== 128) { // hack...
 			hash(this.state.profile.Password).then(hashed => {
 				this.props.save({
@@ -64,18 +70,28 @@ class SingleTeacher extends Component {
 					...this.state.profile,
 					Password: hashed
 				})
+
+				this.setState({
+					redirect: is_first
+				})
 			})
 		}
 		else {
 			this.props.save({
 				id,
 				...this.state.profile,
-			})
+			}, is_first)
+
 		}
 		console.log('save')
+
 	}
 
 	render() {
+
+		if(this.state.redirect) {
+			return <Redirect to="/login" />
+		}
 
 		return <Layout>
 			<div className="single-teacher">
@@ -143,6 +159,11 @@ class SingleTeacher extends Component {
 						<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date"/>
 					</div>
 
+					<div className="row">
+						<label>Admin</label>
+						<input type="checkbox" {...this.former.super_handle(["Admin"])} />
+					</div>
+
 					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>
 			</div>
@@ -150,17 +171,6 @@ class SingleTeacher extends Component {
 	}
 }
 
-export default connect(state => ({ teachers: state.db.teachers }) , dispatch => ({ 
-	save: (teacher) => {
-		//dispatch(createMerge(["db", "teachers", teacher.id], teacher))
-
-		dispatch(createMerges([
-			{path: ["db", "teachers", teacher.id], value: teacher},
-			{path: ["db", "users", teacher.id], value: {
-				username: teacher.Username,
-				password: teacher.Password,
-				type: "teacher"
-			}}
-		]))
-	}
+export default connect(state => ({ faculty: state.db.faculty }) , dispatch => ({ 
+	save: (teacher) => dispatch(createFacultyMerge(teacher)) 
  }))(SingleTeacher);

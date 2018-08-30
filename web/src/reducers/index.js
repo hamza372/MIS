@@ -46,9 +46,13 @@ const rootReducer = (state, action) => {
 					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
 				}, {})
 
-			const next = Dynamic.put(state, ["queued"], newQ);
+			let next = Dynamic.put(state, ["queued"], newQ);
+
+			if(Object.keys(action.db).length > 0) {
+				next = Dynamic.put(next, ["db"], action.db)
+			}
 			return {
-				...Dynamic.put(next, ["db"], action.db),
+				...next,
 				acceptSnapshot: true
 			}
 		}
@@ -135,7 +139,11 @@ const rootReducer = (state, action) => {
 			return {
 				...state,
 				auth,
-				db: action.db
+				db: 
+				{
+					...state.db,
+					...action.db
+				}
 			}
 		}
 

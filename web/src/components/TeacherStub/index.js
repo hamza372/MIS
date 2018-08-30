@@ -4,7 +4,7 @@ import Link from 'components/Link'
 const TeacherStub = ({ teacher }) => {
 
 	return <div className="teacher-stub">
-		<Link to={`/teacher/${teacher.id}`}>{teacher.Name}</Link>
+		<Link to={`/faculty/${teacher.id}`}>{teacher.Name}</Link>
 	</div>
 }
 

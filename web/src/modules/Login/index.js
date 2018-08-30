@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Redirect } from 'react-router-dom'
 import { createLogin } from 'actions'
 
 import Former from 'utils/former'
@@ -37,6 +37,11 @@ class Login extends Component {
 	}
 
 	render() {
+
+		if(this.props.num_users === 0) {
+			return <Redirect to="/faculty/first" from_login={true} />
+		}
+
 		return <Layout>
 			<div className="login">
 				<input type="text" {...this.former.super_handle(["username"])} placeholder="Username" />
@@ -49,8 +54,11 @@ class Login extends Component {
 	}
 }
 
-export default connect(state => ({ auth: state.auth }), dispatch => ({
+export default connect(state => ({ 
+	auth: state.auth,
+	num_users: Object.keys(state.db.users).length
+}), dispatch => ({
 	login: (login) => {
-		dispatch(createLogin(login.school, login.username, login.password))
+		dispatch(createLogin(login.username, login.password))
 	}
 }))(withRouter(Login));

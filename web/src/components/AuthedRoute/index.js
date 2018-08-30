@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 const AuthedRoute = ({ component, school, username, token, ...rest }) => {
 
+	console.log("restt", rest)
 	if(token && username) {
 		return <Route component={component} {...rest} />
 	}
