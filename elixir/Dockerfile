@@ -9,11 +9,15 @@ RUN mix local.rebar
 ENV MIX_ENV=prod
 
 WORKDIR /app
-ADD . .
+
+ADD mix.exs .
+ADD mix.lock .
 
 RUN mix deps.clean --all
 RUN mix deps.get
 RUN mix deps.compile
 
+ADD . .
+
 EXPOSE 8080
-CMD mix run --no-halt
+CMD elixir --sname "sarkar" -S mix run --no-halt

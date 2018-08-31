@@ -39,7 +39,7 @@ class Login extends Component {
 	render() {
 
 		if(this.props.num_users === 0) {
-			return <Redirect to="/faculty/first" from_login={true} />
+			return <Redirect to="/faculty/first" />
 		}
 
 		return <Layout>
