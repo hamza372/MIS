@@ -1,6 +1,5 @@
 import { hash } from 'utils'
 import moment from 'moment'
-import { v4 } from 'node-uuid'
 
 const SYNC = "SYNC"
 

@@ -1,12 +1,11 @@
 FROM elixir:1.7-alpine
 
-RUN apk add --no-cache git
 RUN apk add --no-cache alpine-sdk
-
-RUN mix local.hex --force
-RUN mix local.rebar
+RUN apk add --no-cache bash
 
 ENV MIX_ENV=prod
+RUN mix local.hex --force
+RUN mix local.rebar
 
 WORKDIR /app
 
@@ -19,5 +18,8 @@ RUN mix deps.compile
 
 ADD . .
 
+RUN mix release
+RUN chmod +x "_build/prod/rel/sarkar/bin/sarkar"
+
 EXPOSE 8080
-CMD elixir --sname "sarkar" -S mix run --no-halt
+CMD _build/prod/rel/sarkar/bin/sarkar foreground
