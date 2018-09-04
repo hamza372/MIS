@@ -4,7 +4,7 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
-import { createFacultyMerge } from 'actions'
+import { createStudentMerge } from 'actions'
 import { hash } from 'utils'
 
 import Layout from 'components/Layout'
@@ -19,82 +19,63 @@ import './style.css'
 // I have an object with a bunch of fields
 // text and date input, dropdowns....
 
-const blankTeacher = {
+const blankStudent = {
 	Name: "",
 	CNIC: "",
 	Gender: "",
-	Username: "",
-	Password: "",
-	Married: false,
 	Phone: "",
-	Salary: 0,
+	Fee: 0,
 	Active: true,
 
 	ManCNIC: "",
 	Birthdate: moment().subtract(20, "year"),
 	Address: "",
-	Qualification: "",
-	Experience: "",
-	HireDate: moment(),
-	Admin: false
+	Notes: "",
+	StartDate: moment(),
 }
 // should be a dropdown of choices. not just teacher or admin.
 
-class SingleTeacher extends Component {
+class SingleStudent extends Component {
 
 	constructor(props) {
 		super(props);
-		console.log(props)
 
 		const id = props.match.params.id;
 
 		this.state = {
-			profile: id === 'new' ? blankTeacher : props.faculty[id] || blankTeacher,
+			profile: props.students[id] || blankStudent,
 			redirect: false
 		}
 
 		this.former = new Former(this, ["profile"])
 	}
 
-	isFirst = () => this.props.match.path.indexOf("first") >= 0
+	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
 	onSave = () => {
-		// dispatch merge action, which should come from props.
-
+		console.log('save!', this.state.profile)
 		const id = v4();
 
-		if(this.state.profile.Password.length !== 128) { // hack...
-			hash(this.state.profile.Password).then(hashed => {
-				this.props.save({
-					id,
-					...this.state.profile,
-					Password: hashed
-				})
-
-				this.setState({
-					redirect: this.is_first()
-				})
-			})
+		const student = {
+			id,
+			...this.state.profile
 		}
-		else {
-			this.props.save({
-				id,
-				...this.state.profile,
-			}, this.is_first())
 
-		}
-		console.log('save')
+		this.props.save(student)
 
+		this.setState({
+			redirect: this.isNew() ? `/student/${student.id}/profile` : false
+		})
 	}
 
 	render() {
 
 		if(this.state.redirect) {
-			return <Redirect to="/login" />
+			console.log('redirecting....')
+			return <Redirect to={this.state.redirect} />
 		}
 
-		return <Layout>
-			<div className="single-teacher">
+		return <div className="single-student">
 				<div className="form">
 					<div className="row">
 						<label>Name</label>
@@ -111,26 +92,17 @@ class SingleTeacher extends Component {
 							<option value="female">Female</option>
 						</select>
 					</div>
-					<div className="row">
-						<label>Username</label>
-						<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" />
-					</div>
-					<div className="row">
-						<label>Password</label>
-						<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
-					</div>
-					<div className="row">
-						<label>Married</label>
-						<input type="checkbox" {...this.former.super_handle(["Married"])} />
-					</div>
+
 					<div className="row">
 						<label>Phone Number</label>
 						<input type="tel" {...this.former.super_handle(["Phone"])} placeholder="Phone Number" />
 					</div>
+
 					<div className="row">
-						<label>Monthly Salary</label>
-						<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
+						<label>Monthly Fee</label>
+						<input type="number" {...this.former.super_handle(["Fee"])} placeholder="Monthly Fee"/>
 					</div>
+
 					<div className="row">
 						<label>Active</label>
 						<input type="checkbox" {...this.former.super_handle(["Active"])} />
@@ -140,6 +112,7 @@ class SingleTeacher extends Component {
 						<label>Husband/Father CNIC</label>
 						<input type="text" {...this.former.super_handle(["ManCNIC"])} placeholder="Father/Husband CNIC" />
 					</div>
+
 					<div className="row">
 						<label>Birth Date</label>
 						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
@@ -149,28 +122,23 @@ class SingleTeacher extends Component {
 						<label>Address</label>
 						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" />
 					</div>
+
 					<div className="row">
-						<label>Experience</label>
-						<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
+						<label>Notes</label>
+						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
 					</div>
 
 					<div className="row">
-						<label>Hire Date</label>
-						<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date"/>
-					</div>
-
-					<div className="row">
-						<label>Admin</label>
-						<input type="checkbox" {...this.former.super_handle(["Admin"])} />
+						<label>Start Date</label>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
 					</div>
 
 					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>
 			</div>
-		</Layout>
 	}
 }
 
-export default connect(state => ({ faculty: state.db.faculty }) , dispatch => ({ 
-	save: (teacher) => dispatch(createFacultyMerge(teacher)) 
- }))(SingleTeacher);
+export default connect(state => ({ students: state.db.students }) , dispatch => ({ 
+	save: (student) => dispatch(createStudentMerge(student)) 
+ }))(SingleStudent);

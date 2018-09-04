@@ -117,6 +117,14 @@ export const createFacultyMerge = (faculty) => dispatch => {
 	]))
 }
 
+export const MERGE_STUDENT = "MERGE_STUDENT"
+export const createStudentMerge = (student) => dispatch => {
+
+	dispatch(createMerges([
+		{path: ["db", "students", student.id], value: student},
+	]))
+}
+
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
 export const connected = () => (dispatch, getState, syncr) => { 

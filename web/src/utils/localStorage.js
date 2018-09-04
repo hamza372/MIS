@@ -6,7 +6,8 @@ const initState = {
 	acceptSnapshot: false,
 	db: {
 		faculty: { },
-		users: { } // username: passwordhash, permissions, etc.  
+		users: { }, // username: passwordhash, permissions, etc.  
+		students: { }
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
@@ -27,12 +28,20 @@ export const loadDB = () => {
 			console.log('null')
 			return initState;
 		}
-
-		return {
+		
+		const prev = JSON.parse(serialized)
+		const merged = {
 			...initState,
-			...JSON.parse(serialized),
+			...prev,
+			db: {
+				...initState.db,
+				...prev.db
+			},
 			connected: false
 		}
+
+		console.log(merged)
+		return merged;
 	}
 	catch(err) {
 		console.error(err)

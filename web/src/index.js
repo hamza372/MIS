@@ -13,8 +13,8 @@ import Syncr from 'syncr'
 
 //const debug_host = 'ws://192.168.0.237:8080'
 //const debug_host = 'ws://192.168.10.8:8080'
-//const debug_host = 'ws://localhost:8080'
-const debug_host = "wss://mis-socket.metal.fish"
+const debug_host = 'ws://localhost:8080'
+//const debug_host = "wss://mis-socket.metal.fish"
 
 const host = process.env.REACT_APP_MIS_HOST || debug_host;
 const initialState = loadDB();

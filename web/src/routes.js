@@ -5,6 +5,9 @@ import { Provider } from 'react-redux'
 import Landing from 'modules/Landing'
 import TeacherList from 'modules/Teacher/List'
 import TeacherSingle from 'modules/Teacher/Single'
+import StudentList from 'modules/Student/List'
+import StudentSingle from 'modules/Student/Single'
+import StudentCreate from 'modules/Student/Single/Create'
 import Login from 'modules/Login'
 import SchoolLogin from 'modules/Login/school'
 
@@ -18,6 +21,8 @@ export default ({ store }) => (
 				<Route path="/faculty/first" component={TeacherSingle} />
 				<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
 				<AuthedRoute path="/teacher" component={TeacherList} />
+				<AuthedRoute path="/student/:id" component={StudentSingle} />
+				<AuthedRoute path="/student" component={StudentList} />
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />
 			</Switch>
