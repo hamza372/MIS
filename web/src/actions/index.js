@@ -35,7 +35,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 
 	syncr.send(payload)
 		.then(dispatch)
-		.catch(err => dispatch(QueueUp(action)))
+		.catch(err => dispatch(QueueUp(payload.payload)))
 }
 
 export const DELETE = "DELETE"
