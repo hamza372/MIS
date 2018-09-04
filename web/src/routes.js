@@ -7,7 +7,6 @@ import TeacherList from 'modules/Teacher/List'
 import TeacherSingle from 'modules/Teacher/Single'
 import StudentList from 'modules/Student/List'
 import StudentSingle from 'modules/Student/Single'
-import StudentCreate from 'modules/Student/Single/Create'
 import Login from 'modules/Login'
 import SchoolLogin from 'modules/Login/school'
 

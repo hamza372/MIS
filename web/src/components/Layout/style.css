@@ -22,7 +22,7 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
-.header>div {
+.header>* {
 	padding: 10px;
 }
 

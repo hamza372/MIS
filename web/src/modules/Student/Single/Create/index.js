@@ -5,9 +5,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
 import { createStudentMerge } from 'actions'
-import { hash } from 'utils'
 
-import Layout from 'components/Layout'
 import Former from 'utils/former'
 
 import './style.css'

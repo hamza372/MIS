@@ -1,18 +1,19 @@
 import React from 'react'
-import Link from 'components/Link'
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import './style.css'
 
-const Layout = ({ children }) => {
+const Layout = ({ user, children }) => {
 	return <div className="layout">
-		<Header />
+		<Header user={user} />
 		{ children }
 	</div>
 }
 
-const Header = () => <div className="header">
+const Header = ({user}) => <div className="header">
 	<div className="left"><Link to="/">MIS</Link></div>
-	<div className="profile">Profile</div>
+	{ user ? <Link className="profile" to={`/faculty/${user}/`}>Profile</Link> : false }
 </div>
 
-export default Layout;
+export default connect(state => ({ user: Object.values(state.db.faculty).find(x => x.Username === state.auth.username) }))(Layout)
