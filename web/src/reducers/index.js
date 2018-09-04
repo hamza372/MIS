@@ -1,16 +1,10 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGE, MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOCAL_LOGIN, ON_CONNECT, ON_DISCONNECT, SCHOOL_LOGIN, LOGIN_FAIL, LOGIN_SUCCEED } from '../actions'
-import moment from 'moment'
+import { MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOCAL_LOGIN, ON_CONNECT, ON_DISCONNECT, SCHOOL_LOGIN, LOGIN_FAIL, LOGIN_SUCCEED } from '../actions'
 
 const rootReducer = (state, action) => {
 
 	console.log(action)
 	switch(action.type) {
-		case MERGE:
-		{
-			return {...Dynamic.put(state, action.path, action.value)}
-		}
-
 		case MERGES:
 		{
 			return action.merges.reduce((agg, curr) => {
@@ -26,10 +20,12 @@ const rootReducer = (state, action) => {
 
 		case QUEUE:
 		{
-
-			const next = Dynamic.put(state, ["queued", action.payload.path], {action: action.payload, date: moment().unix() * 1000});
 			return {
-				...next,
+				...state,
+				queued: {
+					...state.queued,
+					...action.payload
+				},
 				acceptSnapshot: false
 			}
 		}

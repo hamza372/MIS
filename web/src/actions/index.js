@@ -3,34 +3,6 @@ import moment from 'moment'
 
 const SYNC = "SYNC"
 
-export const MERGE = "MERGE"
-export const createMerge = (path, value) => (dispatch, getState, syncr) => {
-
-	const action = {
-		type: MERGE,
-		path,
-		value
-	}
-
-	// apply the merge locally
-	dispatch(action);
-
-	// attempt to send it
-	syncr.send({
-		type: SYNC,
-		school_id: getState().school_id,
-		payload: {
-			[path]: {
-				action,
-				date: moment().unix() * 1000
-			}
-		}
-	})
-	.then(dispatch)
-	.catch(err => dispatch(QueueUp(action)))
-
-}
-
 export const MERGES = "MERGES"
 export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	// merges is a list of path, value
@@ -200,24 +172,6 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 		console.log(res)
 		
 		dispatch(createLoginSucceed(school_id, res.db, res.token))
-
-		// if(Object.keys(res.db.users).length === 0 && false) {
-		// 	// we need to dispatch an admin create user action.
-
-		// 	// actually, we should take them to a create-user page.
-		// 	// not just make one on the client magically.
-		// 	// this create-user page should only be available if 
-		// 	// no teachers exist on the client
-		// 	const user_id = v4();
-
-		// 	dispatch(createMerges([
-		// 		{path: ["db", "users", user_id], value: {
-		// 			username: "admin",
-		// 			password: "changeme",
-		// 			type: "super_admin"
-		// 		}}
-		// 	]))
-		// }
 	})
 	.catch(err => {
 		console.error(err)
