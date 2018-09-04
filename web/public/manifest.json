@@ -8,12 +8,12 @@
       "type": "image/png"
     }
   ],
-  "start_url": "./home",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#222222",
   "background_color": "#ffffff",
   "developer": {
 	  "name": "Taimur Shah",
-	  "url": "http://cerp.org.pk",
+	  "url": "http://cerp.org.pk"
   }
 }
