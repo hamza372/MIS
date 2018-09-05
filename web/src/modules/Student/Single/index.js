@@ -17,9 +17,9 @@ export default class StudentPage extends Component {
 		// if student is new, just render the profile. when they hit save, redirect to the right page.
 
 		return <Layout>
-			<div className="student">
+			<div className="single-student">
 				{ this.props.location.pathname.indexOf("new") >= 0 ? false : 
-				<div className="row">
+				<div className="row tabs">
 					<Link className="button" to="profile">Profile</Link>
 					<Link className="button" to="payment">Payment</Link>
 					<Link className="button" to="attendance">Attendance</Link>

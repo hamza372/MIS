@@ -11,6 +11,7 @@ const Landing = (props) => {
 		<div className="landing">
 			<Link to="/teacher" className="button">Teachers</Link>
 			<Link to="/student" className="button">Students</Link>
+			<Link to="/class" className="button">Class</Link>
 		</div>
 	</Layout>
 }

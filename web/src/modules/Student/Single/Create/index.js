@@ -74,6 +74,7 @@ class SingleStudent extends Component {
 		}
 
 		return <div className="single-student">
+				<div className="title">Edit Student</div>
 				<div className="form">
 					<div className="row">
 						<label>Name</label>

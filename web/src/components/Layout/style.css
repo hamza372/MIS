@@ -22,13 +22,10 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
-.header>* {
-	padding: 10px;
-}
-
 .header a {
 	text-decoration: none;
 	color: white;
+	padding: 10px;
 }
 
 .header .profile {
@@ -64,6 +61,11 @@ html,body, #root, .layout{
 		border: 1px solid black;
 	}
 
+.form .divider {
+	margin: 20px auto;
+	font-size: 1.2rem;
+}
+
 textarea {
 	background-color: inherit;
 	resize: none;
@@ -77,14 +79,16 @@ textarea {
 	}
 
 .button {
+	color: #222;
 	border: 2px solid #222;
 	border-radius: 5px;
 	padding: 10px 15px;
 	transition: all .3s linear;
 	cursor: pointer;
 	font-weight: bold;
+	text-decoration: none;
 }
 	.button:hover {
-		color: white;
+		color: #fafafa;
 		background-color: #222;
 	}

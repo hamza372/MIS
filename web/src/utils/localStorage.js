@@ -7,7 +7,8 @@ const initState = {
 	db: {
 		faculty: { },
 		users: { }, // username: passwordhash, permissions, etc.  
-		students: { }
+		students: { },
+		sections: { } // id: { name, class, teacher_id, subjects: { name: 1 } }
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
@@ -29,7 +30,8 @@ export const loadDB = () => {
 			return initState;
 		}
 		
-		const prev = JSON.parse(serialized)
+		const prev = JSON.parse(serialized);
+		// but should we make sure that fields that are no longer in the initState db are deleted?
 		const merged = {
 			...initState,
 			...prev,

@@ -4,3 +4,7 @@
 	align-items: center;
 	width: 100%;
 }
+
+.single-student .tabs a {
+	margin: 10px;
+}

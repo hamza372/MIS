@@ -4,8 +4,6 @@
 	align-items: center;
 }
 
-.button {
-	color: black;
-	margin: 5px 0;
-	text-decoration: none;
+.landing .button {
+	margin: 10px;
 }
