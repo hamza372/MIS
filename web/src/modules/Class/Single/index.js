@@ -12,10 +12,12 @@ const blankClass = {
 	sections: {
 		[v4()]: {
 			name: "Section 1",
+			faculty_id: ""
 		}
-	},
+	}, // always at least 1 section
 	subjects: {
-
+		// these need to come from a central list of subjects...
+		// 
 	}
 }
 // we dont save class under its own db
@@ -56,6 +58,32 @@ class SingleClass extends Component {
 		this.props.save();
 	}
 
+	removeSection = (id) => () => {
+
+		const {[id]: removed, ...rest} = this.state.class.sections;
+
+		this.setState({
+			class: {
+				...this.state.class,
+				sections: rest 
+			}
+		})
+	}
+
+	onAddSection = () => {
+		this.setState({
+			class: {
+				...this.state.class,
+				sections: {
+					...this.state.class.sections,
+					[v4()]: {
+						name: "New Section"
+					}
+				}
+			}
+		})
+	}
+
 	render() {
 		return <Layout>
 			<div className="single-class">
@@ -70,11 +98,30 @@ class SingleClass extends Component {
 
 					{
 						Object.entries(this.state.class.sections)
-							.map(([id, section]) => <div className="row" key={id}>
-								<label>Section Name</label>
-								<input type="text" {...this.former.super_handle(["sections", id, "name"])} />
+							.map(([id, section], i, arr) => <div className="class-section" key={id}>
+								<div className="row">
+									<label>Section Name</label>
+									<input type="text" {...this.former.super_handle(["sections", id, "name"])} />
+								</div>
+
+								<div className="row">
+									<label>Section Lead</label>
+									<select {...this.former.super_handle(["sections", id, "faculty_id"])}>
+										<option disabled selected value>select teacher</option>
+										{
+											Object.values(this.props.faculty)
+											.map(faculty => <option value={faculty.id} key={faculty.id}>{faculty.Name}</option>)
+										}
+									</select>
+
+									
+								</div>
+
 							</div>)
 					}
+					<div className="button" onClick={this.onAddSection}>Add Section</div>
+
+					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
 			</div>
 		</Layout>
@@ -82,7 +129,8 @@ class SingleClass extends Component {
 }
 
 export default connect(state => ({
-	sections: state.db.sections
+	sections: state.db.sections,
+	faculty: state.db.faculty
 }), dispatch => ({
 	save: () => console.log('save')
 }))(SingleClass)
