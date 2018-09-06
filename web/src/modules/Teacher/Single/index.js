@@ -72,7 +72,7 @@ class SingleTeacher extends Component {
 				})
 
 				this.setState({
-					redirect: this.is_first()
+					redirect: this.isFirst()
 				})
 			})
 		}
@@ -80,7 +80,7 @@ class SingleTeacher extends Component {
 			this.props.save({
 				id,
 				...this.state.profile,
-			}, this.is_first())
+			}, this.isFirst())
 
 		}
 		console.log('save')
