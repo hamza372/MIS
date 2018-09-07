@@ -5,6 +5,8 @@ import { v4 } from 'node-uuid'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
 
+import { createEditClass } from 'actions'
+
 import './style.css'
 
 const blankClass = {
@@ -18,7 +20,8 @@ const blankClass = {
 	subjects: {
 		// these need to come from a central list of subjects...
 		// 
-	}
+	},
+	new_subject: ""
 }
 // we dont save class under its own db
 // we save the sections. this will be handled by the action we dispatch on save.
@@ -54,8 +57,67 @@ class SingleClass extends Component {
 		this.former = new Former(this, ["class"])
 	}
 
+	uniqueSubjects = () => {
+		// instead of having a db of subjects, just going to derive it from the 
+		// sections table.
+		// so we need to loop through all sections, pull out the subjects and compile them
+		const s = new Set();
+		Object.values(this.props.sections)
+			.forEach(section => {
+				Object.keys(section.subjects)
+					.forEach(subj => s.add(subj))
+			})
+		
+		/*
+		Object.keys(this.state.class.subjects)
+			.forEach(subject => s.add(subject))
+		*/
+
+		return s;
+	}
+
 	onSave = () => {
 		this.props.save();
+	}
+
+	addSubject = () => {
+		/*
+		console.log('add subject');
+		this.setState({
+			class: {
+				...this.state.class,
+				subjects: {
+					...this.state.class.subjects,
+					"New Subject": true
+				}
+			}
+		})
+		*/
+		this.setState({
+			class: {
+				...this.state.class,
+				subjects: {
+					...this.state.class.subjects,
+					[this.state.class.new_subject]: true
+				},
+				new_subject: ""
+			}
+		})
+	}
+
+	removeSubject = subj => () => {
+		const {[subj]: removed, ...rest} = this.state.class.subjects;
+
+		this.setState({
+			class: {
+				...this.state.class,
+				subjects: rest
+			}
+		})
+	}
+
+	onSubjectChange = e => {
+		console.log(e)
 	}
 
 	removeSection = (id) => () => {
@@ -70,7 +132,7 @@ class SingleClass extends Component {
 		})
 	}
 
-	onAddSection = () => {
+	addSection = () => {
 		this.setState({
 			class: {
 				...this.state.class,
@@ -119,7 +181,26 @@ class SingleClass extends Component {
 
 							</div>)
 					}
-					<div className="button" onClick={this.onAddSection}>Add Section</div>
+					<div className="button" onClick={this.addSection}>Add Section</div>
+
+					<div className="divider">Subjects</div>
+					{
+						Object.keys(this.state.class.subjects)
+						.map(subject => <div className="row">
+							<label>{subject}</label>
+							<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
+						</div>)
+					}
+					<div className="row">
+						<input list="subjects" onChange={this.onSubjectChange} {...this.former.super_handle(["new_subject"])}/>
+						<datalist id="subjects">
+						{
+							[...this.uniqueSubjects().keys()]
+							.map(subj => <option value={subj} />)
+						}
+						</datalist>
+						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
+					</div>
 
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>

@@ -1,4 +1,4 @@
-import { connected, disconnected } from 'actions'
+import { connected, disconnected } from 'actions/core'
 import sleep from 'utils/sleep'
 import { v4 } from 'node-uuid'
 
