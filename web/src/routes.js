@@ -27,7 +27,7 @@ export default ({ store }) => (
 				<AuthedRoute path="/student/:id" component={StudentSingle} />
 				<AuthedRoute path="/student" component={StudentList} />
 
-				<AuthedRoute path="/class/:name" component={ClassSingle} />
+				<AuthedRoute path="/class/:id" component={ClassSingle} />
 				<AuthedRoute path="/class" component={ClassModule} />
 
 				<Route path="/school-login" component={SchoolLogin} />

@@ -3,8 +3,3 @@
 	flex-direction: column;
 	width: 90%;
 }
-
-.button.remove {
-	padding: 10px;
-	border-radius: 50%;
-}

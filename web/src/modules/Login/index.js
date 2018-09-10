@@ -44,6 +44,7 @@ class Login extends Component {
 
 		return <Layout>
 			<div className="login">
+				<div className="title">{`Login to School ${this.props.auth.school_id}`}</div>
 				<input type="text" {...this.former.super_handle(["username"])} placeholder="Username" />
 				<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
 				<div className="button save" onClick={this.onLogin}>Login</div>

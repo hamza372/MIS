@@ -23,32 +23,14 @@ const blankClass = {
 	},
 	new_subject: ""
 }
-// we dont save class under its own db
-// we save the sections. this will be handled by the action we dispatch on save.
-// this view is derived from sections.
 
 class SingleClass extends Component {
 
 	constructor(props) {
 		super(props);
 
-		const name = props.match.params.name;
-
-		// todo: separate out the subjects to class-level
-		const currClass = name === 'new' ? blankClass : Object.values(props.sections)
-				.filter(section => section.class === name)
-				.reduce((agg, curr) => {
-					return {
-						...agg,
-						sections: {
-							...agg.sections,
-							[curr.id]: curr
-						}
-					}
-				}, {
-					name,
-					sections: { }
-				})
+		const id = props.match.params.id;
+		const currClass = id === 'new' ? blankClass : this.props.classes[id]
 
 		this.state = {
 			class: currClass
@@ -61,38 +43,31 @@ class SingleClass extends Component {
 		// instead of having a db of subjects, just going to derive it from the 
 		// sections table.
 		// so we need to loop through all sections, pull out the subjects and compile them
+
 		const s = new Set();
-		Object.values(this.props.sections)
-			.forEach(section => {
-				Object.keys(section.subjects)
+
+		Object.values(this.props.classes)
+			.forEach(cl => {
+				Object.keys(cl.subjects)
 					.forEach(subj => s.add(subj))
 			})
-		
-		/*
-		Object.keys(this.state.class.subjects)
-			.forEach(subject => s.add(subject))
-		*/
 
 		return s;
 	}
 
 	onSave = () => {
-		this.props.save();
+
+		// create an id
+		const id = v4();
+		// will be overriden if its already in class
+		this.props.save({
+			id,
+			...this.state.class
+		});
 	}
 
 	addSubject = () => {
-		/*
-		console.log('add subject');
-		this.setState({
-			class: {
-				...this.state.class,
-				subjects: {
-					...this.state.class.subjects,
-					"New Subject": true
-				}
-			}
-		})
-		*/
+
 		this.setState({
 			class: {
 				...this.state.class,
@@ -157,7 +132,6 @@ class SingleClass extends Component {
 					</div>
 
 					<div className="divider">Sections</div>
-
 					{
 						Object.entries(this.state.class.sections)
 							.map(([id, section], i, arr) => <div className="class-section" key={id}>
@@ -186,7 +160,7 @@ class SingleClass extends Component {
 					<div className="divider">Subjects</div>
 					{
 						Object.keys(this.state.class.subjects)
-						.map(subject => <div className="row">
+						.map(subject => <div className="row" key={subject}>
 							<label>{subject}</label>
 							<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
 						</div>)
@@ -196,7 +170,7 @@ class SingleClass extends Component {
 						<datalist id="subjects">
 						{
 							[...this.uniqueSubjects().keys()]
-							.map(subj => <option value={subj} />)
+							.map(subj => <option key={subj} value={subj} />)
 						}
 						</datalist>
 						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
@@ -210,8 +184,9 @@ class SingleClass extends Component {
 }
 
 export default connect(state => ({
-	sections: state.db.sections,
+	//sections: state.db.sections, // maybe this can just be classes. i dont see a problem with the class data structure
+	classes: state.db.classes,
 	faculty: state.db.faculty
 }), dispatch => ({
-	save: () => console.log('save')
+	save: (c) => dispatch(createEditClass(c))
 }))(SingleClass)

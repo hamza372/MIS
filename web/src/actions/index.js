@@ -66,11 +66,9 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 	})
 }
 
-export const createEditClass = newClass => {
-	console.log('new class')
-
-	return {
-		type: "EDIT_CLASS",
-		payload: newClass
-	}
+export const createEditClass = newClass => dispatch => {
+	dispatch(createMerges([
+			{path: ["db", "classes", newClass.id], value: newClass}
+		]
+	))
 }
