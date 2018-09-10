@@ -31,7 +31,7 @@ const blankStudent = {
 	Notes: "",
 	StartDate: moment(),
 
-	class_id: ""
+	section_id: ""
 }
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -89,6 +89,7 @@ class SingleStudent extends Component {
 					<div className="row">
 						<label>Gender</label>
 						<select {...this.former.super_handle(["Gender"])}>
+							<option value='' disabled>Please Set a Gender</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
 						</select>
@@ -134,12 +135,29 @@ class SingleStudent extends Component {
 						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
 					</div>
 
+					{ this.state.profile.class_id === '' ? false : <div className="row">
+						<label>Section</label>
+						<select {...this.former.super_handle(["section_id"])}>
+							{
+								 [{id: '', name: 'Please Select a Section'}, ...Object.values(this.props.classes) // collapse into label class - section name. value is section id
+								 	.reduce((agg, c) => {
+										 return [...agg, ...Object.entries(c.sections)
+										 	.reduce((agg2, [id, section]) => { 
+												return [...agg2, { id, name:`${c.name}-${section.name}` }]
+											 }, [])]
+									 }, [])]
+									.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+							}
+						</select>
+					</div>
+					}
+
 					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>
 			</div>
 	}
 }
 
-export default connect(state => ({ students: state.db.students }) , dispatch => ({ 
+export default connect(state => ({ students: state.db.students, classes: state.db.classes }) , dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)) 
  }))(SingleStudent);

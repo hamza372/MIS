@@ -73,16 +73,16 @@ export const createEditClass = newClass => dispatch => {
 	))
 }
 
-export const addStudentToClass = (class_id, student) => dispatch => {
+export const addStudentToSection = (section_id, student) => dispatch => {
 
 	dispatch(createMerges([
-		{path: ["db", "students", student.id, "class_id"], value: class_id}
+		{path: ["db", "students", student.id, "section_id"], value: section_id}
 	]))
 }
 
-export const removeStudentFromClass = (student) => dispatch => {
+export const removeStudentFromSection = (student) => dispatch => {
 
 	dispatch(createMerges([
-		{path: ["db", "students", student.id, "class_id"], value: ""}
+		{path: ["db", "students", student.id, "section_id"], value: ""}
 	]))
 }

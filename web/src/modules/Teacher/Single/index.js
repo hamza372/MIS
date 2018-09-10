@@ -107,6 +107,7 @@ class SingleTeacher extends Component {
 					<div className="row">
 						<label>Gender</label>
 						<select {...this.former.super_handle(["Gender"])}>
+							<option value='' disabled>Please Set a Gender</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
 						</select>

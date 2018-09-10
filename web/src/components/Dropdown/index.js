@@ -23,7 +23,7 @@ class Dropdown extends Component {
 		const {items, toLabel, onSelect, toKey} = this.props;
 		return <div className="dropdown">
 
-			<input type="text" {...this.former.super_handle(["text"])} />
+			<input type="text" {...this.former.super_handle(["text"])} placeholder={this.props.placeholder || "Enter Text"} />
 			<div className="dropdown-items">
 			{
 				this.state.text.length === 0 ? false : items

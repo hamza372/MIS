@@ -7,19 +7,14 @@ import Former from 'utils/former'
 
 import Dropdown from 'components/Dropdown'
 
-import { createEditClass, addStudentToClass, removeStudentFromClass } from 'actions'
+import { createEditClass, addStudentToSection, removeStudentFromSection } from 'actions'
 
 import './style.css'
 
 const blankClass = {
 	id: v4(),
 	name: "",
-	sections: {
-		[v4()]: {
-			name: "Section 1",
-			faculty_id: ""
-		}
-	}, // always at least 1 section
+	sections: { },
 	subjects: {
 		// these need to come from a central list of subjects...
 	},
@@ -112,7 +107,7 @@ class SingleClass extends Component {
 					}
 				}
 			}
-		})
+		}, () => this.props.save(this.state.class))
 	}
 
 	addStudent = student => {
@@ -137,6 +132,26 @@ class SingleClass extends Component {
 						<input type="text" {...this.former.super_handle(["name"])} placeholder="Name" />
 					</div>
 
+					<div className="divider">Subjects</div>
+					{
+						Object.keys(this.state.class.subjects)
+						.map(subject => <div className="row" key={subject}>
+							<label>{subject}</label>
+							<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
+						</div>)
+					}
+
+					<div className="row">
+						<input list="subjects" {...this.former.super_handle(["new_subject"])}/>
+						<datalist id="subjects">
+						{
+							[...this.uniqueSubjects().keys()]
+							.map(subj => <option key={subj} value={subj} />)
+						}
+						</datalist>
+						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
+					</div>
+
 					<div className="divider">Sections</div>
 					{
 						Object.entries(this.state.class.sections)
@@ -155,47 +170,28 @@ class SingleClass extends Component {
 											.map(faculty => <option value={faculty.id} key={faculty.id}>{faculty.Name}</option>)
 										}
 									</select>
-
-									
 								</div>
 
+								<div className="students">
+									<h4>Students</h4>
+									{
+										Object.values(this.props.students)
+										.filter(student => student.section_id === id)
+										.map(student => {
+											return <div className="row" key={student.id}>
+												<label>{student.Name}</label>
+												<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
+											</div>
+										})
+									}
+									<Dropdown items={Object.values(this.props.students)} toLabel={s => s.Name} onSelect={this.addStudent} toKey={s => s.id} placeholder="Student Name" />
+								</div>
+
+								<div className="button" onClick={this.removeSection(id)}>Delete Section</div>
 							</div>)
 					}
 					<div className="button" onClick={this.addSection}>Add Section</div>
 
-					<div className="divider">Subjects</div>
-					{
-						Object.keys(this.state.class.subjects)
-						.map(subject => <div className="row" key={subject}>
-							<label>{subject}</label>
-							<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
-						</div>)
-					}
-					<div className="row">
-						<input list="subjects" {...this.former.super_handle(["new_subject"])}/>
-						<datalist id="subjects">
-						{
-							[...this.uniqueSubjects().keys()]
-							.map(subj => <option key={subj} value={subj} />)
-						}
-						</datalist>
-						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
-					</div>
-
-					<div className="divider">Students</div>
-					{
-						class_students
-							.map(student => {
-								console.log(student)
-
-								return <div className="row" key={student.id}>
-									<label>{student.Name}</label>
-									<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
-								</div>
-							})
-					}
-
-					<Dropdown items={Object.values(this.props.students)} toLabel={s => s.Name} onSelect={this.addStudent} toKey={s => s.id}/>
 
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
@@ -211,6 +207,6 @@ export default connect(state => ({
 	students: state.db.students
 }), dispatch => ({
 	save: (c) => dispatch(createEditClass(c)),
-	addStudent: (class_id, student) => dispatch(addStudentToClass(class_id, student)),
-	removeStudent: (student) => dispatch(removeStudentFromClass(student))
+	addStudent: (section_id, student) => dispatch(addStudentToSection(section_id, student)),
+	removeStudent: (student) => dispatch(removeStudentFromSection(student))
 }))(SingleClass)
