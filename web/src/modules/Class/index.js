@@ -8,15 +8,6 @@ import List from 'components/List'
 class ClassModule extends Component {
 
 	render() {
-		console.log(this.props)
-		/*
-		const unique_classes =  Object.values(this.props.sections)
-			.reduce((agg, curr) => {
-				// get all unique classes
-				return agg[curr.class] === undefined ? 
-					{ ...agg, [curr.class]: 1 } : agg
-			}, {});
-		*/
 		
 		return <Layout>
 			<div className="class-module">

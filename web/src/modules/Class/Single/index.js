@@ -110,8 +110,8 @@ class SingleClass extends Component {
 		}, () => this.props.save(this.state.class))
 	}
 
-	addStudent = student => {
-		this.props.addStudent(this.state.class.id, student);
+	addStudent = id => student => {
+		this.props.addStudent(id, student);
 	}
 
 	removeStudent = student => {
@@ -184,7 +184,12 @@ class SingleClass extends Component {
 											</div>
 										})
 									}
-									<Dropdown items={Object.values(this.props.students)} toLabel={s => s.Name} onSelect={this.addStudent} toKey={s => s.id} placeholder="Student Name" />
+									<Dropdown 
+										items={Object.values(this.props.students)}
+										toLabel={s => s.Name} 
+										onSelect={this.addStudent(id)} 
+										toKey={s => s.id} 
+										placeholder="Student Name" />
 								</div>
 
 								<div className="button" onClick={this.removeSection(id)}>Delete Section</div>
