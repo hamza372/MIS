@@ -72,3 +72,17 @@ export const createEditClass = newClass => dispatch => {
 		]
 	))
 }
+
+export const addStudentToClass = (class_id, student) => dispatch => {
+
+	dispatch(createMerges([
+		{path: ["db", "students", student.id, "class_id"], value: class_id}
+	]))
+}
+
+export const removeStudentFromClass = (student) => dispatch => {
+
+	dispatch(createMerges([
+		{path: ["db", "students", student.id, "class_id"], value: ""}
+	]))
+}

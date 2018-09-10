@@ -30,6 +30,8 @@ const blankStudent = {
 	Address: "",
 	Notes: "",
 	StartDate: moment(),
+
+	class_id: ""
 }
 // should be a dropdown of choices. not just teacher or admin.
 

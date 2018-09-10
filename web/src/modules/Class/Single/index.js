@@ -5,11 +5,14 @@ import { v4 } from 'node-uuid'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
 
-import { createEditClass } from 'actions'
+import Dropdown from 'components/Dropdown'
+
+import { createEditClass, addStudentToClass, removeStudentFromClass } from 'actions'
 
 import './style.css'
 
 const blankClass = {
+	id: v4(),
 	name: "",
 	sections: {
 		[v4()]: {
@@ -19,7 +22,6 @@ const blankClass = {
 	}, // always at least 1 section
 	subjects: {
 		// these need to come from a central list of subjects...
-		// 
 	},
 	new_subject: ""
 }
@@ -58,12 +60,8 @@ class SingleClass extends Component {
 	onSave = () => {
 
 		// create an id
-		const id = v4();
 		// will be overriden if its already in class
-		this.props.save({
-			id,
-			...this.state.class
-		});
+		this.props.save(this.state.class);
 	}
 
 	addSubject = () => {
@@ -89,10 +87,6 @@ class SingleClass extends Component {
 				subjects: rest
 			}
 		})
-	}
-
-	onSubjectChange = e => {
-		console.log(e)
 	}
 
 	removeSection = (id) => () => {
@@ -121,7 +115,19 @@ class SingleClass extends Component {
 		})
 	}
 
+	addStudent = student => {
+		this.props.addStudent(this.state.class.id, student);
+	}
+
+	removeStudent = student => {
+		this.props.removeStudent(student)
+	}
+
 	render() {
+
+		const class_students = Object.values(this.props.students)
+			.filter(student => student.class_id == this.state.class.id)
+
 		return <Layout>
 			<div className="single-class">
 				<div className="title">Edit Class</div>
@@ -166,7 +172,7 @@ class SingleClass extends Component {
 						</div>)
 					}
 					<div className="row">
-						<input list="subjects" onChange={this.onSubjectChange} {...this.former.super_handle(["new_subject"])}/>
+						<input list="subjects" {...this.former.super_handle(["new_subject"])}/>
 						<datalist id="subjects">
 						{
 							[...this.uniqueSubjects().keys()]
@@ -175,6 +181,21 @@ class SingleClass extends Component {
 						</datalist>
 						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
 					</div>
+
+					<div className="divider">Students</div>
+					{
+						class_students
+							.map(student => {
+								console.log(student)
+
+								return <div className="row" key={student.id}>
+									<label>{student.Name}</label>
+									<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
+								</div>
+							})
+					}
+
+					<Dropdown items={Object.values(this.props.students)} toLabel={s => s.Name} onSelect={this.addStudent} toKey={s => s.id}/>
 
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
@@ -186,7 +207,10 @@ class SingleClass extends Component {
 export default connect(state => ({
 	//sections: state.db.sections, // maybe this can just be classes. i dont see a problem with the class data structure
 	classes: state.db.classes,
-	faculty: state.db.faculty
+	faculty: state.db.faculty,
+	students: state.db.students
 }), dispatch => ({
-	save: (c) => dispatch(createEditClass(c))
+	save: (c) => dispatch(createEditClass(c)),
+	addStudent: (class_id, student) => dispatch(addStudentToClass(class_id, student)),
+	removeStudent: (student) => dispatch(removeStudentFromClass(student))
 }))(SingleClass)
