@@ -1,6 +1,6 @@
 defmodule Sarkar.ActionHandler do
 
-	def handle_action(%{type: "LOGIN", payload: %{school_id: school_id, client_id: client_id, password: password}}, state) do
+	def handle_action(%{"type" => "LOGIN", "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password}}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
 			{:ok, token} -> 
 				start_school(school_id)
@@ -11,7 +11,7 @@ defmodule Sarkar.ActionHandler do
 		end
 	end
 
-	def handle_action(%{type: "VERIFY", payload: %{school_id: school_id, token: token, client_id: client_id}}, state) do
+	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
 		case Sarkar.Auth.verify({school_id, client_id, token}) do
 			{:ok, _} -> 
 				start_school(school_id)
@@ -23,12 +23,12 @@ defmodule Sarkar.ActionHandler do
 		end
 	end
 
-	def handle_action(%{type: "SYNC", payload: payload}, %{school_id: school_id, client_id: client_id} = state) do
+	def handle_action(%{"type" => "SYNC", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
 		res = Sarkar.School.sync_changes(school_id, client_id, payload)
 		{:reply, succeed(res), state}
 	end
 
-	def handle_action(%{type: type, payload: payload}, state) do
+	def handle_action(%{"type" => type, "payload" => payload}, state) do
 		IO.puts "it is likely you have not authenticated. no handler exists for this combination of state and message"
 		IO.inspect type
 		IO.inspect payload
