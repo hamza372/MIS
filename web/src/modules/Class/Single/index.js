@@ -120,9 +120,6 @@ class SingleClass extends Component {
 
 	render() {
 
-		const class_students = Object.values(this.props.students)
-			.filter(student => student.class_id == this.state.class.id)
-
 		return <Layout>
 			<div className="single-class">
 				<div className="title">Edit Class</div>
@@ -205,7 +202,6 @@ class SingleClass extends Component {
 }
 
 export default connect(state => ({
-	//sections: state.db.sections, // maybe this can just be classes. i dont see a problem with the class data structure
 	classes: state.db.classes,
 	faculty: state.db.faculty,
 	students: state.db.students
