@@ -17,7 +17,7 @@ import './style.css'
 // I have an object with a bunch of fields
 // text and date input, dropdowns....
 
-const blankStudent = {
+const blankStudent = () => ({
 	Name: "",
 	CNIC: "",
 	Gender: "",
@@ -32,7 +32,7 @@ const blankStudent = {
 	StartDate: moment(),
 
 	section_id: ""
-}
+})
 // should be a dropdown of choices. not just teacher or admin.
 
 class SingleStudent extends Component {
@@ -43,7 +43,7 @@ class SingleStudent extends Component {
 		const id = props.match.params.id;
 
 		this.state = {
-			profile: props.students[id] || blankStudent,
+			profile: props.students[id] || blankStudent(),
 			redirect: false
 		}
 

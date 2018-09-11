@@ -75,7 +75,6 @@ export const createEditClass = newClass => dispatch => {
 
 export const addStudentToSection = (section_id, student) => dispatch => {
 
-	console.log('add student', section_id, student.id)
 	dispatch(createMerges([
 		{path: ["db", "students", student.id, "section_id"], value: section_id}
 	]))

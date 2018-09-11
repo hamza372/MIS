@@ -11,7 +11,7 @@ import { createEditClass, addStudentToSection, removeStudentFromSection } from '
 
 import './style.css'
 
-const blankClass = {
+const blankClass = () => ({
 	id: v4(),
 	name: "",
 	sections: { },
@@ -19,7 +19,7 @@ const blankClass = {
 		// these need to come from a central list of subjects...
 	},
 	new_subject: ""
-}
+})
 
 class SingleClass extends Component {
 
@@ -27,7 +27,7 @@ class SingleClass extends Component {
 		super(props);
 
 		const id = props.match.params.id;
-		const currClass = id === 'new' ? blankClass : this.props.classes[id]
+		const currClass = id === 'new' ? blankClass() : this.props.classes[id]
 
 		this.state = {
 			class: currClass
@@ -196,7 +196,6 @@ class SingleClass extends Component {
 							</div>)
 					}
 					<div className="button" onClick={this.addSection}>Add Section</div>
-
 
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
