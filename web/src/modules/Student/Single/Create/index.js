@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom';
 
 import { createStudentMerge } from 'actions'
 
+import Banner from 'components/Banner'
 import Former from 'utils/former'
 
 import './style.css'
@@ -44,7 +45,8 @@ class SingleStudent extends Component {
 
 		this.state = {
 			profile: props.students[id] || blankStudent(),
-			redirect: false
+			redirect: false,
+			saveBanner: false
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -64,8 +66,15 @@ class SingleStudent extends Component {
 		this.props.save(student)
 
 		this.setState({
-			redirect: this.isNew() ? `/student/${student.id}/profile` : false
+			saveBanner: true
 		})
+
+		setTimeout(() => {
+			this.setState({
+				saveBanner: false,
+				redirect: this.isNew() ? `/student/${student.id}/profile` : false
+			})
+		}, 3000);
 	}
 
 	render() {
@@ -76,6 +85,7 @@ class SingleStudent extends Component {
 		}
 
 		return <div className="single-student">
+				{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 				<div className="title">Edit Student</div>
 				<div className="form">
 					<div className="row">

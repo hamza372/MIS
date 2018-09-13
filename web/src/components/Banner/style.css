@@ -1,0 +1,17 @@
+.banner {
+	width: 100%;
+	text-align: center;
+	padding: 25px;
+	font-size: 1.5rem;
+	font-weight: bold;
+	position: fixed;
+	top: 60px;
+	left: 0;
+	right: 0;
+}
+
+.banner.good {
+	background-color: #9EE493;
+	color: whitesmoke;
+
+}

@@ -4,6 +4,7 @@ import { v4 } from 'node-uuid'
 
 import Layout from 'components/Layout'
 import Former from 'utils/former'
+import Banner from 'components/Banner'
 
 import Dropdown from 'components/Dropdown'
 
@@ -30,7 +31,8 @@ class SingleClass extends Component {
 		const currClass = id === 'new' ? blankClass() : this.props.classes[id]
 
 		this.state = {
-			class: currClass
+			class: currClass,
+			saveBanner: false
 		}
 
 		this.former = new Former(this, ["class"])
@@ -57,6 +59,9 @@ class SingleClass extends Component {
 		// create an id
 		// will be overriden if its already in class
 		this.props.save(this.state.class);
+
+		this.setState({ saveBanner: true })
+		setTimeout(() => this.setState({ saveBanner: false }), 5000);
 	}
 
 	addSubject = () => {
@@ -122,6 +127,7 @@ class SingleClass extends Component {
 
 		return <Layout>
 			<div className="single-class">
+			{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 				<div className="title">Edit Class</div>
 				<div className="form">
 					<div className="row">

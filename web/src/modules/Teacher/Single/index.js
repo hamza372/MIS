@@ -7,6 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
+import Banner from 'components/Banner'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
 
@@ -82,6 +83,14 @@ class SingleTeacher extends Component {
 				...this.state.profile,
 			}, this.isFirst())
 
+			this.setState({
+				saveBanner: true
+			})
+
+			setTimeout(() => {
+				this.setState({ saveBanner: false })
+			}, 3000);
+
 		}
 		console.log('save')
 
@@ -95,6 +104,7 @@ class SingleTeacher extends Component {
 
 		return <Layout>
 			<div className="single-teacher">
+				{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 				<div className="form">
 					<div className="row">
 						<label>Name</label>
