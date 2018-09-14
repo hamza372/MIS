@@ -1,0 +1,9 @@
+.attendance .status {
+	display: flex;
+	margin-left: auto;
+	flex-direction: row;
+}
+
+.attendance .status .button {
+	margin: 0 5px;
+}

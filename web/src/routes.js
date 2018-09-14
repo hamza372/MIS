@@ -11,6 +11,7 @@ import Login from 'modules/Login'
 import SchoolLogin from 'modules/Login/school'
 import ClassModule from 'modules/Class'
 import ClassSingle from 'modules/Class/Single'
+import Attendance from 'modules/Attendance'
 
 import AuthedRoute from 'components/AuthedRoute'
 
@@ -27,8 +28,10 @@ export default ({ store }) => (
 				<AuthedRoute path="/student/:id" component={StudentSingle} />
 				<AuthedRoute path="/student" component={StudentList} />
 
-				<AuthedRoute path="/class/:name" component={ClassSingle} />
+				<AuthedRoute path="/class/:id" component={ClassSingle} />
 				<AuthedRoute path="/class" component={ClassModule} />
+
+				<AuthedRoute path="/attendance" component={Attendance} />
 
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />

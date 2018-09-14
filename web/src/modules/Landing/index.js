@@ -12,6 +12,7 @@ const Landing = (props) => {
 			<Link to="/teacher" className="button">Teachers</Link>
 			<Link to="/student" className="button">Students</Link>
 			<Link to="/class" className="button">Class</Link>
+			<Link to="/attendance" className="button">Attendance</Link>
 		</div>
 	</Layout>
 }

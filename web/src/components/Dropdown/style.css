@@ -1,0 +1,14 @@
+.dropdown-items {
+	background-color: white;
+}
+
+.dropdown-items>div {
+	cursor: pointer;
+	padding: 1rem 10px;
+	transition: all .2s ease-in;
+}
+
+	.dropdown-items>div:hover {
+		background-color: #222;
+		color: white;
+	}

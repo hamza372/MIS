@@ -1,5 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, LOCAL_LOGIN, ON_CONNECT, ON_DISCONNECT, SCHOOL_LOGIN, LOGIN_FAIL, LOGIN_SUCCEED } from '../actions'
+import { MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED } from 'actions/core'
+import { LOCAL_LOGIN, SCHOOL_LOGIN } from '../actions'
 
 const rootReducer = (state, action) => {
 
@@ -7,9 +8,11 @@ const rootReducer = (state, action) => {
 	switch(action.type) {
 		case MERGES:
 		{
-			return action.merges.reduce((agg, curr) => {
-				return {...Dynamic.put(agg, curr.path, curr.value)}
+			const nextState = action.merges.reduce((agg, curr) => {
+				return Dynamic.put(agg, curr.path, curr.value)
 			}, state);
+
+			return JSON.parse(JSON.stringify(nextState));
 
 		}
 		

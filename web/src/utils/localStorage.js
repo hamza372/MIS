@@ -8,7 +8,7 @@ const initState = {
 		faculty: { },
 		users: { }, // username: passwordhash, permissions, etc.  
 		students: { },
-		sections: { } // id: { name, class, teacher_id, subjects: { name: 1 } }
+		classes: { } // id: { name, class, teacher_id, subjects: { name: 1 } }
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later

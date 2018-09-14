@@ -14,12 +14,12 @@ defmodule Sarkar.Websocket do
 	end
 
 	def websocket_handle({:text, content}, state) do
-		json = Poison.decode!(content, [keys: :atoms])
+		json = Poison.decode!(content)
 
 		handle_json(json, state)
 	end
 
-	def handle_json(%{key: message_key, payload: %{type: type, payload: payload} = action}, state) do
+	def handle_json(%{"key" => message_key, "payload" => %{"type" => type, "payload" => payload} = action}, state) do
 		case Sarkar.ActionHandler.handle_action(action, state) do
 			{:reply, %{type: resp_type, payload: msg}, new_state} -> {:reply, {:text, Poison.encode!(%{key: message_key, type: resp_type, payload: msg})}, new_state}
 			{:reply, %{type: resp_type}, new_state} -> {:reply, {:text, Poison.encode!(%{key: message_key, type: resp_type, payload: %{}})}, new_state}

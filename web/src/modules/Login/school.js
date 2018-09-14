@@ -38,6 +38,7 @@ class SchoolLogin extends Component {
 
 		return <Layout>
 			<div className="school-login">
+				<div className="title">Verify your School</div>
 				<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" />
 				<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
 				<div className="button save" onClick={this.onLogin}>Login</div>

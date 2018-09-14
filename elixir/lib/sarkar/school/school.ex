@@ -34,10 +34,12 @@ defmodule Sarkar.School do
 		# we need to keep a dictionary of path/date to decide if we should execute that write
 		# for now we'll just execute and last write wins.
 
-		{nextDb, last_date} = Enum.reduce(changes, {db, 0}, fn {path_key, payload}, {agg_db, max_date} -> 
-			%{ action: %{path: path, type: type, value: value}, date: date} = payload
+		{nextDb, last_date} = Enum.reduce(changes, {db, 0}, fn({path_key, payload}, {agg_db, max_date}) -> 
+			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
+
 
 			[prefix | p ] = path
+
 			{Dynamic.put(agg_db, p, value), max(date, max_date)}
 		end)
 

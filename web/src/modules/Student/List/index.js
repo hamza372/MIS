@@ -22,6 +22,5 @@ const StudentList = (props) => {
 }
 
 export default connect(state => {
-	console.log(state.db)
 	return { students: Object.entries(state.db.students) }
 })(StudentList);

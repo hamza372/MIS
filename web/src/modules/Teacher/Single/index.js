@@ -7,6 +7,7 @@ import { Redirect } from 'react-router-dom';
 import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
+import Banner from 'components/Banner'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
 
@@ -31,6 +32,7 @@ const blankTeacher = {
 	Active: true,
 
 	ManCNIC: "",
+	ManName: "",
 	Birthdate: moment().subtract(20, "year"),
 	Address: "",
 	Qualification: "",
@@ -82,6 +84,14 @@ class SingleTeacher extends Component {
 				...this.state.profile,
 			}, this.isFirst())
 
+			this.setState({
+				saveBanner: true
+			})
+
+			setTimeout(() => {
+				this.setState({ saveBanner: false })
+			}, 3000);
+
 		}
 		console.log('save')
 
@@ -95,6 +105,7 @@ class SingleTeacher extends Component {
 
 		return <Layout>
 			<div className="single-teacher">
+				{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 				<div className="form">
 					<div className="row">
 						<label>Name</label>
@@ -102,11 +113,12 @@ class SingleTeacher extends Component {
 					</div>
 					<div className="row">
 						<label>CNIC</label>
-						<input type="text" {...this.former.super_handle(["CNIC"])} placeholder="CNIC" />
+						<input type="text" {...this.former.super_handle(["CNIC"], (num) => num.length <= 13)} placeholder="CNIC" />
 					</div>
 					<div className="row">
 						<label>Gender</label>
 						<select {...this.former.super_handle(["Gender"])}>
+							<option value='' disabled>Please Set a Gender</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
 						</select>
@@ -125,7 +137,7 @@ class SingleTeacher extends Component {
 					</div>
 					<div className="row">
 						<label>Phone Number</label>
-						<input type="tel" {...this.former.super_handle(["Phone"])} placeholder="Phone Number" />
+						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
 					</div>
 					<div className="row">
 						<label>Monthly Salary</label>
@@ -137,11 +149,17 @@ class SingleTeacher extends Component {
 					</div>
 
 					<div className="row">
-						<label>Husband/Father CNIC</label>
-						<input type="text" {...this.former.super_handle(["ManCNIC"])} placeholder="Father/Husband CNIC" />
+						<label>Husband/Father Name</label>
+						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father/Husband Name" />
 					</div>
+
 					<div className="row">
-						<label>Birth Date</label>
+						<label>Husband/Father CNIC</label>
+						<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 13)} placeholder="Father/Husband CNIC" />
+					</div>
+
+					<div className="row">
+						<label>Date of Birth</label>
 						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
 					</div>
 
@@ -152,6 +170,10 @@ class SingleTeacher extends Component {
 					<div className="row">
 						<label>Experience</label>
 						<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
+					</div>
+					<div className="row">
+						<label>Qualification</label>
+						<textarea {...this.former.super_handle(["Qualification"])} placeholder="Qualification" />
 					</div>
 
 					<div className="row">

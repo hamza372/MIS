@@ -38,7 +38,7 @@ html,body, #root, .layout{
 	align-items: baseline;
 }
 
-.form>* {
+.form .row {
 	margin: 5px 0;
 }
 
@@ -63,7 +63,7 @@ html,body, #root, .layout{
 
 .form .divider {
 	margin: 20px auto;
-	font-size: 1.2rem;
+	font-size: 1.8rem;
 }
 
 textarea {
@@ -87,8 +87,16 @@ textarea {
 	cursor: pointer;
 	font-weight: bold;
 	text-decoration: none;
+	text-align: center;
 }
 	.button:hover {
 		color: #fafafa;
 		background-color: #222;
 	}
+
+	.button.save {
+	}
+
+input::-webkit-calendar-picker-indicator {
+	opacity: 100;
+}
