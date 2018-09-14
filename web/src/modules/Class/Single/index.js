@@ -108,7 +108,7 @@ class SingleClass extends Component {
 				sections: {
 					...this.state.class.sections,
 					[v4()]: {
-						name: "New Section"
+						name: ""
 					}
 				}
 			}
@@ -145,14 +145,14 @@ class SingleClass extends Component {
 					}
 
 					<div className="row">
-						<input list="subjects" {...this.former.super_handle(["new_subject"])}/>
+						<input list="subjects" {...this.former.super_handle(["new_subject"])} placeholder="Type or Select Subject" />
 						<datalist id="subjects">
 						{
 							[...this.uniqueSubjects().keys()]
 							.map(subj => <option key={subj} value={subj} />)
 						}
 						</datalist>
-						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Add Subject</div>
+						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Save Subject</div>
 					</div>
 
 					<div className="divider">Sections</div>
@@ -161,7 +161,7 @@ class SingleClass extends Component {
 							.map(([id, section], i, arr) => <div className="class-section" key={id}>
 								<div className="row">
 									<label>Section Name</label>
-									<input type="text" {...this.former.super_handle(["sections", id, "name"])} />
+									<input type="text" {...this.former.super_handle(["sections", id, "name"])} placeholder="Type Section Name"/>
 								</div>
 
 								<div className="row">

@@ -96,3 +96,7 @@ textarea {
 
 	.button.save {
 	}
+
+input::-webkit-calendar-picker-indicator {
+	opacity: 100;
+}

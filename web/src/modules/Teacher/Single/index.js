@@ -32,6 +32,7 @@ const blankTeacher = {
 	Active: true,
 
 	ManCNIC: "",
+	ManName: "",
 	Birthdate: moment().subtract(20, "year"),
 	Address: "",
 	Qualification: "",
@@ -112,7 +113,7 @@ class SingleTeacher extends Component {
 					</div>
 					<div className="row">
 						<label>CNIC</label>
-						<input type="text" {...this.former.super_handle(["CNIC"])} placeholder="CNIC" />
+						<input type="text" {...this.former.super_handle(["CNIC"], (num) => num.length <= 13)} placeholder="CNIC" />
 					</div>
 					<div className="row">
 						<label>Gender</label>
@@ -136,7 +137,7 @@ class SingleTeacher extends Component {
 					</div>
 					<div className="row">
 						<label>Phone Number</label>
-						<input type="tel" {...this.former.super_handle(["Phone"])} placeholder="Phone Number" />
+						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
 					</div>
 					<div className="row">
 						<label>Monthly Salary</label>
@@ -148,11 +149,17 @@ class SingleTeacher extends Component {
 					</div>
 
 					<div className="row">
-						<label>Husband/Father CNIC</label>
-						<input type="text" {...this.former.super_handle(["ManCNIC"])} placeholder="Father/Husband CNIC" />
+						<label>Husband/Father Name</label>
+						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father/Husband Name" />
 					</div>
+
 					<div className="row">
-						<label>Birth Date</label>
+						<label>Husband/Father CNIC</label>
+						<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 13)} placeholder="Father/Husband CNIC" />
+					</div>
+
+					<div className="row">
+						<label>Date of Birth</label>
 						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
 					</div>
 
@@ -163,6 +170,10 @@ class SingleTeacher extends Component {
 					<div className="row">
 						<label>Experience</label>
 						<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
+					</div>
+					<div className="row">
+						<label>Qualification</label>
+						<textarea {...this.former.super_handle(["Qualification"])} placeholder="Qualification" />
 					</div>
 
 					<div className="row">

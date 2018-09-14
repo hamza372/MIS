@@ -12,23 +12,28 @@ export default class Former {
 
 	}
 
-	handle(path, cb = () => { }) {
+	handle(path, validate = (x) => true, cb = () => { }) {
 
 		return e => {
 			const value = this._getValue(e)
 			const full_path = [...this.base_path, ...path]
-			this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+			if(validate(value)) {
+				this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+			}
 		}
 	}
 
-	super_handle(path, cb = () => { }) {
+	super_handle(path, validate = (x) => true, cb = () => { }) {
 
 		const full_path = [...this.base_path, ...path]
 
 		return {
 			onChange: e => {
 				const value = this._getValue(e)
-				this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+				if(validate(value))
+				{
+					this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+				}
 			},
 			value: Dynamic.get(this._component.state, full_path),
 			checked: Dynamic.get(this._component.state, full_path)

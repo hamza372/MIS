@@ -20,13 +20,14 @@ import './style.css'
 
 const blankStudent = () => ({
 	Name: "",
-	CNIC: "",
+	BForm: "",
 	Gender: "",
 	Phone: "",
 	Fee: 0,
 	Active: true,
 
 	ManCNIC: "",
+	ManName: "",
 	Birthdate: moment().subtract(20, "year"),
 	Address: "",
 	Notes: "",
@@ -86,16 +87,26 @@ class SingleStudent extends Component {
 
 		return <div className="single-student">
 				{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
+
 				<div className="title">Edit Student</div>
+
+
 				<div className="form">
+					<div className="divider">Personal Information</div>
 					<div className="row">
 						<label>Name</label>
 						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Name" />
 					</div>
 					<div className="row">
-						<label>CNIC</label>
-						<input type="text" {...this.former.super_handle(["CNIC"])} placeholder="CNIC" />
+						<label>B-Form Number</label>
+						<input type="number" {...this.former.super_handle(["BForm"])} placeholder="BForm" />
 					</div>
+
+					<div className="row">
+						<label>Date of Birth</label>
+						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
+					</div>
+
 					<div className="row">
 						<label>Gender</label>
 						<select {...this.former.super_handle(["Gender"])}>
@@ -106,28 +117,20 @@ class SingleStudent extends Component {
 					</div>
 
 					<div className="row">
+						<label>Father Name</label>
+						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name" />
+					</div>
+
+					<div className="row">
+						<label>Father CNIC</label>
+						<input type="number" {...this.former.super_handle(["ManCNIC"])} placeholder="Father CNIC" />
+					</div>
+
+					<div className="divider">Contact Information</div>
+
+					<div className="row">
 						<label>Phone Number</label>
 						<input type="tel" {...this.former.super_handle(["Phone"])} placeholder="Phone Number" />
-					</div>
-
-					<div className="row">
-						<label>Monthly Fee</label>
-						<input type="number" {...this.former.super_handle(["Fee"])} placeholder="Monthly Fee"/>
-					</div>
-
-					<div className="row">
-						<label>Active</label>
-						<input type="checkbox" {...this.former.super_handle(["Active"])} />
-					</div>
-
-					<div className="row">
-						<label>Husband/Father CNIC</label>
-						<input type="text" {...this.former.super_handle(["ManCNIC"])} placeholder="Father/Husband CNIC" />
-					</div>
-
-					<div className="row">
-						<label>Birth Date</label>
-						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
 					</div>
 
 					<div className="row">
@@ -135,18 +138,10 @@ class SingleStudent extends Component {
 						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" />
 					</div>
 
-					<div className="row">
-						<label>Notes</label>
-						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
-					</div>
-
-					<div className="row">
-						<label>Start Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
-					</div>
+					<div className="divider">School Information</div>
 
 					{ this.state.profile.class_id === '' ? false : <div className="row">
-						<label>Section</label>
+						<label>Class Section</label>
 						<select {...this.former.super_handle(["section_id"])}>
 							{
 								 [{id: '', name: 'Please Select a Section'}, ...Object.values(this.props.classes) // collapse into label class - section name. value is section id
@@ -161,6 +156,27 @@ class SingleStudent extends Component {
 						</select>
 					</div>
 					}
+
+					<div className="row">
+						<label>Monthly Fee</label>
+						<input type="number" {...this.former.super_handle(["Fee"])} placeholder="Monthly Fee"/>
+					</div>
+
+					<div className="row">
+						<label>Active</label>
+						<input type="checkbox" {...this.former.super_handle(["Active"])} />
+					</div>
+
+					<div className="row">
+						<label>Notes</label>
+						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
+					</div>
+
+					<div className="row">
+						<label>Start Date</label>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
+					</div>
+
 
 					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>

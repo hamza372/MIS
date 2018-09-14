@@ -86,3 +86,12 @@ export const removeStudentFromSection = (student) => dispatch => {
 		{path: ["db", "students", student.id, "section_id"], value: ""}
 	]))
 }
+
+export const markStudent = (student, status) => {
+	console.log('mark student', student, ' as', status)
+
+	// eventually dispatches merges
+	return {
+		type: "ATTENDANCE"
+	}
+}
