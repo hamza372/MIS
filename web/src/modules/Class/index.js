@@ -14,7 +14,9 @@ class ClassModule extends Component {
 				<div className="title">Classes</div>
 				<List create={'/class/new'} createText={"Add new Class"}>
 				{
-					Object.values(this.props.classes).map(x => <Link to={`/class/${x.id}`} key={x.id}>{x.name}</Link>)
+					Object.values(this.props.classes)
+					.sort((a, b) => (b.classYear || 0) - (a.classYear || 0))
+					.map(x => <Link to={`/class/${x.id}`} key={x.id}>{x.name}</Link>)
 				}
 				</List>
 			</div>

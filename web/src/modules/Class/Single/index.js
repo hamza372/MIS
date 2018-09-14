@@ -15,6 +15,7 @@ import './style.css'
 const blankClass = () => ({
 	id: v4(),
 	name: "",
+	classYear: 0,
 	sections: { },
 	subjects: {
 		// these need to come from a central list of subjects...
@@ -133,6 +134,10 @@ class SingleClass extends Component {
 					<div className="row">
 						<label>Name</label>
 						<input type="text" {...this.former.super_handle(["name"])} placeholder="Name" />
+					</div>
+					<div className="row">
+						<label>Class Year</label>
+						<input type="number" {...this.former.super_handle(["classYear"])} placeholder="Class Year" />
 					</div>
 
 					<div className="divider">Subjects</div>
