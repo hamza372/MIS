@@ -1,0 +1,10 @@
+.student-attendance {
+	width: 90%;
+}
+.student-attendance .row>*:nth-child(2){
+	margin-left: auto;
+}
+
+.student-attendance .row {
+	margin: 10px 0;
+}

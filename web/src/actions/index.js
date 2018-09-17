@@ -87,8 +87,15 @@ export const removeStudentFromSection = (student) => dispatch => {
 	]))
 }
 
-export const markStudent = (student, status) => {
+export const markStudent = (student, date, status) => dispatch => {
 	console.log('mark student', student, ' as', status)
+
+	dispatch(createMerges([
+		{path: ["db", "students", student.id, "attendance", date], value: {
+			date,
+			status
+		}}
+	]))
 
 	// eventually dispatches merges
 	return {

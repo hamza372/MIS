@@ -61,10 +61,17 @@ html,body, #root, .layout{
 		border: 1px solid black;
 	}
 
-.form .divider {
+.title {
+	font-size: 2rem;
+	margin: 20px 0;
+}
+
+.divider {
 	margin: 20px auto;
 	font-size: 1.8rem;
+	text-align: center;
 }
+
 
 textarea {
 	background-color: inherit;
@@ -89,12 +96,10 @@ textarea {
 	text-decoration: none;
 	text-align: center;
 }
-	.button:hover {
+
+	.button.selected, .button:hover {
 		color: #fafafa;
 		background-color: #222;
-	}
-
-	.button.save {
 	}
 
 input::-webkit-calendar-picker-indicator {
