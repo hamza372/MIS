@@ -83,13 +83,15 @@ const rootReducer = (state, action) => {
 			}
 
 			if(action.password === user.password) {
-				console.log("matched password")
+
+				const faculty = Object.values(state.db.faculty).find(f => f.Username === user.username);
 
 				return {
 					...state,
 					auth: {
 						...state.auth,
-						username: user.username
+						username: user.username,
+						faculty_id: faculty.id
 					}
 				}
 			}

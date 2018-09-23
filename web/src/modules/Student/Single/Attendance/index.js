@@ -37,15 +37,13 @@ class StudentAttendance extends Component {
 				<div>{(num_present / (num_absent + num_present) * 100).toFixed(2)}%</div>
 			</div>
 			<div className="divider">Record</div>
-		{
-			Object.values(attendance)
-			.map(
-				rec => <div className="row" key={rec.date}>
-					<label>{rec.date}:</label>
-					<div>{rec.status}</div>
-				</div>
-			)
-		}
+			{ Object.values(attendance)
+				.map(
+					rec => <div className="row" key={rec.date}>
+						<label>{rec.date}</label>
+						<div>{rec.status}</div>
+					</div>
+			)}
 
 		</div>
 	}

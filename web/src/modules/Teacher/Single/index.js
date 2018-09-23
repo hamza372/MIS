@@ -38,7 +38,9 @@ const blankTeacher = {
 	Qualification: "",
 	Experience: "",
 	HireDate: moment(),
-	Admin: false
+	Admin: false,
+
+	attendance: { } 
 }
 // should be a dropdown of choices. not just teacher or admin.
 

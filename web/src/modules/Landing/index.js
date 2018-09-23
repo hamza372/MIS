@@ -3,18 +3,28 @@ import { Link } from 'react-router-dom'
 
 import Layout from 'components/Layout'
 
+import { connect } from 'react-redux'
+
 import './style.css'
 
 const Landing = (props) => {
 
 	return <Layout>
 		<div className="landing">
-			<Link to="/teacher" className="button">Teachers</Link>
-			<Link to="/student" className="button">Students</Link>
-			<Link to="/class" className="button">Class</Link>
-			<Link to="/attendance" className="button">Attendance</Link>
+			<div className="row">
+				<Link to="/attendance" className="button">Attendance</Link>
+				<Link to="/class" className="button">Class</Link>
+			</div>
+			<div className="row">
+				<Link to="/student" className="button">Students</Link>
+				<Link to="/teacher" className="button">Teachers</Link>
+			</div>
+			{ props.user.Admin ? <div className="row">
+				<Link to="/teacher-attendance" className="button">Teacher Attendance</Link>
+			</div> : false
+			}
 		</div>
 	</Layout>
 }
 
-export default Landing;
+export default connect(state => ({ user: state.db.faculty[state.auth.faculty_id] }))(Landing)

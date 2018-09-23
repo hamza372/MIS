@@ -1,0 +1,10 @@
+.teacher-attendance .status .button {
+	margin: 0 5px;
+}
+
+.teacher-attendance .status {
+	display: flex;
+	margin-left: auto;
+	flex-direction: row;
+	align-items: baseline;
+}

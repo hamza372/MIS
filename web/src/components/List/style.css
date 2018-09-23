@@ -17,6 +17,10 @@
 	border-bottom: 1px solid black;
 }
 
+.list-row>* {
+	margin: 0 10px;
+}
+
 .list .create {
 	justify-content: center;
 	cursor: pointer;
