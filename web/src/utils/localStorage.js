@@ -42,8 +42,18 @@ export const loadDB = () => {
 			connected: false
 		}
 
-		console.log(merged)
-		return merged;
+		console.log(merged);
+
+		const updatedDB = onLoadScripts.reduce((agg, curr) => {
+			try {
+				return curr(agg)
+			}
+			catch(e) {
+				console.error(e)
+				return agg;
+			}
+		}, merged);
+		return updatedDB;
 	}
 	catch(err) {
 		console.error(err)
@@ -76,3 +86,22 @@ if(navigator.storage && navigator.storage.persist) {
 else {
 	console.log('no navigator.storage or navigator.storage.persist')
 }
+
+const addFacultyID = state => {
+
+	if(state.auth.faculty_id !== undefined) {
+		console.log("not running addFacultyID script")
+		return state;
+	}
+	console.log("running addFacultyID script")
+
+	const faculty = Object.values(state.db.faculty).find(f => f.Username === state.auth.username);
+
+	state.auth.faculty_id = faculty.id;
+}
+
+// this modifies db in case any schema changes have happened
+// which means i should maybe version the client db formally...
+const onLoadScripts = [
+	addFacultyID
+];

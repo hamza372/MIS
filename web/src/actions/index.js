@@ -28,7 +28,6 @@ export const createLogin = (username, password) => (dispatch) => {
 
 	hash(password)
 		.then(hashed => {
-			console.log(hashed)
 			dispatch({
 				type: LOCAL_LOGIN,
 				username,
