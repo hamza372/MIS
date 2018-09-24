@@ -61,7 +61,7 @@ class TeacherAttendance extends Component {
 									{ !current_attendance.check_in || current_attendance.check_out ? false : <div className="button check_out" onClick={this.mark(f, "check_out")}>Check Out</div>}
 									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button absent" onClick={this.mark(f, "absent")}>Absent</div> }
 									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button leave" onClick={this.mark(f, "leave")}>Leave</div> }
-									{ current_attendance.check_in && current_attendance.check_out ? <label>{moment.utc(moment(current_attendance.check_out).diff(current_attendance.check_in)).format("HH:mm:ss")}</label> : false}
+									{ current_attendance.check_in && current_attendance.check_out ?  <div>Check In: <b>{moment(current_attendance.check_in).format("HH:mm")}</b> Check Out: <b>{moment(current_attendance.check_out).format("HH:mm")}</b></div>: false}
 									{ current_attendance.absent ? <label>Absent</label> : false }
 									{ current_attendance.leave ? <label>Leave</label> : false }
 								</div>
