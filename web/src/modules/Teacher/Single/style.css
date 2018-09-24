@@ -1,5 +1,10 @@
-.single-teacher .form {
+.single-teacher {
 	display: flex;
 	flex-direction: column;
-	width: 90%;
+	align-items: center;
+	width: 100%;
+}
+
+.single-teacher .tabs a {
+	margin: 10px;
 }

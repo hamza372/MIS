@@ -53,7 +53,6 @@ class TeacherAttendance extends Component {
 
 							// current_attendance should be something like blank if new day or, { check_in: time, check_out: time, absent: true, leave: true }
 
-							console.log(f.Name, current_attendance)
 							return <div className="list-row" key={f.id}>
 								<Link to={`/teacher/${f.id}`}>{f.Name}</Link>
 								<div className="status">

@@ -1,0 +1,11 @@
+.faculty-attendance {
+	width: 90%;
+}
+
+.faculty-attendance .row {
+	width: 100%;
+}
+
+.faculty-attendance .row>*:nth-child(2) {
+	margin-left: auto;
+}

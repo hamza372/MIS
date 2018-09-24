@@ -1,0 +1,12 @@
+.single-teacher-create {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	align-items: center;
+}
+
+.single-teacher-create .form {
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+}
