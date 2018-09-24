@@ -26,7 +26,6 @@ class Login extends Component {
 	}
 
 	onLogin = () => {
-		console.log('dispatching')
 		this.props.login(this.state.login)
 	}
 

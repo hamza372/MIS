@@ -1,5 +1,6 @@
 import { hash } from 'utils'
 import { createMerges, createLoginSucceed, createLoginFail } from './core'
+import moment from 'moment'
 
 export const MERGE_FACULTY = "MERGE_FACULTY"
 export const createFacultyMerge = (faculty) => dispatch => {
@@ -23,11 +24,10 @@ export const createStudentMerge = (student) => dispatch => {
 }
 
 export const LOCAL_LOGIN = "LOCAL_LOGIN"
-export const createLogin = (username, password) => dispatch => {
+export const createLogin = (username, password) => (dispatch) => {
 
 	hash(password)
 		.then(hashed => {
-			console.log(hashed)
 			dispatch({
 				type: LOCAL_LOGIN,
 				username,
@@ -87,11 +87,25 @@ export const removeStudentFromSection = (student) => dispatch => {
 	]))
 }
 
-export const markStudent = (student, status) => {
+export const markStudent = (student, date, status, time = moment.now()) => dispatch => {
 	console.log('mark student', student, ' as', status)
 
-	// eventually dispatches merges
-	return {
-		type: "ATTENDANCE"
-	}
+	dispatch(createMerges([
+		{path: ["db", "students", student.id, "attendance", date], value: {
+			date,
+			status,
+			time
+		}}
+	]))
+}
+
+export const markFaculty = (faculty, date, status, time = moment.now()) => dispatch => {
+	console.log('mark faculty', faculty, 'as', status);
+
+	dispatch(createMerges([
+		{
+			path: ["db", "faculty", faculty.id, "attendance", date, status],
+			value: time
+		}
+	]))
 }

@@ -5,5 +5,10 @@
 }
 
 .landing .button {
+	display: flex;
 	margin: 10px;
+	height: 100px;
+	width: 100px;
+	align-items: center;
+	justify-content: center;
 }

@@ -12,6 +12,7 @@ import SchoolLogin from 'modules/Login/school'
 import ClassModule from 'modules/Class'
 import ClassSingle from 'modules/Class/Single'
 import Attendance from 'modules/Attendance'
+import TeacherAttendance from 'modules/Teacher-Attendance'
 
 import AuthedRoute from 'components/AuthedRoute'
 
@@ -32,6 +33,7 @@ export default ({ store }) => (
 				<AuthedRoute path="/class" component={ClassModule} />
 
 				<AuthedRoute path="/attendance" component={Attendance} />
+				<AuthedRoute path="/teacher-attendance" component={TeacherAttendance} />
 
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />

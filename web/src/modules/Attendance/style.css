@@ -7,3 +7,19 @@
 .attendance .status .button {
 	margin: 0 5px;
 }
+
+.attendance .list {
+	margin-top: 40px;
+}
+
+.button.PRESENT {
+	background-color: #95B8D1;
+}
+
+.button.ABSENT {
+	background-color: #EDAFB8;
+}
+
+.button.LEAVE {
+	background-color: #E8DDB5;
+}

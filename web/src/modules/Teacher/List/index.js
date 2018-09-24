@@ -18,5 +18,5 @@ const TeacherList = (props) => {
 }
 
 export default connect(state => ({
-	teachers: Object.entries(state.db.faculty).reduce((agg, [k, v]) => v.Admin ? agg : {...agg, [k]: v}, { })
+	teachers: state.db.faculty //Object.entries(state.db.faculty).reduce((agg, [k, v]) => v.Admin ? agg : {...agg, [k]: v}, { })
 }))(TeacherList);

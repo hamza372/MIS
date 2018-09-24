@@ -8,7 +8,7 @@ const List = (props) => {
 	return <div className="list">
 		{ props.create ? <Create to={props.create} text={props.createText} /> : false }
 		{
-			props.children
+			props.children.map(C => <div className="list-row" key={Math.random()}>{C}</div>)
 		}
 	</div>
 }
