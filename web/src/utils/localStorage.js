@@ -98,6 +98,8 @@ const addFacultyID = state => {
 	const faculty = Object.values(state.db.faculty).find(f => f.Username === state.auth.username);
 
 	state.auth.faculty_id = faculty.id;
+
+	return state;
 }
 
 // this modifies db in case any schema changes have happened
