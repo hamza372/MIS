@@ -13,7 +13,7 @@ const Layout = ({ user, children }) => {
 
 const Header = ({user}) => <div className="header">
 	<div className="left"><Link to="/">MIS</Link></div>
-	{ user ? <Link className="profile" to={`/faculty/${user.id}/`}>Profile</Link> : false }
+	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>Profile</Link> : false }
 </div>
 
 export default connect(state => ({ user: Object.values(state.db.faculty).find(x => x.Username === state.auth.username) }))(Layout)

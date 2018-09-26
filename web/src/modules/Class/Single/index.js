@@ -62,7 +62,7 @@ class SingleClass extends Component {
 		this.props.save(this.state.class);
 
 		this.setState({ saveBanner: true })
-		setTimeout(() => this.setState({ saveBanner: false }), 5000);
+		setTimeout(() => this.setState({ saveBanner: false }), 3000);
 	}
 
 	addSubject = () => {
@@ -143,13 +143,13 @@ class SingleClass extends Component {
 					<div className="divider">Subjects</div>
 					{
 						Object.keys(this.state.class.subjects)
-						.map(subject => <div className="row" key={subject}>
-							<label>{subject}</label>
+						.map(subject => <div className="subject row" key={subject}>
+							<div>{subject}</div>
 							<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
 						</div>)
 					}
 
-					<div className="row">
+					<div className="subject row">
 						<input list="subjects" {...this.former.super_handle(["new_subject"])} placeholder="Type or Select Subject" />
 						<datalist id="subjects">
 						{
@@ -157,7 +157,7 @@ class SingleClass extends Component {
 							.map(subj => <option key={subj} value={subj} />)
 						}
 						</datalist>
-						<div className="button" onClick={this.addSubject} style={{marginLeft: "auto"}}>Save Subject</div>
+						<div className="button" onClick={this.addSubject}>Save Subject</div>
 					</div>
 
 					<div className="divider">Sections</div>
@@ -186,8 +186,8 @@ class SingleClass extends Component {
 										Object.values(this.props.students)
 										.filter(student => student.section_id === id)
 										.map(student => {
-											return <div className="row" key={student.id}>
-												<label>{student.Name}</label>
+											return <div className="student row" key={student.id}>
+												<div>{student.Name}</div>
 												<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
 											</div>
 										})

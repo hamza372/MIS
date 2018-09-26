@@ -22,3 +22,14 @@
 .class-section .button {
 	padding: 5px 10px;
 }
+
+.subject.row, .student.row {
+	flex-direction: row;
+}
+	.subject.row>*, .student.row>* {
+		width: initial;
+	}
+
+	.subject.row>*:last-child, .student.row>*:last-child {
+		margin-left: auto;
+	}

@@ -95,8 +95,8 @@ class SingleStudent extends Component {
 				<div className="form">
 					<div className="divider">Personal Information</div>
 					<div className="row">
-						<label>Name</label>
-						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Name" />
+						<label>Full Name</label>
+						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
 					</div>
 					<div className="row">
 						<label>B-Form Number</label>

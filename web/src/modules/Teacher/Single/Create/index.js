@@ -8,7 +8,6 @@ import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
 import Banner from 'components/Banner'
-import Layout from 'components/Layout'
 import Former from 'utils/former'
 
 import './style.css'
@@ -16,7 +15,7 @@ import './style.css'
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
 
-const blankTeacher = {
+const blankTeacher = (isFirst = false) => ({
 	Name: "",
 	CNIC: "",
 	Gender: "",
@@ -34,10 +33,10 @@ const blankTeacher = {
 	Qualification: "",
 	Experience: "",
 	HireDate: moment(),
-	Admin: false,
+	Admin: isFirst,
 
 	attendance: { } 
-}
+})
 
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -50,7 +49,7 @@ class CreateTeacher extends Component {
 		const id = props.match.params.id;
 
 		this.state = {
-			profile: id === 'new' ? blankTeacher : props.faculty[id] || blankTeacher,
+			profile: props.faculty[id] || blankTeacher(this.isFirst()),
 			redirect: false
 		}
 
@@ -108,8 +107,8 @@ class CreateTeacher extends Component {
 			{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 			<div className="form">
 				<div className="row">
-					<label>Name</label>
-					<input type="text" {...this.former.super_handle(["Name"])} placeholder="Name" />
+					<label>Full Name</label>
+					<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
 				</div>
 				<div className="row">
 					<label>CNIC</label>
@@ -133,7 +132,11 @@ class CreateTeacher extends Component {
 				</div>
 				<div className="row">
 					<label>Married</label>
-					<input type="checkbox" {...this.former.super_handle(["Married"])} />
+					<select {...this.former.super_handle(["Married"])}>
+						<option value='' disabled>Please Select Marriage Status</option>
+						<option value={false}>Not Married</option>
+						<option value={true}>Married</option>
+					</select>
 				</div>
 				<div className="row">
 					<label>Phone Number</label>
@@ -144,8 +147,12 @@ class CreateTeacher extends Component {
 					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
 				</div>
 				<div className="row">
-					<label>Active</label>
-					<input type="checkbox" {...this.former.super_handle(["Active"])} />
+					<label>Active Status</label>
+					<select {...this.former.super_handle(["Active"])}>
+						<option value='' disabled>Please Select Active Status</option>
+						<option value={true}>Currently Working at School</option>
+						<option value={false}>No Longer Working at School</option>
+					</select>
 				</div>
 
 				<div className="row">
@@ -182,8 +189,11 @@ class CreateTeacher extends Component {
 				</div>
 
 				<div className="row">
-					<label>Admin</label>
-					<input type="checkbox" {...this.former.super_handle(["Admin"])} />
+					<label>Admin Status</label>
+					<select {...this.former.super_handle(["Admin"])} disabled={!this.props.user.Admin}>
+						<option value={false}>Not an Admin</option>
+						<option value={true}>Admin</option>
+					</select>
 				</div>
 
 				<div className="save button" onClick={this.onSave}>Save</div>
@@ -192,6 +202,6 @@ class CreateTeacher extends Component {
 	}
 }
 
-export default connect(state => ({ faculty: state.db.faculty }) , dispatch => ({ 
+export default connect(state => ({ faculty: state.db.faculty, user: state.db.faculty[state.auth.faculty_id] }) , dispatch => ({
 	save: (teacher) => dispatch(createFacultyMerge(teacher)) 
  }))(CreateTeacher);

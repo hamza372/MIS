@@ -39,9 +39,17 @@ class SchoolLogin extends Component {
 		return <Layout>
 			<div className="school-login">
 				<div className="title">Verify your School</div>
-				<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" />
-				<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
-				<div className="button save" onClick={this.onLogin}>Login</div>
+				<div className="form">
+					<div className="row">
+						<label>School ID</label>
+						<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" />
+					</div>
+					<div className="row">
+						<label>Password</label>
+						<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
+					</div>
+					<div className="button save" onClick={this.onLogin}>Login</div>
+				</div>
 				{ this.props.auth.loading ? <div>Signing in....</div> : false }
 				{ this.props.auth.attempt_failed ? <div>Login failed</div> : false }
 			</div>
