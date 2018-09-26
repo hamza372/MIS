@@ -164,8 +164,11 @@ class SingleStudent extends Component {
 					</div>
 
 					<div className="row">
-						<label>Active</label>
-						<input type="checkbox" {...this.former.super_handle(["Active"])} />
+						<label>Active Status</label>
+						<select {...this.former.super_handle(["Active"])}>
+							<option value={true}>Student Currently goes to this School</option>
+							<option value={false}>Student No Longer goes to this School</option>
+						</select>
 					</div>
 
 					<div className="row">
