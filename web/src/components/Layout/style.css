@@ -85,6 +85,10 @@ html,body, #root, .layout{
 	border-bottom: 1px solid black;
 	transition: all .2s ease-in;
 }
+
+	input[disabled] {
+		background-color: #aaa;
+	}
 	
 	input[type="date"] {
 		background-color: initial;

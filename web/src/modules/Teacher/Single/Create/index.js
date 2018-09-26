@@ -50,7 +50,12 @@ class CreateTeacher extends Component {
 
 		this.state = {
 			profile: props.faculty[id] || blankTeacher(this.isFirst()),
-			redirect: false
+			redirect: false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -64,7 +69,19 @@ class CreateTeacher extends Component {
 
 		const id = v4();
 
-		if(this.state.profile.Password.length !== 128) { // hack...
+		// check if they set a username and password. 
+
+		if(this.state.profile.Username === "" && this.state.profile.Password === "") {
+			return this.setState({
+				banner: {
+					active: true,
+					text: "Please Fill Account Information",
+					good: false
+				}
+			})
+		}
+
+		if (this.state.profile.Password.length !== 128) { // hack...
 			hash(this.state.profile.Password).then(hashed => {
 				this.props.save({
 					id,
@@ -74,7 +91,11 @@ class CreateTeacher extends Component {
 
 				this.setState({
 					redirect: this.isFirst() ? "/login" : (this.isNew() ? `/faculty/${id}/profile` : false),
-					saveBanner: true
+					banner: {
+						active: true,
+						good: true,
+						text: "Saved!"
+					}
 				})
 			})
 		}
@@ -85,12 +106,16 @@ class CreateTeacher extends Component {
 			}, this.isFirst())
 
 			this.setState({
-				saveBanner: true,
+				banner: {
+					active: true,
+					good: true,
+					text: "Saved!"
+				},
 				redirect: this.isNew() ? `/faculty/${id}/profile` : false
 			})
 
 			setTimeout(() => {
-				this.setState({ saveBanner: false })
+				this.setState({ banner: { active: false }})
 			}, 3000);
 
 		}
@@ -104,8 +129,10 @@ class CreateTeacher extends Component {
 		}
 
 		return <div className="single-teacher-create">
-			{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
+			{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+
 			<div className="form">
+				<div className="divider">Personal Information</div>
 				<div className="row">
 					<label>Full Name</label>
 					<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
@@ -123,14 +150,6 @@ class CreateTeacher extends Component {
 					</select>
 				</div>
 				<div className="row">
-					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" />
-				</div>
-				<div className="row">
-					<label>Password</label>
-					<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
-				</div>
-				<div className="row">
 					<label>Married</label>
 					<select {...this.former.super_handle(["Married"])}>
 						<option value='' disabled>Please Select Marriage Status</option>
@@ -138,21 +157,10 @@ class CreateTeacher extends Component {
 						<option value={true}>Married</option>
 					</select>
 				</div>
+
 				<div className="row">
-					<label>Phone Number</label>
-					<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
-				</div>
-				<div className="row">
-					<label>Monthly Salary</label>
-					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
-				</div>
-				<div className="row">
-					<label>Active Status</label>
-					<select {...this.former.super_handle(["Active"])}>
-						<option value='' disabled>Please Select Active Status</option>
-						<option value={true}>Currently Working at School</option>
-						<option value={false}>No Longer Working at School</option>
-					</select>
+					<label>Date of Birth</label>
+					<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
 				</div>
 
 				<div className="row">
@@ -164,16 +172,33 @@ class CreateTeacher extends Component {
 					<label>Husband/Father CNIC</label>
 					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 13)} placeholder="Father/Husband CNIC" />
 				</div>
-
+				
+				<div className="divider">Account Information</div>
 				<div className="row">
-					<label>Date of Birth</label>
-					<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
+					<label>Username</label>
+					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" />
+				</div>
+				<div className="row">
+					<label>Password</label>
+					<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
 				</div>
 
+				<div className="divider">Contact Information</div>
+				<div className="row">
+					<label>Phone Number</label>
+					<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
+				</div>
 				<div className="row">
 					<label>Address</label>
 					<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" />
 				</div>
+
+				<div className="divider">School Information</div>
+				<div className="row">
+					<label>Monthly Salary</label>
+					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
+				</div>
+
 				<div className="row">
 					<label>Experience</label>
 					<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
@@ -193,6 +218,15 @@ class CreateTeacher extends Component {
 					<select {...this.former.super_handle(["Admin"])} disabled={!this.props.user.Admin}>
 						<option value={false}>Not an Admin</option>
 						<option value={true}>Admin</option>
+					</select>
+				</div>
+
+				<div className="row">
+					<label>Active Status</label>
+					<select {...this.former.super_handle(["Active"])}>
+						<option value='' disabled>Please Select Active Status</option>
+						<option value={true}>Currently Working at School</option>
+						<option value={false}>No Longer Working at School</option>
 					</select>
 				</div>
 
