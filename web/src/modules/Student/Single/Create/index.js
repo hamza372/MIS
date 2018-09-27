@@ -33,6 +33,13 @@ const blankStudent = () => ({
 	Notes: "",
 	StartDate: moment(),
 
+	fees: {
+		[v4()]: {
+			name: "Monthly Fee",
+			amount: "",
+			period: "M"  // M: MONTHLY, Y: YEARLY 
+		}
+	},
 	attendance: {},
 	section_id: ""
 })
@@ -52,6 +59,8 @@ class SingleStudent extends Component {
 		}
 
 		this.former = new Former(this, ["profile"])
+
+		console.log(this.state.profile)
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
@@ -77,6 +86,33 @@ class SingleStudent extends Component {
 				redirect: this.isNew() ? `/student/${student.id}/profile` : false
 			})
 		}, 3000);
+	}
+
+	addFee = () => {
+		this.setState({
+			profile: {
+				...this.state.profile,
+				fees: {
+					...this.state.profile.fees,
+					[v4()]: {
+						name: "",
+						amount: "",
+						period: "",
+					}
+				}
+			}
+		})
+	}
+
+	removeFee = id => () => {
+		const {[id]: removed, ...nextFee} = this.state.profile.fees;
+
+		this.setState({
+			profile: {
+				...this.state.profile,
+				fees: nextFee
+			}
+		})
 	}
 
 	render() {
@@ -159,11 +195,6 @@ class SingleStudent extends Component {
 					}
 
 					<div className="row">
-						<label>Monthly Fee</label>
-						<input type="number" {...this.former.super_handle(["Fee"])} placeholder="Monthly Fee"/>
-					</div>
-
-					<div className="row">
 						<label>Active Status</label>
 						<select {...this.former.super_handle(["Active"])}>
 							<option value={true}>Student Currently goes to this School</option>
@@ -172,15 +203,40 @@ class SingleStudent extends Component {
 					</div>
 
 					<div className="row">
-						<label>Notes</label>
-						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
-					</div>
-
-					<div className="row">
 						<label>Start Date</label>
 						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
 					</div>
 
+					<div className="row">
+						<label>Notes</label>
+						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
+					</div>
+
+					<div className="divider">Payment</div>
+					{
+						Object.entries(this.state.profile.fees).map(([id, fee]) => {
+							return <div className="section" key={id}>
+								<div className="row">
+									<label>Name</label>
+									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder="Fee Name" />
+								</div>
+								<div className="row">
+									<label>Amount</label>
+									<input type="number" {...this.former.super_handle(["fees", id, "amount"])} placeholder="Amount" />
+								</div>
+								<div className="row">
+									<label>Fee Period</label>
+									<select {...this.former.super_handle(["fees", id, "period"])}>
+										<option value="" disabled>Please Select a Time Period</option>
+										<option value="M">Every Month</option>
+										<option value="Y">Every Year</option>
+									</select>
+								</div>
+								<div className="button" onClick={this.removeFee(id)}>Remove Fee</div>
+							</div>
+						})
+					}
+					<div className="button" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
 
 					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>

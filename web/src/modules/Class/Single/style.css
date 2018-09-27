@@ -12,17 +12,6 @@
 		margin: 20px 0;
 	}
 
-.single-class .class-section {
-	border: 1px solid rgba(0,0,0,0.3);
-	border-radius: 5px;
-	padding: 15px;
-	margin-bottom: 20px;
-}
-
-.class-section .button {
-	padding: 5px 10px;
-}
-
 .subject.row, .student.row {
 	flex-direction: row;
 }

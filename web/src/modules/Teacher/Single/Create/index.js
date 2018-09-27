@@ -71,7 +71,7 @@ class CreateTeacher extends Component {
 
 		// check if they set a username and password. 
 
-		if(this.state.profile.Username === "" && this.state.profile.Password === "") {
+		if(this.state.profile.Username === "" || this.state.profile.Password === "") {
 			return this.setState({
 				banner: {
 					active: true,
@@ -97,6 +97,11 @@ class CreateTeacher extends Component {
 						text: "Saved!"
 					}
 				})
+
+				setTimeout(() => {
+					this.setState({ banner: { active: false }})
+				}, 3000);
+
 			})
 		}
 		else {
@@ -176,7 +181,7 @@ class CreateTeacher extends Component {
 				<div className="divider">Account Information</div>
 				<div className="row">
 					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" />
+					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autocorrect="off" autocapitalize="off" />
 				</div>
 				<div className="row">
 					<label>Password</label>
@@ -209,7 +214,7 @@ class CreateTeacher extends Component {
 				</div>
 
 				<div className="row">
-					<label>Hire Date</label>
+					<label>Start Date</label>
 					<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date"/>
 				</div>
 

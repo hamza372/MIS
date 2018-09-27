@@ -42,7 +42,7 @@ class SchoolLogin extends Component {
 				<div className="form">
 					<div className="row">
 						<label>School ID</label>
-						<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" />
+						<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" autocorrect="off" autocapitalize="off" />
 					</div>
 					<div className="row">
 						<label>Password</label>

@@ -67,6 +67,10 @@ class SingleClass extends Component {
 
 	addSubject = () => {
 
+		if(this.state.class.new_subject.trim() === "") {
+			return;
+		}
+
 		this.setState({
 			class: {
 				...this.state.class,
@@ -163,7 +167,7 @@ class SingleClass extends Component {
 					<div className="divider">Sections</div>
 					{
 						Object.entries(this.state.class.sections)
-							.map(([id, section], i, arr) => <div className="class-section" key={id}>
+							.map(([id, section], i, arr) => <div className="section" key={id}>
 								<div className="row">
 									<label>Section Name</label>
 									<input type="text" {...this.former.super_handle(["sections", id, "name"])} placeholder="Type Section Name"/>

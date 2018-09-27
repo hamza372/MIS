@@ -28,6 +28,10 @@ html,body, #root, .layout{
 	padding: 10px;
 }
 
+a {
+	color: #4DA2DF;
+}
+
 .header .profile {
 	margin-left: auto;
 }
@@ -38,6 +42,17 @@ html,body, #root, .layout{
 	align-items: baseline;
 	font-size: 1rem;
 }
+
+.section {
+	border: 1px solid rgba(0,0,0,0.3);
+	border-radius: 5px;
+	padding: 15px;
+	margin-bottom: 20px;
+}
+
+	.section .row .button {
+		padding: 5px 10px;
+	}
 
 .form .row {
 	margin: 5px 0;
@@ -54,7 +69,7 @@ html,body, #root, .layout{
 	}
 
 	.row:focus-within label {
-		color: rgb(77, 162, 223);
+		color: #4DA2DF;
 		font-weight: bold;
 	}
 
@@ -69,6 +84,11 @@ html,body, #root, .layout{
 		}
 
 		.form .row>*:last-child {
+			margin-left: auto;
+		}
+
+		.form .button {
+			width: initial;
 			margin-left: auto;
 		}
 	}
@@ -116,7 +136,14 @@ html,body, #root, .layout{
 
 	.form input:focus {
 		background-color: white;
-		border: 1px solid #95B8D1;
+		border: 1px solid #4DA2DF;
+	}
+
+	.form .button.save {
+		/*background-color: #95B8D1;*/
+		background-color: #4DA2DF;
+		color: #fafafa;
+		border: 1px solid black;
 	}
 
 .title {
@@ -154,6 +181,7 @@ textarea {
 	font-weight: bold;
 	text-decoration: none;
 	text-align: center;
+	user-select: none;
 }
 
 	.button.selected, .button:hover {
