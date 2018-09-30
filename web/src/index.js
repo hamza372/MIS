@@ -8,7 +8,7 @@ import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers'
 
 import Routes from './routes'
-import { saveDB, loadDB, updateDB } from 'utils/localStorage';
+import { saveDB, loadDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
 const debug_host = 'wss://80603a0f.ngrok.io'
