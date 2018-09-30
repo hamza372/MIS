@@ -27,6 +27,7 @@ defmodule Sarkar.MixProject do
 			{:poison, "~> 3.0"},
 			{:distillery, "~> 2.0"},
 			{:cowboy, "~> 2.2", override: true, manager: :rebar3},
+			{:uuid, "~> 1.1"},
 			{:postgrex, "~>0.13.3"},
 			{:dynamic, github: "ironbay/dynamic", sparse: "elixir"}
 		]

@@ -8,10 +8,10 @@ import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers'
 
 import Routes from './routes'
-import { saveDB, loadDB } from 'utils/localStorage';
+import { saveDB, loadDB, updateDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
-const debug_host = 'wss://64ae2728.ngrok.io'
+const debug_host = 'wss://80603a0f.ngrok.io'
 
 const host = process.env.REACT_APP_MIS_HOST || debug_host;
 const initialState = loadDB();

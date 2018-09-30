@@ -36,8 +36,9 @@ const blankStudent = () => ({
 	fees: {
 		[v4()]: {
 			name: "Monthly Fee",
+			type: "FEE",
 			amount: "",
-			period: "M"  // M: MONTHLY, Y: YEARLY 
+			period: "MONTHLY"  // M: MONTHLY, Y: YEARLY 
 		}
 	},
 	attendance: {},
@@ -96,6 +97,7 @@ class SingleStudent extends Component {
 					...this.state.profile.fees,
 					[v4()]: {
 						name: "",
+						type: "", 
 						amount: "",
 						period: "",
 					}
@@ -216,6 +218,14 @@ class SingleStudent extends Component {
 					{
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
+								<div className="row">
+									<label>Type</label>
+									<select {...this.former.super_handle(["fees", id, "type"])}>
+										<option value="" disabled>Select Fee or Scholarship</option>
+										<option value="FEE">Fee</option>
+										<option value="SCHOLARSHIP">Scholarship</option>
+									</select>
+								</div>
 								<div className="row">
 									<label>Name</label>
 									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder="Fee Name" />

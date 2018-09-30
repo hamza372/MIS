@@ -48,7 +48,7 @@ const rootReducer = (state, action) => {
 			let next = Dynamic.put(state, ["queued"], newQ);
 
 			if(Object.keys(action.db).length > 0) {
-				next = Dynamic.put(next, ["db"], {...state.db, ...action.db}) // this way if we add new fields on client which arent on db it wont null them.
+				next = Dynamic.put(next, ["db"], {...state.db, ...action.db}) // this way if we add new fields on client which arent on db it wont null them. only top level tho....
 			}
 			return {
 				...next,
