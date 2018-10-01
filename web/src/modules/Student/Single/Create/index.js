@@ -41,6 +41,7 @@ const blankStudent = () => ({
 			period: "MONTHLY"  // M: MONTHLY, Y: YEARLY 
 		}
 	},
+	payments: {},
 	attendance: {},
 	section_id: ""
 })
@@ -228,7 +229,7 @@ class SingleStudent extends Component {
 								</div>
 								<div className="row">
 									<label>Name</label>
-									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder="Fee Name" />
+									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} />
 								</div>
 								<div className="row">
 									<label>Amount</label>
@@ -238,8 +239,8 @@ class SingleStudent extends Component {
 									<label>Fee Period</label>
 									<select {...this.former.super_handle(["fees", id, "period"])}>
 										<option value="" disabled>Please Select a Time Period</option>
-										<option value="M">Every Month</option>
-										<option value="Y">Every Year</option>
+										<option value="MONTHLY">Every Month</option>
+										<option value="YEARLY">Every Year</option>
 									</select>
 								</div>
 								<div className="button" onClick={this.removeFee(id)}>Remove Fee</div>

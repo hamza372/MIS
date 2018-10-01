@@ -1,0 +1,13 @@
+.student-fees {
+	width: 90%;
+}
+
+.student-fees .form {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.student-fees .row>*:nth-child(2){
+	margin-left: auto;
+}

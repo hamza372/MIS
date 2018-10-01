@@ -108,43 +108,8 @@ const addFacultyID = state => {
 	return state;
 }
 
-// these should be dispatching merges so that it gets reflected on the db side as well.
-
-// convert the old single "monthly fee" field of student into the new fee map.
-const addFeeMapToStudents = state => {
-
-	state.db.students = Object.entries(state.db.students)
-		.reduce((agg, [id, student]) => {
-
-			if(student.fees === undefined || Object.values(student.fees)[0].type === undefined) {
-
-				console.log("mapping student", student.Name)
-
-				agg[id] = {
-					...student,
-					fees: {
-						[v4()]: {
-							name: "Monthly Fee",
-							amount: student.Fee,
-							type: "FEE", // FEE, SCHOLARSHIP
-							period: "MONTHLY"  // M: MONTHLY, Y: YEARLY 
-						}
-					}
-				};
-			}
-			else {
-				agg[id] = student;
-			}
-
-			return agg;
-		}, {})
-
-	return state;
-}
-
 // this modifies db in case any schema changes have happened
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
-//	addFeeMapToStudents
 ];

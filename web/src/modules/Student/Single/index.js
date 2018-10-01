@@ -5,12 +5,10 @@ import Layout from 'components/Layout'
 
 import Create from './Create'
 import Attendance from './Attendance'
+import Fees from './Fees'
 
 import './style.css'
 
-const New = () => {
-	return <div>New thing</div>
-}
 export default class StudentPage extends Component {
 
 	render() {
@@ -32,7 +30,7 @@ export default class StudentPage extends Component {
 
 				<Route path="/student/new" component={Create} />
 				<Route path="/student/:id/profile" component={Create} />
-				<Route path="/student/:id/payment" component={New} />
+				<Route path="/student/:id/payment" component={Fees} />
 				<Route path="/student/:id/attendance" component={Attendance} />
 			</div>
 		</Layout>
