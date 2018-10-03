@@ -12,10 +12,7 @@ const StudentList = (props) => {
 		<div className="student-list">
 			<Title>Students</Title>
 			<List create={'/student/new'} createText={"Add new Student"}>
-				{Object.values(props.students).map(([id, student]) => {
-
-					return <Link to={`/student/${student.id}/profile`} key={student.id}>{student.Name}</Link>
-				} )} 
+				{Object.values(props.students).map(([id, student]) => <Link to={`/student/${student.id}/profile`} key={id}>{student.Name}</Link>)} 
 			</List>
 		</div>
 	</Layout>

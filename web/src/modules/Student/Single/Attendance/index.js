@@ -10,7 +10,9 @@ class StudentAttendance extends Component {
 		const id = this.props.match.params.id;
 		const student = this.props.students[id];
 
-		const attendance = student.attendance;
+		const attendance = student.attendance || {};
+
+		console.log(attendance)
 
 		const { PRESENT: num_present, ABSENT: num_absent, LEAVE: num_leave } = Object.values(attendance).reduce((agg, curr) => {
 			agg[curr.status] += 1;
@@ -49,4 +51,4 @@ class StudentAttendance extends Component {
 	}
 }
 
-export default connect(state => ({ students: state.db.students }), dispatch => ({ }))(StudentAttendance)
+export default connect(state => ({ students: state.db.students }))(StudentAttendance)

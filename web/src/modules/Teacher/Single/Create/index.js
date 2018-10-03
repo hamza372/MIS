@@ -181,7 +181,7 @@ class CreateTeacher extends Component {
 				<div className="divider">Account Information</div>
 				<div className="row">
 					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autocorrect="off" autocapitalize="off" />
+					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
 				</div>
 				<div className="row">
 					<label>Password</label>

@@ -4,7 +4,7 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
-import { createStudentMerge } from 'actions'
+import { createStudentMerge, deleteStudent } from 'actions'
 
 import Banner from 'components/Banner'
 import Former from 'utils/former'
@@ -88,6 +88,16 @@ class SingleStudent extends Component {
 				redirect: this.isNew() ? `/student/${student.id}/profile` : false
 			})
 		}, 3000);
+	}
+
+	onDelete = () => {
+		console.log(this.state.profile.id)
+
+		this.props.delete(this.state.profile)
+
+		this.setState({
+			redirect: `/student`
+		})
 	}
 
 	addFee = () => {
@@ -239,6 +249,7 @@ class SingleStudent extends Component {
 									<label>Fee Period</label>
 									<select {...this.former.super_handle(["fees", id, "period"])}>
 										<option value="" disabled>Please Select a Time Period</option>
+										<option value="SINGLE">One Time</option>
 										<option value="MONTHLY">Every Month</option>
 										<option value="YEARLY">Every Year</option>
 									</select>
@@ -250,11 +261,13 @@ class SingleStudent extends Component {
 					<div className="button" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
 
 					<div className="save button" onClick={this.onSave}>Save</div>
+					<div className="button red" onClick={this.onDelete}>Delete</div>
 				</div>
 			</div>
 	}
 }
 
 export default connect(state => ({ students: state.db.students, classes: state.db.classes }) , dispatch => ({ 
-	save: (student) => dispatch(createStudentMerge(student)) 
+	save: (student) => dispatch(createStudentMerge(student)),
+	delete: (student) => dispatch(deleteStudent(student))
  }))(SingleStudent);

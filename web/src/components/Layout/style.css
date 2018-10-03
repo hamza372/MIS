@@ -43,6 +43,21 @@ a {
 	font-size: 1rem;
 }
 
+.table.row {
+	justify-content: space-between;
+}
+
+	.table.row *{
+		width: 100%;
+	}
+
+	.table.row *:last-child {
+		text-align: right;
+	}
+	.table.row *:first-child {
+		text-align: left;
+	}
+
 .section {
 	border: 1px solid rgba(0,0,0,0.3);
 	border-radius: 5px;
@@ -50,9 +65,6 @@ a {
 	margin-bottom: 20px;
 }
 
-	.section .row .button {
-		padding: 5px 10px;
-	}
 
 .form .row {
 	margin: 5px 0;
@@ -139,12 +151,6 @@ a {
 		border: 1px solid #4DA2DF;
 	}
 
-	.form .button.save {
-		/*background-color: #95B8D1;*/
-		background-color: #4DA2DF;
-		color: #fafafa;
-		border: 1px solid black;
-	}
 
 .title {
 	margin: 20px 0;
@@ -187,6 +193,25 @@ textarea {
 	.button.selected, .button:hover {
 		color: #fafafa;
 		background-color: #222;
+	}
+
+	.section .row .button {
+		padding: 5px 10px;
+	}
+
+	.form .button.save {
+		/*background-color: #95B8D1;*/
+		background-color: #4DA2DF;
+		color: #fafafa;
+		border: 1px solid black;
+	}
+
+	.button.red {
+		background-color: #EDAFB8;
+		color: #fafafa;
+		border: 1px solid black;
+		margin-left: auto;
+		margin-top: 10px;
 	}
 
 input::-webkit-calendar-picker-indicator {

@@ -38,6 +38,37 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 		.catch(err => dispatch(QueueUp(payload.payload)))
 }
 
+export const DELETES = "DELETES"
+export const createDeletes = (paths) => (dispatch, getState, syncr) => {
+
+	const action = {
+		type: DELETES,
+		paths
+	}
+
+	dispatch(action)
+	const payload = paths.reduce((agg, curr) => ({
+			...agg, 
+			[curr.path.join(',')]: {
+				action: {
+					type: "DELETE",
+					path: curr.path,
+					value: 1
+				},
+				date: moment().unix() * 1000
+			}
+		}), {})
+
+	syncr.send({
+		type: SYNC,
+		school_id: getState().school_id,
+		payload 
+	})
+	.then(dispatch)
+	.catch(err => dispatch(QueueUp(payload)))
+
+}
+
 export const DELETE = "DELETE"
 export const createDelete = (path) => (dispatch, getState, syncr) => {
 	const action = {
