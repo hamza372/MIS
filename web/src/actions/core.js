@@ -18,19 +18,17 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	const payload = {
 		type: "SYNC",
 		school_id: state.school_id,
-		payload: merges.reduce((agg, curr) => {
-			return {
-				...agg, 
-				[curr.path.join(',')]: {
-					action: {
-						type: "MERGE",
-						path: curr.path, 
-						value: curr.value
-					},
-					date: moment().unix() * 1000
-				}
+		payload: merges.reduce((agg, curr) => ({
+			...agg, 
+			[curr.path.join(',')]: {
+				action: {
+					type: "MERGE",
+					path: curr.path.map(p => p === undefined ? "" : p),
+					value: curr.value
+				},
+				date: moment().unix() * 1000
 			}
-		}, {})
+		}), {})
 	}
 
 	syncr.send(payload)
@@ -52,7 +50,7 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 			[curr.path.join(',')]: {
 				action: {
 					type: "DELETE",
-					path: curr.path,
+					path: curr.path.map(x => x === undefined ? "" : x),
 					value: 1
 				},
 				date: moment().unix() * 1000

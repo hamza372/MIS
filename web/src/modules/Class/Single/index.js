@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { v4 } from 'node-uuid'
+import { Link } from 'react-router-dom'
 
 import Layout from 'components/Layout'
 import Former from 'utils/former'
@@ -191,7 +192,7 @@ class SingleClass extends Component {
 										.filter(student => student.section_id === id)
 										.map(student => {
 											return <div className="student row" key={student.id}>
-												<div>{student.Name}</div>
+												<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
 												<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
 											</div>
 										})

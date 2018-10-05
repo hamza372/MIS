@@ -22,6 +22,15 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
+@media print {
+	.header {
+		display: none;
+	}
+	.button {
+		display: none;
+	}
+}
+
 .header a {
 	text-decoration: none;
 	color: white;
@@ -207,6 +216,14 @@ textarea {
 	}
 
 	.button.red {
+		background-color: #EDAFB8;
+		color: #fafafa;
+		border: 1px solid black;
+		margin-left: auto;
+		margin-top: 10px;
+	}
+
+	.button.blue {
 		background-color: #EDAFB8;
 		color: #fafafa;
 		border: 1px solid black;

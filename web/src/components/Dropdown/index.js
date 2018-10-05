@@ -21,6 +21,7 @@ class Dropdown extends Component {
 	render() {
 
 		const {items, toLabel, onSelect, toKey} = this.props;
+
 		return <div className="dropdown">
 
 			<input type="text" {...this.former.super_handle(["text"])} placeholder={this.props.placeholder || "Enter Text"} />

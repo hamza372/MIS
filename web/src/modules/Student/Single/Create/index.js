@@ -19,6 +19,7 @@ import './style.css'
 // text and date input, dropdowns....
 
 const blankStudent = () => ({
+	id: v4(),
 	Name: "",
 	BForm: "",
 	Gender: "",
@@ -57,41 +58,88 @@ class SingleStudent extends Component {
 		this.state = {
 			profile: props.students[id] || blankStudent(),
 			redirect: false,
-			saveBanner: false
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, ["profile"])
 
-		console.log(this.state.profile)
+		// console.log(this.state.profile)
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
 	onSave = () => {
 		console.log('save!', this.state.profile)
-		const id = v4();
 
-		const student = {
-			id,
-			...this.state.profile
+		const student = this.state.profile;
+
+		// verify 
+
+		for(let fee of Object.values(this.state.profile.fees)) {
+			console.log('fees', fee)
+
+			if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
+				console.log("uh oh")
+				return this.setState({
+					banner: {
+						visible: true,
+						good: false,
+						text: "Please fill out all Fee Information"
+					}
+				})
+			}
 		}
 
 		this.props.save(student)
-
 		this.setState({
-			saveBanner: true
+			banner: {
+				visible: true,
+				good: true,
+				text: "Saved!"
+			}
 		})
 
 		setTimeout(() => {
 			this.setState({
-				saveBanner: false,
+				banner: {
+					visible: false
+				},
 				redirect: this.isNew() ? `/student/${student.id}/profile` : false
 			})
 		}, 3000);
 	}
 
+	addSibling = (sibling) => {
+		console.log("ADD SIBLING", sibling)
+
+		// we create another table called "families" with a unique id, and loop and check that map
+		// on the student there would be a family id. similar to how we do classes.
+
+		/*
+		families: {
+			[id]: { 
+				name: "",
+
+				students: { [id]: true},
+				contact: { phone: number, address: string},
+				profile: {
+					fathername: "",
+					fathercnic: ""
+				}
+			}
+		}
+
+		once added to a family, these fields should also be set on the student profile. if that is the case then it should be above these fields 
+		then like a subject, if it's not there they will need to be able to set this 
+		*/
+	}
+
 	onDelete = () => {
-		console.log(this.state.profile.id)
+		// console.log(this.state.profile.id)
 
 		this.props.delete(this.state.profile)
 
@@ -108,7 +156,7 @@ class SingleStudent extends Component {
 					...this.state.profile.fees,
 					[v4()]: {
 						name: "",
-						type: "", 
+						type: "FEE", 
 						amount: "",
 						period: "",
 					}
@@ -136,7 +184,7 @@ class SingleStudent extends Component {
 		}
 
 		return <div className="single-student">
-				{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
+				{ this.state.banner.visible ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
 				<div className="title">Edit Student</div>
 
@@ -267,7 +315,8 @@ class SingleStudent extends Component {
 	}
 }
 
-export default connect(state => ({ students: state.db.students, classes: state.db.classes }) , dispatch => ({ 
+export default connect(state => ({
+	students: state.db.students, classes: state.db.classes }) , dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
 	delete: (student) => dispatch(deleteStudent(student))
  }))(SingleStudent);

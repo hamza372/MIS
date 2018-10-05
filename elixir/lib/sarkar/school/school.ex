@@ -41,10 +41,8 @@ defmodule Sarkar.School do
 
 			case type do
 				"MERGE" -> 
-					IO.puts "doing merge"
 					{Dynamic.put(agg_db, p, value), max(date, max_date)}
 				"DELETE" -> 
-					IO.puts "doing delete"
 					{Dynamic.delete(agg_db, p), max(date, max_date)}
 				other -> 
 					IO.puts "unrecognized type"
