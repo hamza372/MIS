@@ -17,7 +17,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	const state = getState();
 	const payload = {
 		type: "SYNC",
-		school_id: state.school_id,
+		school_id: state.auth.school_id,
 		payload: merges.reduce((agg, curr) => ({
 			...agg, 
 			[curr.path.join(',')]: {
@@ -59,7 +59,7 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 
 	syncr.send({
 		type: SYNC,
-		school_id: getState().school_id,
+		school_id: getState().auth.school_id,
 		payload 
 	})
 	.then(dispatch)
@@ -80,7 +80,7 @@ export const createDelete = (path) => (dispatch, getState, syncr) => {
 	// attempt to send it
 	syncr.send({
 		type: SYNC,
-		school_id: getState().school_id,
+		school_id: getState().auth.school_id,
 		payload: {
 			[path]: {
 				action,
