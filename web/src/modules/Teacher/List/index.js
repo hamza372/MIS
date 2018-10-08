@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+
 import Layout from 'components/Layout'
 import List from 'components/List'
 import Title from 'components/Title'
-import TeacherStub from 'components/TeacherStub'
 
 
 const TeacherList = (props) => {
@@ -11,7 +12,7 @@ const TeacherList = (props) => {
 		<div className="teacher-list">
 			<Title>Teachers</Title>
 			<List create={'/faculty/new'} createText={"Add new Teacher"}>
-				{Object.values(props.teachers).map(teacher => <TeacherStub key={teacher.id} teacher={teacher} />)}
+				{Object.values(props.teachers).map(teacher => <Link key={teacher.id} to={`/faculty/${teacher.id}/profile`}>{teacher.Name}</Link>)} 
 			</List>
 		</div>
 	</Layout>

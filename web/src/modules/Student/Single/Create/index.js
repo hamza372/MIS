@@ -83,7 +83,6 @@ class SingleStudent extends Component {
 			console.log('fees', fee)
 
 			if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
-				console.log("uh oh")
 				return this.setState({
 					banner: {
 						visible: true,

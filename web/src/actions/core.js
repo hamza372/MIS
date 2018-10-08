@@ -127,7 +127,7 @@ export const connected = () => (dispatch, getState, syncr) => {
 			.then(res => {
 				return syncr.send({
 					type: SYNC,
-					school_id: state.school_id,
+					school_id: state.auth.school_id,
 					payload: state.queued
 				})
 			})
