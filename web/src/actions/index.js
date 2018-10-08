@@ -140,3 +140,13 @@ export const addPayment = (student, payment_id, amount, date = moment.now(), typ
 		}
 	]))
 }
+
+export const createTemplateMerges = templates => dispatch => {
+
+	dispatch(createMerges([
+		{
+			path: ["db", "sms_templates"],
+			value: templates
+		}
+	]))
+}
