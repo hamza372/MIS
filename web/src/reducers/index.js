@@ -73,7 +73,8 @@ const rootReducer = (state, action) => {
 		{
 			if(state.acceptSnapshot && Object.keys(action.db).length > 0) {
 				console.log('applying snapshot')
-				return {...Dynamic.put(state, ["db"], action.db)}
+
+				return JSON.parse(JSON.stringify(Dynamic.put(state, ["db"], action.db)))
 			}
 
 			return state;

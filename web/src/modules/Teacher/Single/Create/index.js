@@ -126,6 +126,16 @@ class CreateTeacher extends Component {
 		}
 	}
 
+	componentWillReceiveProps(newProps) {
+		// this means every time teacher upgrades, we will change the fields to whatever was just sent.
+		// this means it will be very annoying for someone to edit the user at the same time as someone else
+		// which is probably a good thing. 
+
+		this.setState({
+			profile: newProps.faculty[this.props.match.params.id] || this.state.profile
+		})
+	}
+
 	render() {
 
 		if(this.state.redirect) {

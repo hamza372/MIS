@@ -75,6 +75,7 @@ class SMS extends Component {
 							<label>Message</label>
 							<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 						</div>
+						<div className="button">Send</div>
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">
