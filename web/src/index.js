@@ -21,7 +21,7 @@ const store = createStore(reducer, initialState, applyMiddleware(thunkMiddleware
 
 store.subscribe(() => {
 	const state = store.getState();
-	saveDB(state)
+	saveDB(state);
 })
 
 ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
