@@ -36,6 +36,42 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 		.catch(err => dispatch(QueueUp(payload.payload)))
 }
 
+export const SMS = "SMS"
+export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
+	
+	// should i keep a log of all messages sent in the db?
+
+	syncr.send({
+		type: SMS,
+		school_id: getState().auth.school_id,
+		payload: {
+			text,
+			number,
+		}
+	})
+	.then(dispatch)
+	.catch(err => console.error(err)) // this should backup to sending the sms via the android app?
+
+}
+
+export const BATCH_SMS = "BATCH_SMS"
+export const sendBatchSMS = (messages) => (dispatch, getState, syncr) => {
+
+	syncr.send({
+		type: BATCH_SMS,
+		school_id: getState().auth.school_id,
+		payload: {
+			messages: messages.map(m => ({
+				text: m.text,
+				number: m.number // only doing this for documentation purposes
+			}))
+		}
+	})
+	.catch(err => {
+		console.error(err) // send via android app?
+	})
+}
+
 export const DELETES = "DELETES"
 export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 

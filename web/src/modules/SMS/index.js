@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { createTemplateMerges } from 'actions'
+import { sendSMS } from 'actions/core'
+
 import former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
@@ -51,6 +53,17 @@ class SMS extends Component {
 		setTimeout(() => this.setState({ banner: {active: false}}), 3000);
 	}
 
+	sendMessage = () => {
+
+		if(this.state.selected_student_number === "") {
+			return;
+		}
+
+		console.log('send message', this.state.text, this.state.selected_student_number);
+		this.props.sendMessage(this.state.text, this.state.selected_student_number);
+
+	}
+
 	render() {
 		return <Layout>
 			<div className="sms-page">
@@ -65,9 +78,11 @@ class SMS extends Component {
 							<label>Select Student</label>
 							<select {...this.former.super_handle(["selected_student_number"])}>
 								{
-									Object.entries(this.props.students)
+									[<option key="abcd" value="" disabled>Select a Student</option>,
+									...Object.entries(this.props.students)
 									.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
 									.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
+									]
 								}
 							</select>
 						</div>
@@ -75,7 +90,7 @@ class SMS extends Component {
 							<label>Message</label>
 							<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 						</div>
-						<div className="button">Send</div>
+						<div className="button" onClick={this.sendMessage}>Send</div>
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">
@@ -121,5 +136,6 @@ class SMS extends Component {
 }
 
 export default connect(state => ({ sms_templates: state.db.sms_templates, students: state.db.students }), dispatch => ({
-	saveTemplates: templates => dispatch(createTemplateMerges(templates))
+	saveTemplates: templates => dispatch(createTemplateMerges(templates)),
+	sendMessage: (text, number) => dispatch(sendSMS(text, number))
 }))(SMS);

@@ -79,6 +79,7 @@ class StudentFees extends Component {
 		for(let [id, fee] of Object.entries(student.fees || {})) {
 			if(fee.period === "MONTHLY") {
 				// check if this fee exists in "owed" column.
+
 				const existing_monthly = Object.values(student.payments || {}).find(p => p.fee_id === id && moment(p.date).format("MM/YYYY") === curr);
 				if(existing_monthly === undefined) { // there is no payment for this month owed yet
 					// create it
