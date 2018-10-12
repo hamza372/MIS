@@ -1,0 +1,9 @@
+[{
+	"relation": ["delegate_permission/common.handle_all_urls"],
+	"target": {
+		"namespace": "android_app",
+		"package_name": "pk.org.cerp.mischool.mischoolcompanion",
+		"sha256_cert_fingerprints":
+			["24:A0:C6:ED:13:22:22:38:19:52:80:C6:C5:B1:C2:DE:BF:94:D4:C7:7D:01:1D:0C:9B:36:78:FA:6A:69:A1:B7"]
+	}
+}]

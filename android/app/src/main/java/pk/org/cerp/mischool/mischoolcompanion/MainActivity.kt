@@ -17,15 +17,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        val intent = getIntent()
+        val intent = this.intent
 
-        val action = intent.getAction()
-        val data = intent.getData()
+        val action = intent.action
+        val data = intent.data
+        val dataString = intent.dataString
 
-        Log.i(TAG, intent.dataString)
-        Log.i(TAG, action)
+        //Log.i(TAG, intent.dataString)
+        //Log.i(TAG, action)
+        Log.d(TAG, "HELLOOOO")
+        Log.d(TAG, intent.action)
+        if (data != null && dataString != null){
+            Log.d(TAG, "NOT NULL")
+            Log.d(TAG, dataString)
+        }
 
-        
+        // read a list of phone numbers and messages, dispatch texts to all.
     }
 
     fun sendSMS(text: String, phoneNumber: String) {
