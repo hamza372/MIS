@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         //Log.i(TAG, action)
         Log.d(TAG, "HELLOOOO")
         Log.d(TAG, intent.action)
-        if (data != null && dataString != null){
+        if (data != null && dataString != null) {
             Log.d(TAG, "NOT NULL")
             Log.d(TAG, dataString)
         }

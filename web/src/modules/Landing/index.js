@@ -28,7 +28,7 @@ const Landing = (props) => {
 			</div> : false
 			}
 
-			<a href="https://mis.metal.fish/android-sms" target="_blank" className="button">SMS-Android</a>
+			<a className="button" href="intent://android-sms/#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;S.browser_fallback_url=https%3A%2F%2Fmis.metal.fish;end">SMS-Android</a>
 		</div>
 	</Layout>
 }
