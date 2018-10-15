@@ -27,7 +27,21 @@ class Attendance extends Component {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
+	sendBatchSMS = () => {
+		console.log('send batch sms');
+
+		// we need to jump to the right url `intent://whatever'
+
+	}
+
 	render() {
+
+		const payload = [{
+			number: "+9203222932227",
+			text: "helllo"
+		}]
+
+		const url = `intent://mis.metal.fish/android-sms?payload=${encodeURI(JSON.stringify(payload))}#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end`
 
 		return <Layout>
 			<div className="attendance">
@@ -51,6 +65,7 @@ class Attendance extends Component {
 					</div>})
 				}
 				</div>
+				{ !this.props.connected ? <a href={url} className="button">Send SMS</a> : false }
 			</div>
 		</Layout>
 
@@ -69,7 +84,8 @@ export default connect(state => {
 		.filter(s => sections.find(([id, section]) => id === s.section_id) !== undefined)
 
 	return {
-		students 
+		students,
+		connected: state.connected
 	}
 
 }, dispatch => ({
