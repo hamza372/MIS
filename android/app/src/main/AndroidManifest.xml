@@ -25,7 +25,7 @@
                 <data
                     android:scheme="https"
                     android:host="mis.metal.fish"
-                    android:pathPattern="/android-sms" />
+                    android:path="/android-sms" />
             </intent-filter>
         </activity>
     </application>

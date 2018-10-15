@@ -6,4 +6,13 @@
 		"sha256_cert_fingerprints":
 			["24:A0:C6:ED:13:22:22:38:19:52:80:C6:C5:B1:C2:DE:BF:94:D4:C7:7D:01:1D:0C:9B:36:78:FA:6A:69:A1:B7"]
 	}
+},
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app", 
+			"package_name": "pk.org.cerp.mischool.mischoolcompanion",
+			"sha256_cert_fingerprints": 
+				["20:7E:E1:E5:A8:14:2C:6C:86:F9:55:FA:47:03:26:65:85:A4:B5:52:99:7A:3E:C1:69:93:E6:29:2D:47:D8:1A"]
+	}
 }]
