@@ -59,6 +59,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun permissions() {
+
+
         if(ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             // no permission granted
             ActivityCompat.requestPermissions(this@MainActivity, arrayOf(android.Manifest.permission.SEND_SMS), MY_PERMISSIONS_SEND_SMS)

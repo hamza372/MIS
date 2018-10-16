@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { smsIntentLink } from 'utils/intent'
+
 import { createTemplateMerges } from 'actions'
 import { sendSMS } from 'actions/core'
 
@@ -65,6 +67,7 @@ class SMS extends Component {
 	}
 
 	render() {
+
 		return <Layout>
 			<div className="sms-page">
 				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -90,12 +93,16 @@ class SMS extends Component {
 							<label>Message</label>
 							<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 						</div>
-						<div className="button" onClick={this.sendMessage}>Send</div>
+						{ !this.props.connected ? 
+							<div className="button" onClick={this.sendMessage}>Send</div> : 
+							<a href={smsIntentLink([{ 
+								number: this.state.selected_student_number,
+								text: this.state.text }])} className="button">Send using Local SIM</a> }
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">
-						<div className="row"><div>Use $NAME to insert the child's name.</div></div>
-						<div className="row"><div>Use $STATUS to insert the attendance status.</div></div>
+						<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+						<div className="row"><div>Use <code>$STATUS</code> to insert the attendance status.</div></div>
 						<div className="row">
 							<label>SMS Template</label>
 							<textarea {...this.former.super_handle(["templates", "attendance"])} placeholder="Enter SMS template here" />
@@ -104,26 +111,26 @@ class SMS extends Component {
 
 					<div className="divider">Fees Template</div>
 					<div className="section">
-						<div className="row"><div>Use $NAME to insert the child's name.</div></div>
-						<div className="row"><div>Use $AMOUNT to insert the fee amount.</div></div>
-						<div className="row"><div>Use $BALANCE to insert the total fee balance.</div></div>
+						<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+						<div className="row"><div>Use <code>$AMOUNT</code> to insert the fee amount.</div></div>
+						<div className="row"><div>Use <code>$BALANCE</code> to insert the total fee balance.</div></div>
 						<div className="row">
 							<label>SMS Template</label>
-							<textarea {...this.former.super_handle(["template", "fee"])} placeholder="Enter SMS template here" />
+							<textarea {...this.former.super_handle(["templates", "fee"])} placeholder="Enter SMS template here" />
 						</div>
 					</div>
 
 					<div className="divider">Results Template</div>
 					<div className="section">
 						<div className="row">
-							<div>Use $NAME to insert the child's name.</div>
+							<div>Use <code>$NAME</code> to insert the child's name.</div>
 						</div>
 						<div className="row">
-							<div>Use $REPORT to send report line by line.</div>
+							<div>Use <code>$REPORT</code> to send report line by line.</div>
 						</div>
 						<div className="row">
 							<label>SMS Template</label>
-							<textarea {...this.former.super_handle(["template", "result"])} placeholder="Enter SMS template here" />
+							<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
 						</div>
 
 					</div>
@@ -135,7 +142,11 @@ class SMS extends Component {
 	}
 }
 
-export default connect(state => ({ sms_templates: state.db.sms_templates, students: state.db.students }), dispatch => ({
+export default connect(state => ({
+	sms_templates: state.db.sms_templates,
+	students: state.db.students,
+	connected: state.connected
+}), dispatch => ({
 	saveTemplates: templates => dispatch(createTemplateMerges(templates)),
 	sendMessage: (text, number) => dispatch(sendSMS(text, number))
 }))(SMS);

@@ -27,8 +27,6 @@ const Landing = (props) => {
 				<Link to="/teacher-attendance" className="button">Teacher Attendance</Link>
 			</div> : false
 			}
-
-			<a className="button" href="intent://mis.metal.fish/android-sms#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end">Test Android SMS</a>
 		</div>
 	</Layout>
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import { smsIntentLink } from 'utils/intent'
 import Layout from 'components/Layout'
 import { markStudent } from 'actions'
 
@@ -36,13 +37,23 @@ class Attendance extends Component {
 
 	render() {
 
-		const payload = [{
-			number: "+9203222932227",
-			text: "helllo"
-		}]
+		const payload = this.props.students
+			.filter(x => (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")] !== undefined)
+			.map(x => {
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
 
-		const url = `intent://mis.metal.fish/android-sms?payload=${encodeURI(JSON.stringify(payload))}#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end`
+				return {
+					number: x.Phone,
+					text: this.props.attendance_message_template.replace(/\$NAME/g, x.Name).replace(/\$STATUS/g, status)
+				}
+		})
 
+		//const url = `intent://mis.metal.fish/android-sms?payload=${encodeURI(JSON.stringify(payload))}#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end`
+		const url = smsIntentLink(payload);
+
+		// { !this.props.connected ? <a href={url} className="button">Send SMS</a> : false }
+		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
 		return <Layout>
 			<div className="attendance">
 				<div className="title">Attendance</div>
@@ -65,7 +76,7 @@ class Attendance extends Component {
 					</div>})
 				}
 				</div>
-				{ !this.props.connected ? <a href={url} className="button">Send SMS</a> : false }
+				<a href={url} className="button">Send SMS</a>
 			</div>
 		</Layout>
 
@@ -85,7 +96,8 @@ export default connect(state => {
 
 	return {
 		students,
-		connected: state.connected
+		connected: state.connected,
+		attendance_message_template: (state.db.sms_templates || {}).attendance || ""
 	}
 
 }, dispatch => ({
