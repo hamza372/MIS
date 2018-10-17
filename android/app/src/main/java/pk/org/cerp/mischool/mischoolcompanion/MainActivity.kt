@@ -49,10 +49,15 @@ class MainActivity : AppCompatActivity() {
                 sendSMS(p.text, p.number)
             }
 
+            Toast.makeText(applicationContext, parsed?.messages.orEmpty().size.toString() + " messages Sent", Toast.LENGTH_SHORT).show()
+
             if(parsed?.return_link != null) {
+                finish()
+                /*
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = Uri.parse(parsed.return_link)
                 startActivity(intent)
+                */
             }
 
 
@@ -82,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             val smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNumber, null, text, null, null)
 
-            Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
         } catch( e: Exception) {
             Log.d(TAG, e.message)
         }
