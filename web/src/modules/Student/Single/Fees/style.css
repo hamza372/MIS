@@ -8,3 +8,19 @@
 	width: 80%;
 	margin: auto;
 }
+
+.payment-history {
+	font-family: monospace;
+	color: #222;
+	background-color: white;
+}
+
+	.payment-history .table.row {
+		border-bottom: 1px solid #222;
+		line-height: 2rem;
+	}
+
+	.payment-history .table.row.last {
+		border-top: 1px solid #222;
+		border-bottom: none;
+	}

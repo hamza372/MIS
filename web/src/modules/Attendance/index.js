@@ -37,7 +37,7 @@ class Attendance extends Component {
 
 	render() {
 
-		const payload = this.props.students
+		const messages = this.props.students
 			.filter(x => (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")] !== undefined)
 			.map(x => {
 				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
@@ -50,7 +50,10 @@ class Attendance extends Component {
 		})
 
 		//const url = `intent://mis.metal.fish/android-sms?payload=${encodeURI(JSON.stringify(payload))}#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end`
-		const url = smsIntentLink(payload);
+		const url = smsIntentLink({
+			messages,
+			return_link: window.location.href
+		});
 
 		// { !this.props.connected ? <a href={url} className="button">Send SMS</a> : false }
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
@@ -76,7 +79,7 @@ class Attendance extends Component {
 					</div>})
 				}
 				</div>
-				<a href={url} className="button">Send SMS</a>
+				<a href={url} className="button blue">Send SMS</a>
 			</div>
 		</Layout>
 

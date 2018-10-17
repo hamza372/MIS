@@ -24,3 +24,9 @@
 	background-color: #E8DDB5;
 	background-color: #d1d1d1;
 }
+
+.attendance a.button {
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: 5%;
+}

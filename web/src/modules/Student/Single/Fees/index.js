@@ -29,7 +29,7 @@ class StudentFees extends Component {
 		this.state = {
 			payment: {
 				active: false,
-				amount: 0,
+				amount: "",
 				type: "SUBMITTED" // submitted or owed
 			}
 		}
@@ -47,7 +47,7 @@ class StudentFees extends Component {
 		this.setState({ 
 			payment: {
 				active: !this.state.payment.active,
-				amount: 0,
+				amount: "",
 				type: "SUBMITTED"
 			}
 		})
@@ -120,11 +120,11 @@ class StudentFees extends Component {
 				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "YEARLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
 			</div>
 
-			<div className="divider">History</div>
+			<div className="divider">Ledger</div>
 			<div className="payment-history section">
-				<div className="table row">
+				<div className="table row heading">
 					<label><b>Date</b></label>
-					<label><b>Reason</b></label>
+					<label><b>Label</b></label>
 					<label><b>Amount</b></label>
 				</div>
 			{
@@ -139,8 +139,8 @@ class StudentFees extends Component {
 						</div>
 					</div>})
 			}
-				<div className="table row">
-					<label><b>Total:</b></label>
+				<div className="table row last">
+					<label><b>Amount Owed:</b></label>
 					<div><b>{
 						Object.values(this.student().payments || {})
 							.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
@@ -149,12 +149,12 @@ class StudentFees extends Component {
 			</div>
 
 			<div className="form">
-				<div className="button" onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Payment"}</div>
+				<div className="button" onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
 				{ this.state.payment.active ? <div className="new-payment">
 					<div className="row">
 						<label>Amount</label>
-						<input type="number" {...this.Former.super_handle(["payment", "amount"])} placeholder="Enter Fee Amount" />
+						<input type="number" {...this.Former.super_handle(["payment", "amount"])} placeholder="Enter Amount" />
 					</div>
 					<div className="row">
 						<label>Type</label>

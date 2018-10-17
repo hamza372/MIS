@@ -28,12 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         val intent = this.intent
 
-        val action = intent.action
         val data = intent.data
         val dataString = intent.dataString
-
-        //Log.i(TAG, intent.dataString)S.browser_fallback_url=
-        //Log.i(TAG, action)
 
         permissions()
 
@@ -46,12 +42,19 @@ class MainActivity : AppCompatActivity() {
             val json_string = java.net.URLDecoder.decode(dataString.split("=")[1], "UTF-8")
             Log.d(TAG, json_string)
 
-            val parsed : List<SMSItem>? = Klaxon().parseArray(json_string)
+            val parsed : SMSPayload? = Klaxon().parse(json_string)
 
-            for(p in parsed.orEmpty()) {
+            for(p in parsed?.messages.orEmpty()) {
                 Log.d(TAG, "send " + p.text + " to " + p.number)
                 sendSMS(p.text, p.number)
             }
+
+            if(parsed?.return_link != null) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(parsed.return_link)
+                startActivity(intent)
+            }
+
 
         }
 

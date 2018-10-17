@@ -54,6 +54,7 @@ a {
 
 .table.row {
 	justify-content: space-between;
+	line-height: 1.5rem;
 }
 
 	.table.row *{
@@ -224,7 +225,7 @@ textarea {
 	}
 
 	.button.blue {
-		background-color: #EDAFB8;
+		background-color: #4DA2DF;
 		color: #fafafa;
 		border: 1px solid black;
 		margin-left: auto;
