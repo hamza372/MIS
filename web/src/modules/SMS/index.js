@@ -95,9 +95,10 @@ class SMS extends Component {
 						</div>
 						{ !this.props.connected ? 
 							<div className="button" onClick={this.sendMessage}>Send</div> : 
-							<a href={smsIntentLink([{ 
-								number: this.state.selected_student_number,
-								text: this.state.text }])} className="button">Send using Local SIM</a> }
+							<a href={smsIntentLink({
+								messages: [{ number: this.state.selected_student_number, text: this.state.text }],
+								return_link: window.location.href 
+								})} className="button">Send using Local SIM</a> }
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">
