@@ -175,7 +175,10 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Date of Birth</label>
-					<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
+					<input type="date" 
+						onChange={this.former.handle(["Birthdate"])}
+						value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")}
+						placeholder="Date of Birth" />
 				</div>
 
 				<div className="row">
