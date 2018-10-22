@@ -64,7 +64,9 @@ class StudentFees extends Component {
 			fee_id: undefined
 		}
 
-		this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
+		if(this.state.payment.amount !== "") {
+			this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
+		}
 
 		this.setState({
 			payment: {
@@ -84,7 +86,7 @@ class StudentFees extends Component {
 				if(existing_monthly === undefined) { // there is no payment for this month owed yet
 					// create it
 					const amount = (fee.type === "FEE" ? 1 : -1) * fee.amount;
-					this.props.addPayment(student, id, amount, moment().startOf('month').unix() * 1000, "OWED", id);
+					this.props.addPayment(student, id, amount, moment().startOf('month').unix() * 1000, "OWED", id, fee.name);
 				}
 			}
 
@@ -129,12 +131,13 @@ class StudentFees extends Component {
 				</div>
 			{
 				Object.entries(this.student().payments || {})
-					.sort(([a_id, a_payment], [b_id, b_payment]) => a_payment.date - b_payment.date)
+					.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 					.map(([id, payment]) => {
+						console.log(payment)
 						return <div className="payment" key={id}>
 						<div className="table row">
 							<div>{moment(payment.date).format("MM/DD")}</div>
-							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : this.student().fees[payment.fee_id].name}</div>
+							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
 							<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
 						</div>
 					</div>})
@@ -173,5 +176,5 @@ class StudentFees extends Component {
 export default connect(state => ({
 	students: state.db.students
 }), dispatch => ({
-	addPayment: (student, id, amount, date, type, fee_id) => dispatch(addPayment(student, id, amount, date, type, fee_id))
+	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name))
 }))(StudentFees)

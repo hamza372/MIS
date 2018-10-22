@@ -308,7 +308,6 @@ class SingleStudent extends Component {
 										<option value="" disabled>Please Select a Time Period</option>
 										<option value="SINGLE">One Time</option>
 										<option value="MONTHLY">Every Month</option>
-										<option value="YEARLY">Every Year</option>
 									</select>
 								</div>
 								<div className="button" onClick={this.removeFee(id)}>Remove Fee</div>

@@ -6,7 +6,7 @@ const initState : MIState = {
 	acceptSnapshot: false,
 	db: {
 		faculty: { },
-		users: { }, // username: passwordhash, permissions, etc.  
+		users: { }, // userid: name, passwordhash, permissions, etc.  
 		students: { },
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
 		sms_templates: { }
@@ -16,7 +16,7 @@ const initState : MIState = {
 	auth: {
 		school_id: undefined,
 		token: undefined,
-		username: undefined,
+		name: undefined,
 		attempt_failed: false,
 		loading: false
 	},
@@ -42,8 +42,6 @@ export const loadDB = () => {
 			},
 			connected: false
 		}
-
-		console.log(merged);
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {
 			try {

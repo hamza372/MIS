@@ -71,7 +71,7 @@ class CreateTeacher extends Component {
 
 		// check if they set a username and password. 
 
-		if(this.state.profile.Username === "" || this.state.profile.Password === "") {
+		if(this.state.profile.Name === "" || this.state.profile.Password === "") {
 			return this.setState({
 				banner: {
 					active: true,
@@ -142,6 +142,12 @@ class CreateTeacher extends Component {
 			return <Redirect to={this.state.redirect} />
 			//return <Redirect to="/login" />
 		}
+		/*
+				<div className="row">
+					<label>Username</label>
+					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
+				</div>
+				*/
 
 		return <div className="single-teacher-create">
 			{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -192,10 +198,6 @@ class CreateTeacher extends Component {
 				</div>
 				
 				<div className="divider">Account Information</div>
-				<div className="row">
-					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
-				</div>
 				<div className="row">
 					<label>Password</label>
 					<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />

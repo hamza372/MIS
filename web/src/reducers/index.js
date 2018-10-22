@@ -84,7 +84,7 @@ const rootReducer = (state, action) => {
 		{
 
 			const user = Object.values(state.db.users)
-				.find(u => u.username === action.username)
+				.find(u => u.name === action.name)
 
 			if(user === undefined) {
 				return {
@@ -98,13 +98,14 @@ const rootReducer = (state, action) => {
 
 			if(action.password === user.password) {
 
-				const faculty = Object.values(state.db.faculty).find(f => f.Username === user.username);
+				const faculty = Object.values(state.db.faculty)
+					.find(f => f.Name === user.name);
 
 				return {
 					...state,
 					auth: {
 						...state.auth,
-						username: user.username,
+						name: user.name,
 						faculty_id: faculty.id
 					}
 				}

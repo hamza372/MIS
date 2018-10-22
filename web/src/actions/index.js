@@ -8,7 +8,7 @@ export const createFacultyMerge = (faculty) => dispatch => {
 	dispatch(createMerges([
 		{path: ["db", "faculty", faculty.id], value: faculty},
 		{path: ["db", "users", faculty.id], value: {
-			username: faculty.Username,
+			name: faculty.Name,
 			password: faculty.Password,
 			type: faculty.Admin ? "admin" : "teacher"
 		}}
@@ -32,13 +32,13 @@ export const deleteStudent = (student) => dispatch => {
 }
 
 export const LOCAL_LOGIN = "LOCAL_LOGIN"
-export const createLogin = (username, password) => (dispatch) => {
+export const createLogin = (name, password) => (dispatch) => {
 
 	hash(password)
 		.then(hashed => {
 			dispatch({
 				type: LOCAL_LOGIN,
-				username,
+				name,
 				password: hashed
 			})
 		})
@@ -121,7 +121,7 @@ export const markFaculty = (faculty, date, status, time = moment.now()) => dispa
 	]))
 }
 
-export const addPayment = (student, payment_id, amount, date = moment.now(), type = "SUBMITTED", fee_id = undefined) => dispatch => {
+export const addPayment = (student, payment_id, amount, date = moment.now(), type = "SUBMITTED", fee_id = undefined, fee_name = "Fee") => dispatch => {
 	console.log('add payment', student.Name, 'amount', amount)
 
 	if(amount === undefined || amount === 0) {

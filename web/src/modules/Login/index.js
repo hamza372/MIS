@@ -18,6 +18,7 @@ class Login extends Component {
 			login: {
 				school: "",
 				username: "",
+				name: "",
 				password: ""
 			}
 		}
@@ -30,7 +31,7 @@ class Login extends Component {
 	}
 
 	componentWillReceiveProps(newProps) {
-		if(newProps.auth.username !== undefined && newProps.auth.username !== this.props.auth.username) {
+		if(newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
 			this.props.history.push('/')
 		}
 	}
@@ -48,11 +49,11 @@ class Login extends Component {
 				<div className="title">{`Login to School ${this.props.auth.school_id}`}</div>
 				<div className="form">
 					<div className="row">
-						<label>Username</label>
-						<input list="usernames" {...this.former.super_handle(["username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
+						<label>Teacher Name</label>
+						<input list="usernames" {...this.former.super_handle(["name"])} placeholder="Full Name" autoCorrect="off" autoCapitalize="off" />
 						<datalist id="usernames">
 						{
-							Object.values(this.props.users).map(u => <option key={u.username} value={u.username} />)
+							Object.values(this.props.users).map(u => <option key={u.username} value={u.name} />)
 						}
 						</datalist>
 					</div>
@@ -75,6 +76,6 @@ export default connect(state => ({
 	num_users: Object.keys(state.db.users).length
 }), dispatch => ({
 	login: (login) => {
-		dispatch(createLogin(login.username, login.password))
+		dispatch(createLogin(login.name, login.password))
 	}
 }))(withRouter(Login));

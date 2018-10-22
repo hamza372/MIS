@@ -17,6 +17,7 @@ const initState = {
 		school_id: undefined,
 		token: undefined,
 		username: undefined,
+		name: undefined,
 		attempt_failed: false,
 		loading: false
 	},
@@ -43,7 +44,7 @@ export const loadDB = () => {
 			connected: false
 		}
 
-		console.log(merged);
+		// console.log(merged);
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {
 			try {
@@ -102,7 +103,7 @@ const addFacultyID = state => {
 	}
 	console.log("running addFacultyID script")
 
-	const faculty = Object.values(state.db.faculty).find(f => f.Username === state.auth.username);
+	const faculty = Object.values(state.db.faculty).find(f => f.Name === state.auth.name);
 
 	state.auth.faculty_id = faculty.id;
 
