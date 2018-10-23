@@ -9,7 +9,8 @@ const initState = {
 		users: { }, // username: passwordhash, permissions, etc.  
 		students: { },
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
-		sms_templates: { }
+		sms_templates: { },
+		exams: { } // id: { name, total_score, subject, etc. rest of info is under student }
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later

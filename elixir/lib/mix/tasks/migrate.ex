@@ -1,16 +1,23 @@
 defmodule Mix.Tasks.Migrate do
 	use Mix.Task
 
-	def run(_) do
+	def run(args) do
 		Application.ensure_all_started(:sarkar)
 		case Postgrex.query(Sarkar.School.DB, "SELECT school_id, db from backup", []) do
 			{:ok, res} ->
 
 				next_backup = res.rows
 				|> Enum.each(fn ([school_id, school_db]) ->
-					# next_school = adjust_fees(school_id, school_db)
-					# next_school = add_payment_name(school_id, school_db)
-					next_school = adjust_users_table(school_id, school_db)
+
+					{:ok, next_school} = case args do
+						["fees"] -> {:ok, adjust_fees(school_id, school_db)}
+						["payment"] -> {:ok, add_payment_name(school_id, school_db)}
+						["users"] -> {:ok, adjust_users_table(school_id, school_db)}
+						other -> 
+							IO.inspect other
+							IO.puts "ERROR: supply a recognized task to run"
+							{:error, "no task"}
+					end
 
 					case Postgrex.query(Sarkar.School.DB, "INSERT INTO backup(school_id, db) VALUES ($1, $2) ON CONFLICT(school_id) DO UPDATE SET db=$2", [school_id, next_school]) do
 						{:ok, _} -> IO.puts "updated school #{school_id}"

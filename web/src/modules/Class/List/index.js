@@ -16,7 +16,7 @@ class ClassModule extends Component {
 				{
 					Object.values(this.props.classes)
 					.sort((a, b) => (b.classYear || 0) - (a.classYear || 0))
-					.map(x => <Link to={`/class/${x.id}`} key={x.id}>{x.name}</Link>)
+					.map(x => <Link to={`/class/${x.id}/profile`} key={x.id}>{x.name}</Link>)
 				}
 				</List>
 			</div>

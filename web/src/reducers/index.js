@@ -118,7 +118,6 @@ const rootReducer = (state, action) => {
 					attempt_failed: true
 				}
 			}
-
 		}
 
 		case ON_CONNECT: 

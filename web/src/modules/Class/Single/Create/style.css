@@ -1,0 +1,31 @@
+.single-class {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	align-items: center;
+}
+
+.single-class .form {
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+}
+
+.single-class .students label {
+	margin-left: 10px;
+}
+
+	.single-class .students .dropdown {
+		margin: 20px 0;
+	}
+
+.subject.row, .student.row {
+	flex-direction: row;
+}
+	.subject.row>*, .student.row>* {
+		width: initial;
+	}
+
+	.subject.row>*:last-child, .student.row>*:last-child {
+		margin-left: auto;
+	}
