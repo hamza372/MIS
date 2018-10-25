@@ -93,6 +93,7 @@ class Attendance extends Component {
 				<input type="date" onChange={this.Former.handle(["date"], d => moment(d) < moment.now())} value={moment(this.state.date).format("YYYY-MM-DD")} placeholder="Current Date" />
 
 				<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
+				<label>P: Present, A: Absent, L: Leave</label>
 				<div className="list">
 				{
 					this.props.students.map(x =>  {
@@ -104,9 +105,9 @@ class Attendance extends Component {
 							<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
 							<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
 							<div className="status">
-								<div className={`button ${status === "PRESENT" ? status : false}`} onClick={this.mark(x, "PRESENT")}>Present</div>
-								<div className={`button ${status === "ABSENT" ? status : false}`} onClick={this.mark(x, "ABSENT")}>Absent</div>
-								<div className={`button ${status === "LEAVE" ? status : false}`} onClick={this.mark(x, "LEAVE")}>Leave</div>
+								<div className={`button ${status === "PRESENT" ? status : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
+								<div className={`button ${status === "ABSENT" ? status : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
+								<div className={`button ${status === "LEAVE" ? status : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
 							</div>
 					</div>})
 				}

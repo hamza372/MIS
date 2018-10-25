@@ -156,7 +156,7 @@ class SingleExam extends Component {
 						<div className="section">
 						{
 							Object.entries(this.props.students)
-								.filter(([id, student]) => student.section_id === this.section_id() )
+								.filter(([id, student]) => student.section_id === this.section_id())
 								.map(([id, student]) => (
 									<div className="student row" key={id}>
 										<label><Link to={`/student/${id}/profile`}>{student.Name}</Link></label>

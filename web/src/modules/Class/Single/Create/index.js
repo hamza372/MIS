@@ -173,7 +173,7 @@ class SingleClass extends Component {
 						.map(subj => <option key={subj} value={subj} />)
 					}
 					</datalist>
-					<div className="button" onClick={this.addSubject}>Save Subject</div>
+					<div className="button" onClick={this.addSubject}>+</div>
 				</div>
 
 				<div className="divider">Sections</div>
