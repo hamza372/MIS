@@ -30,6 +30,9 @@
 	width: 100%;
 	border-bottom: 1px solid black;
 }
+	.list>*:last-child {
+		border-bottom: none;
+	}
 
 .list-row>* {
 	margin: 0 10px;

@@ -150,3 +150,29 @@ export const createTemplateMerges = templates => dispatch => {
 		}
 	]))
 }
+
+export const mergeExam = (exam, class_id, section_id) => dispatch => {
+	// exam is
+	// { id, name, subject, total_score, date, student_marks: { student_id, grade } }
+
+	const {id, name, subject, total_score, date, student_marks} = exam;
+
+	// make sure date is a unix timestamp
+
+	const student_merges = Object.entries(student_marks)
+		.reduce((agg, [student_id, score]) => ([
+			...agg,
+			{
+				path: ["db", "students", student_id, "exams", id, "score"],
+				value: score
+			}
+		]), [])
+
+	dispatch(createMerges([
+		{
+			path: ["db", "exams", id],
+			value: { id, name, subject, total_score, date, class_id, section_id }
+		},
+		...student_merges
+	]))
+}

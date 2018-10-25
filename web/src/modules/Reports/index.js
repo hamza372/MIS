@@ -17,6 +17,7 @@ class Reports extends Component {
 							...agg2,
 							{
 								id,
+								class_id: c.id,
 								namespaced_name: `${c.name}-${section.name}`,
 								...section
 							}
@@ -24,13 +25,10 @@ class Reports extends Component {
 					}, [])]
 			}, [])
 
-			console.log(sections)
 			return sections;
 	}
 
 	render() {
-
-		console.log(this.props)
 
 		const sections = this.getSectionsFromClasses(this.props.classes)
 		return <Layout>
@@ -38,7 +36,7 @@ class Reports extends Component {
 				<div className="title">Sections</div>
 				<div className="list">
 				{
-					sections.map(s => <Link to={`/reports/${s.id}`} key={s.id}>{s.namespaced_name}</Link>)
+					sections.map(s => <Link to={`/reports/${s.class_id}/${s.id}`} key={s.id}>{s.namespaced_name}</Link>)
 				}
 				</div>
 			</div>

@@ -135,12 +135,12 @@ class StudentFees extends Component {
 					.map(([id, payment]) => {
 						console.log(payment)
 						return <div className="payment" key={id}>
-						<div className="table row">
-							<div>{moment(payment.date).format("MM/DD")}</div>
-							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-							<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
-						</div>
-					</div>})
+							<div className="table row">
+								<div>{moment(payment.date).format("MM/DD")}</div>
+								<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
+								<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
+							</div>
+						</div>})
 			}
 				<div className="table row last">
 					<label><b>Amount Owed:</b></label>

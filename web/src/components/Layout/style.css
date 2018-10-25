@@ -61,6 +61,10 @@ a {
 		width: 100%;
 	}
 
+	.table.row .centered {
+		text-align: center;
+	}
+
 	.table.row *:last-child {
 		text-align: right;
 	}

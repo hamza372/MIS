@@ -1,0 +1,28 @@
+.student-marks {
+	width: 90%;
+
+	margin-top: 50px;
+}
+
+.student-marks .table.section {
+	overflow-x: auto;
+}
+.student-marks .table.row {
+	flex-wrap: nowrap;
+}
+
+.student-marks .table.row {
+	line-height: 3rem;
+	width: auto;
+}
+
+.student-marks .table.row * {
+	flex-wrap: nowrap;
+	flex: 0 0 auto;
+	min-width: 6rem;
+	width: initial;
+	text-align: left;
+}
+	.student-marks .table.row *:last-child {
+		text-align: left;
+	}

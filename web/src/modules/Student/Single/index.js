@@ -6,6 +6,7 @@ import Layout from 'components/Layout'
 import Create from './Create'
 import Attendance from './Attendance'
 import Fees from './Fees'
+import Marks from './Marks'
 
 import './style.css'
 
@@ -25,6 +26,7 @@ export default class StudentPage extends Component {
 					<Link className={`button ${loc === "profile" ? "selected" : false}`} to="profile" replace={true}>Profile</Link>
 					<Link className={`button ${loc === "payment" ? "selected": false}`} to="payment" replace={true}>Payment</Link>
 					<Link className={`button ${loc === "attendance" ? "selected" : false}`} to="attendance" replace={true}>Attendance</Link>
+					<Link className={`button ${loc === "marks" ? "selected" : false}`} to="marks" replace={true}>Marks</Link>
 				</div>
 				}
 
@@ -32,6 +34,7 @@ export default class StudentPage extends Component {
 				<Route path="/student/:id/profile" component={Create} />
 				<Route path="/student/:id/payment" component={Fees} />
 				<Route path="/student/:id/attendance" component={Attendance} />
+				<Route path="/student/:id/marks" component={Marks} />
 			</div>
 		</Layout>
 	}

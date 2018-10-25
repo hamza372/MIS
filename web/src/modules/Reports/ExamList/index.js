@@ -12,14 +12,17 @@ class ReportList extends Component {
 
 	render() {
 
-		const id = this.props.match.params.section_id;
-		const exams = []
+		const section_id = this.props.match.params.section_id;
+		const class_id = this.props.match.params.class_id;
 
 		return <Layout>
 			<div className="reports-list">
-				<List create={`/reports/${id}/new`} createText="New Exam">
+				<div className="title">Exams</div>
+				<List create={`/reports/${class_id}/${section_id}/new`} createText="New Exam">
 				{
-					exams.map(x => <Link to={`/reports/${id}/exam/${x.id}`}>{x.name}</Link>)
+					Object.entries(this.props.exams)
+						.filter(([id, exam]) => exam.class_id === class_id && exam.section_id === section_id)
+						.map(([id, exam]) => <Link key={id} to={`/reports/${exam.class_id}/${exam.section_id}/exam/${id}`}>{exam.subject}: {exam.name}</Link>)
 				}
 				</List>
 			</div>
@@ -28,4 +31,6 @@ class ReportList extends Component {
 	}
 }
 
-export default ReportList;
+export default connect(state => ({
+	exams: state.db.exams
+}))(ReportList);

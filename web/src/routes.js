@@ -41,9 +41,9 @@ export default ({ store }) => (
 
 				<AuthedRoute path="/sms" component={SMS} />
 
-				<AuthedRoute path="/reports/:section_id/new" component={SingleExam} />
-				<AuthedRoute path="/reports/:section_id/exam/:exam_id" component={SingleExam} />
-				<AuthedRoute path="/reports/:section_id" component={ExamList} />
+				<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
+				<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
+				<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
 				<AuthedRoute path="/reports" component={Reports} />
 
 				<Route path="/school-login" component={SchoolLogin} />
