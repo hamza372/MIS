@@ -6,11 +6,14 @@ import Map from '~/src/components/DeckMap'
 
 export default class Home extends React.Component {
 
+	onSelect = (item : any) => {
+		console.log("SELECTED", item)
+	}
+
 	render() {
 		return <div>
 			Hello
-
-			<Map />
+			<Map onSelect={this.onSelect}/>
 		</div>
 	}
 }

@@ -5,5 +5,6 @@ declare module "*.json" {
 
 declare module 'deck.gl' {
 	const value: any;
+	export const ScatterplotLayer: any;
 	export default value;
 }
