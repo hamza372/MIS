@@ -21,7 +21,7 @@ const Landing = (props) => {
 			</div>
 			<div className="row">
 				<Link to="/sms" className="button">SMS</Link>
-				<Link to="/reports" className="button">Reports</Link>
+				<Link to="/reports" className="button">Marks</Link>
 			</div>
 			{ props.user.Admin ? <div className="row">
 				<Link to="/teacher-attendance" className="button">Teacher Attendance</Link>

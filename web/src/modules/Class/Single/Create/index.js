@@ -152,7 +152,7 @@ class SingleClass extends Component {
 					<input type="text" {...this.former.super_handle(["name"])} placeholder="Name" />
 				</div>
 				<div className="row">
-					<label>Class Year</label>
+					<label>Class Order</label>
 					<input type="number" {...this.former.super_handle(["classYear"])} placeholder="Class Year" />
 				</div>
 
@@ -186,7 +186,7 @@ class SingleClass extends Component {
 							</div>
 
 							<div className="row">
-								<label>Section Lead</label>
+								<label>Section Teacher</label>
 								<select {...this.former.super_handle(["sections", id, "faculty_id"])}>
 									<option disabled selected value>select teacher</option>
 									{

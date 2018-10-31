@@ -90,11 +90,11 @@ class StudentFees extends Component {
 				}
 			}
 
-			if(fee.period === "ONE_TIME") {
+			if(fee.period === "SINGLE") {
 				const existing_one_time = Object.values(student.payments || {}).find(p => p.fee_id === id);
 				if(existing_one_time === undefined) {
 					const amount = (fee.type === "FEE" ? 1: -1) * fee.amount;
-					this.props.addPayment(student, id, amount, moment.now(), "OWED", id);
+					this.props.addPayment(student, id, amount, moment.now(), "OWED", id, fee.name);
 				}
 			}
 
@@ -133,7 +133,6 @@ class StudentFees extends Component {
 				Object.entries(this.student().payments || {})
 					.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 					.map(([id, payment]) => {
-						console.log(payment)
 						return <div className="payment" key={id}>
 							<div className="table row">
 								<div>{moment(payment.date).format("MM/DD")}</div>

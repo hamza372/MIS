@@ -22,6 +22,7 @@ class ReportList extends Component {
 				{
 					Object.entries(this.props.exams)
 						.filter(([id, exam]) => exam.class_id === class_id && exam.section_id === section_id)
+						.sort(([, a], [, b]) => `${a.subject}: ${a.name}`.localeCompare(`${b.subject}: ${b.name}`))
 						.map(([id, exam]) => <Link key={id} to={`/reports/${exam.class_id}/${exam.section_id}/exam/${id}`}>{exam.subject}: {exam.name}</Link>)
 				}
 				</List>

@@ -135,7 +135,8 @@ export const addPayment = (student, payment_id, amount, date = moment.now(), typ
 				amount,
 				date,
 				type,
-				fee_id
+				fee_id,
+				fee_name
 			}
 		}
 	]))
