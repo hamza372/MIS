@@ -8,7 +8,6 @@ import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
 import Banner from 'components/Banner'
-import Layout from 'components/Layout'
 import Former from 'utils/former'
 
 import './style.css'
@@ -16,7 +15,7 @@ import './style.css'
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
 
-const blankTeacher = {
+const blankTeacher = (isFirst = false) => ({
 	Name: "",
 	CNIC: "",
 	Gender: "",
@@ -34,10 +33,10 @@ const blankTeacher = {
 	Qualification: "",
 	Experience: "",
 	HireDate: moment(),
-	Admin: false,
+	Admin: isFirst,
 
 	attendance: { } 
-}
+})
 
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -50,8 +49,13 @@ class CreateTeacher extends Component {
 		const id = props.match.params.id;
 
 		this.state = {
-			profile: id === 'new' ? blankTeacher : props.faculty[id] || blankTeacher,
-			redirect: false
+			profile: props.faculty[id] || blankTeacher(this.isFirst()),
+			redirect: false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -65,7 +69,19 @@ class CreateTeacher extends Component {
 
 		const id = v4();
 
-		if(this.state.profile.Password.length !== 128) { // hack...
+		// check if they set a username and password. 
+
+		if(this.state.profile.Name === "" || this.state.profile.Password === "") {
+			return this.setState({
+				banner: {
+					active: true,
+					text: "Please Fill Account Information",
+					good: false
+				}
+			})
+		}
+
+		if (this.state.profile.Password.length !== 128) { // hack...
 			hash(this.state.profile.Password).then(hashed => {
 				this.props.save({
 					id,
@@ -75,8 +91,17 @@ class CreateTeacher extends Component {
 
 				this.setState({
 					redirect: this.isFirst() ? "/login" : (this.isNew() ? `/faculty/${id}/profile` : false),
-					saveBanner: true
+					banner: {
+						active: true,
+						good: true,
+						text: "Saved!"
+					}
 				})
+
+				setTimeout(() => {
+					this.setState({ banner: { active: false }})
+				}, 3000);
+
 			})
 		}
 		else {
@@ -86,15 +111,29 @@ class CreateTeacher extends Component {
 			}, this.isFirst())
 
 			this.setState({
-				saveBanner: true,
+				banner: {
+					active: true,
+					good: true,
+					text: "Saved!"
+				},
 				redirect: this.isNew() ? `/faculty/${id}/profile` : false
 			})
 
 			setTimeout(() => {
-				this.setState({ saveBanner: false })
+				this.setState({ banner: { active: false }})
 			}, 3000);
 
 		}
+	}
+
+	componentWillReceiveProps(newProps) {
+		// this means every time teacher upgrades, we will change the fields to whatever was just sent.
+		// this means it will be very annoying for someone to edit the user at the same time as someone else
+		// which is probably a good thing. 
+
+		this.setState({
+			profile: newProps.faculty[this.props.match.params.id] || this.state.profile
+		})
 	}
 
 	render() {
@@ -103,13 +142,21 @@ class CreateTeacher extends Component {
 			return <Redirect to={this.state.redirect} />
 			//return <Redirect to="/login" />
 		}
+		/*
+				<div className="row">
+					<label>Username</label>
+					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
+				</div>
+				*/
 
 		return <div className="single-teacher-create">
-			{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
+			{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+
 			<div className="form">
+				<div className="divider">Personal Information</div>
 				<div className="row">
-					<label>Name</label>
-					<input type="text" {...this.former.super_handle(["Name"])} placeholder="Name" />
+					<label>Full Name</label>
+					<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
 				</div>
 				<div className="row">
 					<label>CNIC</label>
@@ -124,28 +171,20 @@ class CreateTeacher extends Component {
 					</select>
 				</div>
 				<div className="row">
-					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" />
-				</div>
-				<div className="row">
-					<label>Password</label>
-					<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
-				</div>
-				<div className="row">
 					<label>Married</label>
-					<input type="checkbox" {...this.former.super_handle(["Married"])} />
+					<select {...this.former.super_handle(["Married"])}>
+						<option value='' disabled>Please Select Marriage Status</option>
+						<option value={false}>Not Married</option>
+						<option value={true}>Married</option>
+					</select>
 				</div>
+
 				<div className="row">
-					<label>Phone Number</label>
-					<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
-				</div>
-				<div className="row">
-					<label>Monthly Salary</label>
-					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
-				</div>
-				<div className="row">
-					<label>Active</label>
-					<input type="checkbox" {...this.former.super_handle(["Active"])} />
+					<label>Date of Birth</label>
+					<input type="date" 
+						onChange={this.former.handle(["Birthdate"])}
+						value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")}
+						placeholder="Date of Birth" />
 				</div>
 
 				<div className="row">
@@ -157,16 +196,29 @@ class CreateTeacher extends Component {
 					<label>Husband/Father CNIC</label>
 					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 13)} placeholder="Father/Husband CNIC" />
 				</div>
-
+				
+				<div className="divider">Account Information</div>
 				<div className="row">
-					<label>Date of Birth</label>
-					<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
+					<label>Password</label>
+					<input type="password" {...this.former.super_handle(["Password"])} placeholder="Password" />
 				</div>
 
+				<div className="divider">Contact Information</div>
+				<div className="row">
+					<label>Phone Number</label>
+					<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11 )} placeholder="Phone Number" />
+				</div>
 				<div className="row">
 					<label>Address</label>
 					<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" />
 				</div>
+
+				<div className="divider">School Information</div>
+				<div className="row">
+					<label>Monthly Salary</label>
+					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
+				</div>
+
 				<div className="row">
 					<label>Experience</label>
 					<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
@@ -177,13 +229,25 @@ class CreateTeacher extends Component {
 				</div>
 
 				<div className="row">
-					<label>Hire Date</label>
+					<label>Start Date</label>
 					<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date"/>
 				</div>
 
 				<div className="row">
-					<label>Admin</label>
-					<input type="checkbox" {...this.former.super_handle(["Admin"])} />
+					<label>Admin Status</label>
+					<select {...this.former.super_handle(["Admin"])} disabled={!this.props.user.Admin}>
+						<option value={false}>Not an Admin</option>
+						<option value={true}>Admin</option>
+					</select>
+				</div>
+
+				<div className="row">
+					<label>Active Status</label>
+					<select {...this.former.super_handle(["Active"])}>
+						<option value='' disabled>Please Select Active Status</option>
+						<option value={true}>Currently Working at School</option>
+						<option value={false}>No Longer Working at School</option>
+					</select>
 				</div>
 
 				<div className="save button" onClick={this.onSave}>Save</div>
@@ -192,6 +256,6 @@ class CreateTeacher extends Component {
 	}
 }
 
-export default connect(state => ({ faculty: state.db.faculty }) , dispatch => ({ 
+export default connect(state => ({ faculty: state.db.faculty, user: state.db.faculty[state.auth.faculty_id] }) , dispatch => ({
 	save: (teacher) => dispatch(createFacultyMerge(teacher)) 
  }))(CreateTeacher);

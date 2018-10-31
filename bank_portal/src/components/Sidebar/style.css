@@ -1,0 +1,32 @@
+
+.sidebar {
+	position: absolute;
+	top: calc(5% - 20px);
+	right: 20px;
+	background-color: #fafafa;
+	height: 90%;
+	padding: 20px;
+	width: 25%;
+	border-radius: 6px;
+	box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.5);
+	overflow: auto;
+	font-family: sans-serif;
+}
+
+.title {
+	padding: 10px 0;
+	font-size: 2rem;
+}
+
+.sidebar .close {
+	font-family: monospace;
+	font-weight: bolder;
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	text-align: right;
+	cursor: pointer;
+}
+
+	.sidebar .close:hover {
+		color: rgb(255, 140, 0);
+	}

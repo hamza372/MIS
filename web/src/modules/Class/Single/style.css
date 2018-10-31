@@ -1,24 +1,7 @@
-.single-class .form {
-	display: flex;
-	flex-direction: column;
-	width: 90%;
+.single-class-container .row-tabs {
+	margin-top: 30px;
 }
 
-.single-class .students label {
-	margin-left: 10px;
-}
-
-	.single-class .students .dropdown {
-		margin: 20px 0;
-	}
-
-.single-class .class-section {
-	border: 1px solid rgba(0,0,0,0.3);
-	border-radius: 5px;
-	padding: 15px;
-	margin-bottom: 20px;
-}
-
-.class-section .button {
-	padding: 5px 10px;
+.row-tabs a {
+	margin: 10px;
 }

@@ -9,7 +9,7 @@
 }
 
 .attendance .list {
-	margin-top: 40px;
+	margin-top: 5px;
 }
 
 .button.PRESENT {
@@ -22,4 +22,22 @@
 
 .button.LEAVE {
 	background-color: #E8DDB5;
+	background-color: #d1d1d1;
+}
+
+.attendance a.button {
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: 5%;
+}
+
+.attendance .button.select-all {
+	margin-top: 20px;
+	margin-right: auto;
+	margin-left: 5%;
+	padding: 5px 10px;
+}
+
+.attendance .list {
+	border-radius: 4px;
 }

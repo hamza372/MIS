@@ -28,6 +28,13 @@ defmodule Sarkar.ActionHandler do
 		{:reply, succeed(res), state}
 	end
 
+	def handle_action(%{"type" => "SMS", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
+
+		IO.puts "HANDLING SMS"
+		IO.inspect payload
+		{:reply, succeed(), state}
+	end 
+
 	def handle_action(%{"type" => type, "payload" => payload}, state) do
 		IO.puts "it is likely you have not authenticated. no handler exists for this combination of state and message"
 		IO.inspect type

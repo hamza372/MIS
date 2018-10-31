@@ -1,5 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETE, CONFIRM_SYNC, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED } from 'actions/core'
+import { MERGES, DELETE, DELETES, CONFIRM_SYNC, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN } from '../actions'
 
 const rootReducer = (state, action) => {
@@ -13,7 +13,20 @@ const rootReducer = (state, action) => {
 			}, state);
 
 			return JSON.parse(JSON.stringify(nextState));
+		}
 
+		case DELETES: 
+		{
+
+			const nextState = action.paths.reduce((agg, curr) => {
+				console.log(curr.path)
+				return Dynamic.delete(agg, curr.path)
+			}, state);
+
+			console.log(nextState)
+
+			//return JSON.parse(JSON.stringify(nextState))
+			return JSON.parse(JSON.stringify(state))
 		}
 		
 		case DELETE:
@@ -48,7 +61,7 @@ const rootReducer = (state, action) => {
 			let next = Dynamic.put(state, ["queued"], newQ);
 
 			if(Object.keys(action.db).length > 0) {
-				next = Dynamic.put(next, ["db"], {...state.db, ...action.db}) // this way if we add new fields on client which arent on db it wont null them.
+				next = Dynamic.put(next, ["db"], {...state.db, ...action.db}) // this way if we add new fields on client which arent on db it wont null them. only top level tho....
 			}
 			return {
 				...next,
@@ -60,7 +73,8 @@ const rootReducer = (state, action) => {
 		{
 			if(state.acceptSnapshot && Object.keys(action.db).length > 0) {
 				console.log('applying snapshot')
-				return {...Dynamic.put(state, ["db"], action.db)}
+
+				return JSON.parse(JSON.stringify(Dynamic.put(state, ["db"], action.db)))
 			}
 
 			return state;
@@ -70,7 +84,7 @@ const rootReducer = (state, action) => {
 		{
 
 			const user = Object.values(state.db.users)
-				.find(u => u.username === action.username)
+				.find(u => u.name === action.name)
 
 			if(user === undefined) {
 				return {
@@ -84,13 +98,14 @@ const rootReducer = (state, action) => {
 
 			if(action.password === user.password) {
 
-				const faculty = Object.values(state.db.faculty).find(f => f.Username === user.username);
+				const faculty = Object.values(state.db.faculty)
+					.find(f => f.Name === user.name);
 
 				return {
 					...state,
 					auth: {
 						...state.auth,
-						username: user.username,
+						name: user.name,
 						faculty_id: faculty.id
 					}
 				}
@@ -103,7 +118,6 @@ const rootReducer = (state, action) => {
 					attempt_failed: true
 				}
 			}
-
 		}
 
 		case ON_CONNECT: 

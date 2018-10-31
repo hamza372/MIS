@@ -18,6 +18,7 @@ class Login extends Component {
 			login: {
 				school: "",
 				username: "",
+				name: "",
 				password: ""
 			}
 		}
@@ -30,23 +31,38 @@ class Login extends Component {
 	}
 
 	componentWillReceiveProps(newProps) {
-		if(newProps.auth.username !== undefined && newProps.auth.username !== this.props.auth.username) {
+		if(newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
 			this.props.history.push('/')
 		}
 	}
 
 	render() {
 
-		if(this.props.num_users === 0) {
+		const num_users = Object.keys(this.props.users).length;
+
+		if(num_users === 0) {
 			return <Redirect to="/faculty/first" />
 		}
 
 		return <Layout>
 			<div className="login">
 				<div className="title">{`Login to School ${this.props.auth.school_id}`}</div>
-				<input type="text" {...this.former.super_handle(["username"])} placeholder="Username" />
-				<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
-				<div className="button save" onClick={this.onLogin}>Login</div>
+				<div className="form">
+					<div className="row">
+						<label>Teacher Name</label>
+						<input list="usernames" {...this.former.super_handle(["name"])} placeholder="Full Name" autoCorrect="off" autoCapitalize="off" />
+						<datalist id="usernames">
+						{
+							Object.values(this.props.users).map(u => <option key={u.username} value={u.name} />)
+						}
+						</datalist>
+					</div>
+					<div className="row">
+						<label>Password</label>
+						<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
+					</div>
+					<div className="button save" onClick={this.onLogin}>Login</div>
+				</div>
 				{ this.props.auth.attempt_failed ? <div>Login Attempt Failed.</div> : false }
 			</div>
 		</Layout>
@@ -56,9 +72,10 @@ class Login extends Component {
 
 export default connect(state => ({ 
 	auth: state.auth,
+	users: state.db.users,
 	num_users: Object.keys(state.db.users).length
 }), dispatch => ({
 	login: (login) => {
-		dispatch(createLogin(login.username, login.password))
+		dispatch(createLogin(login.name, login.password))
 	}
 }))(withRouter(Login));

@@ -1,11 +1,19 @@
+.dropdown input {
+	width: 100%;
+}
 .dropdown-items {
 	background-color: white;
 }
 
+
 .dropdown-items>div {
 	cursor: pointer;
 	padding: 1rem 10px;
+	background-color: white;
 	transition: all .2s ease-in;
+	border-left: 1px solid #aaa;
+	border-right: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
 }
 
 	.dropdown-items>div:hover {

@@ -9,10 +9,14 @@ import StudentList from 'modules/Student/List'
 import StudentSingle from 'modules/Student/Single'
 import Login from 'modules/Login'
 import SchoolLogin from 'modules/Login/school'
-import ClassModule from 'modules/Class'
+import ClassModule from 'modules/Class/List'
 import ClassSingle from 'modules/Class/Single'
 import Attendance from 'modules/Attendance'
 import TeacherAttendance from 'modules/Teacher-Attendance'
+import SMS from 'modules/SMS'
+import Reports from 'modules/Reports'
+import ExamList from 'modules/Reports/ExamList'
+import SingleExam from 'modules/Reports/SingleExam'
 
 import AuthedRoute from 'components/AuthedRoute'
 
@@ -34,6 +38,13 @@ export default ({ store }) => (
 
 				<AuthedRoute path="/attendance" component={Attendance} />
 				<AuthedRoute path="/teacher-attendance" component={TeacherAttendance} />
+
+				<AuthedRoute path="/sms" component={SMS} />
+
+				<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
+				<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
+				<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
+				<AuthedRoute path="/reports" component={Reports} />
 
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />

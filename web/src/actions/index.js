@@ -1,5 +1,5 @@
 import { hash } from 'utils'
-import { createMerges, createLoginSucceed, createLoginFail } from './core'
+import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
 import moment from 'moment'
 
 export const MERGE_FACULTY = "MERGE_FACULTY"
@@ -8,7 +8,7 @@ export const createFacultyMerge = (faculty) => dispatch => {
 	dispatch(createMerges([
 		{path: ["db", "faculty", faculty.id], value: faculty},
 		{path: ["db", "users", faculty.id], value: {
-			username: faculty.Username,
+			name: faculty.Name,
 			password: faculty.Password,
 			type: faculty.Admin ? "admin" : "teacher"
 		}}
@@ -23,14 +23,22 @@ export const createStudentMerge = (student) => dispatch => {
 	]))
 }
 
+export const deleteStudent = (student) => dispatch => {
+	dispatch(createDeletes([
+		{
+			path: ["db", "students", student.id]
+		}
+	]))
+}
+
 export const LOCAL_LOGIN = "LOCAL_LOGIN"
-export const createLogin = (username, password) => (dispatch) => {
+export const createLogin = (name, password) => (dispatch) => {
 
 	hash(password)
 		.then(hashed => {
 			dispatch({
 				type: LOCAL_LOGIN,
-				username,
+				name,
 				password: hashed
 			})
 		})
@@ -91,11 +99,14 @@ export const markStudent = (student, date, status, time = moment.now()) => dispa
 	console.log('mark student', student, ' as', status)
 
 	dispatch(createMerges([
-		{path: ["db", "students", student.id, "attendance", date], value: {
-			date,
-			status,
-			time
-		}}
+		{
+			path: ["db", "students", student.id, "attendance", date],
+			value: {
+				date,
+				status,
+				time
+			}
+		}
 	]))
 }
 
@@ -107,5 +118,62 @@ export const markFaculty = (faculty, date, status, time = moment.now()) => dispa
 			path: ["db", "faculty", faculty.id, "attendance", date, status],
 			value: time
 		}
+	]))
+}
+
+export const addPayment = (student, payment_id, amount, date = moment.now(), type = "SUBMITTED", fee_id = undefined, fee_name = "Fee") => dispatch => {
+	console.log('add payment', student.Name, 'amount', amount)
+
+	if(amount === undefined || amount === 0) {
+		return {};
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["db", "students", student.id, "payments", payment_id],
+			value: {
+				amount,
+				date,
+				type,
+				fee_id,
+				fee_name
+			}
+		}
+	]))
+}
+
+export const createTemplateMerges = templates => dispatch => {
+
+	dispatch(createMerges([
+		{
+			path: ["db", "sms_templates"],
+			value: templates
+		}
+	]))
+}
+
+export const mergeExam = (exam, class_id, section_id) => dispatch => {
+	// exam is
+	// { id, name, subject, total_score, date, student_marks: { student_id, grade } }
+
+	const {id, name, subject, total_score, date, student_marks} = exam;
+
+	// make sure date is a unix timestamp
+
+	const student_merges = Object.entries(student_marks)
+		.reduce((agg, [student_id, score]) => ([
+			...agg,
+			{
+				path: ["db", "students", student_id, "exams", id, "score"],
+				value: score
+			}
+		]), [])
+
+	dispatch(createMerges([
+		{
+			path: ["db", "exams", id],
+			value: { id, name, subject, total_score, date, class_id, section_id }
+		},
+		...student_merges
 	]))
 }
