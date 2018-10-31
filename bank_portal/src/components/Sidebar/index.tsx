@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { RouteComponentProps } from 'react-router';
 
 import './style.css'
 
-interface propTypes {
+interface propTypes extends RouteComponentProps<any> {
 	selected?: {
 		SchoolName: string,
 		id: string
@@ -20,16 +21,22 @@ class Sidebar extends React.Component<propTypes, any>{
 		}
 	}
 
+	school_id = () => this.props.match.params.school_id;
+
+	getSchoolData = () => {
+		this.setState({ loading: true })
+		fetch(`http://localhost:5000/school/${this.school_id()}`)
+			.then(res => res.json())
+			.then((res : any) => this.setState({ school: res, loading: false }))
+			.catch(err => console.error(err))
+	}
+
 	componentWillReceiveProps(nextProps : propTypes) {
+		this.getSchoolData();
+	}
 
-		if(nextProps.selected) {
-
-			this.setState({ loading: true })
-			fetch(`http://localhost:5000/school/${nextProps.selected.id}`)
-				.then(res => res.json())
-				.then((res : any) => this.setState({ school: res, loading: false }))
-				.catch(err => console.error(err))
-		}
+	componentDidMount() {
+		this.getSchoolData();
 	}
 
 	render() {
