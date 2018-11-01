@@ -6,14 +6,19 @@ export interface SelectLocationAction {
 	loc: SchoolLocation
 }
 
-export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch) => {
+export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
 
 	console.log("selecting location", loc.id)
 
-	fetch(`http://localhost:5000/school/${loc.id}`)
-		.then(res => res.json())
-		.then((res : School) => dispatch(addToSchoolDB(res)))
-		.catch(err => console.error(err))
+	const state = getState();
+
+	if(state.school_db[loc.id] === undefined) {
+		fetch(`https://cf899b56.ngrok.io/school/${loc.id}`)
+			.then(res => res.json())
+			.then((res : School) => dispatch(addToSchoolDB(res)))
+			.catch(err => console.error(err))
+	}
+
 
 	dispatch({
 		type: SELECT_LOCATION,

@@ -12,14 +12,11 @@ const initialState : RootBankState = {
 
 const rootReducer = (state : RootBankState = initialState, action: redux.Action<any>) : RootBankState => {
 
-	console.log(action)
-	console.log("helloooo")
+	console.log(action.type)
 
 	switch(action.type) {
 		case SELECT_LOCATION:
 		{
-			console.log(action)
-			console.log("&^&&&")
 			return {
 				...state,
 				selected: (<SelectLocationAction>action).loc

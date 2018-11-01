@@ -37,7 +37,6 @@ class Home extends React.Component<RouteComponentProps<any> & RootBankState & Di
 
 	render() {
 
-		console.log(this.props.school_db, this.props.selected)
 		return <div>
 			Hello
 			<Map onSelect={this.onSelect} school_locations={this.props.school_locations} />
