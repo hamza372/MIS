@@ -9,6 +9,7 @@ export default ({ store } : { store: Store }) => (
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>
+				<Route path="/school/:school_id" component={Home} />
 				<Route path="/" component={Home} />
 			</Switch>
 		</BrowserRouter>
