@@ -7,7 +7,15 @@ import { SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction} fro
 const initialState : RootBankState = {
 	school_locations: locations,
 	school_db: {},
-	selected: undefined
+	selected: undefined,
+	auth: {
+		id: undefined,
+		token: undefined,
+		username: undefined,
+		attempt_failed: false,
+		loading: false
+	}
+
 }
 
 const rootReducer = (state : RootBankState = initialState, action: redux.Action<any>) : RootBankState => {

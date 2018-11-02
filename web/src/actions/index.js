@@ -2,6 +2,8 @@ import { hash } from 'utils'
 import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
 import moment from 'moment'
 
+const client_type = "mis";
+
 export const MERGE_FACULTY = "MERGE_FACULTY"
 export const createFacultyMerge = (faculty) => dispatch => {
 
@@ -57,6 +59,7 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 
 	syncr.send({
 		type: "LOGIN",
+		client_type,
 		payload: {
 			school_id,
 			password,

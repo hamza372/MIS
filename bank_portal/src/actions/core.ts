@@ -1,11 +1,18 @@
 import moment from 'moment'
+import { Dispatch, AnyAction } from 'redux'
+import Syncr from 'src/syncr';
 
 const SYNC = "SYNC"
-const client_type = "mis";
 
 // TODO: separate out connect, auth merges and deletes into separate folder
 export const MERGES = "MERGES"
-export const createMerges= (merges) => (dispatch, getState, syncr) => {
+
+interface Merge {
+	path: string[],
+	value: any
+}
+
+export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -18,8 +25,8 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	const state = getState();
 	const payload = {
 		type: "SYNC",
-		school_id: state.auth.school_id,
-		client_type,
+		client_type: state.auth.client_type,
+		id: state.auth.id,
 		payload: merges.reduce((agg, curr) => ({
 			...agg, 
 			[curr.path.join(',')]: {
@@ -43,41 +50,49 @@ export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
 	
 	// should i keep a log of all messages sent in the db?
 
+	const state = getState();
 	syncr.send({
 		type: SMS,
-		client_type,
-		school_id: getState().auth.school_id,
+		client_type: state.auth.client_type,
+		id: state.auth.id,
 		payload: {
 			text,
 			number,
 		}
 	})
 	.then(dispatch)
-	.catch(err => console.error(err)) // this should backup to sending the sms via the android app?
+	.catch((err : Error) => console.error(err)) // this should backup to sending the sms via the android app?
 
 }
 
 export const BATCH_SMS = "BATCH_SMS"
-export const sendBatchSMS = (messages) => (dispatch, getState, syncr) => {
+interface SMS {
+	text: string,
+	number: string
+}
 
+export const sendBatchSMS = (messages: SMS[]) => (dispatch, getState, syncr) => {
+
+	const state = getState();
 	syncr.send({
 		type: BATCH_SMS,
-		client_type,
-		school_id: getState().auth.school_id,
+		client_type: state.auth.client_type,
+		id: state.auth.id,
 		payload: {
-			messages: messages.map(m => ({
-				text: m.text,
-				number: m.number // only doing this for documentation purposes
-			}))
+			messages: messages
 		}
 	})
-	.catch(err => {
+	.catch((err: Error) => {
 		console.error(err) // send via android app?
 	})
 }
 
 export const DELETES = "DELETES"
-export const createDeletes = (paths) => (dispatch, getState, syncr) => {
+interface Delete {
+	path: string[]
+}
+
+export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyAction>, getState : () => RootBankState, syncr : Syncr) => {
 
 	const action = {
 		type: DELETES,
@@ -99,39 +114,12 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 
 	syncr.send({
 		type: SYNC,
-		client_type,
 		school_id: getState().auth.school_id,
 		payload 
 	})
 	.then(dispatch)
-	.catch(err => dispatch(QueueUp(payload)))
+	.catch((err : Error) => dispatch(QueueUp(payload)))
 
-}
-
-export const DELETE = "DELETE"
-export const createDelete = (path) => (dispatch, getState, syncr) => {
-	const action = {
-		type: DELETE,
-		path
-	}
-
-	// apply the merge locally
-	dispatch(action);
-
-	// attempt to send it
-	syncr.send({
-		type: SYNC,
-		client_type,
-		school_id: getState().auth.school_id,
-		payload: {
-			[path]: {
-				action,
-				date: moment().unix() * 1000
-			}
-		}
-	})
-	.then(dispatch)
-	.catch(err => dispatch(QueueUp(action)))
 }
 
 // this is only produced by the server. 
@@ -160,7 +148,6 @@ export const connected = () => (dispatch, getState, syncr) => {
 		syncr
 			.send({
 				type: "VERIFY",
-				client_type,
 				payload: {
 					school_id: state.auth.school_id,
 					token: state.auth.token,
@@ -170,7 +157,6 @@ export const connected = () => (dispatch, getState, syncr) => {
 			.then(res => {
 				return syncr.send({
 					type: SYNC,
-					client_type,
 					school_id: state.auth.school_id,
 					payload: state.queued
 				})

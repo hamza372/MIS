@@ -8,7 +8,7 @@ defmodule Sarkar.Auth do
 					{:ok, "created #{school_id} with password #{password}"}
 				{:error, err} -> 
 					IO.inspect err
-					{:error, "login failed"}
+					{:error, "creation failed"}
 		end
 	end
 

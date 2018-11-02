@@ -16,7 +16,15 @@ interface RootBankState {
 	selected?: SchoolLocation,
 	school_db: {
 		[school_id: string]: School
+	},
+	auth: {
+		id: string,
+		token: string,
+		username: string,
+		attempt_failed: boolean,
+		loading: boolean
 	}
+
 }
 
 interface SchoolLocation {

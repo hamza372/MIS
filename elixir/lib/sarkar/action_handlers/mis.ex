@@ -1,4 +1,4 @@
-defmodule Sarkar.ActionHandler do
+defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "LOGIN", "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password}}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
@@ -76,4 +76,5 @@ defmodule Sarkar.ActionHandler do
 	defp succeed() do
 		%{type: "success"}
 	end
+
 end

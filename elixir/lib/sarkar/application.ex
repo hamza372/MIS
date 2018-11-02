@@ -19,6 +19,7 @@ defmodule Sarkar.Application do
 					username: "postgres",
 					password: "postgres",
 					database: "postgres",
+					port: System.get_env("POSTGRES_PORT") || "5432",
 					types: Sarkar.PostgrexTypes
 			},
 			Sarkar.Server
