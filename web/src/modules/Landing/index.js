@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
-import Layout from 'components/Layout'
-
 import { connect } from 'react-redux'
+
+import { createLogout } from 'actions'
+import Layout from 'components/Layout'
 
 import './style.css'
 
-const Landing = (props) => {
+const Landing = ({ logout, user }) => {
 
 	return <Layout>
 		<div className="landing">
@@ -23,12 +23,19 @@ const Landing = (props) => {
 				<Link to="/sms" className="button">SMS</Link>
 				<Link to="/reports" className="button">Marks</Link>
 			</div>
-			{ props.user.Admin ? <div className="row">
-				<Link to="/teacher-attendance" className="button">Teacher Attendance</Link>
-			</div> : false
-			}
+			<div className="row">
+				<Link to="/settings" className="button">Settings</Link>
+				<Link to="/analytics" className="button">Analytics</Link>
+			</div>
+			<div className="row">
+				<div className="button" onClick={logout}>Switch User</div>
+			{ user.Admin ? <Link to="/teacher-attendance" className="button">Teacher Attendance</Link> : false }
+			</div>
 		</div>
 	</Layout>
 }
 
-export default connect(state => ({ user: state.db.faculty[state.auth.faculty_id] }))(Landing)
+export default connect(state => ({ user: state.db.faculty[state.auth.faculty_id] }), 
+dispatch => ({
+	logout: () => dispatch(createLogout())
+}))(Landing)

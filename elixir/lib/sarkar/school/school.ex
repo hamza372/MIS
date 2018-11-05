@@ -40,7 +40,7 @@ defmodule Sarkar.School do
 			[prefix | p ] = path
 
 			case type do
-				"MERGE" -> 
+				"MERGE" ->
 					{Dynamic.put(agg_db, p, value), max(date, max_date)}
 				"DELETE" -> 
 					{Dynamic.delete(agg_db, p), max(date, max_date)}

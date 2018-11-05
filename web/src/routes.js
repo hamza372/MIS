@@ -14,9 +14,11 @@ import ClassSingle from 'modules/Class/Single'
 import Attendance from 'modules/Attendance'
 import TeacherAttendance from 'modules/Teacher-Attendance'
 import SMS from 'modules/SMS'
-import Reports from 'modules/Reports'
-import ExamList from 'modules/Reports/ExamList'
-import SingleExam from 'modules/Reports/SingleExam'
+import Marks from 'modules/Marks'
+import ExamList from 'modules/Marks/ExamList'
+import SingleExam from 'modules/Marks/SingleExam'
+import Settings from 'modules/Settings'
+import Analytics from 'modules/Analytics'
 
 import AuthedRoute from 'components/AuthedRoute'
 
@@ -44,7 +46,10 @@ export default ({ store }) => (
 				<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
 				<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
 				<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
-				<AuthedRoute path="/reports" component={Reports} />
+				<AuthedRoute path="/reports" component={Marks} />
+
+				<AuthedRoute path="/settings" component={Settings} />
+				<AuthedRoute path="/analytics" component={Analytics} />
 
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />

@@ -17,9 +17,10 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 
 	const state = getState();
 	const payload = {
-		type: "SYNC",
+		type: SYNC,
 		school_id: state.auth.school_id,
 		client_type,
+		lastSnapshot: state.lastSnapshot,
 		payload: merges.reduce((agg, curr) => ({
 			...agg, 
 			[curr.path.join(',')]: {
@@ -97,10 +98,12 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 			}
 		}), {})
 
+	const state = getState();
 	syncr.send({
 		type: SYNC,
 		client_type,
-		school_id: getState().auth.school_id,
+		school_id: state.auth.school_id,
+		lastSnapshot: state.lastSnapshot,
 		payload 
 	})
 	.then(dispatch)
@@ -172,7 +175,8 @@ export const connected = () => (dispatch, getState, syncr) => {
 					type: SYNC,
 					client_type,
 					school_id: state.auth.school_id,
-					payload: state.queued
+					payload: state.queued,
+					lastSnapshot: state.lastSnapshot
 				})
 			})
 			.then(resp => {

@@ -12,12 +12,11 @@ const New = () => {
 	return <div>New thing</div>
 }
 
-export default class StudentPage extends Component {
+export default class TeacherPage extends Component {
 
 	render() {
 		
 		const loc = this.props.location.pathname.split('/').slice(-1).pop();
-		console.log("LOCLOC", loc)
 
 		return <Layout>
 			<div className="single-teacher">

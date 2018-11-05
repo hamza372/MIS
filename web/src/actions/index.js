@@ -4,6 +4,17 @@ import moment from 'moment'
 
 const client_type = "mis";
 
+export const MERGE_SETTINGS = "MERGE_SETTINGS"
+export const mergeSettings = (settings) => dispatch => {
+	console.log(settings)
+	dispatch(createMerges([
+		{
+			path: ["db", "settings"],
+			value: settings
+		}
+	]))
+}
+
 export const MERGE_FACULTY = "MERGE_FACULTY"
 export const createFacultyMerge = (faculty) => dispatch => {
 
@@ -21,7 +32,10 @@ export const MERGE_STUDENT = "MERGE_STUDENT"
 export const createStudentMerge = (student) => dispatch => {
 
 	dispatch(createMerges([
-		{path: ["db", "students", student.id], value: student},
+		{
+			path: ["db", "students", student.id],
+			value: student
+		},
 	]))
 }
 
@@ -31,6 +45,13 @@ export const deleteStudent = (student) => dispatch => {
 			path: ["db", "students", student.id]
 		}
 	]))
+}
+
+export const LOCAL_LOGOUT = "LOCAL_LOGOUT"
+export const createLogout = () => {
+	return {
+		type: LOCAL_LOGOUT
+	}
 }
 
 export const LOCAL_LOGIN = "LOCAL_LOGIN"

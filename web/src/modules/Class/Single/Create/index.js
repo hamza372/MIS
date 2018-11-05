@@ -30,8 +30,6 @@ class SingleClass extends Component {
 
 		const id = props.match.params.id;
 		console.log(id)
-		const loc = props.location.pathname.split('/').slice(-1).pop();
-
 		const currClass = id === undefined ? blankClass() : this.props.classes[id]
 
 		this.state = {

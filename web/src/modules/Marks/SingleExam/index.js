@@ -58,9 +58,11 @@ class SingleExam extends Component {
 		return Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id())
 			.reduce((agg, [id, student]) => {
+
+				const exam = student.exams[exam_id]
 				return {
 					...agg,
-					[id]: student.exams[exam_id].score
+					[id]: exam ? exam.score : ""
 				}
 			}, {})
 	}

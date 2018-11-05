@@ -24,7 +24,7 @@ class StudentMarks extends Component {
 					<label><b>Percent</b></label>
 				</div>
 			{
-				Object.keys(student.exams)
+				Object.keys(student.exams || {})
 					.map(exam_id => this.props.exams[exam_id])
 					.map(exam => <div className="table row" key={exam.id}>
 							<div>{moment(exam.date).format("MM/DD")}</div>

@@ -1,6 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGES, DELETE, DELETES, CONFIRM_SYNC, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED } from 'actions/core'
-import { LOCAL_LOGIN, SCHOOL_LOGIN } from '../actions'
+import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
 
 const rootReducer = (state, action) => {
 
@@ -63,9 +63,11 @@ const rootReducer = (state, action) => {
 			if(Object.keys(action.db).length > 0) {
 				next = Dynamic.put(next, ["db"], {...state.db, ...action.db}) // this way if we add new fields on client which arent on db it wont null them. only top level tho....
 			}
+
 			return {
 				...next,
-				acceptSnapshot: true
+				acceptSnapshot: true,
+				lastSnapshot: new Date().getTime()
 			}
 		}
 
@@ -74,7 +76,12 @@ const rootReducer = (state, action) => {
 			if(state.acceptSnapshot && Object.keys(action.db).length > 0) {
 				console.log('applying snapshot')
 
-				return JSON.parse(JSON.stringify(Dynamic.put(state, ["db"], action.db)))
+				//const next = JSON.parse(JSON.stringify(Dynamic.put(state, ["db"], action.db)))
+				return {
+					...state,
+					db: action.db,
+					lastSnapshot: new Date().getTime()
+				}
 			}
 
 			return state;
@@ -116,6 +123,19 @@ const rootReducer = (state, action) => {
 				auth: {
 					...state.auth,
 					attempt_failed: true
+				}
+			}
+		}
+
+		case LOCAL_LOGOUT: 
+		{
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					name: undefined,
+					faculty_id: undefined,
+					attempt_failed: false
 				}
 			}
 		}
