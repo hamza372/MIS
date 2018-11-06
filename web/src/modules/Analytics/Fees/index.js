@@ -20,8 +20,6 @@ export default connect(state => ({
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
-	console.log("RENDER")
-
 	let total_paid = 0;
 	let total_owed = 0;
 	let total_forgiven = 0;
