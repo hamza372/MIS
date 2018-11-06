@@ -181,7 +181,7 @@ export const addMultiplePayments = (payments) => dispatch => {
 		}
 	}))
 
-	//dispatch(createMerges(merges));
+	dispatch(createMerges(merges));
 }
 
 export const createTemplateMerges = templates => dispatch => {

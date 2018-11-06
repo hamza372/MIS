@@ -3,16 +3,16 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
 
-import checkStudentDues from 'utils/checkStudentDues'
-import { addPayment } from 'actions'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import { addMultiplePayments } from 'actions'
 
 import { ResponsiveContainer, BarChart, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
 
 export default connect(state => ({
 	students: state.db.students
 }), dispatch => ({
-	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name))
-}))(({ students, addPayment }) => {
+	addPayments: payments => dispatch(addMultiplePayments(payments))
+}))(({ students, addPayments }) => {
 
 	// first make sure all students payments have been calculated... (this is for dues)
 
@@ -20,15 +20,28 @@ export default connect(state => ({
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
+	console.log("RENDER")
+
 	let total_paid = 0;
 	let total_owed = 0;
 	let total_forgiven = 0;
 	let monthly_payments = {}; // [MM-DD-YYYY]: { due, paid, forgiven }
 	let total_student_debts = {} // [id]: { due, paid, forgiven }
 
+	// first update fees
+
+	const nextPayments = Object.values(students)
+		.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
+
+	if(nextPayments.length > 0) {
+		console.log(nextPayments)
+		addPayments(nextPayments)
+	}
+
+
 	for(let sid in students) {
 		const student = students[sid];
-		checkStudentDues(student, addPayment);
+
 		let debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0}
 		for(let pid in student.payments || {}) {
 			const payment = student.payments[pid];
