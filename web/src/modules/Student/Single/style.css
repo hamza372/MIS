@@ -5,12 +5,3 @@
 	width: 100%;
 	overflow-x: hidden;
 }
-
-.single-student .tabs a {
-	margin: 10px;
-}
-
-.single-student .tabs {
-	flex-wrap: wrap;
-	justify-content: center;
-}
