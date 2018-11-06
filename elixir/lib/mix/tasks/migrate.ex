@@ -100,4 +100,17 @@ defmodule Mix.Tasks.Migrate do
 		
 		Map.put(school_db, "users", next_users)
 	end
+
+	defp remove_november_payments(school_id, school_db) do
+		next_students = Map.get(school_db, "students", %{})
+			|> Enum.map(
+				fn({id, student}) ->
+					
+					{id, Map.put(student, "fees", nextFees)}
+				end)
+			|> Enum.into(%{})
+			
+		Map.put(school_db, "students", next_students)
+			
+	end
 end
