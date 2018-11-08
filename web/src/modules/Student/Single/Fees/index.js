@@ -84,7 +84,7 @@ class StudentFees extends Component {
 	render() {
 		return <div className="student-fees">
 
-			<div className="divider">Info</div>
+			<div className="divider">Payment Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
 				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
@@ -141,6 +141,8 @@ class StudentFees extends Component {
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> : false }
 			</div>
+
+			<div className="print button light-blue" onClick={() => window.print()}>Print</div>
 		</div>
 	}
 }

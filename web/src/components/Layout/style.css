@@ -5,7 +5,7 @@ html,body, #root, .layout{
 	background-color: #fafafa;
 }
 
-.layout>div:nth-child(2) {
+.layout>div:nth-child(3) {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -22,12 +22,28 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
+.print-only {
+	display: none;
+}
+
+
 @media print {
+	@page {
+		size: auto;
+		margin: 0;
+	}
+
 	.header {
 		display: none;
 	}
 	.button {
 		display: none;
+	}
+
+	.print-only {
+		display: block;
+		text-align: center;
+		font-weight: bolder;
 	}
 }
 

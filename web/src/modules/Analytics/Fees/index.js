@@ -6,7 +6,7 @@ import moment from 'moment'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { addMultiplePayments } from 'actions'
 
-import { ResponsiveContainer, BarChart, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
+import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
 
 export default connect(state => ({
 	students: state.db.students

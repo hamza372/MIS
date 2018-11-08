@@ -4,9 +4,12 @@ import { connect } from 'react-redux'
 
 import './style.css'
 
-const Layout = ({ user, children }) => {
+const Layout = ({ user, settings, children }) => {
 	return <div className="layout">
 		<Header user={user} />
+		<div className="print-only">
+			<div className="title">{settings.schoolName}</div>
+		</div>
 		{ children }
 	</div>
 }
@@ -18,5 +21,6 @@ const Header = ({user}) => <div className="header">
 
 export default connect(state => ({ 
 	user: Object.values(state.db.faculty)
-		.find(x => x.Name === state.auth.name) 
+		.find(x => x.Name === state.auth.name),
+	settings: state.db.settings
 }))(Layout)

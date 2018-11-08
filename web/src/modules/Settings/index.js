@@ -20,8 +20,6 @@ class Settings extends Component {
 	}
 
 	onSave = () => {
-		console.log("================================")
-		console.log(this.state)
 		this.props.saveSettings(this.state.settings)
 	}
 

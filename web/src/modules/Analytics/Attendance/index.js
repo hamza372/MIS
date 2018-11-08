@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
 
-import { ResponsiveContainer, BarChart, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
+import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
 
 export default connect(state => ({
 	students: state.db.students
