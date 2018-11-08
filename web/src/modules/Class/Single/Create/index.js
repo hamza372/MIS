@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { v4 } from 'node-uuid'
 import { Link, Redirect } from 'react-router-dom'
+import moment from 'moment'
 
 import Former from 'utils/former'
 import Banner from 'components/Banner'
@@ -35,10 +36,16 @@ class SingleClass extends Component {
 		this.state = {
 			class: currClass,
 			saveBanner: false,
-			redirect: false
+			redirect: false,
+			report_dates: {
+				start: moment.now(),
+				end: moment.now()
+			}
 		}
 
 		this.former = new Former(this, ["class"])
+
+		this.report_former = new Former(this, ["report_dates"])
 	}
 
 	id = () => this.props.match.params.id
@@ -218,6 +225,17 @@ class SingleClass extends Component {
 						</div>)
 				}
 				<div className="button" onClick={this.addSection}>Add Section</div>
+
+				<div className="divider">Print Reports</div>
+					<div className="row">
+						<label>Start Date</label>
+						<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_dates.start).format("YYYY-MM-DD")} placeholder="Start Date" />
+					</div>
+					<div className="row">
+						<label>End Date</label>
+						<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
+					</div>
+					<Link className="button" to={`reports`}>Print</Link>
 
 				<div className="button save" onClick={this.onSave}>Save</div>
 			</div>

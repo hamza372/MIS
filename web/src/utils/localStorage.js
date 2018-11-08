@@ -1,4 +1,3 @@
-/*global chrome*/
 import { v4 } from 'node-uuid'
 import requestFS from 'utils/requestFS'
 

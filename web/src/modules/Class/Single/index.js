@@ -3,16 +3,15 @@ import {Route} from 'react-router-dom'
 
 import Layout from 'components/Layout'
 import Create from './Create'
+import Reports from './Reports'
 
 import './style.css'
 
 export default (props) => {
 
-	return <Layout>
-		<div className="single-class-container">
-			<Route path="/class/new" component={Create} />
-			<Route path="/class/:id/profile" component={Create} />
-		</div>
-	</Layout>
-
+	return <div className="single-class-container">
+		<Route path="/class/new" component={Create} />
+		<Route path="/class/:id/profile" component={Create} />
+		<Route path="/class/:id/reports" component={Reports} />
+	</div>
 }
