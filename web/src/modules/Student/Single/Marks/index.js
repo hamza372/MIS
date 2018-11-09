@@ -5,17 +5,39 @@ import moment from 'moment'
 
 import './style.css'
 
-const StudentMarksContainer = ({match, students, exams}) => {
+import { PrintHeader } from 'components/Layout'
+
+const StudentMarksContainer = ({match, students, exams, settings}) => {
 
 	const id = match.params.id;
 
 	const student = students[id];
 
-	return <StudentMarks student={student} exams={exams} />
+	return <div className="student-marks-container">
+			<StudentMarks student={student} exams={exams} settings={settings} />
+			<div className="print button" onClick={() => window.print()}>Print</div>
+		</div>
 }
 
-export const StudentMarks = ({student, exams}) => {
+export const StudentMarks = ({student, exams, settings}) => {
+	
+	const { total_possible, total_marks } = Object.keys(student.exams || {})
+		.map(exam_id => exams[exam_id])
+		.reduce((agg, curr) => ({
+			total_possible: agg.total_possible + parseFloat(curr.total_score),
+			total_marks: agg.total_marks + parseFloat(student.exams[curr.id].score)
+		}), {
+			total_possible: 0,
+			total_marks: 0
+		})
+
 	return <div className="student-marks">
+		<PrintHeader settings={settings} />
+
+		<div className="title">Result Card</div>
+		<div className="student-info">
+			<div className="name"><b>Student Name:</b> {student.Name}</div>
+		</div>
 		<div className="section table">
 			<div className="table row heading">
 				<label><b>Date</b></label>
@@ -26,7 +48,7 @@ export const StudentMarks = ({student, exams}) => {
 				<label><b>Percent</b></label>
 			</div>
 		{
-			Object.keys(student.exams || {})
+			[...Object.keys(student.exams || {})
 				.map(exam_id => exams[exam_id])
 				.sort((a, b) => b.date - a.date)
 				.map(exam => <div className="table row" key={exam.id}>
@@ -36,7 +58,18 @@ export const StudentMarks = ({student, exams}) => {
 						<div>{student.exams[exam.id].score}</div>
 						<div >{exam.total_score}</div>
 						<div>{(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}</div>
-					</div>)
+					</div>),
+					<div className="table row footing" key={`${student.id}-total-heading`}>
+						<label><b>Total Marks</b></label>
+						<label><b>Out of</b></label>
+						<label><b>Percent</b></label>
+					</div>,
+					<div className="table row" key={`${student.id}-total-heading`}>
+						<div>{total_marks}</div>
+						<div>{total_possible}</div>
+						<div>{(total_marks/total_possible * 100).toFixed(2)}%</div>
+					</div> 
+			]
 		}
 		</div>
 	</div>
@@ -45,5 +78,6 @@ export const StudentMarks = ({student, exams}) => {
 
 export default connect(state => ({
 	students: state.db.students,
-	exams: state.db.exams
+	exams: state.db.exams,
+	settings: state.db.settings
 }))(StudentMarksContainer)

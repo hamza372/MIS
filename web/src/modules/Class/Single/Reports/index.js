@@ -1,11 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import Layout, { PrintHeader } from 'components/Layout'
+
 import { StudentMarks } from 'modules/Student/Single/Marks'
 
 import './style.css'
 
-const ClassReports = ({ match, classes, students, exams }) => {
+const ClassReports = ({ match, classes, students, exams, settings }) => {
 
 	const id = match.params.id;
 
@@ -19,11 +21,12 @@ const ClassReports = ({ match, classes, students, exams }) => {
 
 	return <Layout>
 		<div className="class-report">
+			<div className="print button" onClick={() => window.print()}>Print</div>
 			{
+				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
-					<div className="student-report" key={s.id}>
-						<div className="title">{s.Name}</div>
-						<StudentMarks student={s} exams={exams} />
+					<div className="print-page student-report" key={s.id}>
+						<StudentMarks student={s} exams={exams} settings={settings} />
 					</div>)
 			}
 		</div>
@@ -33,5 +36,6 @@ const ClassReports = ({ match, classes, students, exams }) => {
 export default connect(state => ({
 	classes: state.db.classes,
 	students: state.db.students,
+	settings: state.db.settings,
 	exams: state.db.exams
 }))(ClassReports)
