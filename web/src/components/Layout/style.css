@@ -32,6 +32,10 @@ a {
 	display: none;
 }
 
+.no-print {
+	width: 100%;
+}
+
 
 
 @media print {

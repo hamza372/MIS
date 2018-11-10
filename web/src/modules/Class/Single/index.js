@@ -12,6 +12,6 @@ export default (props) => {
 	return <div className="single-class-container">
 		<Route path="/class/new" component={Create} />
 		<Route path="/class/:id/profile" component={Create} />
-		<Route path="/class/:id/reports" component={Reports} />
+		<Route path="/class/:id/reports/:start/:end" component={Reports} />
 	</div>
 }

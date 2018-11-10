@@ -38,7 +38,7 @@ class SingleClass extends Component {
 			saveBanner: false,
 			redirect: false,
 			report_dates: {
-				start: moment.now(),
+				start: moment().subtract(1, "month").unix() * 1000,
 				end: moment.now()
 			}
 		}
@@ -235,7 +235,7 @@ class SingleClass extends Component {
 						<label>End Date</label>
 						<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
 					</div>
-					<Link className="button" to={`reports`}>Print Preview</Link>
+					<Link className="button" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
 
 				<div className="button save" onClick={this.onSave}>Save</div>
 			</div>

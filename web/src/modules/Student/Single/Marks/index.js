@@ -3,26 +3,56 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 
-import './style.css'
-
+import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
-const StudentMarksContainer = ({match, students, exams, settings}) => {
+import './style.css'
 
-	const id = match.params.id;
+class StudentMarksContainer extends Component {
 
-	const student = students[id];
+	constructor(props) {
+		super(props)
+		this.state = {
+			start: moment().subtract(1, "month"),
+			end: moment.now()
+		}
 
-	return <div className="student-marks-container">
-			<StudentMarks student={student} exams={exams} settings={settings} />
-			<div className="print button" onClick={() => window.print()}>Print</div>
-		</div>
+		this.former = new Former(this, []);
+	}
+
+	render() {
+		const {match, students, exams, settings} = this.props;
+		const id = match.params.id;
+
+		const student = students[id];
+
+		return <div className="student-marks-container">
+				<div className="no-print">
+					<div className="form">
+						<div className="row">
+							<label>Start Date</label>
+							<input type="date" onChange={this.former.handle(["start"])} value={moment(this.state.start).format("YYYY-MM-DD")} placeholder="Start Date" />
+						</div>
+						<div className="row">
+							<label>End Date</label>
+							<input type="date" onChange={this.former.handle(["end"])} value={moment(this.state.end).format("YYYY-MM-DD")} placeholder="End Date" />
+						</div>
+					</div>
+				</div>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={moment(this.state.start).unix() * 1000} endDate={moment(this.state.end).unix() * 1000}/>
+				<div className="print button" onClick={() => window.print()}>Print</div>
+			</div>
+	}
 }
 
-export const StudentMarks = ({student, exams, settings}) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now()}) => {
 	
+	const start = moment(startDate);
+	const end = moment(endDate);
+
 	const { total_possible, total_marks } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
+		.filter(exam => moment(exam.date).isBetween(start, end))
 		.reduce((agg, curr) => ({
 			total_possible: agg.total_possible + parseFloat(curr.total_score),
 			total_marks: agg.total_marks + parseFloat(student.exams[curr.id].score)
@@ -50,7 +80,8 @@ export const StudentMarks = ({student, exams, settings}) => {
 		{
 			[...Object.keys(student.exams || {})
 				.map(exam_id => exams[exam_id])
-				.sort((a, b) => b.date - a.date)
+				.filter(exam => moment(exam.date).isBetween(start, end))
+				.sort((a, b) => a.date - b.date)
 				.map(exam => <div className="table row" key={exam.id}>
 						<div>{moment(exam.date).format("MM/DD")}</div>
 						<div>{exam.subject}</div>
@@ -59,12 +90,12 @@ export const StudentMarks = ({student, exams, settings}) => {
 						<div >{exam.total_score}</div>
 						<div>{(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}</div>
 					</div>),
-					<div className="table row footing" key={`${student.id}-total-heading`}>
+					<div className="table row footing" key={`${student.id}-total-footing`}>
 						<label><b>Total Marks</b></label>
 						<label><b>Out of</b></label>
 						<label><b>Percent</b></label>
 					</div>,
-					<div className="table row" key={`${student.id}-total-heading`}>
+					<div className="table row" key={`${student.id}-total-value`}>
 						<div>{total_marks}</div>
 						<div>{total_possible}</div>
 						<div>{(total_marks/total_possible * 100).toFixed(2)}%</div>

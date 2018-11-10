@@ -4,8 +4,10 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
 }
+	.student-marks-container .no-print>* {
+		margin: auto;
+	}
 
 .student-marks {
 	width: 90%;
