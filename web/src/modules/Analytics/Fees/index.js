@@ -5,14 +5,16 @@ import moment from 'moment'
 
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { addMultiplePayments } from 'actions'
+import { PrintHeader } from 'components/Layout'
 
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
 
 export default connect(state => ({
-	students: state.db.students
+	students: state.db.students,
+	settings: state.db.settings
 }), dispatch => ({
 	addPayments: payments => dispatch(addMultiplePayments(payments))
-}))(({ students, addPayments }) => {
+}))(({ students, addPayments, settings }) => {
 
 	// first make sure all students payments have been calculated... (this is for dues)
 
@@ -65,6 +67,7 @@ export default connect(state => ({
 	}
 
 	return <div className="fees-analytics">
+		<PrintHeader settings={settings} />
 		<div className="table row">
 			<label>Total Paid</label>
 			<div>{total_paid}</div>
@@ -82,6 +85,7 @@ export default connect(state => ({
 			<div>{total_paid + total_forgiven - total_owed}</div>
 		</div>
 		
+		<div className="no-print">
 		<div className="divider">Payments over Time</div>
 
 		<ResponsiveContainer width="100%" height={500}>
@@ -100,7 +104,9 @@ export default connect(state => ({
 			</ComposedChart>
 		</ResponsiveContainer>
 
+		</div>
 		<div className="divider">Students with Payments Outstanding</div>
+		<div className="section">
 		{
 			Object.values(total_student_debts)
 				.sort((a, b) => calculateDebt(a.debt) - calculateDebt(b.debt))
@@ -109,6 +115,8 @@ export default connect(state => ({
 					<div>{calculateDebt(debt)}</div>
 				</div>)
 		}
+		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
+		</div>
 
 	</div>
 })
