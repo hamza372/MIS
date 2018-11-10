@@ -7,37 +7,33 @@ import './style.css'
 class List extends Component {
 	constructor(props) {
 		super(props)
-		
 		this.state = {
-			items: [],
+			filterText : ""
 		}
 	}
 	
-	filterlist = (e) => { 
-
-		const updatedList = this.props.children.filter((item) => {
-			//console.log(item);
-			return item.props.children.toLowerCase().search(e.target.value.toLowerCase())!== -1;
-		});
-		//console.log(updatedList)
-		this.setState({items : updatedList});
+	getLabel = (item) => {
+		return item.props.children;
 	}
 
-	componentDidMount(){
-		let items = this.props.children; 
-		this.setState({ items });
-		//console.log(items);
+	onChange = (e) => {
+		this.setState({filterText:e.target.value});
 	}
 
 	render() {
-		return <div className="list-wrap">
-			<input type="text" placeholder="Search" onChange={this.filterlist}/>
 
+		const filteredList = this.props.children.filter(item => {
+			return this.getLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
+		})
+		
+		return <div className="list-wrap">
+			<input type="text" placeholder="Search" onChange={this.onChange}/>
+			
 			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			
 			<div className="list">
 				{
-					this.state.items.map(C => <div className="list-row" key={Math.random()}>{C}</div>)
+					filteredList.map(C => <div className="list-row" key={Math.random()}>{C}</div>)
 				}
 			</div>
 		</div>
