@@ -6,6 +6,15 @@
 	align-items: center;
 }
 
+.search-bar {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	width: 90%;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	border-radius: 5px;
+}
 .list-wrap .button {
 	align-self: flex-end;
 	margin-right: 5%;

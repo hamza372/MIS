@@ -27,8 +27,8 @@ class List extends Component {
 		})
 		
 		return <div className="list-wrap">
-			<input type="text" placeholder="Search" onChange={this.onChange}/>
-			
+			<input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
+
 			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			
 			<div className="list">
