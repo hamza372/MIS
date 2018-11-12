@@ -1,7 +1,7 @@
 import * as redux from 'redux'
 import locations from './narrowed.json'
 
-import { SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
+import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
 
 
 const initialState : RootBankState = {
@@ -13,12 +13,13 @@ const initialState : RootBankState = {
 		token: undefined,
 		username: undefined,
 		attempt_failed: false,
-		loading: false
+		loading: false,
+		client_type: "bank_portal"
 	},
 	filter_text: ""
 }
 
-const rootReducer = (state : RootBankState = initialState, action: redux.Action<any>) : RootBankState => {
+const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
 
 	console.log(action.type)
 

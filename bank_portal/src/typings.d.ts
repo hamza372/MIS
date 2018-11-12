@@ -22,7 +22,8 @@ interface RootBankState {
 		token: string,
 		username: string,
 		attempt_failed: boolean,
-		loading: boolean
+		loading: boolean,
+		client_type: "bank_portal"
 	},
 	filter_text: string
 
