@@ -22,9 +22,9 @@ export default class TeacherPage extends Component {
 			<div className="single-teacher">
 				{ loc === "new" ? false : 
 				<div className="row tabs">
-					<Link className={`button ${loc === "profile" ? "selected" : false}`} to="profile" replace={true}>Profile</Link>
-					<Link className={`button ${loc === "payment" ? "selected": false}`} to="payment" replace={true}>Payment</Link>
-					<Link className={`button ${loc === "attendance" ? "selected" : false}`} to="attendance" replace={true}>Attendance</Link>
+					<Link className={`button ${loc === "profile" ? "orange" : false}`} to="profile" replace={true}>Profile</Link>
+					<Link className={`button ${loc === "payment" ? "green": false}`} to="payment" replace={true}>Payment</Link>
+					<Link className={`button ${loc === "attendance" ? "purple" : false}`} to="attendance" replace={true}>Attendance</Link>
 				</div>
 				}
 

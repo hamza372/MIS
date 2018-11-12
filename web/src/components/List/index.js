@@ -16,7 +16,7 @@ const List = (props) => {
 }
 
 const Create = ({ to, text}) => {
-	return <Link className="button" to={to}>{text}</Link>
+	return <Link className="button blue" to={to}>{text}</Link>
 }
 
 export default List

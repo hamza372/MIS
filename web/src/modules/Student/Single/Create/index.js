@@ -310,11 +310,11 @@ class SingleStudent extends Component {
 										<option value="MONTHLY">Every Month</option>
 									</select>
 								</div>
-								<div className="button" onClick={this.removeFee(id)}>Remove Fee</div>
+								<div className="button red" onClick={this.removeFee(id)}>Remove Fee</div>
 							</div>
 						})
 					}
-					<div className="button" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
+					<div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
 
 					<div className="save button" onClick={this.onSave}>Save</div>
 					<div className="button red" onClick={this.onDelete}>Delete</div>
