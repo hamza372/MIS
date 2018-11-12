@@ -11,21 +11,23 @@ class List extends Component {
 			filterText : ""
 		}
 	}
-	
-	getLabel = (item) => {
-		return item.props.children;
-	}
 
 	onChange = (e) => {
 		this.setState({filterText:e.target.value});
 	}
-
+ 
 	render() {
-
-		const filteredList = this.props.children.filter(item => {
-			return this.getLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
-		})
 		
+		//console.log(this.props.items); //for Debugging :)
+		
+		const {items, toLabel, Component } = this.props;
+		
+		const filteredList = items.filter(item => {
+			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
+		});
+
+		//console.log(filteredList); //for Debugging :)
+
 		return <div className="list-wrap">
 			<input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
 
@@ -33,8 +35,9 @@ class List extends Component {
 			
 			<div className="list">
 				{
-					filteredList.map(C => <div className="list-row" key={Math.random()}>{C}</div>)
+					filteredList.map(item => Component(item))
 				}
+			
 			</div>
 		</div>
 	}

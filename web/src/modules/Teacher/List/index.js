@@ -5,15 +5,29 @@ import { Link } from 'react-router-dom'
 import Layout from 'components/Layout'
 import List from 'components/List'
 import Title from 'components/Title'
+ 
+const TeacherItem = (T) => 
+	<Link key={T.id} to={`/faculty/${T.id}/profile`}>
+		{teacherLabel(T)}
+	</Link>
 
+const teacherLabel = (T) => `${T.Name}`;
 
 const TeacherList = (props) => {
+	
+	const items = Object.values(props.teachers); 
+
 	return <Layout>
 		<div className="teacher-list">
 			<Title>Teachers</Title>
-			<List create={'/faculty/new'} createText={"Add new Teacher"}>
-				{Object.values(props.teachers).map(teacher => <Link key={teacher.id} to={`/faculty/${teacher.id}/profile`}>{teacher.Name}</Link>)} 
-			</List>
+			
+			<List
+				items={items}
+				Component={TeacherItem}
+				create={'/faculty/new'} 
+				createText={"Add new Teacher"} 
+				toLabel={teacherLabel} 
+			/>
 		</div>
 	</Layout>
 }
