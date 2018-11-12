@@ -15,7 +15,10 @@ const StudentList = (props) => {
 				{
 					Object.values(props.students)
 						.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
-						.map(([id, student]) => <Link to={`/student/${student.id}/profile`} key={id}>{student.Name}</Link>)
+						.map(([id, student]) => 
+							<Link to={`/student/${student.id}/profile`} key={id}>
+								{student.Name}
+							</Link>)
 				} 
 			</List>
 		</div>

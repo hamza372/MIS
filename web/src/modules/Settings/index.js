@@ -7,7 +7,9 @@ import Layout from 'components/Layout'
 
 const defaultSettings = {
 	shareData: true,
-	schoolName: ""
+	schoolName: "",
+	schoolAddress: "",
+	schoolPhoneNumber: "",
 }
 class Settings extends Component {
 
@@ -20,8 +22,6 @@ class Settings extends Component {
 	}
 
 	onSave = () => {
-		console.log("================================")
-		console.log(this.state)
 		this.props.saveSettings(this.state.settings)
 	}
 
@@ -43,6 +43,17 @@ class Settings extends Component {
 						<label>School Name</label>
 						<input type="text" {...this.former.super_handle(["schoolName"])} placeholder="School Name" />
 					</div>
+
+					<div className="row">
+						<label>School Address</label>
+						<input type="text" {...this.former.super_handle(["schoolAddress"])} placeholder="School Address" />
+					</div>
+
+					<div className="row">
+						<label>School Phone Number</label>
+						<input type="text" {...this.former.super_handle(["schoolPhoneNumber"])} placeholder="School Phone Number" />
+					</div>
+
 					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["shareData"])}>

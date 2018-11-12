@@ -1,4 +1,5 @@
 import { v4 } from 'node-uuid'
+import requestFS from 'utils/requestFS'
 
 const initState = {
 	client_id: v4(),
@@ -79,23 +80,52 @@ export const saveDB = (db) => {
 	catch(err) {
 		console.error(err)
 	}
+
+	saveDbToFilesystem(db);
+
 }
 
-// check and request persistent storage
-if(navigator.storage && navigator.storage.persist) {
-	navigator.storage.persisted()
-		.then(persistent => {
-			if(persistent) {
-				console.log('persistent storage activated')
-			}
-			else {
-				console.log('persistent storage denied')
-			}
+const saveDbToFilesystem = (db) => {
+
+	requestFS(20)
+		.then(fs => {
+			console.log('got fs');
 		})
+		.catch(err => {
+			console.error(err)
+		})
+
 }
-else {
-	console.log('no navigator.storage or navigator.storage.persist')
+
+const checkPersistent = () => {
+	// check and request persistent storage
+	if(navigator.storage && navigator.storage.persist) {
+		navigator.storage.persist()
+			.then(persist => {
+				console.log("PERSIST!!!!", persist)
+			})
+			.catch(err => console.error(err))
+
+		navigator.storage.persisted()
+			.then(persistent => {
+				if(persistent) {
+					console.log('persistent storage activated')
+				}
+				else {
+					console.log('persistent storage denied')
+				}
+			})
+		
+			navigator.storage.estimate()
+				.then(estimate => console.log("ESTIMATE!!", estimate))
+				.catch(err => console.error(err))
+	}
+	else {
+		console.log('no navigator.storage or navigator.storage.persist')
+	}
 }
+
+checkPersistent();
 
 // add faculty_id to the auth field if it doesn't exist.
 const addFacultyID = state => {

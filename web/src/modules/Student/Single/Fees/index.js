@@ -5,6 +5,8 @@ import {v4} from 'node-uuid'
 
 import former from 'utils/former'
 
+import { PrintHeader } from 'components/Layout'
+
 import { addPayment } from 'actions'
 import checkStudentDues from 'utils/checkStudentDues'
 
@@ -84,18 +86,23 @@ class StudentFees extends Component {
 	render() {
 		return <div className="student-fees">
 
-			<div className="divider">Info</div>
+			<PrintHeader settings={this.props.settings}/>
+			<div className="divider">Payment Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
 				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
 			</div>
 
 			<div className="table row">
-				<label>Total Annual Fees:</label>
-				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "YEARLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
+				<label>Total One-Time Fees:</label>
+				<div>{
+					Object.values(this.student().fees)
+						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
+				}</div>
 			</div>
 
 			<div className="divider">Ledger</div>
+			<div className="student-name"><b>Student Name:</b> {this.student().Name}</div>
 			<div className="payment-history section">
 				<div className="table row heading">
 					<label><b>Date</b></label>
@@ -125,6 +132,7 @@ class StudentFees extends Component {
 
 			<div className="form">
 				<div className="button" onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
+				<div className="print button" onClick={() => window.print()}>Print</div>
 
 				{ this.state.payment.active ? <div className="new-payment">
 					<div className="row">
@@ -141,12 +149,14 @@ class StudentFees extends Component {
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> : false }
 			</div>
+
 		</div>
 	}
 }
 
 export default connect(state => ({
-	students: state.db.students
+	students: state.db.students,
+	settings: state.db.settings
 }), dispatch => ({
 	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name))
 }))(StudentFees)

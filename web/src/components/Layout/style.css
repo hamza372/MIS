@@ -3,6 +3,7 @@ html,body, #root, .layout{
 	width: 100%;
 	margin: 0;
 	background-color: #fafafa;
+	overflow: visible;
 }
 
 .layout>div:nth-child(2) {
@@ -22,11 +23,53 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
+
+a {
+	color: #4DA2DF;
+}
+
+.print-only {
+	display: none;
+}
+
+.no-print {
+	width: 100%;
+}
+
+
+
 @media print {
+	@page {
+		size: auto;
+		margin: 0;
+	}
+
+	div.print-page {
+		page-break-after: always;
+		page-break-inside: avoid;
+		display: block!important;
+		position: relative!important;
+	}
+
+	a {
+		color: #222;
+		text-decoration: none;
+	}
+
 	.header {
 		display: none;
 	}
 	.button {
+		display: none;
+	}
+
+	.print-only {
+		display: block;
+		text-align: center;
+		font-weight: bolder;
+	}
+
+	.no-print {
 		display: none;
 	}
 }
@@ -35,10 +78,6 @@ html,body, #root, .layout{
 	text-decoration: none;
 	color: white;
 	padding: 10px;
-}
-
-a {
-	color: #4DA2DF;
 }
 
 .header .profile {

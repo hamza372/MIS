@@ -5,8 +5,12 @@
 .student-fees .form {
 	display: flex;
 	flex-direction: column;
-	width: 80%;
+	width: 100%;
 	margin: auto;
+}
+
+.student-fees .form .print.button {
+	margin-top: 20px;
 }
 
 .payment-history {
