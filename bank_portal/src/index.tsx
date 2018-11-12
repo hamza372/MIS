@@ -10,6 +10,6 @@ import Routes from './routes'
 const store = createStore(reducer, applyMiddleware(thunkMiddleware));
 console.log(store)
 ReactDOM.render(
-	<Routes store={store}/>,
+	<Routes store={store} />,
 	document.getElementById("root")
 )

@@ -23,7 +23,8 @@ interface RootBankState {
 		username: string,
 		attempt_failed: boolean,
 		loading: boolean
-	}
+	},
+	filter_text: string
 
 }
 

@@ -47,7 +47,7 @@ class Map extends React.Component<propTypes, any> {
 					data={data}
 					opacity={0.4}
 					radiusScale={90}
-					radiusMinPixels={1}
+					radiusMinPixels={Object.keys(this.props.school_locations).length > 2000 ? 1 : 5}
 					radiusMaxPixels={300}
 					getPosition={(d : any) => ([parseFloat(d.GPS_East), parseFloat(d.GPS_North)])}
 					getColor={(d: any) => ([255, 140, 0])}

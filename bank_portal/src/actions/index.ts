@@ -13,7 +13,7 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 	const state = getState();
 
 	if(state.school_db[loc.id] === undefined) {
-		fetch(`https://cf899b56.ngrok.io/school/${loc.id}`)
+		fetch(`https://37c4fcf7.ngrok.io/school/${loc.id}`)
 			.then(res => res.json())
 			.then((res : School) => dispatch(addToSchoolDB(res)))
 			.catch(err => console.error(err))
@@ -24,6 +24,19 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 		type: SELECT_LOCATION,
 		loc: loc
 	})
+}
+
+export const SET_FILTER = "SET_FILTER"
+export interface SetFilterAction {
+	type: 'SET_FILTER',
+	filter_text: string
+}
+export const setFilter = (filter_text : string) : SetFilterAction => {
+
+	return {
+		type: SET_FILTER,
+		filter_text
+	}
 }
 
 
