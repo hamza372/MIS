@@ -4,7 +4,7 @@ html,body, #root, .layout{
 	margin: 0;
 	position: absolute;
 	/*background-color: #fafafa;*/
-	background-color: #fefefe;
+	background-color: #fafafa;
 	overflow: visible;
 }
 
@@ -139,7 +139,7 @@ a.block {
 	}
 
 	.row:focus-within label {
-		color: #4DA2DF;
+		color: #74aced;
 		font-weight: bold;
 	}
 
@@ -156,6 +156,11 @@ a.block {
 
 		.form .row>*:last-child {
 			margin-left: auto;
+		}
+
+		.button:hover {
+			color: #fafafa;
+			background-color: #222;
 		}
 
 		.form input {
@@ -187,6 +192,7 @@ a.block {
 	border: none;
 	border-bottom: 1px solid black;
 	transition: all .2s ease-in;
+	outline: none;
 }
 
 	input[disabled] {
@@ -202,6 +208,7 @@ a.block {
 		background-color: initial;
 		height: 40px;
 		border: 1px solid #bbb;
+		border-radius: 5px;
 	}
 
 	input[type=text], input[type=url], input[type=email], input[type=password], input[type=tel], input[type=number], input[list] {
@@ -211,11 +218,13 @@ a.block {
 		height: 40px;
 		line-height: 40px; font-size: 17px;
 		border: 1px solid #bbb;
+		border-radius: 5px;
 	}
 
 	select {
 		height: 40px;
 		background-color: initial;
+		border-radius: 5px;
 	}
 
 	select:focus {
@@ -231,9 +240,11 @@ a.block {
 .title {
 	margin: 20px 0;
 	font-size: 2.0rem;
+	/*color: #777;*/
 }
 
 .divider {
+	/*color: #aaa;*/
 	margin: 20px auto;
 	font-size: 1.8rem;
 	text-align: center;
@@ -256,6 +267,7 @@ textarea {
 .button {
 	color: #222;
 	border: 3px solid #222;
+	border: 3px solid rgba(0,0,0,0.5);
 	border-radius: 5px;
 	padding: 10px 15px;
 	transition: all .3s linear;
@@ -264,7 +276,7 @@ textarea {
 	text-decoration: none;
 	text-align: center;
 	user-select: none;
-	box-shadow: none!important;
+	box-shadow: none;
 }
 
 
@@ -282,18 +294,24 @@ textarea {
 	.button.red {
 		background-color: #EDAFB8;
 		background-color: #fc6171;
-		box-shadow: 3px 3px 5px #ffb9b7;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.red-shadow {
+		box-shadow: 5px 5px 5px #ffb9b7;
 	}
 
 	.button.blue, .button.save {
 		/*background-color: #4DA2DF;*/
 		background-color: #189cec;
 		background-color: #74aced;
-		box-shadow: 3px 3px 5px #8fd0f6;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.blue-shadow {
+		box-shadow: 5px 5px 5px #8fd0f6;
 	}
 
 	.button.green {
@@ -301,18 +319,24 @@ textarea {
 		background-color: #4ec9b3;
 		background-color: #6dc4b5;
 		background-color: #5ecdb9;
-		box-shadow: 3px 3px 5px #99eae1;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.green-shadow {
+		box-shadow: 5px 5px 5px #99eae1;
 	}
 
 	.button.yellow {
 		/*background-color: #4DA2DF;*/
 		background-color: #ffca7b;
 		background-color: #f4d29f;
-		box-shadow: 3px 3px 5px #ffe7c2;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.yellow-shadow {
+		box-shadow: 5px 5px 5px #ffe7c2;
 	}
 
 	.button.print-old {
@@ -324,31 +348,43 @@ textarea {
 
 	.button.black {
 		background-color: #222222;
-		box-shadow: 3px 3px 5px black;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
 	}
 
+	.black-shadow {
+		box-shadow: 5px 5px 5px #555555;
+	}
+
 	.button.grey, .button.print {
 		background-color: #e0e0e0;
-		box-shadow: 3px 3px 5px #eeeeee;
 		color: #222222;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.grey-shadow {
+		box-shadow: 5px 5px 5px #eeeeee;
 	}
 
 	.button.purple {
 		background-color: #5c6af8;
 		background-color: #7e88f7;
-		box-shadow: 3px 3px 5px #cbc9f0;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
 	}
 
+	.purple-shadow {
+		box-shadow: 5px 5px 5px #cbc9f0;
+	}
+
 	.button.orange {
 		background-color: #ff6b68;
-		box-shadow: 3px 3px 5px #ffb9b7;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.orange-shadow {
+		box-shadow: 5px 5px 5px #ffb9b7;
 	}
 
 	.button.light-blue {
@@ -358,8 +394,6 @@ textarea {
 	}
 
 	.button.selected, .button:hover {
-		color: #fafafa;
-		background-color: #222;
 		box-shadow: 0px 0px;
 	}
 
