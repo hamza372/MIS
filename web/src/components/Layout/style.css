@@ -255,7 +255,7 @@ textarea {
 
 .button {
 	color: #222;
-	border: 2px solid #222;
+	border: 3px solid #222;
 	border-radius: 5px;
 	padding: 10px 15px;
 	transition: all .3s linear;
@@ -284,7 +284,7 @@ textarea {
 		background-color: #fc6171;
 		box-shadow: 3px 3px 5px #ffb9b7;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.blue, .button.save {
@@ -293,7 +293,7 @@ textarea {
 		background-color: #74aced;
 		box-shadow: 3px 3px 5px #8fd0f6;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.green {
@@ -303,7 +303,7 @@ textarea {
 		background-color: #5ecdb9;
 		box-shadow: 3px 3px 5px #99eae1;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.yellow {
@@ -312,28 +312,28 @@ textarea {
 		background-color: #f4d29f;
 		box-shadow: 3px 3px 5px #ffe7c2;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.print-old {
 		background-color: #f4d29f;
 		box-shadow: 3px 3px 5px #ffe7c2;
 		color: #e0e0e0;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.black {
 		background-color: #222222;
 		box-shadow: 3px 3px 5px black;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.grey, .button.print {
 		background-color: #e0e0e0;
 		box-shadow: 3px 3px 5px #eeeeee;
 		color: #222222;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.purple {
@@ -341,14 +341,14 @@ textarea {
 		background-color: #7e88f7;
 		box-shadow: 3px 3px 5px #cbc9f0;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.orange {
 		background-color: #ff6b68;
 		box-shadow: 3px 3px 5px #ffb9b7;
 		color: #fafafa;
-		border: 2px solid rgba(0,0,0,0.2);
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
 	.button.light-blue {

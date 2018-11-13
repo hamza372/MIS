@@ -8,10 +8,15 @@
 .landing .button {
 	display: flex;
 	margin: 12px;
-	height: 100px;
+	min-height: 100px;
 	width: 100px;
 	align-items: center;
 	justify-content: center;
+}
+
+.landing .row {
+	flex-wrap: wrap;
+	justify-content: space-around;
 }
 
 /*
