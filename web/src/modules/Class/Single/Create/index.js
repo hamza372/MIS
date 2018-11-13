@@ -229,6 +229,7 @@ class SingleClass extends Component {
 				<div className="button green" onClick={this.addSection}>Add Section</div>
 
 				<div className="divider">Print Reports</div>
+				<div className="section">
 					<div className="row">
 						<label>Start Date</label>
 						<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_dates.start).format("YYYY-MM-DD")} placeholder="Start Date" />
@@ -237,7 +238,8 @@ class SingleClass extends Component {
 						<label>End Date</label>
 						<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
 					</div>
-					<Link className="button grey" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
+					<Link className="button grey block" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
+				</div>
 
 				<div className="button blue" onClick={this.onSave}>Save</div>
 			</div>

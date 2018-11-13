@@ -3,6 +3,10 @@
 	display: block!important;
 }
 
+.class-report .button {
+	margin: 20px;
+}
+
 .class-report .student-report {
 	width: 100%;
 	display: block;

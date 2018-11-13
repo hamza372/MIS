@@ -98,7 +98,7 @@ class SMS extends Component {
 							<a href={smsIntentLink({
 								messages: [{ number: this.state.selected_student_number, text: this.state.text }],
 								return_link: window.location.href 
-								})} className="button">Send using Local SIM</a> }
+								})} className="button blue">Send using Local SIM</a> }
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">

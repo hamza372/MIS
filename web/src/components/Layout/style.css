@@ -31,6 +31,10 @@ a {
 	color: #189cec;
 }
 
+a.block {
+	display: block;
+}
+
 .print-only {
 	display: none;
 }
@@ -38,8 +42,6 @@ a {
 .no-print {
 	width: 100%;
 }
-
-
 
 @media print {
 	@page {
@@ -270,7 +272,7 @@ textarea {
 		padding: 5px 10px;
 	}
 
-	.form .button.save {
+	.form .button.save-old {
 		/*background-color: #95B8D1;*/
 		background-color: #4DA2DF;
 		color: #fafafa;
@@ -285,7 +287,7 @@ textarea {
 		border: 2px solid rgba(0,0,0,0.2);
 	}
 
-	.button.blue {
+	.button.blue, .button.save {
 		/*background-color: #4DA2DF;*/
 		background-color: #189cec;
 		background-color: #74aced;
@@ -313,10 +315,10 @@ textarea {
 		border: 2px solid rgba(0,0,0,0.2);
 	}
 
-	.button.print {
+	.button.print-old {
 		background-color: #f4d29f;
 		box-shadow: 3px 3px 5px #ffe7c2;
-		color: #fafafa;
+		color: #e0e0e0;
 		border: 2px solid rgba(0,0,0,0.2);
 	}
 
@@ -327,7 +329,7 @@ textarea {
 		border: 2px solid rgba(0,0,0,0.2);
 	}
 
-	.button.grey {
+	.button.grey, .button.print {
 		background-color: #e0e0e0;
 		box-shadow: 3px 3px 5px #eeeeee;
 		color: #222222;
@@ -357,6 +359,7 @@ textarea {
 
 	.button.selected, .button:hover {
 		color: #fafafa;
+		background-color: #222;
 		box-shadow: 0px 0px;
 	}
 

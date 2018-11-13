@@ -46,7 +46,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 }
 
 export const SMS = "SMS"
-export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
+export const sendSMS = (text : string, number : string) => (dispatch, getState, syncr) => {
 	
 	// should i keep a log of all messages sent in the db?
 
@@ -62,8 +62,8 @@ export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
 	})
 	.then(dispatch)
 	.catch((err : Error) => console.error(err)) // this should backup to sending the sms via the android app?
-
 }
+
 
 export const BATCH_SMS = "BATCH_SMS"
 interface SMS {
