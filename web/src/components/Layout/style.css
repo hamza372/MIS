@@ -158,10 +158,12 @@ a.block {
 			margin-left: auto;
 		}
 
+		/*
 		.button:hover {
 			color: #fafafa;
 			background-color: #222;
 		}
+		*/
 
 		.form input {
 			min-width: 30%;
@@ -234,6 +236,7 @@ a.block {
 	.form input:focus {
 		background-color: white;
 		border: 1px solid #4DA2DF;
+		border: 1px solid #74aced;
 	}
 
 
