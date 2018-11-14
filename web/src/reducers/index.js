@@ -75,29 +75,35 @@ const rootReducer = (state, action) => {
 		{
 			console.log("confirm sync diff: ", Object.keys(action.new_writes).length, " changes synced")
 
+			const newQ = Object.keys(state.queued)
+				.filter(t => {
+					console.log(state.queued[t].date, action.date, state.queued[t].date - action.date);
+					return state.queued[t].date > action.date
+				})
+				.reduce((agg, curr) => {
+					console.log(curr)
+					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
+				}, {})
+
 			if(Object.keys(action.new_writes).length > 0) {
 				// remove queued items
-
-				// this probably doesn't work....
-				const newQ = Object.keys(state.queued)
-					.filter(t => state.queued[t].date > action.date)
-					.reduce((agg, curr) => {
-						console.log(curr)
-						return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
-					}, {})
 
 				const nextState = Object.values(action.new_writes)
 					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
 
 				return  {
-					...Dynamic.put(nextState, ["queued"], newQ),
+					...nextState, 
+					queued: newQ,
 					acceptSnapshot: true,
 					lastSnapshot: new Date().getTime()
 				}
 			}
 
+
 			return {
 				...state,
+				queued: newQ,
+				acceptSnapshot: true,
 				lastSnapshot: new Date().getTime()
 			}
 		}
