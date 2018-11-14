@@ -15,7 +15,7 @@ export default class LinkButton extends Component {
 		const {to, children} = this.props;
 		return <Link 
 			to={to} 
-			className={`link-button ${this.state.engaged ? "engaged" : ""}`}
+			className={`link-button button ${this.state.engaged ? "engaged" : ""}`}
 			onTouchStart={this.onTouchStart}
 			onTouchEnd={this.onTouchEnd}>{children}
 			</Link>

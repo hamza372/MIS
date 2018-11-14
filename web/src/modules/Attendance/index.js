@@ -105,9 +105,9 @@ class Attendance extends Component {
 							<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
 							<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
 							<div className="status">
-								<div className={`button ${status === "PRESENT" ? status : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
-								<div className={`button ${status === "ABSENT" ? status : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
-								<div className={`button ${status === "LEAVE" ? status : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
+								<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
+								<div className={`button ${status === "ABSENT" ? "orange" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
+								<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
 							</div>
 					</div>})
 				}

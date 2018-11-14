@@ -98,9 +98,9 @@ export default connect(state => ({
 				<XAxis dataKey="month" />
 				<YAxis />
 				<Tooltip />
-				<Bar dataKey="SUBMITTED" stackId="a" fill="#aaaaaa" name="Payed" />
-				<Bar dataKey="FORGIVEN" stackId="a" fill="#95B8D1" name="Forgiven" />
-				<Bar dataKey='net' name="Profit" fill="#222222" />
+				<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Payed" />
+				<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
+				<Bar dataKey='net' name="Profit" fill="#ff6b68" />
 			</ComposedChart>
 		</ResponsiveContainer>
 

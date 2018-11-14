@@ -131,8 +131,7 @@ class StudentFees extends Component {
 			</div>
 
 			<div className="form">
-				<div className="button" onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
-				<div className="print button" onClick={() => window.print()}>Print</div>
+				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
 				{ this.state.payment.active ? <div className="new-payment">
 					<div className="row">
@@ -148,6 +147,7 @@ class StudentFees extends Component {
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> : false }
+				<div className="print button" onClick={() => window.print()}>Print</div>
 			</div>
 
 		</div>

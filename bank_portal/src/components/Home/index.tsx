@@ -6,7 +6,7 @@ import { selectLocation } from '~/src/actions'
 
 import Map from '~/src/components/DeckMap'
 import Sidebar from '~/src/components/Sidebar'
-import { Dispatch } from "redux";
+import Filter from '~/src/components/Filter'
 
 
 class Home extends React.Component<RouteComponentProps<any> & RootBankState & DispatchProps, any> {
@@ -37,9 +37,25 @@ class Home extends React.Component<RouteComponentProps<any> & RootBankState & Di
 
 	render() {
 
+		const filter = this.props.filter_text;
+
+		const locations = filter === "" ? this.props.school_locations : Object.entries(this.props.school_locations)
+			.reduce((agg, [id, sloc]) => {
+					if(sloc.SchoolName.startsWith(filter)) {
+					return {
+						...agg,
+						[id]: sloc
+					}
+				}
+				else {
+					return agg;
+				}
+			}, {})
+
 		return <div>
-			Hello
-			<Map onSelect={this.onSelect} school_locations={this.props.school_locations} />
+			Loading...
+			<Filter />
+			<Map onSelect={this.onSelect} school_locations={locations} />
 			{ this.props.selected === undefined ? false : <Sidebar school={this.props.school_db[this.props.selected.id]} /> }
 		</div>
 	}
