@@ -10,8 +10,8 @@ defmodule Sarkar.School do
 
 		# state is school_id, map of writes, map of db.
 		# TODO: map of writes: (path) -> date
-
-		GenServer.start_link(__MODULE__, {school_id, %{}, Sarkar.Store.School.load(school_id)}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		{db, writes} = Sarkar.Store.School.load(school_id)
+		GenServer.start_link(__MODULE__, {school_id, writes, db}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
@@ -103,6 +103,7 @@ defmodule Sarkar.School do
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
+				Sarkar.Store.School.save(school_id, nextDb, new_writes) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
 				Sarkar.Store.School.save(school_id, nextDb) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}

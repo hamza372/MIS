@@ -99,7 +99,6 @@ const rootReducer = (state, action) => {
 				}
 			}
 
-
 			return {
 				...state,
 				queued: newQ,
