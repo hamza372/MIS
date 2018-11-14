@@ -33,7 +33,7 @@ class SchoolLogin extends Component {
 	render() {
 
 		if (!this.props.connected) {
-			return <div>This page requires an internet connection. Attempting to connect.....</div>
+			return <div>Connecting.....</div>
 		}
 
 		return <Layout>

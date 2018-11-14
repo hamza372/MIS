@@ -166,6 +166,24 @@ export const addPayment = (student, payment_id, amount, date = moment.now(), typ
 	]))
 }
 
+export const addMultiplePayments = (payments) => dispatch => {
+
+	// payments is array of { student, payment_id, amount, date, type, fee_id, fee_name }
+
+	const merges = payments.map(p => ({
+		path: ["db", "students", p.student.id, "payments", p.payment_id],
+		value: {
+			amount: p.amount,
+			date: p.date,
+			type: p.type,
+			fee_id: p.fee_id,
+			fee_name: p.fee_name
+		}
+	}))
+
+	dispatch(createMerges(merges));
+}
+
 export const createTemplateMerges = templates => dispatch => {
 
 	dispatch(createMerges([

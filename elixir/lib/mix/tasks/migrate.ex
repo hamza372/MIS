@@ -13,6 +13,7 @@ defmodule Mix.Tasks.Migrate do
 						["fees"] -> {:ok, adjust_fees(school_id, school_db)}
 						["payment"] -> {:ok, add_payment_name(school_id, school_db)}
 						["users"] -> {:ok, adjust_users_table(school_id, school_db)}
+						["fix-fees"] -> {:ok, remove_november_payments(school_id, school_db)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -99,5 +100,32 @@ defmodule Mix.Tasks.Migrate do
 			|> Enum.into(%{})
 		
 		Map.put(school_db, "users", next_users)
+	end
+
+	defp remove_november_payments(school_id, school_db) do
+		next_students = Map.get(school_db, "students", %{})
+			|> Enum.map(
+				fn({id, student}) ->
+					
+					payments = Map.get(student, "payments", %{})
+
+					nextPayments = payments
+					|> Enum.reduce(%{}, fn({id, payment}, agg) -> 
+						d = Map.get(payment, "date")
+						if d < 1541012400000 do
+							Map.put(agg, id, payment)
+						else
+							agg
+						end
+					end)
+
+					IO.inspect nextPayments
+
+					{id, Map.put(student, "payments", nextPayments)}
+				end)
+			|> Enum.into(%{})
+			
+		Map.put(school_db, "students", next_students)
+			
 	end
 end

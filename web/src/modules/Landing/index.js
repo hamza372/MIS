@@ -25,7 +25,7 @@ const Landing = ({ logout, user }) => {
 			</div>
 			<div className="row">
 				<Link to="/settings" className="button">Settings</Link>
-				<Link to="/analytics" className="button">Analytics</Link>
+				<Link to="/analytics/fees" className="button">Analytics</Link>
 			</div>
 			<div className="row">
 				<div className="button" onClick={logout}>Switch User</div>

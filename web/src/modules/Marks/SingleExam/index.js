@@ -27,9 +27,6 @@ class SingleExam extends Component {
 	constructor(props) {
 		super(props);
 
-
-		console.log("CONSTRUCTOR");
-
 		const student_marks = Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id() )
 			.reduce((agg, [id, student]) => ({ ...agg, [id]: ""}), {})

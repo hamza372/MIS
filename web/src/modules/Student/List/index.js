@@ -49,6 +49,7 @@ const StudentList = (props) => {
 	return <Layout>
 		<div className="student-list">
 			<Title>Students</Title>
+<<<<<<< HEAD
 			<List 
 				items = {[ { Name: "crap", special: true }, ...items]}
 				Component = {StudentItem}
@@ -56,6 +57,18 @@ const StudentList = (props) => {
 				createText = {"Add new Student"} 
 				toLabel = {s => s.Name}
 				/> 
+=======
+			<List create={'/student/new'} createText={"Add new Student"}>
+				{
+					Object.values(props.students)
+						.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
+						.map(([id, student]) => 
+							<Link to={`/student/${student.id}/profile`} key={id}>
+								{student.Name}
+							</Link>)
+				} 
+			</List>
+>>>>>>> 29b45410c65c4df6b514e102758847df8e676f73
 		</div>
 	</Layout>
 }

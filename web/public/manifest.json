@@ -15,5 +15,11 @@
   "developer": {
 	  "name": "Taimur Shah",
 	  "url": "http://cerp.org.pk"
-  }
+  },
+  "offline_enabled": true,
+  "permissions": [
+	"storage",
+	"unlimitedStorage",
+	{"fileSystem": ["write", "retainEntries", "directory"]}
+  ]
 }
