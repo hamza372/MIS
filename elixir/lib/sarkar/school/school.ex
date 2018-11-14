@@ -16,8 +16,8 @@ defmodule Sarkar.School do
 
 	# API 
 
-	def sync_changes(school_id, client_id, changes) do
-		GenServer.call(via(school_id), {:sync_changes, client_id, changes})
+	def sync_changes(school_id, client_id, changes, last_sync_date) do
+		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date})
 	end
 
 	def get_db(school_id) do
@@ -26,7 +26,7 @@ defmodule Sarkar.School do
 
 	# SERVER
 
-	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, db} = state) do
+	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {school_id, writes, db} = state) do
 
 		# map of changes.
 		# key is path separated by comma
@@ -34,32 +34,79 @@ defmodule Sarkar.School do
 		# we need to keep a dictionary of path/date to decide if we should execute that write
 		# for now we'll just execute and last write wins.
 
-		{nextDb, last_date} = Enum.reduce(changes, {db, 0}, fn({path_key, payload}, {agg_db, max_date}) -> 
+		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
 			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
 			[prefix | p ] = path
 
+			p_key = Enum.join(p, ",")
+			write = %{"date" => date, "value" => value, "path" => path, "type" => type}
+
 			case type do
 				"MERGE" ->
-					{Dynamic.put(agg_db, p, value), max(date, max_date)}
+					case Map.get(agg_writes, p_key) do
+						nil -> 
+							IO.puts "nil write for path:"
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
+							IO.puts "OLD write for path:"
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+							IO.puts "IGNORING write for path:"
+							{agg_db, agg_writes, agg_new_writes, max_date}
+						other -> 
+							IO.puts "OTHER!!!!!!!!!!!!!"
+							IO.inspect other
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+					end
+
 				"DELETE" -> 
-					{Dynamic.delete(agg_db, p), max(date, max_date)}
+					case Map.get(agg_writes, p_key) do
+						nil -> 
+							IO.puts "nil write for path"
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date} when prev_date <= date ->
+							IO.puts "OLD write for path"
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date} when prev_date > date ->
+							IO.puts "IGNORING write for path"
+							{agg_db, agg_writes, agg_new_writes, max_date}
+						other ->
+							IO.puts "OTHER!!!!!!!!!!!"
+							IO.inspect other
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+					end
 				other -> 
 					IO.puts "unrecognized type"
 					{agg_db, max_date}
 			end
-
 		end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
 		# TODO: think about just sending the changes.
 
-		case length(Map.keys(changes)) do
-			0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+		# each client has sent its "last received data" date. when it connects, we should send all the latest writes that have happened since then, not the full db.
+		# get that data for it here.
+
+		relevant = nextWrites # this doesnt know if I JUST overwrote it. if i use nextWrites which has the overwrite values, it will include the writes i just made...
+			|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
+			|> Enum.into(%{})
+
+		if map_size(relevant) > 0 do
+			IO.puts "RELEVANT for client...."
+			IO.inspect last_sync_date
+			IO.inspect relevant
+		end
+
+		case map_size(new_writes) do
+			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
+			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
 			_ -> 
-				broadcast(school_id, client_id, snapshot(nextDb))
-				Sarkar.Store.School.save(school_id, nextDb)
-				{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+				#broadcast(school_id, client_id, snapshot(nextDb))
+				broadcast(school_id, client_id, snapshot_diff(new_writes))
+				Sarkar.Store.School.save(school_id, nextDb) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
+				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
+				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
 		end
 	end
 
@@ -80,6 +127,21 @@ defmodule Sarkar.School do
 		%{
 			type: "SNAPSHOT",
 			db: db
+		}
+	end
+
+	defp snapshot_diff(new_writes) do
+		%{
+			type: "SNAPSHOT_DIFF",
+			new_writes: new_writes
+		}
+	end
+
+	defp confirm_sync_diff(date, new_writes) do
+		%{
+			type: "CONFIRM_SYNC_DIFF",
+			date: date,
+			new_writes: new_writes # client should only have to check these against queued / pending writes.
 		}
 	end
 

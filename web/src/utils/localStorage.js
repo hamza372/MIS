@@ -89,10 +89,10 @@ const saveDbToFilesystem = (db) => {
 
 	requestFS(20)
 		.then(fs => {
-			console.log('got fs');
+			//console.log('got fs');
 		})
 		.catch(err => {
-			console.error(err)
+			//console.error(err)
 		})
 
 }

@@ -15,7 +15,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 
 	dispatch(action)
 
-	const state = getState();
+	const state = getState()
 	const payload = {
 		type: SYNC,
 		school_id: state.auth.school_id,
@@ -140,7 +140,9 @@ export const createDelete = (path) => (dispatch, getState, syncr) => {
 // this is only produced by the server. 
 // it will tell us it hsa confirmed sync up to { date: timestamp }
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
+export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
 export const SNAPSHOT = "SNAPSHOT"
+export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 
 export const QUEUE = "QUEUE"
 export const QueueUp = (action) => {
