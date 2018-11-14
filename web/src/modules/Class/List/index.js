@@ -9,10 +9,8 @@ import List from 'components/List'
 
 const ClassItem = (C) => 
 	<Link key={C.id} to={`/class/${C.id}/profile`} >
-		{classLabel(C)}
+		{C.name}
 	</Link>
-
-const classLabel = (C) => `${C.name}`;
 
 class ClassModule extends Component {
  
@@ -31,7 +29,7 @@ class ClassModule extends Component {
 					Component={ClassItem}
 					create={'/class/new'} 
 					createText={"Add new Class"} 
-					toLabel={classLabel} 
+					toLabel={C => C.name} 
 					/>
 			</div>
 		</Layout>
@@ -41,13 +39,3 @@ class ClassModule extends Component {
 export default connect(state => ({
 	classes: state.db.classes
 }))(ClassModule)
-
-/*
-<List 
-  items={items} 
-  Component={ExamItem} 
-  create={`/reports/${class_id}/${section_id}/new`} 
-  createText="New Exam" 
-  toLabel={examLabel}
- />
- */

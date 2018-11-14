@@ -33,7 +33,7 @@ class StudentMarks extends Component {
 							<div>{student.exams[exam.id].score}</div>
 							<div >{exam.total_score}</div>
 							<div>{(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}</div>
-						</div>)
+							</div>)
 			}
 			</div>
 		</div>

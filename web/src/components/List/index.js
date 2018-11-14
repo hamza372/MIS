@@ -11,14 +11,14 @@ class List extends Component {
 			filterText : ""
 		}
 	}
-
 	onChange = (e) => {
 		this.setState({filterText:e.target.value});
 	}
- 
+
 	render() {
 		
-		//console.log(this.props.items); //for Debugging :)
+		console.log("Following are the Items from List Component");
+		console.log(this.props.items); //for Debugging :)
 		
 		const {items, toLabel, Component } = this.props;
 		
@@ -26,10 +26,11 @@ class List extends Component {
 			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
 		});
 
-		//console.log(filteredList); //for Debugging :)
+		console.log(filteredList); //for Debugging :)
 
 		return <div className="list-wrap">
-			<input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
+			<
+				input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
 
 			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			
@@ -48,18 +49,4 @@ export const Create = ({ to, text}) => {
 }
 
 export default List;
-
-/* const List = (props) => {
-
-	let updatedList = this.props.children;
-	return <div className="list-wrap">
-		<input type="text" placeholder="Search" onChange={this.filterlist}/>
-		{ props.create ? <Create to={props.create} text={props.createText} /> : false }
-		<div className="list">
-			{
-				props.children.map(C => <div className="list-row" key={Math.random()}>{C}</div>)
-			}
-		</div>
-	</div>
-} */
 

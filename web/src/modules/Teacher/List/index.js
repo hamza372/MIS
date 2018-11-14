@@ -11,6 +11,12 @@ const TeacherItem = (T) =>
 		{teacherLabel(T)}
 	</Link>
 
+const tableTitle = () =>{
+	return	<div className="table row heading">
+					<label><b>Name</b></label>
+		 		</div>
+}
+
 const teacherLabel = (T) => `${T.Name}`;
 
 const TeacherList = (props) => {
@@ -19,10 +25,11 @@ const TeacherList = (props) => {
 
 	return <Layout>
 		<div className="teacher-list">
-			<Title>Teachers</Title>
 			
+			<Title>Teachers</Title>
 			<List
 				items={items}
+				tableTitle={tableTitle}
 				Component={TeacherItem}
 				create={'/faculty/new'} 
 				createText={"Add new Teacher"} 

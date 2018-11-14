@@ -13,9 +13,6 @@ const examLabel = (exam) => `${exam.subject}: ${exam.name}`;
 
 class ReportList extends Component {
 
-	// display a list of all exams for this section.
-	// TODO: figure out what 
-
 	render() {
 
 		const section_id = this.props.match.params.section_id;
@@ -32,7 +29,7 @@ class ReportList extends Component {
 				<div className="title">Exams</div>
 
 				<List 
-					  items={items} 
+					  items={items}
 					  Component={ExamItem} 
 					  create={`/reports/${class_id}/${section_id}/new`} 
 					  createText="New Exam" 

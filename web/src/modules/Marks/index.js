@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-
+import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Layout from 'components/Layout'
 
 class Reports extends Component {
 
-	getSectionsFromClasses = (classes) => {
+/* 	getSectionsFromClasses = (classes) => {
 
 		const sections = Object.values(classes)
 			.reduce((agg, c) => {
@@ -26,11 +26,11 @@ class Reports extends Component {
 			}, [])
 
 			return sections;
-	}
+	} */
 
 	render() {
 
-		const sections = this.getSectionsFromClasses(this.props.classes)
+		const sections = getSectionsFromClasses(this.props.classes)
 		return <Layout>
 			<div className="reports-page">
 				<div className="title">Sections</div>
