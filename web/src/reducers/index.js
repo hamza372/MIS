@@ -54,8 +54,8 @@ const rootReducer = (state, action) => {
 			// remove all queued writes less than this last date.
 			const newQ = Object.keys(state.queued)
 				.filter(t => state.queued[t].date > last)
-				.reduce((agg, curr) => {
-					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
+				.reduce((agg, curr_key) => {
+					return {...agg, [curr_key]: state.queued[curr_key]}
 				}, {})
 
 			let next = Dynamic.put(state, ["queued"], newQ);
@@ -78,6 +78,7 @@ const rootReducer = (state, action) => {
 			if(Object.keys(action.new_writes).length > 0) {
 				// remove queued items
 
+				// this probably doesn't work....
 				const newQ = Object.keys(state.queued)
 					.filter(t => state.queued[t].date > action.date)
 					.reduce((agg, curr) => {
@@ -87,7 +88,7 @@ const rootReducer = (state, action) => {
 
 				const nextState = Object.values(action.new_writes)
 					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
-				
+
 				return  {
 					...Dynamic.put(nextState, ["queued"], newQ),
 					acceptSnapshot: true,
@@ -95,7 +96,10 @@ const rootReducer = (state, action) => {
 				}
 			}
 
-			return state;
+			return {
+				...state,
+				lastSnapshot: new Date().getTime()
+			}
 		}
 
 		case SNAPSHOT_DIFF: 
@@ -114,7 +118,10 @@ const rootReducer = (state, action) => {
 				}
 			}
 
-			return state;
+			return {
+				...state,
+				lastSnapshot: new Date().getTime()
+			};
 		}
 
 		case SNAPSHOT:
@@ -220,11 +227,11 @@ const rootReducer = (state, action) => {
 			return {
 				...state,
 				auth,
-				db: 
-				{
+				db: {
 					...state.db,
 					...action.db
-				}
+				},
+				lastSnapshot: new Date().getTime()
 			}
 		}
 

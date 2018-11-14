@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 const SYNC = "SYNC"
 const client_type = "mis";
 
@@ -29,7 +27,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 					path: curr.path.map(p => p === undefined ? "" : p),
 					value: curr.value
 				},
-				date: moment().unix() * 1000
+				date: new Date().getTime()
 			}
 		}), {})
 	}
@@ -94,7 +92,7 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 					path: curr.path.map(x => x === undefined ? "" : x),
 					value: 1
 				},
-				date: moment().unix() * 1000
+				date: new Date().getTime()
 			}
 		}), {})
 
@@ -129,7 +127,7 @@ export const createDelete = (path) => (dispatch, getState, syncr) => {
 		payload: {
 			[path]: {
 				action,
-				date: moment().unix() * 1000
+				date: new Date().getTime()
 			}
 		}
 	})

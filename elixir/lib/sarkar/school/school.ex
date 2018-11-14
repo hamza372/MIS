@@ -83,7 +83,6 @@ defmodule Sarkar.School do
 		end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
-		# TODO: think about just sending the changes.
 
 		# each client has sent its "last received data" date. when it connects, we should send all the latest writes that have happened since then, not the full db.
 		# get that data for it here.
@@ -93,9 +92,9 @@ defmodule Sarkar.School do
 			|> Enum.into(%{})
 
 		if map_size(relevant) > 0 do
-			IO.puts "RELEVANT for client...."
+			IO.puts "RELEVANT for client #{client_id}"
 			IO.inspect last_sync_date
-			IO.inspect relevant
+			IO.inspect Enum.map(relevant, fn {k, v} -> k end)
 		end
 
 		case map_size(new_writes) do
@@ -105,6 +104,7 @@ defmodule Sarkar.School do
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
 				Sarkar.Store.School.save(school_id, nextDb) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
+				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
 				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
 		end
