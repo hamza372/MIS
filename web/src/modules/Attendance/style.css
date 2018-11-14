@@ -14,15 +14,17 @@
 
 .button.PRESENT {
 	background-color: #95B8D1;
+	background-color: #4ec9b3;
 }
 
 .button.ABSENT {
 	background-color: #EDAFB8;
+	background-color: #fc6171;
 }
 
 .button.LEAVE {
 	background-color: #E8DDB5;
-	background-color: #d1d1d1;
+	background-color: #aaaaaa;
 }
 
 .attendance a.button {

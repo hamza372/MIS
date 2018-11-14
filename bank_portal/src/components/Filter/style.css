@@ -1,0 +1,14 @@
+
+.filter-component {
+	position: absolute;
+	left: 10px;
+	top: calc(5% - 20px);
+	height: 200px;
+	width: 400px;
+	z-index: 9999;
+}
+
+.filter-component input {
+	width: 100%;
+	line-height: 2.5rem;
+}

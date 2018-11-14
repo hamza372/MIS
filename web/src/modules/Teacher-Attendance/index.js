@@ -56,11 +56,11 @@ class TeacherAttendance extends Component {
 							return <div className="list-row" key={f.id}>
 								<Link to={`/faculty/${f.id}/attendance`}>{f.Name}</Link>
 								<div className="status">
-									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? false : <div className="button check_in" onClick={this.mark(f, "check_in")}>Check In</div> }
+									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? false : <div className="button check_in blue" onClick={this.mark(f, "check_in")}>Check In</div> }
 									{ !current_attendance.check_in || current_attendance.check_out ? false : <label>Check In: { moment(current_attendance.check_in).format("HH:mm") }</label> }
-									{ !current_attendance.check_in || current_attendance.check_out ? false : <div className="button check_out" onClick={this.mark(f, "check_out")}>Check Out</div>}
-									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button absent" onClick={this.mark(f, "absent")}>Absent</div> }
-									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button leave" onClick={this.mark(f, "leave")}>Leave</div> }
+									{ !current_attendance.check_in || current_attendance.check_out ? false : <div className="button check_out green" onClick={this.mark(f, "check_out")}>Check Out</div>}
+									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button absent orange" onClick={this.mark(f, "absent")}>Absent</div> }
+									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button leave grey" onClick={this.mark(f, "leave")}>Leave</div> }
 									{ current_attendance.check_in && current_attendance.check_out ?  <div>Check In: <b>{moment(current_attendance.check_in).format("HH:mm")}</b> Check Out: <b>{moment(current_attendance.check_out).format("HH:mm")}</b></div>: false}
 									{ current_attendance.absent ? <label>Absent</label> : false }
 									{ current_attendance.leave ? <label>Leave</label> : false }

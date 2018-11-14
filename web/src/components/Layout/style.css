@@ -1,7 +1,9 @@
 html,body, #root, .layout{
-	height: 100%;
+	min-height: 100%;
 	width: 100%;
 	margin: 0;
+	position: absolute;
+	/*background-color: #fafafa;*/
 	background-color: #fafafa;
 	overflow: visible;
 }
@@ -26,6 +28,11 @@ html,body, #root, .layout{
 
 a {
 	color: #4DA2DF;
+	color: #189cec;
+}
+
+a.block {
+	display: block;
 }
 
 .print-only {
@@ -35,8 +42,6 @@ a {
 .no-print {
 	width: 100%;
 }
-
-
 
 @media print {
 	@page {
@@ -134,7 +139,7 @@ a {
 	}
 
 	.row:focus-within label {
-		color: #4DA2DF;
+		color: #74aced;
 		font-weight: bold;
 	}
 
@@ -142,6 +147,7 @@ a {
 
 		.form .row {
 			flex-direction: row;
+			margin: 10px 0;
 		}
 
 		.form .row>* {
@@ -150,6 +156,25 @@ a {
 
 		.form .row>*:last-child {
 			margin-left: auto;
+		}
+
+		/*
+		.button:hover {
+			color: #fafafa;
+			background-color: #222;
+		}
+		*/
+
+		.form input {
+			min-width: 30%;
+		}
+		
+		.form select {
+			min-width: 30%;
+		}
+
+		.form textarea {
+			min-width: 30%;
 		}
 
 		.form .button {
@@ -169,6 +194,7 @@ a {
 	border: none;
 	border-bottom: 1px solid black;
 	transition: all .2s ease-in;
+	outline: none;
 }
 
 	input[disabled] {
@@ -184,6 +210,7 @@ a {
 		background-color: initial;
 		height: 40px;
 		border: 1px solid #bbb;
+		border-radius: 5px;
 	}
 
 	input[type=text], input[type=url], input[type=email], input[type=password], input[type=tel], input[type=number], input[list] {
@@ -193,11 +220,13 @@ a {
 		height: 40px;
 		line-height: 40px; font-size: 17px;
 		border: 1px solid #bbb;
+		border-radius: 5px;
 	}
 
 	select {
 		height: 40px;
 		background-color: initial;
+		border-radius: 5px;
 	}
 
 	select:focus {
@@ -207,15 +236,18 @@ a {
 	.form input:focus {
 		background-color: white;
 		border: 1px solid #4DA2DF;
+		border: 1px solid #74aced;
 	}
 
 
 .title {
 	margin: 20px 0;
 	font-size: 2.0rem;
+	/*color: #777;*/
 }
 
 .divider {
+	/*color: #aaa;*/
 	margin: 20px auto;
 	font-size: 1.8rem;
 	text-align: center;
@@ -237,7 +269,8 @@ textarea {
 
 .button {
 	color: #222;
-	border: 2px solid #222;
+	border: 3px solid #222;
+	border: 3px solid rgba(0,0,0,0.5);
 	border-radius: 5px;
 	padding: 10px 15px;
 	transition: all .3s linear;
@@ -246,18 +279,15 @@ textarea {
 	text-decoration: none;
 	text-align: center;
 	user-select: none;
+	box-shadow: none;
 }
 
-	.button.selected, .button:hover {
-		color: #fafafa;
-		background-color: #222;
-	}
 
 	.section .row .button {
 		padding: 5px 10px;
 	}
 
-	.form .button.save {
+	.form .button.save-old {
 		/*background-color: #95B8D1;*/
 		background-color: #4DA2DF;
 		color: #fafafa;
@@ -266,30 +296,117 @@ textarea {
 
 	.button.red {
 		background-color: #EDAFB8;
+		background-color: #fc6171;
 		color: #fafafa;
-		border: 1px solid black;
-		margin-left: auto;
-		margin-top: 10px;
+		border: 3px solid rgba(0,0,0,0.2);
 	}
 
-	.button.blue {
-		background-color: #4DA2DF;
+	.red-shadow {
+		box-shadow: 5px 5px 5px #ffb9b7;
+	}
+
+	.button.blue, .button.save {
+		/*background-color: #4DA2DF;*/
+		background-color: #189cec;
+		background-color: #74aced;
 		color: #fafafa;
-		border: 1px solid black;
-		margin-left: auto;
-		margin-top: 10px;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.blue-shadow {
+		box-shadow: 5px 5px 5px #8fd0f6;
+	}
+
+	.button.green {
+		/*background-color: #4DA2DF;*/
+		background-color: #4ec9b3;
+		background-color: #6dc4b5;
+		background-color: #5ecdb9;
+		color: #fafafa;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.green-shadow {
+		box-shadow: 5px 5px 5px #99eae1;
+	}
+
+	.button.yellow {
+		/*background-color: #4DA2DF;*/
+		background-color: #ffca7b;
+		background-color: #f4d29f;
+		color: #fafafa;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.yellow-shadow {
+		box-shadow: 5px 5px 5px #ffe7c2;
+	}
+
+	.button.print-old {
+		background-color: #f4d29f;
+		box-shadow: 3px 3px 5px #ffe7c2;
+		color: #e0e0e0;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.button.black {
+		background-color: #222222;
+		color: #fafafa;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.black-shadow {
+		box-shadow: 5px 5px 5px #555555;
+	}
+
+	.button.grey, .button.print {
+		background-color: #e0e0e0;
+		color: #222222;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.grey-shadow {
+		box-shadow: 5px 5px 5px #eeeeee;
+	}
+
+	.button.purple {
+		background-color: #5c6af8;
+		background-color: #7e88f7;
+		color: #fafafa;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.purple-shadow {
+		box-shadow: 5px 5px 5px #cbc9f0;
+	}
+
+	.button.orange {
+		background-color: #ff6b68;
+		color: #fafafa;
+		border: 3px solid rgba(0,0,0,0.2);
+	}
+
+	.orange-shadow {
+		box-shadow: 5px 5px 5px #ffb9b7;
 	}
 
 	.button.light-blue {
 		background-color: #95B8D1;
 		color: #fafafa;
 		border: 1px solid black;
-		margin-left: auto;
-		margin-top: 10px;
+	}
+
+	.button.selected, .button:hover {
+		box-shadow: 0px 0px;
 	}
 
 input::-webkit-calendar-picker-indicator {
 	opacity: 100;
+}
+
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	display: none;
 }
 
 .tabs a {

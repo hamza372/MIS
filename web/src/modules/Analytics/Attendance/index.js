@@ -60,9 +60,9 @@ export default connect(state => ({
 				<XAxis dataKey="month"/>
 				<YAxis />
 				<Tooltip />
-				<Bar dataKey="PRESENT" stackId="a" fill="#95B8D1" name="Present" />
-				<Bar dataKey="ABSENT" stackId="a" fill="#EDAFB8" name="Absent" />
-				<Bar dataKey="LEAVE" stackId="a" fill="#aaaaaa" name="Leave" />
+				<Bar dataKey="PRESENT" stackId="a" fill="#5ecdb9" name="Present" />
+				<Bar dataKey="ABSENT" stackId="a" fill="#ff6b68" name="Absent" />
+				<Bar dataKey="LEAVE" stackId="a" fill="#e0e0e0" name="Leave" />
 				<Line dataKey="percent" stroke="#222222" name="Percentage" />
 			</ComposedChart>
 		</ResponsiveContainer>

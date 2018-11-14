@@ -6,6 +6,7 @@ import moment from 'moment'
 
 import Former from 'utils/former'
 import Banner from 'components/Banner'
+import Layout from 'components/Layout'
 
 import Dropdown from 'components/Dropdown'
 
@@ -148,7 +149,8 @@ class SingleClass extends Component {
 		if(this.state.redirect) {
 			return <Redirect to={`/class/${this.state.class.id}/profile`} />
 		}
-		return <div className="single-class">
+		return <Layout>
+			<div className="single-class">
 		{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 			<div className="title">Edit Class</div>
 			<div className="form">
@@ -166,7 +168,7 @@ class SingleClass extends Component {
 					Object.keys(this.state.class.subjects)
 					.map(subject => <div className="subject row" key={subject}>
 						<div>{subject}</div>
-						<div className="button" onClick={this.removeSubject(subject)}>Remove</div>
+						<div className="button orange" onClick={this.removeSubject(subject)}>Remove</div>
 					</div>)
 				}
 
@@ -178,7 +180,7 @@ class SingleClass extends Component {
 						.map(subj => <option key={subj} value={subj} />)
 					}
 					</datalist>
-					<div className="button" onClick={this.addSubject}>+</div>
+					<div className="button green" onClick={this.addSubject}>+</div>
 				</div>
 
 				<div className="divider">Sections</div>
@@ -209,7 +211,7 @@ class SingleClass extends Component {
 									.map(student => {
 										return <div className="student row" key={student.id}>
 											<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
-											<div className="button" onClick={() => this.removeStudent(student)}>Remove</div>
+											<div className="button orange" onClick={() => this.removeStudent(student)}>Remove</div>
 										</div>
 									})
 								}
@@ -221,12 +223,13 @@ class SingleClass extends Component {
 									placeholder="Student Name" />
 							</div>
 
-							<div className="button" onClick={this.removeSection(id)}>Delete Section</div>
+							<div className="button orange" onClick={this.removeSection(id)}>Delete Section</div>
 						</div>)
 				}
-				<div className="button" onClick={this.addSection}>Add Section</div>
+				<div className="button green" onClick={this.addSection}>Add Section</div>
 
 				<div className="divider">Print Reports</div>
+				<div className="section">
 					<div className="row">
 						<label>Start Date</label>
 						<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_dates.start).format("YYYY-MM-DD")} placeholder="Start Date" />
@@ -235,11 +238,13 @@ class SingleClass extends Component {
 						<label>End Date</label>
 						<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
 					</div>
-					<Link className="button" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
+					<Link className="button grey block" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
+				</div>
 
-				<div className="button save" onClick={this.onSave}>Save</div>
+				<div className="button blue" onClick={this.onSave}>Save</div>
 			</div>
 		</div>
+	</Layout>
 	}
 }
 

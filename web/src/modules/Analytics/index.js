@@ -18,8 +18,8 @@ class Analytics extends Component {
 		return <Layout>
 			<div className="analytics">
 				<div className="row tabs">
-					<Link className={`button ${loc === "fees" ? "selected" : false}`} to="fees" replace={true}>Fees</Link>
-					<Link className={`button ${loc === "attendance" ? "selected" : false}`} to="attendance" replace={true}>Attendance</Link>
+					<Link className={`button ${loc === "fees" ? "orange" : false}`} to="fees" replace={true}>Fees</Link>
+					<Link className={`button ${loc === "attendance" ? "blue" : false}`} to="attendance" replace={true}>Attendance</Link>
 				</div>
 
 				<Route path="/analytics/fees" component={Fees} />
