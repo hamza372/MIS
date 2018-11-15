@@ -46,13 +46,10 @@ defmodule Sarkar.School do
 				"MERGE" ->
 					case Map.get(agg_writes, p_key) do
 						nil -> 
-							IO.puts "nil write for path:"
 							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
-							IO.puts "OLD write for path:"
 							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
-							IO.puts "IGNORING write for path:"
 							{agg_db, agg_writes, agg_new_writes, max_date}
 						other -> 
 							IO.puts "OTHER!!!!!!!!!!!!!"
@@ -63,13 +60,10 @@ defmodule Sarkar.School do
 				"DELETE" -> 
 					case Map.get(agg_writes, p_key) do
 						nil -> 
-							IO.puts "nil write for path"
 							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date} when prev_date <= date ->
-							IO.puts "OLD write for path"
 							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date} when prev_date > date ->
-							IO.puts "IGNORING write for path"
 							{agg_db, agg_writes, agg_new_writes, max_date}
 						other ->
 							IO.puts "OTHER!!!!!!!!!!!"
@@ -91,11 +85,11 @@ defmodule Sarkar.School do
 			|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
 			|> Enum.into(%{})
 
-		if map_size(relevant) > 0 do
-			IO.puts "RELEVANT for client #{client_id}"
-			IO.inspect last_sync_date
-			IO.inspect Enum.map(relevant, fn {k, v} -> k end)
-		end
+		# if map_size(relevant) > 0 do
+		# 	IO.puts "RELEVANT for client #{client_id}"
+		# 	IO.inspect last_sync_date
+		# 	IO.inspect Enum.map(relevant, fn {k, v} -> k end)
+		# end
 
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
