@@ -37,7 +37,7 @@ class Home extends React.Component<RouteComponentProps<any> & RootBankState & Di
 
 	render() {
 
-		const filter = this.props.filter_text;
+		const filter = this.props.filter_text.toUpperCase();
 
 		const locations = filter === "" ? this.props.school_locations : Object.entries(this.props.school_locations)
 			.reduce((agg, [id, sloc]) => {
