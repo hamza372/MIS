@@ -15,7 +15,8 @@ class List extends Component {
 		this.setState({filterText:e.target.value});
 	}
 
-	render() {
+	render() 
+	{
 		
 		console.log("Following are the Items from List Component");
 		console.log(this.props.items); //for Debugging :)

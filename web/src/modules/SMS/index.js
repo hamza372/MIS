@@ -78,7 +78,6 @@ class SMS extends Component {
 					<div className="divider">Send Message</div>
 					<div className="section">
 						<div className="row">
-							<label>Select Student</label>
 							<select {...this.former.super_handle(["selected_student_number"])}>
 								{
 									[<option key="abcd" value="" disabled>Select a Student</option>,
@@ -88,6 +87,8 @@ class SMS extends Component {
 									]
 								}
 							</select>
+							<label>Select Student</label>							
+						
 						</div>
 						<div className="row">
 							<label>Message</label>

@@ -7,7 +7,7 @@ import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
 import './style.css'
-
+ 
 class StudentMarksContainer extends Component {
 
 	constructor(props) {

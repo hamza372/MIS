@@ -10,7 +10,7 @@ const Layout = ({ user, settings, children }) => {
 		{ children }
 	</div>
 }
-
+ 
 const Header = ({user}) => <div className="header">
 	<div className="left"><Link to="/">MIS</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>Profile</Link> : false }
