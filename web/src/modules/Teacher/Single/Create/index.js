@@ -235,7 +235,7 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Admin Status</label>
-					<select {...this.former.super_handle(["Admin"])} disabled={!this.props.user.Admin}>
+					<select {...this.former.super_handle(["Admin"])} disabled={!(this.isFirst() || this.props.user.Admin)}>
 						<option value={false}>Not an Admin</option>
 						<option value={true}>Admin</option>
 					</select>
