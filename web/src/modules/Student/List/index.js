@@ -5,6 +5,8 @@ import Layout from 'components/Layout';
 import List from 'components/List';
 import Title from 'components/Title';
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
+import {PrintHeader} from 'components/Layout';
+import './style.css'
 
 const StudentItem = (S) => {
 
@@ -47,8 +49,10 @@ const StudentList = (props) => {
 		} 
 	});	
 	return <Layout>
+		<PrintHeader settings={props.settings} />
+		
 		<div className="student-list">
-			<Title>Students</Title>
+			<Title className="title">Students</Title>
 			<List 
 				items = {[ { Name: "crap", special: true }, ...items]}
 				Component = {StudentItem}
@@ -56,6 +60,7 @@ const StudentList = (props) => {
 				createText = {"Add new Student"} 
 				toLabel = {s => s.Name}
 				/> 
+				<div className="print button resize" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
 		</div>
 	</Layout>
 }
@@ -63,6 +68,7 @@ const StudentList = (props) => {
 export default connect(state => {
 	return { 
 		students: state.db.students,
-		classes: state.db.classes
+		classes: state.db.classes,
+		settings: state.db.settings
 	}
 })(StudentList);

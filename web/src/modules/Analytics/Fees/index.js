@@ -62,7 +62,7 @@ return <div className="section table">
 			}
 		</div> 
 			
-}
+} 
 
 export default connect(state => ({
 	students: state.db.students,

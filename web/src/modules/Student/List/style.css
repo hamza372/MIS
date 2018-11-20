@@ -1,0 +1,16 @@
+.title {
+	text-align: center;
+}
+
+.button.print-old {
+	background-color: #f4d29f;
+	box-shadow: 3px 3px 5px #ffe7c2;
+	color: #e0e0e0;
+	border: 3px solid rgba(0,0,0,0.2);
+}
+
+.resize {
+	margin-left: 80px;
+	margin-right: 80px;
+
+}
