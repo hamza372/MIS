@@ -9,10 +9,10 @@ import { PrintHeader } from 'components/Layout'
 
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
 
-const MakeChartView = (monthly_payments) => {
+const MonthlyFeesChart = (props) => {
 			
 	return <ResponsiveContainer width="100%" height={200}>
-				<ComposedChart data={Object.entries(monthly_payments).map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
+				<ComposedChart data={Object.entries(props.monthly_payments).map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
 					month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED - FORGIVEN
 				}))}>
 					<Legend />
@@ -26,15 +26,18 @@ const MakeChartView = (monthly_payments) => {
 			</ResponsiveContainer> 
 }
 
-const MakeFeesTable = (monthly_payments,total) =>{
+const MonthlyFeesTable = (props) =>{
+	
+	const total = props.total_debts;
+	const monthly_payments = props.monthly_payments;
 
 return <div className="section table">
 			<div className="table row heading">
 				<label><b>Date</b></label>
+				<label><b>Owed</b></label>
 				<label><b>Paid</b></label>
 				<label><b>Forgiven</b></label>
-				<label><b>Owed</b></label>
-				<label><b>Profit</b></label>
+				<label><b>Balance</b></label>
 			</div>				
 			{/** console.log(monthly_payments)*/}
 			{
@@ -44,9 +47,9 @@ return <div className="section table">
 													
 						<div className="table row">
 							<div>{month }</div>
-							<div>{SUBMITTED}</div>
-							<div>{FORGIVEN}</div>
 							<div>{OWED }</div>
+							<div>{SUBMITTED}</div>							
+							<div>{FORGIVEN}</div>
 							<div>{SUBMITTED - OWED - FORGIVEN}</div>
 						</div>
 					),				
@@ -128,14 +131,15 @@ export default connect(state => ({
 		<PrintHeader settings={settings} />
 		
 		<div>
-			{MakeFeesTable(monthly_payments, total_debts)}
+			<MonthlyFeesTable monthly_payments={monthly_payments} total_debts={total_debts}/>
 		</div>
 		
 		<div className="no-print">
+		
 		<div className="divider">Payments over Time</div>
-{/** ------------------------------------------------HERE----------------------------------------------------------------- */}
-		{MakeChartView(monthly_payments)}
-{/**  -------------------------------------------------------------------------------------------------------------------- */}
+		{
+			<MonthlyFeesChart monthly_payments={monthly_payments}/>
+		}
 		</div>
 		<div className="divider">Students with Payments Outstanding</div>
 		<div className="section">

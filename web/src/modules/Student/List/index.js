@@ -21,7 +21,7 @@ const StudentItem = (S) => {
 				<Link to={`/student/${S.id}/profile`} key={S.id}>
 					{S.Name} 
 				</Link>
-				<div>{S.ManName !== "" || null ? S.ManName : "Null" }</div>
+				<div>{S.ManName !== "" || null ? S.ManName : "Not Entered" }</div>
 				<div> {cname /*+ "/" + sname */}</div>
 			</div>
 }
@@ -60,7 +60,7 @@ const StudentList = (props) => {
 				createText = {"Add new Student"} 
 				toLabel = {s => s.Name}
 				/> 
-				<div className="print button resize" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
+				<div className="print button resize" onClick={() => window.print()}>Print</div>
 		</div>
 	</Layout>
 }

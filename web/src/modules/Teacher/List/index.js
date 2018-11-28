@@ -8,7 +8,7 @@ import Title from 'components/Title'
  
 const TeacherItem = (T) => 
 	<Link key={T.id} to={`/faculty/${T.id}/profile`}>
-		{teacherLabel(T)}
+		{T.Name}
 	</Link>
 
 const tableTitle = () =>{
@@ -17,23 +17,19 @@ const tableTitle = () =>{
 		 		</div>
 }
 
-const teacherLabel = (T) => `${T.Name}`;
-
 const TeacherList = (props) => {
 	
-	const items = Object.values(props.teachers); 
-
 	return <Layout>
 		<div className="teacher-list">
 			
 			<Title>Teachers</Title>
 			<List
-				items={items}
+				items={Object.values(props.teachers)}
 				tableTitle={tableTitle}
 				Component={TeacherItem}
 				create={'/faculty/new'} 
 				createText={"Add new Teacher"} 
-				toLabel={teacherLabel} 
+				toLabel={T => T.Name} 
 			/>
 		</div>
 	</Layout>

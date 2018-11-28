@@ -5,10 +5,13 @@ import moment from 'moment'
 import './style.css'
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
 
-const MakeChartView = (monthly_attendance) => {
-			
+const MonthlyAttendanceChart = (props) => {
+
+		const monthly_attendance = props.monthly_attendance;
+		
 		return <ResponsiveContainer width="100%" height={200}>
-					<ComposedChart data={Object.entries(monthly_attendance)
+					<ComposedChart 
+						data={Object.entries(monthly_attendance)
 						.sort(([month, ], [m2, ]) => month.localeCompare(m2))
 						.map(([month, { student, PRESENT, LEAVE, ABSENT }]) => ({
 							month, PRESENT, LEAVE, ABSENT, percent: (1 - ABSENT / (PRESENT + LEAVE)) * 100
@@ -21,11 +24,13 @@ const MakeChartView = (monthly_attendance) => {
 							<Bar dataKey="ABSENT" stackId="a" fill="#ff6b68" name="Absent" />
 							<Bar dataKey="LEAVE" stackId="a" fill="#e0e0e0" name="Leave" />
 							<Line dataKey="percent" stroke="#222222" name="Percentage" />
-				</ComposedChart>  
-		</ResponsiveContainer>
+					</ComposedChart>  
+			</ResponsiveContainer>
 }
-const MakeAttendanceTable = (monthly_attendance,total) =>{
-	
+const MonthlyAttendanceTable = (props) =>{
+	const monthly_attendance = props.monthly_attendance;
+	const total = props.totals;
+
 	return <div className="section table">
 				<div className="table row heading">
 					<label><b>Date</b></label>
@@ -33,7 +38,10 @@ const MakeAttendanceTable = (monthly_attendance,total) =>{
 					<label><b>Absent</b></label>
 					<label><b>Leave</b></label>
 					<label><b>Absentee(%)</b></label>
-				</div>				
+				</div>
+
+				{/**-----------------------------------------HERE ---------------------------------------------- */}				
+				
 				{
 					[...Object.entries(monthly_attendance)
 						.sort(([month, ], [m2, ]) => month.localeCompare(m2))
@@ -64,7 +72,7 @@ const MakeAttendanceTable = (monthly_attendance,total) =>{
 export default connect(state => ({
 	students: state.db.students
 }))(({ students }) => {
-
+	
 	let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0 };
 	let monthly_attendance = { } // [mm/yyyy]: { present / absent / leave }
 	let student_attendance = { } // [id]: { absents, presents, leaves }
@@ -107,15 +115,16 @@ export default connect(state => ({
 
 		<div className="divider">Monthly Attendance</div>
 		
-		{ /** Hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee */}
-		<div>
+			<div>
 			{
-				MakeAttendanceTable(monthly_attendance,totals)
-			} 
-				{MakeChartView(monthly_attendance)}
-			
-
-		</div>
+				<MonthlyAttendanceTable monthly_attendance={monthly_attendance} totals = {totals}/>
+			}
+			</div>
+			<div> 
+			{
+				<MonthlyAttendanceChart monthly_attendance = {monthly_attendance}/>
+			}
+			</div>
 
 		
 		

@@ -30,8 +30,8 @@ class List extends Component {
 		console.log(filteredList); //for Debugging :)
 
 		return <div className="list-wrap">
-			<
-				input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
+			
+			<input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
 
 			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			
