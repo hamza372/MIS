@@ -9,6 +9,64 @@ import { PrintHeader } from 'components/Layout'
 
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
 
+const MonthlyFeesChart = (props) => {
+			
+	return <ResponsiveContainer width="100%" height={200}>
+				<ComposedChart data={Object.entries(props.monthly_payments).map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
+					month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED - FORGIVEN
+				}))}>
+					<Legend />
+					<XAxis dataKey="month" />
+					<YAxis />
+					<Tooltip />
+					<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Payed" />
+					<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
+					<Bar dataKey='net' name="Profit" fill="#ff6b68" />
+			  </ComposedChart>
+			</ResponsiveContainer> 
+}
+
+const MonthlyFeesTable = (props) =>{
+	
+	const total = props.total_debts;
+	const monthly_payments = props.monthly_payments;
+
+return <div className="section table">
+			<div className="table row heading">
+				<label><b>Date</b></label>
+				<label><b>Owed</b></label>
+				<label><b>Paid</b></label>
+				<label><b>Forgiven</b></label>
+				<label><b>Balance</b></label>
+			</div>				
+			{/** console.log(monthly_payments)*/}
+			{
+				[...Object.entries(monthly_payments)
+					.sort(([month, ], [m2, ]) => month.localeCompare(m2))
+					.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => 
+													
+						<div className="table row">
+							<div>{month }</div>
+							<div>{OWED }</div>
+							<div>{SUBMITTED}</div>							
+							<div>{FORGIVEN}</div>
+							<div>{SUBMITTED - OWED - FORGIVEN}</div>
+						</div>
+					),				
+					/**Here it isssssssssssssssssssssssssssssssssssssssssssssssssssss          */
+						<div className="table row footing" key={Math.random()}>   
+							<label><b>Total</b></label>
+							<label><b>{total.PAID}</b></label>
+							<label><b>{total.FORGIVEN}</b></label>
+							<label><b>{total.OWED}</b></label>
+							<label><b>{total.PAID - total.OWED - total.FORGIVEN}</b></label>
+						</div>
+				]
+			}
+		</div> 
+			
+} 
+
 export default connect(state => ({
 	students: state.db.students,
 	settings: state.db.settings
@@ -26,8 +84,8 @@ export default connect(state => ({
 	let total_owed = 0;
 	let total_forgiven = 0;
 	let monthly_payments = {}; // [MM-DD-YYYY]: { due, paid, forgiven }
-	let total_student_debts = {} // [id]: { due, paid, forgiven }
-
+	let total_student_debts = {}; // [id]: { due, paid, forgiven }
+	let total_debts = {};
 	// first update fees
 
 	const nextPayments = Object.values(students)
@@ -64,46 +122,24 @@ export default connect(state => ({
 		total_forgiven += debt.FORGIVEN;
 
 		total_student_debts[sid] = { student, debt };
+
+		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven}
 	}
 
 	return <div className="fees-analytics">
+		
 		<PrintHeader settings={settings} />
-		<div className="table row">
-			<label>Total Paid</label>
-			<div>{total_paid}</div>
-		</div>
-		<div className="table row">
-			<label>Total Owed</label>
-			<div>{total_owed}</div>
-		</div>
-		<div className="table row">
-			<label>Total Forgiven</label>
-			<div>{total_forgiven}</div>
-		</div>
-		<div className="table row">
-			<label><b>Total Outstanding</b></label>
-			<div>{total_paid + total_forgiven - total_owed}</div>
+		
+		<div>
+			<MonthlyFeesTable monthly_payments={monthly_payments} total_debts={total_debts}/>
 		</div>
 		
 		<div className="no-print">
+		
 		<div className="divider">Payments over Time</div>
-
-		<ResponsiveContainer width="100%" height={500}>
-
-			<ComposedChart data={Object.entries(monthly_payments).map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
-				month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED - FORGIVEN
-			}))}>
-
-				<Legend />
-				<XAxis dataKey="month" />
-				<YAxis />
-				<Tooltip />
-				<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Payed" />
-				<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
-				<Bar dataKey='net' name="Profit" fill="#ff6b68" />
-			</ComposedChart>
-		</ResponsiveContainer>
-
+		{
+			<MonthlyFeesChart monthly_payments={monthly_payments}/>
+		}
 		</div>
 		<div className="divider">Students with Payments Outstanding</div>
 		<div className="section">
