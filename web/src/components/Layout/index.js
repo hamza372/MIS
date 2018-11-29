@@ -24,7 +24,7 @@ export const PrintHeader = ({settings}) => <div className="print-only school-hea
 
 export default connect(state => ({ 
 	user: Object.values(state.db.faculty)
-		.find(x => x.name === state.auth.name),
+		.find(x => x.Name === state.auth.name),
 }))(Layout)
 
 const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div className="layout">
