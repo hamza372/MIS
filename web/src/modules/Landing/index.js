@@ -12,31 +12,35 @@ const Landing = ({ logout, user }) => {
 	return <Layout>
 		<div className="landing">
 			
-			<div className="title" >Hello, {user.Name}!</div>
-			
+			<div className="divider">Actions</div>
 			<div className="row">
-				<Link to="/attendance" className="button orange-shadow">Attendance</Link>
-				<Link to="/student" className="button blue-shadow">Students</Link>
+				<Link to="/attendance" className="button orange-shadow">Take Attendance</Link>
+				{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow">Teacher Attendance</Link> : false }
+			</div>
+			<div className="row">
+				<Link to="/student?forwardTo=payment" className="button blue-shadow">Add Fee</Link>
+				<Link to="/reports" className="button yellow-shadow">Edit Marks</Link>
+			</div>
+			<div className="row">
+				<Link to="/analytics/fees" className="button blue-shadow">Analytics</Link>
+				<Link to="/reports-menu" className="button green-shadow">Reports</Link>
+			</div>
+			<div className="row">
+				<Link to="/sms" className="button purple-shadow">Send SMS</Link>
 			</div>
 			
+			<div className="divider">Management</div>
 			<div className="row">
 				<Link to="/teacher" className="button green-shadow">Teachers</Link>
 				<Link to="/class" className="button purple-shadow">Classes</Link>
 			</div>
 			
 			<div className="row">
-				<Link to="/reports" className="button yellow-shadow">Marks</Link>
-				<Link to="/analytics/fees" className="button blue-shadow">Analytics</Link>
-			</div>
-
-			<div className="row">
-				<Link to="/sms" className="button orange-shadow">SMS</Link>
+				<Link to="/student" className="button blue-shadow">Students</Link>
 				<Link to="/settings" className="button purple-shadow">Settings</Link>
 			</div>
-			
 			<div className="row">
 				<div className="button yellow-shadow" onClick={logout}>Switch User</div>
-			{ user.Admin ? <Link to="/teacher-attendance" className="button blue-shadow">Teacher Attendance</Link> : false }
 			</div>
 		</div>
 	</Layout>

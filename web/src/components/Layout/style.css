@@ -36,7 +36,7 @@ a.block {
 }
 
 .print-only {
-	display: none;
+	display: none!important;
 }
 
 .no-print {
@@ -75,7 +75,7 @@ a.block {
 	}
 
 	.no-print {
-		display: none;
+		display: none!important;
 	}
 }
 
@@ -417,3 +417,16 @@ input::-webkit-inner-spin-button {
 	flex-wrap: wrap;
 	justify-content: center;
 }
+
+.horizontal-scroll-container {
+	overflow-x: auto;
+	width: 100%;
+
+	scroll-snap-type: x mandatory;
+	scroll-padding: 50%;
+}
+
+	.horizontal-scroll-container>* {
+		scroll-snap-align: center;
+		width: 100%;
+	}
