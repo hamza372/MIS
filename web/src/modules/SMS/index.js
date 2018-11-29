@@ -1,15 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { smsIntentLink } from 'utils/intent'
 
 import { createTemplateMerges } from 'actions'
 import { sendSMS } from 'actions/core'
 
-import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
 
+import ToSingleStudent from 'SmsOptions';
+import ToSingleClass   from 'SmsOptions';
+import ToAllStudents   from 'SmsOptions';
+import ToSingleTeacher from 'SmsOptions';
+import ToAllTeachers   from 'SmsOptions';
+//import ToFeeDefaulters from 'SmsOptions';
 
 import './style.css'
 
@@ -31,8 +35,6 @@ class SMS extends Component {
 				good: true,
 				text: "Saved!"
 			},
-			text: "",
-			selected_student_number: "",
 			smsFilter : ""
 		}
 		console.log(this.state.templates)
@@ -56,75 +58,64 @@ class SMS extends Component {
 		setTimeout(() => this.setState({ banner: {active: false}}), 3000);
 	}
 
-	sendMessage = () => {
+	sendMessage = (text, number) => {
 
-		if(this.state.selected_student_number === "") {
+		if(number === "") {
 			return;
 		}
 
-		console.log('send message', this.state.text, this.state.selected_student_number);
-		this.props.sendMessage(this.state.text, this.state.selected_student_number);
+		console.log('send message', text, number);
+		this.props.sendMessage(text, number);
 
 	}
 	sendMessageFilter=(e)=>{
 		this.setState({ smsFilter : e.target.value})
 	}
 
+
 	getFilteredFunctionality = (value) =>{
 		switch(value){
 			case "to_single_student":
-			return <div className="row">
-							<label>Select student</label>		
-							<select {...this.former.super_handle(["selected_student_number"])}>
-								{
-									[<option key="abcd" value="" disabled>Select a Student</option>,
-									...Object.entries(this.props.students)
-									.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
-									.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
-									]
-								}
-							</select>
-						</div>
+				return  <ToSingleStudent 
+							students={this.props.students} 
+							sendMessage={this.sendMessage} 
+							connected={this.props.connected}
+							/>
 
 			case "to_single_class":
-			return <div className="row">
-						<label>Select Class\Section </label>		
-
-							<select {...this.former.super_handle(["selected_section_id"])}>
-								{
-									[<option key="abcd" value="" disabled>Select Section</option>,
-									...Object.entries(getSectionsFromClasses(this.props.classes))
-									.map(([id, C]) => <option key={id} value={C.section_id}>{C.namespaced_name}</option>)
-									]
-								}
-							</select>
-						</div>
+				return <ToSingleClass 
+							classes={this.props.classes} 
+							students={this.props.students} 
+							sendMessage={this.sendMessage} 
+							connected={this.props.connected}
+							/>
 			
 			case "to_all_students":
-			return "All Students";
+				return <ToAllStudents 
+							students={this.props.students} 
+							sendMessage={this.sendMessage} 
+							connected={this.props.connected} 
+							/>
 
 			case "to_single_teacher":
-			return <div className="row">
-						<label>Select Teacher </label>		
-
-							<select {...this.former.super_handle(["selected_teacher_number"])}>
-								{
-									[<option key="abcd" value="" disabled>Select a Teacher</option>,
-									...Object.entries(this.props.teachers)
-									.filter(([id, teacher]) => teacher.Phone !== undefined && teacher.Phone !== "")
-									.map(([id, teacher]) => <option key={id} value={teacher.Phone}>{teacher.Name}</option>)
-									]
-								}
-							</select>
-					</div>;
+				return <ToSingleTeacher 
+							teachers={this.props.teachers} 
+							sendMessage={this.sendMessage} 
+							connected={this.props.connected}
+							/>
 			
 			case "to_all_teachers":
-			return "All Teacher";
+				return <ToAllTeachers  
+							teachers={this.props.teachers} 
+							sendMessage={this.sendMessage} 
+							connected={this.props.connected}
+							/>
 			
 			case "to_fee_defaulters":
-			return "To Defaulters"
+				return  "Fee Defaulters";{/**<ToFeeDefaulters/>*/}
+			
 			default:
-			return;
+				return;
 		}
 	}
 	render() {
@@ -144,54 +135,18 @@ class SMS extends Component {
 						{console.log(this.props.teachers)}
 
 							<select onChange={this.sendMessageFilter}>
-									<option key="abcd" value="" >Select</option>
-									<option key="to_single_student" value="to_single_student">Single Student</option>
-									<option key="to_single_class" value="to_single_class">Class</option>
-									<option key="to_all_students" value="to_all_students">All Students</option>
-									<option key="to_single_teacher" value="to_single_teacher">Single Teacher</option>
-									<option key="to_all_teachers" value="to_all_teachers">All Teachers</option>
-									<option key="to_fee_defaulters" value="to_fee_defaulters">Fee Defaulters</option>
+									<option value="" >Select</option>
+									<option value="to_single_student">Single Student</option>
+									<option value="to_single_class">Class</option>
+									<option value="to_all_students">All Students</option>
+									<option value="to_single_teacher">Single Teacher</option>
+									<option value="to_all_teachers">All Teachers</option>
+									<option value="to_fee_defaulters">Fee Defaulters</option>
 							</select>
 						</div>
-											
+{/**=======================================================HERE======================== */}
 						{this.getFilteredFunctionality(this.state.smsFilter)}
 
-						{/* <div className="row">
-						<label>Select student</label>		
-							<select {...this.former.super_handle(["selected_student_number"])}>
-								{
-									[<option key="abcd" value="" disabled>Select a Student</option>,
-									...Object.entries(this.props.students)
-									.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
-									.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
-									]
-								}
-							</select>
-						</div> */}
-
-{/* 						<div className="row">
-						<label>Select Class\Section </label>		
-
-							<select {...this.former.super_handle(["selected_section_id"])}>
-								{
-									[<option key="abcd" value="" disabled>Select Section</option>,
-									...Object.entries(getSectionsFromClasses(this.props.classes))
-									.map(([id, C]) => <option key={id} value={C.section_id}>{C.namespaced_name}</option>)
-									]
-								}
-							</select>
-						</div> */}
-
-						<div className="row">
-							<label>Message</label>
-							<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
-						</div>
-						{ !this.props.connected ? 
-							<div className="button" onClick={this.sendMessage}>Send</div> : 
-							<a href={smsIntentLink({
-								messages: [{ number: this.state.selected_student_number, text: this.state.text }],
-								return_link: window.location.href 
-								})} className="button blue">Send using Local SIM</a> }
 					</div>
 					<div className="divider">Attendance Template</div>
 					<div className="section">
