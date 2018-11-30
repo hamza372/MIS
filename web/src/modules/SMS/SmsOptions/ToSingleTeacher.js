@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
-
-import '../../style.css'
 import former from 'utils/former'
 
 
@@ -40,7 +38,7 @@ export default class ToSingleTeacher extends Component {
 			<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 		</div>
 			{ !this.props.connected ? 
-				<div className="button" onClick={()=> sendMessage( this.state.text, this.state.selected_teacher_number)}>Send</div> : 
+				<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_teacher_number)}>Send</div> : 
 				<a href={smsIntentLink({
 					messages: [{ number: this.state.selected_teacher_number, text: this.state.text }],
 					return_link: window.location.href 

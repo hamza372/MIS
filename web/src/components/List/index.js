@@ -17,17 +17,11 @@ class List extends Component {
 
 	render() 
 	{
-		
-		console.log("Following are the Items from List Component");
-		console.log(this.props.items); //for Debugging :)
-		
 		const {items, toLabel, Component } = this.props;
 		
 		const filteredList = items.filter(item => {
 			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
 		});
-
-		console.log(filteredList); //for Debugging :)
 
 		return <div className="list-wrap">
 			

@@ -18,7 +18,6 @@ class ClassModule extends Component {
 
 		const items = Object.values(this.props.classes)
 		.sort((a, b) => (b.classYear || 0) - (a.classYear || 0));
-		console.log(items);
 		
 		return <Layout>
 			<div className="class-module">

@@ -1,27 +1,20 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { createTemplateMerges } from 'actions'
-import { sendSMS } from 'actions/core'
+import { sendSMS, sendBatchSMS } from 'actions/core'
 
 import former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
 
-import ToSingleStudent from 'SmsOptions';
-import ToSingleClass   from 'SmsOptions';
-import ToAllStudents   from 'SmsOptions';
-import ToSingleTeacher from 'SmsOptions';
-import ToAllTeachers   from 'SmsOptions';
-//import ToFeeDefaulters from 'SmsOptions';
+import ToSingleStudent from './SmsOptions/ToSingleStudent';
+import ToSingleClass   from './SmsOptions/ToSingleClass';
+import ToAllStudents   from './SmsOptions/ToAllStudents';
+import ToSingleTeacher from './SmsOptions/ToSingleTeacher';
+import ToAllTeachers   from './SmsOptions/ToAllTeachers';
+import ToFeeDefaulters from './SmsOptions/ToFeeDefaulters';
 
 import './style.css'
-
-const defaultTemplates = () => ({
-	attendance: "$NAME has been marked as $STATUS",
-	fee: "$NAME has just paid $AMOUNT PKR. Your balance is now $BALANCE.",
-	result: "$NAME has a new report ready.\n$REPORT"
-})
 
 class SMS extends Component {
 
@@ -29,7 +22,6 @@ class SMS extends Component {
 		super(props);
 
 		this.state = {
-			templates: Object.keys(this.props.sms_templates).length === 0 ? defaultTemplates() : this.props.sms_templates,
 			banner: {
 				active: false,
 				good: true,
@@ -37,7 +29,6 @@ class SMS extends Component {
 			},
 			smsFilter : ""
 		}
-		console.log(this.state.templates)
 
 		this.former = new former(this, [])
 	}
@@ -68,6 +59,15 @@ class SMS extends Component {
 		this.props.sendMessage(text, number);
 
 	}
+
+	sendBatchMessages = (messages) =>{
+		if(messages ===""){
+			return;
+		}
+		console.log("Sending messages", messages);
+		this.props.sendBatchMessages(messages);
+	}
+
 	sendMessageFilter=(e)=>{
 		this.setState({ smsFilter : e.target.value})
 	}
@@ -86,15 +86,15 @@ class SMS extends Component {
 				return <ToSingleClass 
 							classes={this.props.classes} 
 							students={this.props.students} 
-							sendMessage={this.sendMessage} 
+							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							/>
 			
 			case "to_all_students":
 				return <ToAllStudents 
 							students={this.props.students} 
-							sendMessage={this.sendMessage} 
-							connected={this.props.connected} 
+							sendBatchMessages={this.sendBatchMessages} 
+							connected={this.props.connected}
 							/>
 
 			case "to_single_teacher":
@@ -107,12 +107,16 @@ class SMS extends Component {
 			case "to_all_teachers":
 				return <ToAllTeachers  
 							teachers={this.props.teachers} 
-							sendMessage={this.sendMessage} 
+							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							/>
 			
 			case "to_fee_defaulters":
-				return  "Fee Defaulters";{/**<ToFeeDefaulters/>*/}
+				return  <ToFeeDefaulters						
+							students={this.props.students} 
+							sendBatchMessages={this.sendBatchMessages} 
+							connected={this.props.connected}
+							/>
 			
 			default:
 				return;
@@ -131,9 +135,6 @@ class SMS extends Component {
 					<div className="section">
 						<div className="row"> 
 						<label>Send By</label>		
-						{console.log("TEACHERS")}
-						{console.log(this.props.teachers)}
-
 							<select onChange={this.sendMessageFilter}>
 									<option value="" >Select</option>
 									<option value="to_single_student">Single Student</option>
@@ -144,47 +145,9 @@ class SMS extends Component {
 									<option value="to_fee_defaulters">Fee Defaulters</option>
 							</select>
 						</div>
-{/**=======================================================HERE======================== */}
+
 						{this.getFilteredFunctionality(this.state.smsFilter)}
-
 					</div>
-					<div className="divider">Attendance Template</div>
-					<div className="section">
-						<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
-						<div className="row"><div>Use <code>$STATUS</code> to insert the attendance status.</div></div>
-						<div className="row">
-							<label>SMS Template</label>
-							<textarea {...this.former.super_handle(["templates", "attendance"])} placeholder="Enter SMS template here" />
-						</div>
-					</div>
-
-					<div className="divider">Fees Template</div>
-					<div className="section">
-						<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
-						<div className="row"><div>Use <code>$AMOUNT</code> to insert the fee amount.</div></div>
-						<div className="row"><div>Use <code>$BALANCE</code> to insert the total fee balance.</div></div>
-						<div className="row">
-							<label>SMS Template</label>
-							<textarea {...this.former.super_handle(["templates", "fee"])} placeholder="Enter SMS template here" />
-						</div>
-					</div>
-
-					<div className="divider">Results Template</div>
-					<div className="section">
-						<div className="row">
-							<div>Use <code>$NAME</code> to insert the child's name.</div>
-						</div>index.
-						<div className="row">
-							<div>Use <code>$REPORT</code> to send report line by line.</div>
-						</div>
-						<div className="row">
-							<label>SMS Template</label>
-							<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
-						</div>
-
-					</div>
-
-					<div className="button save" onClick={this.save}>Save</div>
 				</div>
 			</div>
 		</Layout>
@@ -192,12 +155,11 @@ class SMS extends Component {
 }
 
 export default connect(state => ({
-	sms_templates: state.db.sms_templates,
 	students: state.db.students,
 	classes: state.db.classes,
 	teachers:state.db.faculty,
 	connected: state.connected
 }), dispatch => ({
-	saveTemplates: templates => dispatch(createTemplateMerges(templates)),
-	sendMessage: (text, number) => dispatch(sendSMS(text, number))
+	sendMessage: (text, number) => dispatch(sendSMS(text, number)),
+	sendBatchMessages: (messages) => dispatch(sendBatchSMS(messages))
 }))(SMS);

@@ -39,7 +39,6 @@ return <div className="section table">
 				<label><b>Forgiven</b></label>
 				<label><b>Balance</b></label>
 			</div>				
-			{/** console.log(monthly_payments)*/}
 			{
 				[...Object.entries(monthly_payments)
 					.sort(([month, ], [m2, ]) => month.localeCompare(m2))
@@ -53,7 +52,6 @@ return <div className="section table">
 							<div>{SUBMITTED - OWED - FORGIVEN}</div>
 						</div>
 					),				
-					/**Here it isssssssssssssssssssssssssssssssssssssssssssssssssssss          */
 						<div className="table row footing" key={Math.random()}>   
 							<label><b>Total</b></label>
 							<label><b>{total.PAID}</b></label>

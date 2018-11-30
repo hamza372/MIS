@@ -3,8 +3,6 @@ import { smsIntentLink } from 'utils/intent'
 
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
-
-import '../../style.css'
 import former from 'utils/former'
 
 
@@ -20,15 +18,15 @@ export default class ToSingleClass extends Component {
 
 	  this.former = new former(this, [])
 	}
-	
-  render() {
 
-	const { classes, students, sendMessage } = this.props;
+  	render() {
+
+	const { classes, students, sendBatchMessages } = this.props;
 	
-	const message = { messages : [ students.filter(student=> student.section_id !== this.state.selected_section_id)
-						.map(S => [{ number: S.Phone, text : this.state.text }])
-					]
-				}
+	const messages = Object.values(students)
+			.filter( student => student.section_id === this.state.selected_section_id)
+			.map(S => ({ number: S.Phone, text : this.state.text }))
+				
 
 	return (
 			<div>
@@ -38,7 +36,7 @@ export default class ToSingleClass extends Component {
 									{
 										[<option key="abcd" value="" disabled>Select Section</option>,
 										...Object.entries(getSectionsFromClasses(classes))
-										.map(([id, C]) => <option key={id} value={C.section_id}>{C.namespaced_name}</option>)
+										.map(([id, C]) => <option key={id} value={C.id}>{C.namespaced_name}</option>)
 										]
 									}
 						</select>
@@ -46,11 +44,11 @@ export default class ToSingleClass extends Component {
 				<div className="row">
 					<label>Message</label>
 					<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
-				</div> {/**Here   ------------------------------------------------------- */}
+				</div>
 					{ !this.props.connected ? 
-						<div className="button" onClick={sendMessage}>Send</div> : 
+						<div className="button" onClick={() => sendBatchMessages(messages)}>Send</div> : 
 						<a href={smsIntentLink({
-							message,
+							messages,
 							return_link: window.location.href 
 							})} className="button blue">Send using Local SIM</a> }
 			</div>
