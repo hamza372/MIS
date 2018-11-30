@@ -8,6 +8,9 @@ export interface SelectLocationAction {
 	loc: SchoolLocation
 }
 
+const debug_url = "http://localhost:5000/"
+const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
+
 export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
 
 	console.log("selecting location", loc.id)
@@ -15,12 +18,11 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 	const state = getState();
 
 	if(state.school_db[loc.id] === undefined) {
-		fetch(`http://localhost:5000/school/${loc.id}`)
+		fetch(`${python_host}/school/${loc.id}`)
 			.then(res => res.json())
 			.then((res : School) => dispatch(addToSchoolDB(res)))
 			.catch(err => console.error(err))
 	}
-
 
 	dispatch({
 		type: SELECT_LOCATION,

@@ -9,9 +9,11 @@ import reducer from './reducers'
 
 const debug_url = "ws://localhost:8080/ws"
 
+const host = process.env.REACT_APP_PORTAL_HOST || debug_url;
+
 import Routes from './routes'
 
-const syncr : Syncr = new Syncr(debug_url, msg => store.dispatch(msg))
+const syncr : Syncr = new Syncr(host, msg => store.dispatch(msg))
 const store = createStore(reducer, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootBankState, Actions, Syncr>));
 
 ReactDOM.render(

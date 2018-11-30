@@ -30,6 +30,7 @@ const blankTeacher = (isFirst = false) => ({
 	ManName: "",
 	Birthdate: moment().subtract(20, "year"),
 	Address: "",
+	StructuredQualification: "",
 	Qualification: "",
 	Experience: "",
 	HireDate: moment(),
@@ -223,8 +224,20 @@ class CreateTeacher extends Component {
 					<label>Experience</label>
 					<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
 				</div>
+
 				<div className="row">
 					<label>Qualification</label>
+					<select {...this.former.super_handle(["StructuredQualification"])}>
+						<option value='' disabled>Please select a Qualification</option>
+						<option value='Matric'>Matric</option>
+						<option value='Inter'>Intermidiate</option>
+						<option value='BS'>Bachelors Degree (BS)</option>
+						<option value='MS'>Masters Degree (MS)</option>
+						<option value='diploma'>Diploma</option>
+					</select>
+				</div>
+				<div className="row">
+					<label>Other Qualification</label>
 					<textarea {...this.former.super_handle(["Qualification"])} placeholder="Qualification" />
 				</div>
 
@@ -235,7 +248,7 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Admin Status</label>
-					<select {...this.former.super_handle(["Admin"])} disabled={!this.props.user.Admin}>
+					<select {...this.former.super_handle(["Admin"])} disabled={!(this.isFirst() || this.props.user.Admin)}>
 						<option value={false}>Not an Admin</option>
 						<option value={true}>Admin</option>
 					</select>

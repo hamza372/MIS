@@ -99,7 +99,7 @@ class Attendance extends Component {
 					this.props.students.map(x =>  {
 
 						const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
-						const status = current_attendance ? current_attendance.status : "n/a"
+						const status = current_attendance ? current_attendance.status : "PRESENT"
 
 						return <div className="list-row" key={x.id}>
 							<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
