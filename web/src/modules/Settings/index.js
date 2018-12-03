@@ -14,12 +14,12 @@ const defaultSettings = {
 }
 
 const defaultTemplates = () => ({
-	attendance: " کے طور پر نشان لگا دیا گیا ہے $STATUS کو $NAME",
-	fee: "$NAME has just paid $AMOUNT PKR. Your balance is now $BALANCE.",
-	result: "$NAME has a new report ready.\n$REPORT"
+	attendance: "ہے $Status اسکول میں $Name",
+	fee: "ہے۔ $BALANCE کی ادائگی کردی ہے۔ جبکہ آپ کا بقایا حساب $AMOUNT نے $NAME",
+	result: "\n$REPORT کے امتحان کا نتیجہ آگیا ہے $NAME"
 })
 
-class Settings extends Component {
+class Settings extends Component {$Name
 
 	constructor(props){ 
 		super(props);
