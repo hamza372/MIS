@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+
 import { smsIntentLink } from 'utils/intent'
 import Layout from 'components/Layout'
 import { markStudent } from 'actions'
@@ -11,15 +13,36 @@ import Former from 'utils/former'
 
 import './style.css'
 
+const deriveSelectedStudents = (selected_section, students) =>  getStudentsForSection(selected_section, students)
+	.reduce((agg, curr) => {
+		console.log('deriving students', agg)
+		return {...agg, [curr.id]: true}
+	}, {})
+
+const getStudentsForSection = (section_id, students) => Object.values(students)
+	.filter(s => {
+		console.log('finding student');
+		return s.section_id === section_id
+	})
+
 class Attendance extends Component {
 
 	constructor(props) {
 		super(props);
 
+		// by default, the class selected should be one owned by the user.
+
+		const sections = getSectionsFromClasses(props.classes)
+
+		const my_sections = sections.filter(s => s.faculty_id === props.current_faculty.id)
+
+		const selected_section = my_sections.length > 0 ? my_sections[0].id : "";
+
 		this.state = {
 			date: moment.now(),
 			sending: false,
-			selected_students: props.students.reduce((agg, curr) => ({...agg, [curr.id]: true}), {})
+			selected_section,
+			selected_students: deriveSelectedStudents(selected_section, props.students)
 		}
 
 		this.Former = new Former(this, [])
@@ -43,7 +66,6 @@ class Attendance extends Component {
 			})
 		}, 2000);
 
-		// we need to jump to the right url `intent://whatever'
 	}
 
 	selectAllOrNone = () => {
@@ -64,27 +86,48 @@ class Attendance extends Component {
 		}
 	}
 
-	render() {
+	onSectionChange = e => {
+		const newSectionId = e.target.value;
 
-		const messages = this.props.students
-			.filter(x => this.state.selected_students[x.id] && (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")] !== undefined)
-			.map(x => {
-				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
-				const status = current_attendance ? current_attendance.status : "n/a"
-
-				return {
-					number: x.Phone,
-					text: this.props.attendance_message_template.replace(/\$NAME/g, x.Name).replace(/\$STATUS/g, status)
-				}
+		this.setState({
+			selected_section: newSectionId,
+			selected_students: deriveSelectedStudents(newSectionId, this.props.students)
 		})
 
-		//const url = `intent://mis.metal.fish/android-sms?payload=${encodeURI(JSON.stringify(payload))}#Intent;scheme=https;package=pk.org.cerp.mischool.mischoolcompanion;end`
+	}
+
+	relevant_students = () => {
+		Object.keys(this.state.selected_students)
+			.map(id => this.props.students[id])
+	}
+
+	render() {
+
+		const messages = Object.entries(this.state.selected_students)
+			.reduce((agg, [sid, selected]) => {
+				if(!selected) {
+					return agg;
+				}
+
+				const student = this.props.students[sid]
+				const att = (student.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+
+				if(att === undefined) {
+					return agg;
+				}
+
+				return [...agg, {
+					number: student.Phone,
+					text: this.props.attendance_message_template.replace(/\$NAME/g, student.Name).replace(/\$STATUS/g, att.status)
+				}]
+
+			}, [])
+
 		const url = smsIntentLink({
 			messages,
 			return_link: window.location.href
 		});
 
-		// { !this.props.connected ? <a href={url} className="button">Send SMS</a> : false }
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
 		return <Layout>
 			<div className="attendance">
@@ -92,45 +135,48 @@ class Attendance extends Component {
 
 				<input type="date" onChange={this.Former.handle(["date"], d => moment(d) < moment.now())} value={moment(this.state.date).format("YYYY-MM-DD")} placeholder="Current Date" />
 
-				<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
+				<div className="row" style={{width: "90%"}}>
+					<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
+					<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
+						{
+							getSectionsFromClasses(this.props.classes)
+								.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+						}
+					</select>
+				</div>
 				<div className="list">
 				{
-					this.props.students.map(x =>  {
+					Object.keys(this.state.selected_students)
+						.map(sid => {
+							const x = this.props.students[sid]
 
-						const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
-						const status = current_attendance ? current_attendance.status : "n/a"
+							const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+							const status = current_attendance ? current_attendance.status : "n/a"
 
-						return <div className="list-row" key={x.id}>
-							<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
-							<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
-							<div className="status">
-								<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
-								<div className={`button ${status === "ABSENT" ? "orange" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
-								<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
+							return <div className="list-row" key={x.id}>
+								<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
+								<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
+								<div className="status">
+									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
+									<div className={`button ${status === "ABSENT" ? "orange" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
+									<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
+								</div>
 							</div>
-					</div>})
+						})
 				}
 				</div>
 				{ Object.values(this.state.selected_students).some(x => x) ? <a href={url} className="button blue" onClick={this.sendBatchSMS}>Send SMS</a> : false }
 			</div>
 		</Layout>
-
 	}
 }
 
 export default connect(state => {
 
-	const faculty = state.db.faculty[state.auth.faculty_id];
-
-	const sections = Object.values(state.db.classes)
-		.reduce((agg, curr) => [...agg, ...Object.entries(curr.sections)], [])
-		.filter(([id, s]) => s.faculty_id === faculty.id);
-
-	const students = Object.values(state.db.students)
-		.filter(s => sections.find(([id, section]) => id === s.section_id) !== undefined)
-
 	return {
-		students,
+		current_faculty: state.db.faculty[state.auth.faculty_id],
+		students: state.db.students,
+		classes: state.db.classes,
 		connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {}).attendance || ""
 	}
