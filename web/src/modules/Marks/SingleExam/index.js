@@ -18,7 +18,7 @@ const blankExam = () => ({
 	total_score: "",
 	date: new Date().getTime(),
 	student_marks: {
-
+		
 	}
 })
 
@@ -83,6 +83,15 @@ class SingleExam extends Component {
 			})
 		}
 
+		if(this.state.exam.name === ""){
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Please select an exam type"
+				}
+			})
+		}
 		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
 			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
 
@@ -143,8 +152,16 @@ class SingleExam extends Component {
 				<div className="form">
 					<div className="row">
 						<label>Exam Name</label>
-						<input type="text" {...this.former.super_handle(["name"])} placeholder="Exam Name" />
+						<select {...this.former.super_handle(["name"])}>
+							<option value="">Select Exam</option>
+							<option value="Test">Test</option>
+							<option value="1st Term">1st Term</option>
+							<option value="2nd Term">2nd Term</option>
+							<option value="Mid-Term">Mid-Term</option>
+							<option value="Final-Term">Final-Term</option>
+						</select>
 					</div>
+
 					<div className="row">
 						<label>Subject</label>
 						<datalist id="subjects">
