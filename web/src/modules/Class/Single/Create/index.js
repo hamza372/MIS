@@ -203,7 +203,7 @@ class SingleClass extends Component {
 										<option disabled selected value>select teacher</option>
 										{
 											Object.values(this.props.faculty)
-											.map(faculty => <option value={faculty.id} key={faculty.id}>{faculty.Name}</option>)
+												.map(faculty => <option value={faculty.id} key={faculty.id}>{faculty.Name}</option>)
 										}
 									</select>
 								</div>
@@ -212,24 +212,23 @@ class SingleClass extends Component {
 									<h4>Students</h4>
 									{
 										Object.values(this.props.students)
-										.filter(student => student.section_id === id)
-										.map(student => {
-											return <div className="student row" key={student.id}>
-												<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
-												<div className="button orange" onClick={() => this.removeStudent(student)}>Remove</div>
-											</div>
-										})
+											.filter(student => student.section_id === id)
+											.map(student => {
+												return <div className="student row" key={student.id}>
+													<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
+													<div className="button orange" onClick={() => this.removeStudent(student)}>Remove</div>
+												</div>
+											})
 									}
 
 									<div className="row">
-
-									<Dropdown
-										items={Object.values(this.props.students)}
-										toLabel={s => s.Name} 
-										onSelect={this.addStudent(id)} 
-										toKey={s => s.id} 
-										placeholder="Student Name" />
-										</div>
+										<Dropdown
+											items={Object.values(this.props.students)}
+											toLabel={s => s.Name} 
+											onSelect={this.addStudent(id)} 
+											toKey={s => s.id} 
+											placeholder="Student Name" />
+									</div>
 								</div>
 
 								{ arr.length === 1 ? false : <div className="button orange" onClick={this.removeSection(id)}>Delete Section</div> }
