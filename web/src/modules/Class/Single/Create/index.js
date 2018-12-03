@@ -6,7 +6,6 @@ import moment from 'moment'
 
 import Former from 'utils/former'
 import Banner from 'components/Banner'
-import Layout from 'components/Layout'
 
 import Dropdown from 'components/Dropdown'
 
@@ -38,15 +37,9 @@ class SingleClass extends Component {
 			class: currClass,
 			saveBanner: false,
 			redirect: false,
-			report_dates: {
-				start: moment().subtract(1, "month").unix() * 1000,
-				end: moment.now()
-			}
 		}
 
 		this.former = new Former(this, ["class"])
-
-		this.report_former = new Former(this, ["report_dates"])
 	}
 
 	id = () => this.props.match.params.id
@@ -149,8 +142,7 @@ class SingleClass extends Component {
 		if(this.state.redirect) {
 			return <Redirect to={`/class/${this.state.class.id}/profile`} />
 		}
-		return <Layout>
-			<div className="single-class">
+		return <div className="single-class">
 		{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
 			<div className="title">Edit Class</div>
 			<div className="form">
@@ -228,23 +220,9 @@ class SingleClass extends Component {
 				}
 				<div className="button green" onClick={this.addSection}>Add Section</div>
 
-				<div className="divider">Print Reports</div>
-				<div className="section">
-					<div className="row">
-						<label>Start Date</label>
-						<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_dates.start).format("YYYY-MM-DD")} placeholder="Start Date" />
-					</div>
-					<div className="row">
-						<label>End Date</label>
-						<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
-					</div>
-					<Link className="button grey block" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
-				</div>
-
-				<div className="button blue" onClick={this.onSave}>Save</div>
+				<div className="button save" onClick={this.onSave}>Save</div>
 			</div>
 		</div>
-	</Layout>
 	}
 }
 

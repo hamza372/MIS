@@ -44,21 +44,21 @@ return <div className="section table">
 					.sort(([month, ], [m2, ]) => month.localeCompare(m2))
 					.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => 
 													
-						<div className="table row">
-							<div>{month }</div>
-							<div>{OWED }</div>
+						<div className="table row" key={month}>
+							<div>{month}</div>
+							<div>{OWED}</div>
 							<div>{SUBMITTED}</div>							
 							<div>{FORGIVEN}</div>
 							<div>{SUBMITTED - OWED - FORGIVEN}</div>
 						</div>
 					),				
-						<div className="table row footing" key={Math.random()}>   
-							<label><b>Total</b></label>
-							<label><b>{total.PAID}</b></label>
-							<label><b>{total.FORGIVEN}</b></label>
-							<label><b>{total.OWED}</b></label>
-							<label><b>{total.PAID - total.OWED - total.FORGIVEN}</b></label>
-						</div>
+					<div className="table row footing" key={Math.random()}>   
+						<label><b>Total</b></label>
+						<label><b>{total.PAID}</b></label>
+						<label><b>{total.FORGIVEN}</b></label>
+						<label><b>{total.OWED}</b></label>
+						<label><b>{total.PAID - total.OWED - total.FORGIVEN}</b></label>
+					</div>
 				]
 			}
 		</div> 
@@ -128,17 +128,13 @@ export default connect(state => ({
 		
 		<PrintHeader settings={settings} />
 		
-		<div>
-			<MonthlyFeesTable monthly_payments={monthly_payments} total_debts={total_debts}/>
-		</div>
-		
+	
 		<div className="no-print">
-		
-		<div className="divider">Payments over Time</div>
-		{
+			<div className="divider">Payments over Time</div>
 			<MonthlyFeesChart monthly_payments={monthly_payments}/>
-		}
 		</div>
+		<MonthlyFeesTable monthly_payments={monthly_payments} total_debts={total_debts}/>
+
 		<div className="divider">Students with Payments Outstanding</div>
 		<div className="section">
 		{
