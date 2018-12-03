@@ -87,7 +87,6 @@ class Attendance extends Component {
 	}
 
 	onSectionChange = e => {
-		console.log(e.target.value, e)
 		const newSectionId = e.target.value;
 
 		this.setState({
