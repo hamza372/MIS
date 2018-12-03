@@ -66,6 +66,7 @@ class SMS extends Component {
 		this.props.sendMessage(this.state.text, this.state.selected_student_number);
 
 	}
+
 	sendMessageFilter=(e)=>{
 		this.setState({ smsFilter : e.target.value})
 	}
@@ -226,7 +227,6 @@ class SMS extends Component {
 							<label>SMS Template</label>
 							<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
 						</div>
-
 					</div>
 
 					<div className="button save" onClick={this.save}>Save</div>

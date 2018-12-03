@@ -40,7 +40,6 @@ const MonthlyAttendanceTable = (props) =>{
 					<label><b>Absentee(%)</b></label>
 				</div>
 
-				{/**-----------------------------------------HERE ---------------------------------------------- */}				
 				
 				{
 					[...Object.entries(monthly_attendance)
@@ -115,16 +114,8 @@ export default connect(state => ({
 
 		<div className="divider">Monthly Attendance</div>
 		
-			<div>
-			{
-				<MonthlyAttendanceTable monthly_attendance={monthly_attendance} totals = {totals}/>
-			}
-			</div>
-			<div> 
-			{
-				<MonthlyAttendanceChart monthly_attendance = {monthly_attendance}/>
-			}
-			</div>
+			<MonthlyAttendanceChart monthly_attendance = {monthly_attendance} />
+			<MonthlyAttendanceTable monthly_attendance={monthly_attendance} totals={totals} />
 
 		
 		
