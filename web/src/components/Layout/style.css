@@ -36,7 +36,7 @@ a.block {
 }
 
 .print-only {
-	display: none;
+	display: none!important;
 }
 
 .no-print {
@@ -69,13 +69,13 @@ a.block {
 	}
 
 	.print-only {
-		display: block;
+		display: block!important;
 		text-align: center;
 		font-weight: bolder;
 	}
 
 	.no-print {
-		display: none;
+		display: none!important;
 	}
 }
 
@@ -218,7 +218,8 @@ a.block {
 		display: block;
 		margin: 0;
 		height: 40px;
-		line-height: 40px; font-size: 17px;
+		line-height: 40px; 
+		font-size: 17px;
 		border: 1px solid #bbb;
 		border-radius: 5px;
 	}
@@ -227,6 +228,7 @@ a.block {
 		height: 40px;
 		background-color: initial;
 		border-radius: 5px;
+		font-size: 17px;
 	}
 
 	select:focus {
@@ -326,6 +328,7 @@ textarea {
 		border: 3px solid rgba(0,0,0,0.2);
 	}
 
+
 	.green-shadow {
 		box-shadow: 5px 5px 5px #99eae1;
 	}
@@ -390,6 +393,76 @@ textarea {
 		box-shadow: 5px 5px 5px #ffb9b7;
 	}
 
+	.bg-purple {
+		background-color: #7e88f7;
+		color: #fafafa;
+	}
+
+	.bg-grey {
+		background-color: #e0e0e0;
+		color: #222222;
+	}
+
+	.bg-orange {
+		background-color: #ff6b68;
+		color: #fafafa;
+	}
+	.bg-red {
+		background-color: #fc6171;
+		color: #fafafa;
+	}
+
+	.bg-blue {
+		background-color: #74aced;
+		color: #fafafa;
+	}
+
+	.bg-green {
+		background-color: #5ecdb9;
+		color: #fafafa;
+	}
+
+	.bg-yellow {
+		background-color: #f4d29f;
+		color: #fafafa;
+	}
+
+	.bg-black {
+		background-color: #222222;
+		color: #fafafa;
+	}
+
+	.border-purple {
+		border: 3px solid #7e88f7;
+	}
+
+	.border-grey {
+		border: 3px solid #e0e0e0;
+	}
+
+	.border-orange {
+		border: 3px solid #ff6b68;
+	}
+	.border-red {
+		border: 3px solid #fc6171;
+	}
+
+	.border-blue {
+		border: 3px solid #74aced;
+	}
+
+	.border-green {
+		border: 3px solid #5ecdb9;
+	}
+
+	.border-yellow {
+		border: 3px solid #f4d29f;
+	}
+
+	.border-black {
+		border: 3px solid #222222;
+	}
+
 	.button.light-blue {
 		background-color: #95B8D1;
 		color: #fafafa;
@@ -417,3 +490,17 @@ input::-webkit-inner-spin-button {
 	flex-wrap: wrap;
 	justify-content: center;
 }
+
+.horizontal-scroll-container {
+	display: flex;
+	width: 100%;
+	scroll-snap-type: x mandatory;
+	scroll-snap-points-y: repeat(100vw);
+	flex-wrap: nowrap;
+	overflow-x: auto;
+}
+
+	.horizontal-scroll-container>* {
+		min-width: 100vw;
+		scroll-snap-align: start;
+	}

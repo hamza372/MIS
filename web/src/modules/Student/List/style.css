@@ -9,8 +9,8 @@
 	border: 3px solid rgba(0,0,0,0.2);
 }
 
-.resize {
-	margin-left: 80px;
-	margin-right: 80px;
-
+.student-list .print{
+	margin-top: 15px;
+	margin-left: auto;
+	margin-right: 5%;
 }

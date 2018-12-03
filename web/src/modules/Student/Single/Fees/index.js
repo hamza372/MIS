@@ -34,7 +34,9 @@ class StudentFees extends Component {
 				active: false,
 				amount: "",
 				type: "SUBMITTED" // submitted or owed
-			}
+			},
+			month: "",
+			year: ""
 		}
 
 		this.Former = new former(this, []);
@@ -77,13 +79,52 @@ class StudentFees extends Component {
 			}
 		})
 	}
+	getFilterCondition = (payment) =>
+	{
+		//when both are empty
+		if(this.state.month === "" && this.state.year === "") {
+			return true
+		}
+		//when month is empty	
+		if(this.state.month === "" && this.state.year !== ""){
+			return  moment(payment.date).format("YYYY") === this.state.year;
 
+		}
+		//when year is empty
+		if(this.state.month !== "" && this.state.year === ""){
+			return moment(payment.date).format("MMMM") === this.state.month
+
+		}
+		//when both are not empty
+		if(this.state.month !== "" && this.state.year !== "")
+		{
+			return moment(payment.date).format("MMMM") === this.state.month && moment(payment.date).format("YYYY") === this.state.year;
+		}
+	} 
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		checkStudentDues(this.student(), this.props.addPayment);
 	}
 
 	render() {
+
+		const Months =  [...new Set(
+			Object.entries(this.student().payments || {})
+				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
+				.map(([id, payment]) => moment(payment.date).format("MMMM"))
+			)]
+			
+		const Years = [...new Set(
+			Object.entries(this.student().payments)
+				.sort(([,a_payment],[,b_payment]) => a_payment.date - b_payment.date)
+				.map(([id,payment]) => moment(payment.date).format("YYYY"))
+			)]
+			
+		const filteredPayments = Object.entries(this.student().payments || {})
+				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
+				.filter(([id,payment]) => this.getFilterCondition(payment))
+
+				
 		return <div className="student-fees">
 
 			<PrintHeader settings={this.props.settings}/>
@@ -100,9 +141,33 @@ class StudentFees extends Component {
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
 			</div>
-
 			<div className="divider">Ledger</div>
-			<div className="student-name"><b>Student Name:</b> {this.student().Name}</div>
+
+					
+			<div className="student-name print-only" style={{textAlign: "left", fontWeight: "normal"}}><b>Student Name:</b> {this.student().Name}</div>
+			
+			<div className="row no-print"  style={{marginBottom:"10px"}}>
+				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
+				
+				<option value="">Select Month</option>
+				{
+					Months.map(Month => {
+						return <option key={Month} value={Month}>{Month}</option>	
+					})
+				}
+				</select>
+				
+				<select className="" {...this.Former.super_handle(["year"])}>
+				
+				<option value="">Select Year</option>
+				{ 
+					Years.map(year => {
+						return <option key={year} value={year}> {year} </option>
+					})
+				}
+				</select>
+			</div>
+				
 			<div className="payment-history section">
 				<div className="table row heading">
 					<label><b>Date</b></label>
@@ -110,12 +175,11 @@ class StudentFees extends Component {
 					<label><b>Amount</b></label>
 				</div>
 			{
-				Object.entries(this.student().payments || {})
-					.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-					.map(([id, payment]) => {
+				
+					filteredPayments.map(([id, payment]) => {
 						return <div className="payment" key={id}>
 							<div className="table row">
-								<div>{moment(payment.date).format("MM/DD")}</div>
+								<div>{moment(payment.date).format("DD/MM")}</div>
 								<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
 								<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
 							</div>
@@ -124,8 +188,8 @@ class StudentFees extends Component {
 				<div className="table row last">
 					<label><b>Amount Owed:</b></label>
 					<div><b>{
-						Object.values(this.student().payments || {})
-							.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+						filteredPayments
+							.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 						}</b></div>
 				</div>
 			</div>
