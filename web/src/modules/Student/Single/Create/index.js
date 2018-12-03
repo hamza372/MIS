@@ -4,6 +4,8 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+
 import { createStudentMerge, deleteStudent } from 'actions'
 
 import Banner from 'components/Banner'
@@ -251,14 +253,11 @@ class SingleStudent extends Component {
 						<label>Class Section</label>
 						<select {...this.former.super_handle(["section_id"])}>
 							{
-								 [{id: '', name: 'Please Select a Section'}, ...Object.values(this.props.classes) // collapse into label class - section name. value is section id
-								 	.reduce((agg, c) => {
-										 return [...agg, ...Object.entries(c.sections)
-										 	.reduce((agg2, [id, section]) => { 
-												return [...agg2, { id, name:`${c.name}-${section.name}` }]
-											 }, [])]
-									 }, [])]
-									.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+								 [
+									<option key="" value="">Please Select a Section</option>,
+									 ...getSectionsFromClasses(this.props.classes)
+										 .map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+								]
 							}
 						</select>
 					</div>

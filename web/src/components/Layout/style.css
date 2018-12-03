@@ -218,7 +218,8 @@ a.block {
 		display: block;
 		margin: 0;
 		height: 40px;
-		line-height: 40px; font-size: 17px;
+		line-height: 40px; 
+		font-size: 17px;
 		border: 1px solid #bbb;
 		border-radius: 5px;
 	}
@@ -227,6 +228,7 @@ a.block {
 		height: 40px;
 		background-color: initial;
 		border-radius: 5px;
+		font-size: 17px;
 	}
 
 	select:focus {
