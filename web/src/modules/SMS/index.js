@@ -61,7 +61,7 @@ class SMS extends Component {
 	}
 
 	sendBatchMessages = (messages) =>{
-		if(messages ===""){
+		if(messages.length === 0 || messages === undefined){
 			return;
 		}
 		console.log("Sending messages", messages);
