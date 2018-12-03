@@ -28,3 +28,7 @@
 		border-top: 1px solid #222;
 		border-bottom: none;
 	}
+
+.student-fees .row select {
+	margin: 5px;
+}
