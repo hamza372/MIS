@@ -70,27 +70,29 @@ class SingleExam extends Component {
 	section_id = () => this.props.match.params.section_id
 	class_id = () => this.props.match.params.class_id
 
-	setMarks=(e)=>
-	{
-		if(e.target.value > this.state.total_score){
-			this.setState({
-				banner:{
-					active:true,
-					good:false,
-					text: "Marks cannot exceed the max score"
-				}
-			})
-		}
-	}
 	onSave = () => {
-		console.log("=====================save to exams======================",this.state.student_marks)
-
+		console.log("=====================save to exams======================")
+		
 		if(isNaN(parseFloat(this.state.exam.total_score))) {
 			return this.setState({
 				banner: {
 					active: true,
 					good: false,
 					text: "Total Score is not set to a Number"
+				}
+			})
+		}
+
+		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
+			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
+
+		if(hasScoreAboveLimit)
+		{
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Marks cannot exceed the max score"
 				}
 			})
 		}
@@ -165,7 +167,6 @@ class SingleExam extends Component {
 					</div>
 
 						<div className="divider">Marks</div>
-						{/**============================ HERE =========================== */}
 						<div className="section">
 						{
 							Object.entries(this.props.students)
@@ -174,7 +175,7 @@ class SingleExam extends Component {
 									<div className="student row" key={id}>
 										<label><Link to={`/student/${id}/profile`}>{student.Name}</Link></label>
 										<input 
-											type="number" onChange={this.setMarks}
+											type="number" 
 											{...this.former.super_handle(["student_marks", id])} 
 											placeholder={`Score out of ${this.state.exam.total_score}`} 
 											/>
