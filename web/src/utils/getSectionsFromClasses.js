@@ -5,13 +5,13 @@ export const getSectionsFromClasses = (classes) => {
 		.reduce((agg, c) => {
 			// each section
 			return [...agg, ...Object.entries(c.sections)
-				.reduce((agg2, [id, section]) => {
+				.reduce((agg2, [id, section], i, arr) => {
 					return [
 						...agg2,
 						{
 							id,
 							class_id: c.id,
-							namespaced_name: `${c.name}-${section.name}`,
+							namespaced_name: arr.length === 1 && section.name === "DEFAULT" ? c.name : `${c.name}-${section.name}`,
 							className: c.name,
 							...section
 						}
@@ -21,3 +21,5 @@ export const getSectionsFromClasses = (classes) => {
 
 		return sections;
 }
+
+export default getSectionsFromClasses;
