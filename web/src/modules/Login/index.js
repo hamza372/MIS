@@ -50,12 +50,11 @@ class Login extends Component {
 				<div className="form">
 					<div className="row">
 						<label>Teacher Name</label>
-						<input list="usernames" {...this.former.super_handle(["name"])} placeholder="Full Name" autoCorrect="off" autoCapitalize="off" />
-						<datalist id="usernames">
+						<select {...this.former.super_handle(["name"])}>
 						{
-							Object.values(this.props.users).map(u => <option key={u.username} value={u.name} />)
+							Object.values(this.props.users).map(u => <option key={u.username} value={u.name}>{u.name}</option>)
 						}
-						</datalist>
+						</select>
 					</div>
 					<div className="row">
 						<label>Password</label>

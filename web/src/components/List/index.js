@@ -15,25 +15,19 @@ class List extends Component {
 		this.setState({filterText:e.target.value});
 	}
 
-	render() 
-	{
-		
-		console.log("Following are the Items from List Component");
-		console.log(this.props.items); //for Debugging :)
-		
+	render() {
 		const {items, toLabel, Component } = this.props;
 		
 		const filteredList = items.filter(item => {
 			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
 		});
 
-		console.log(filteredList); //for Debugging :)
-
 		return <div className="list-wrap">
 			
-			<input className="search-bar" type="text" placeholder="Search" onChange={this.onChange}/>
 
 			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
+
+			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
 			
 			<div className="list">
 				{

@@ -19,6 +19,7 @@ import ExamList from 'modules/Marks/ExamList'
 import SingleExam from 'modules/Marks/SingleExam'
 import Settings from 'modules/Settings'
 import Analytics from 'modules/Analytics'
+import ReportsMenu from 'modules/ReportsMenu'
 
 import AuthedRoute from 'components/AuthedRoute'
 
@@ -50,6 +51,8 @@ export default ({ store }) => (
 
 				<AuthedRoute path="/settings" component={Settings} />
 				<AuthedRoute path="/analytics" component={Analytics} />
+
+				<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 
 				<Route path="/school-login" component={SchoolLogin} />
 				<Route path="/login" component={Login} />
