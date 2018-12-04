@@ -72,7 +72,7 @@ class CreateTeacher extends Component {
 
 		// check if they set a username and password. 
 
-		if(this.state.profile.Name === "" || this.state.profile.Password === "") {
+		if(this.state.profile.Name === "" || this.state.profile.Password === "" || this.state.profile.Phone === "" || this.state.profile.Salary === "" ) {
 			return this.setState({
 				banner: {
 					active: true,
@@ -137,6 +137,17 @@ class CreateTeacher extends Component {
 		})
 	}
 
+/* 	formatCNIC = () => {
+
+		// substring
+		console.log('substr(4,6): ',this.state.profile.CNIC.substr(5,6))
+
+		if (this.state.profile.CNIC.length === 5 && this.state.profile.CNIC.substr(5,6) === "" || this.state.profile.CNIC.length === 13 && this.state.profile.CNIC.substr(13,1) === undefined)
+		{
+			this.setState({ profile: { CNIC: this.state.profile.CNIC + '-' }})
+		}
+	} */
+
 	render() {
 
 		if(this.state.redirect) {
@@ -161,7 +172,7 @@ class CreateTeacher extends Component {
 				</div>
 				<div className="row">
 					<label>CNIC</label>
-					<input type="text" {...this.former.super_handle(["CNIC"], (num) => num.length <= 13)} placeholder="CNIC" />
+					<input type="text" {...this.former.super_handle(["CNIC"], (num) => num.length <= 15)}  placeholder="CNIC" />
 				</div>
 				<div className="row">
 					<label>Gender</label>
@@ -215,16 +226,7 @@ class CreateTeacher extends Component {
 				</div>
 
 				<div className="divider">School Information</div>
-				<div className="row">
-					<label>Monthly Salary</label>
-					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
-				</div>
-
-				<div className="row">
-					<label>Experience</label>
-					<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
-				</div>
-
+				
 				<div className="row">
 					<label>Qualification</label>
 					<select {...this.former.super_handle(["StructuredQualification"])}>
@@ -236,13 +238,24 @@ class CreateTeacher extends Component {
 						<option value='diploma'>Diploma</option>
 					</select>
 				</div>
+				
 				<div className="row">
 					<label>Other Qualification</label>
 					<textarea {...this.former.super_handle(["Qualification"])} placeholder="Qualification" />
 				</div>
-
+				
 				<div className="row">
-					<label>Start Date</label>
+					<label>Experience</label>
+					<textarea {...this.former.super_handle(["Experience"])} placeholder="Experience" />
+				</div>
+				
+				<div className="row">
+					<label>Monthly Salary</label>
+					<input type="number" {...this.former.super_handle(["Salary"])} placeholder="Monthly Salary"/>
+				</div>
+				
+				<div className="row">
+					<label>Joining Date</label>
 					<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date"/>
 				</div>
 
@@ -258,8 +271,8 @@ class CreateTeacher extends Component {
 					<label>Active Status</label>
 					<select {...this.former.super_handle(["Active"])}>
 						<option value='' disabled>Please Select Active Status</option>
-						<option value={true}>Currently Working at School</option>
-						<option value={false}>No Longer Working at School</option>
+						<option value={true}>Currently Working in School</option>
+						<option value={false}>No Longer Working in School</option>
 					</select>
 				</div>
 
