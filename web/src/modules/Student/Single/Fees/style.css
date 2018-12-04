@@ -29,6 +29,27 @@
 		border-bottom: none;
 	}
 
-.student-fees .row select {
+.student-fees .filter select {
 	margin: 5px;
 }
+
+.student-fees .print-wrap {
+	display: flex;
+	flex-direction: row;
+}
+	.student-fees .print-wrap>* {
+		display: none;
+		width: 100%;
+	}
+
+	.student-fees .print-wrap>*:first-child {
+		display: block;
+	}
+
+	@media print {
+		.student-fees .print-wrap>* {
+			display: block;
+			width: 100%;
+		}
+
+	}

@@ -47,11 +47,11 @@ class Attendance extends Component {
 	}
 
 	selectAllOrNone = () => {
-		
+
 		const all_selected = Object.values(this.state.selected_students).every(x => x);
 
 		if(all_selected) {
-			// set all to false
+		// set all to false
 			this.setState({
 				selected_students: Object.keys(this.state.selected_students).reduce((agg, curr) => ({...agg, [curr]: false}), {})
 			})
