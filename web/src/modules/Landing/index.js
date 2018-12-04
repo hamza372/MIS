@@ -93,11 +93,11 @@ class Landing extends Component {
 						<div className="title">Management</div>
 						<div className="row">
 							<Link to="/teacher" className="button green-shadow">Teachers</Link>
-							<Link to="/class" className="button purple-shadow">Classes</Link>
+							<Link to="/student" className="button blue-shadow">Students</Link>
 						</div>
 						
 						<div className="row">
-							<Link to="/student" className="button blue-shadow">Students</Link>
+							<Link to="/class" className="button purple-shadow">Classes</Link>
 							<Link to="/settings" className="button red-shadow">Settings</Link>
 						</div>
 						<div className="row">
@@ -120,12 +120,13 @@ class Landing extends Component {
 							<Link to="/reports-menu" className="button green-shadow">Result Card</Link>
 						</div>
 						<div className="row">
-							<Link to="/sms" className="button red-shadow">Send SMS</Link>
+							<Link to="/sms" className="button red-shadow">SMS</Link>
 						</div>
 					</div>
 
 					<div className="page">
-						<div className="divider">Todays Attendance</div>
+						<div className="title">Daily Statistics</div>
+						<div className="divider">Attendance</div>
 						<div className="row">
 							<div className="box bg-green">
 								<div>{today_attendance.PRESENT}</div>
@@ -161,7 +162,7 @@ class Landing extends Component {
 							</div>
 						</div>
 
-						<div className="divider">Fees Collection Today</div>
+						<div className="divider">Fee Collection</div>
 
 						<div className="row">
 							<div className="box bg-blue">
@@ -179,7 +180,7 @@ class Landing extends Component {
 						<div className="row">
 							<div className="box bg-purple">
 								<div>{moment(lastSnapshot).format("HH:mm")}</div>
-								<div>{moment(lastSnapshot).format("YYYY-MM-DD")}</div>
+								<div>{moment(lastSnapshot).format("D-M-YYYY")}</div>
 							</div>
 						</div>
 

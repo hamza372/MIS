@@ -368,8 +368,8 @@ textarea {
 		border: 3px solid rgba(0,0,0,0.2);
 	}
 
-	.grey-shadow {
-		box-shadow: 5px 5px 5px #eeeeee;
+	.grey-shadow, .gray-shadow {
+		box-shadow: 5px 5px 5px #aaa;
 	}
 
 	.button.purple {
