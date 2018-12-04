@@ -285,6 +285,7 @@ class SingleStudent extends Component {
 					{
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
+								<div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>
 								<div className="row">
 									<label>Type</label>
 									<select {...this.former.super_handle(["fees", id, "type"])}>
@@ -309,13 +310,12 @@ class SingleStudent extends Component {
 										<option value="MONTHLY">Every Month</option>
 									</select>
 								</div>
-								<div className="button orange" onClick={this.removeFee(id)}>Remove Fee</div>
 							</div>
 						})
 					}
 					<div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
 					<div className="save-delete">
-						<div className="button orange" onClick={this.onDelete}>Delete</div>
+						<div className="button red" onClick={this.onDelete}>Delete</div>
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
 				</div>

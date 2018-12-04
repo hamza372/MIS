@@ -173,7 +173,7 @@ class SingleClass extends Component {
 					Object.keys(this.state.class.subjects)
 					.map(subject => <div className="subject row" key={subject}>
 						<div>{subject}</div>
-						<div className="button orange" onClick={this.removeSubject(subject)}>Remove</div>
+						<div className="button red" onClick={this.removeSubject(subject)}>Remove</div>
 					</div>)
 				}
 
@@ -216,7 +216,7 @@ class SingleClass extends Component {
 											.map(student => {
 												return <div className="student row" key={student.id}>
 													<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
-													<div className="button orange" onClick={() => this.removeStudent(student)}>Remove</div>
+													<div className="button red" onClick={() => this.removeStudent(student)}>Remove</div>
 												</div>
 											})
 									}
@@ -231,7 +231,7 @@ class SingleClass extends Component {
 									</div>
 								</div>
 
-								{ arr.length === 1 ? false : <div className="button orange" onClick={this.removeSection(id)}>Delete Section</div> }
+								{ arr.length === 1 ? false : <div className="button red" onClick={this.removeSection(id)}>Delete Section</div> }
 							</div>
 						})
 				}

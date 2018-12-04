@@ -108,16 +108,16 @@ class Landing extends Component {
 					<div className="page">
 						<div className="title">Actions</div>
 						<div className="row">
-							<Link to="/attendance" className="button green-shadow">Take Attendance</Link>
+							<Link to="/attendance" className="button green-shadow">Attendance</Link>
 							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow">Teacher Attendance</Link> : false }
 						</div>
 						<div className="row">
-							<Link to="/student?forwardTo=payment" className="button blue-shadow">Add Fee</Link>
-							<Link to="/reports" className="button yellow-shadow">Edit Marks</Link>
+							<Link to="/student?forwardTo=payment" className="button blue-shadow">Fees</Link>
+							<Link to="/reports" className="button yellow-shadow">Marks</Link>
 						</div>
 						<div className="row">
 							<Link to="/analytics/fees" className="button purple-shadow">Analytics</Link>
-							<Link to="/reports-menu" className="button green-shadow">Reports</Link>
+							<Link to="/reports-menu" className="button green-shadow">Result Card</Link>
 						</div>
 						<div className="row">
 							<Link to="/sms" className="button red-shadow">Send SMS</Link>
