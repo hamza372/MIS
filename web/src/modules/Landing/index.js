@@ -164,7 +164,7 @@ class Landing extends Component {
 						<div className="divider">Fees Collection Today</div>
 
 						<div className="row">
-							<div className="box bg-orange">
+							<div className="box bg-blue">
 								<div>{today_payment}</div>
 								<div>Rupees</div>
 							</div>
