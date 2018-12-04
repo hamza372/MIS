@@ -23,6 +23,7 @@ import './style.css'
 const blankStudent = () => ({
 	id: v4(),
 	Name: "",
+	RollNumber: "",
 	BForm: "",
 	Gender: "",
 	Phone: "",
@@ -35,6 +36,7 @@ const blankStudent = () => ({
 	Address: "",
 	Notes: "",
 	StartDate: moment(),
+	AdmissionNumber: "",
 
 	fees: {
 		[v4()]: {
@@ -80,6 +82,44 @@ class SingleStudent extends Component {
 		const student = this.state.profile;
 
 		// verify 
+
+
+		if( 
+			this.state.profile.Name    === "" || this.state.profile.Phone      === "" || 
+			this.state.profile.Phone   === "" || this.state.profile.section_id === "" || 
+			this.state.profile.ManName === "" || this.state.profile.RollNumber === "" ||
+			this.state.profile.AdmissionNumber === "" ) 
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Please Fill Account Information"
+				}
+			})
+		}
+
+		if(Object.values(this.props.students).some(student => student.section_id === this.state.profile.section_id && student.id !== this.state.profile.id && student.RollNumber === this.state.profile.RollNumber ))
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Roll No Already Exists"
+				}
+			})
+		}
+
+		if(Object.values(this.props.students).some(student => student.id !== this.state.profile.id && student.AdmissionNumber === this.state.profile.AdmissionNumber))
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Admission Number Already Exists"
+				}
+			})
+		}
 
 		for(let fee of Object.values(this.state.profile.fees)) {
 			console.log('fees', fee)
@@ -202,10 +242,17 @@ class SingleStudent extends Component {
 
 				<div className="form">
 					<div className="divider">Personal Information</div>
+					
 					<div className="row">
 						<label>Full Name</label>
 						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
 					</div>
+
+					<div className="row">
+						<label>Roll No</label>
+						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" />
+					</div>
+					
 					<div className="row">
 						<label>B-Form Number</label>
 						<input type="number" {...this.former.super_handle(["BForm"])} placeholder="BForm" />
@@ -272,8 +319,13 @@ class SingleStudent extends Component {
 					</div>
 
 					<div className="row">
-						<label>Start Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
+						<label>Admission Date</label>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date"/>
+					</div>
+
+					<div className="row">
+						<label>Admission Number</label>
+						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" />
 					</div>
 
 					<div className="row">
