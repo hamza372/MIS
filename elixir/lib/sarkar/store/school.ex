@@ -26,6 +26,10 @@ defmodule Sarkar.Store.School do
 		GenServer.call(:school_db, {:load, school_id})
 	end
 
+	def get_writes(school_id, last_sync_date) do
+		GenServer.call(:school_db, {:get_writes, school_id, last_sync_date})
+	end
+
 	# modify this to return db + (last 50) writes writes map of path, value, data, type
 	def handle_call({:load, school_id}, _from, state) do
 		case Postgrex.query(
@@ -35,7 +39,7 @@ defmodule Sarkar.Store.School do
 				{:ok, resp} ->
 					[[db]] = resp.rows
 
-					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
+					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 1]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
 								|> Enum.map(fn([ [_ | p] = path, value, time, type]) -> {Enum.join(p, ","), %{
@@ -51,6 +55,24 @@ defmodule Sarkar.Store.School do
 					IO.inspect err
 					{:reply, {:error, err}, state}
 		end
+	end
+
+	def handle_call({:get_writes, school_id, last_sync_date}, _from, state) do
+		case Postgrex.query(
+			Sarkar.School.DB,
+			"SELECT path, value, time, type FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", [school_id, last_sync_date]) do
+				{:ok, writes_resp} ->
+					write_formatted = writes_resp.rows
+						|> Enum.map(fn([ [_ | p] = path, value, time, type]) -> {Enum.join(p, ","), %{
+							"path" => path, "value" => value, "date" => time, "type" => type
+						}} end)
+						|> Enum.reverse
+						|> Enum.into(%{})
+					
+					{:reply, {:ok, write_formatted}, state}
+
+				{:error, err} -> {:reply, {:error, err}, state}
+			end
 	end
 
 	def handle_cast({:save, school_id, db}, state) when db == %{} do

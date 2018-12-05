@@ -11,11 +11,7 @@ import Routes from './routes'
 import { saveDB, loadDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
-<<<<<<< HEAD
-const debug_host = 'wss://fb32146f.ngrok.io'
-=======
-const debug_host = 'wss://a187439b.ngrok.io'
->>>>>>> a62bf2e4ca07bdbe6a6161b11b0eb8a7225091cb
+const debug_host = 'wss://264fb1ea.ngrok.io'
 
 const host = process.env.REACT_APP_MIS_HOST || debug_host;
 const initialState = loadDB();

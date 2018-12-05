@@ -31,8 +31,33 @@ defmodule Sarkar.School do
 		# map of changes.
 		# key is path separated by comma
 		# value is { action: {path, value}, date}
-		# we need to keep a dictionary of path/date to decide if we should execute that write
-		# for now we'll just execute and last write wins.
+
+		have_all_in_memory? = writes 
+			|> Enum.any?(fn {path_string, %{"date" => path_date}} -> last_sync_date > path_date end)
+
+		writes = if not have_all_in_memory? do
+				case Sarkar.Store.School.get_writes(school_id, last_sync_date) do
+					{:ok, aug_writes} -> 
+						IO.puts "SUCCESSFUL DB RECOVERY"
+						aug_writes
+					{:error, err} -> 
+						IO.puts "ERROR ON DB RECOVERY"
+						IO.inspect err
+						writes
+				end
+		else
+			writes
+		end
+		
+		# case Sarkar.Store.School.get_writes(school_id, last_sync_date) do
+		# 	{:ok, writes} ->
+
+		# 	{:error, err} 
+		# 		IO.inspect err
+		# 		mem_writes
+		# 			|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
+		# 			|> Enum.into(%{})
+		# end
 
 		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
@@ -81,15 +106,9 @@ defmodule Sarkar.School do
 		# each client has sent its "last received data" date. when it connects, we should send all the latest writes that have happened since then, not the full db.
 		# get that data for it here.
 
-		relevant = nextWrites # this doesnt know if I JUST overwrote it. if i use nextWrites which has the overwrite values, it will include the writes i just made...
-			|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
-			|> Enum.into(%{})
-
-		# if map_size(relevant) > 0 do
-		# 	IO.puts "RELEVANT for client #{client_id}"
-		# 	IO.inspect last_sync_date
-		# 	IO.inspect Enum.map(relevant, fn {k, v} -> k end)
-		# end
+		relevant = nextWrites 
+					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
+					|> Enum.into(%{})
 
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
