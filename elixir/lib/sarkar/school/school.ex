@@ -49,16 +49,6 @@ defmodule Sarkar.School do
 			writes
 		end
 		
-		# case Sarkar.Store.School.get_writes(school_id, last_sync_date) do
-		# 	{:ok, writes} ->
-
-		# 	{:error, err} 
-		# 		IO.inspect err
-		# 		mem_writes
-		# 			|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
-		# 			|> Enum.into(%{})
-		# end
-
 		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
 			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
