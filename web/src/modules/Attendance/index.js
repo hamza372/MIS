@@ -73,7 +73,7 @@ class Attendance extends Component {
 		const all_selected = Object.values(this.state.selected_students).every(x => x);
 
 		if(all_selected) {
-		// set all to false
+			// set all to false
 			this.setState({
 				selected_students: Object.keys(this.state.selected_students).reduce((agg, curr) => ({...agg, [curr]: false}), {})
 			})
@@ -158,7 +158,7 @@ class Attendance extends Component {
 								<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
 								<div className="status">
 									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
-									<div className={`button ${status === "ABSENT" ? "orange" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
+									<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
 									<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
 								</div>
 							</div>
