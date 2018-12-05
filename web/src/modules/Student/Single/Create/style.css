@@ -11,6 +11,15 @@
 	justify-content: space-between;
 }
 
+.single-student .click-label {
+	color: #aaa;
+	text-align: right;
+	cursor: pointer;
+}
+	.click-label:hover {
+		color: #fc6171;
+	}
+
 @media only screen and (min-width: 768px) {
 	.save-delete .button {
 		margin-left: 0;

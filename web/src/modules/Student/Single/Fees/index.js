@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
 
@@ -8,7 +9,9 @@ import former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
 import { addPayment } from 'actions'
+import { sendSMS } from 'actions/core'
 import checkStudentDues from 'utils/checkStudentDues'
+import { smsIntentLink } from 'utils/intent'
 
 import './style.css'
 
@@ -33,8 +36,11 @@ class StudentFees extends Component {
 			payment: {
 				active: false,
 				amount: "",
-				type: "SUBMITTED" // submitted or owed
-			}
+				type: "SUBMITTED", // submitted or owed
+				sendSMS: false
+			},
+			month: "",
+			year: ""
 		}
 
 		this.Former = new former(this, []);
@@ -76,14 +82,76 @@ class StudentFees extends Component {
 				active: false
 			}
 		})
-	}
 
+		const balance = Object.entries(this.student().payments) 
+					.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+
+		if(this.state.payment.sendSMS) {
+			// send SMS with replace text for regex etc.
+			const message = this.props.feeSMSTemplate
+					.replace(/\$BALANCE/g, balance)
+					.replace(/\$AMOUNT/g, payment.amount)
+					.replace(/\$NAME/g, this.student().Name)
+
+			
+			if(this.props.connected) {
+				this.props.sendSMS(message, this.student().Phone)
+			}
+			else {
+				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
+
+				//this.props.history.push(url);
+				window.location.href = url;
+			}
+
+		}
+
+	}
+	getFilterCondition = (payment) =>
+	{
+		//when both are empty
+		if(this.state.month === "" && this.state.year === "") {
+			return true
+		}
+		//when month is empty	
+		if(this.state.month === "" && this.state.year !== ""){
+			return  moment(payment.date).format("YYYY") === this.state.year;
+
+		}
+		//when year is empty
+		if(this.state.month !== "" && this.state.year === ""){
+			return moment(payment.date).format("MMMM") === this.state.month
+
+		}
+		//when both are not empty
+		if(this.state.month !== "" && this.state.year !== "")
+		{
+			return moment(payment.date).format("MMMM") === this.state.month && moment(payment.date).format("YYYY") === this.state.year;
+		}
+	} 
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		checkStudentDues(this.student(), this.props.addPayment);
 	}
 
 	render() {
+
+		const Months =  [...new Set(
+			Object.entries(this.student().payments || {})
+				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
+				.map(([id, payment]) => moment(payment.date).format("MMMM"))
+			)]
+			
+		const Years = [...new Set(
+			Object.entries(this.student().payments)
+				.sort(([,a_payment],[,b_payment]) => a_payment.date - b_payment.date)
+				.map(([id,payment]) => moment(payment.date).format("YYYY"))
+			)]
+			
+		const filteredPayments = Object.entries(this.student().payments || {})
+				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
+				.filter(([id,payment]) => this.getFilterCondition(payment))
+
 		return <div className="student-fees">
 
 			<PrintHeader settings={this.props.settings}/>
@@ -100,35 +168,34 @@ class StudentFees extends Component {
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
 			</div>
-
 			<div className="divider">Ledger</div>
-			<div className="student-name"><b>Student Name:</b> {this.student().Name}</div>
-			<div className="payment-history section">
-				<div className="table row heading">
-					<label><b>Date</b></label>
-					<label><b>Label</b></label>
-					<label><b>Amount</b></label>
-				</div>
-			{
-				Object.entries(this.student().payments || {})
-					.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-					.map(([id, payment]) => {
-						return <div className="payment" key={id}>
-							<div className="table row">
-								<div>{moment(payment.date).format("MM/DD")}</div>
-								<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-								<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
-							</div>
-						</div>})
-			}
-				<div className="table row last">
-					<label><b>Amount Owed:</b></label>
-					<div><b>{
-						Object.values(this.student().payments || {})
-							.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-						}</b></div>
-				</div>
+
+					
+			
+			<div className="filter row no-print"  style={{marginBottom:"10px"}}>
+				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
+				
+				<option value="">Select Month</option>
+				{
+					Months.map(Month => {
+						return <option key={Month} value={Month}>{Month}</option>	
+					})
+				}
+				</select>
+				
+				<select className="" {...this.Former.super_handle(["year"])}>
+				
+				<option value="">Select Year</option>
+				{ 
+					Years.map(year => {
+						return <option key={year} value={year}> {year} </option>
+					})
+				}
+				</select>
 			</div>
+
+			<div className="student-name print-only" style={{ textAlign: "left", fontWeight: "normal" }}><b>Student Name:</b> {this.student().Name}</div>
+			<PaymentTable payments={filteredPayments} />
 
 			<div className="form">
 				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
@@ -145,6 +212,13 @@ class StudentFees extends Component {
 							<option value="FORGIVEN">Need Scholarship</option>
 						</select>
 					</div>
+					<div className="table row">
+						<label>Send SMS</label>
+						<select {...this.Former.super_handle(["payment", "sendSMS"])}>
+							<option value={false}>No SMS Notification</option>
+							<option value={true}>Send SMS Notification</option>
+						</select>
+					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> : false }
 				<div className="print button" onClick={() => window.print()}>Print</div>
@@ -154,9 +228,42 @@ class StudentFees extends Component {
 	}
 }
 
+const PaymentTable = ({ payments }) => {
+
+	return <div className="payment-history section">
+		<div className="table row heading">
+			<label><b>Date</b></label>
+			<label><b>Label</b></label>
+			<label><b>Amount</b></label>
+		</div>
+	{
+		
+			payments.map(([id, payment]) => {
+				return <div className="payment" key={id}>
+					<div className="table row">
+						<div>{moment(payment.date).format("DD/MM")}</div>
+						<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
+						<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
+					</div>
+				</div>})
+	}
+		<div className="table row last">
+			<label><b>Amount Owed:</b></label>
+			<div><b>{
+				payments
+					.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+				}</b></div>
+		</div>
+	</div>
+
+}
+
 export default connect(state => ({
 	students: state.db.students,
-	settings: state.db.settings
+	connected: state.connected,
+	settings: state.db.settings,
+	feeSMSTemplate: (state.db.sms_templates || {}).fee || ""
 }), dispatch => ({
-	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name))
-}))(StudentFees)
+	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
+	sendSMS: (text, number) => dispatch(sendSMS(text, number))
+}))(withRouter(StudentFees))

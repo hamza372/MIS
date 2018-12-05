@@ -4,6 +4,8 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+
 import { createStudentMerge, deleteStudent } from 'actions'
 
 import Banner from 'components/Banner'
@@ -21,6 +23,7 @@ import './style.css'
 const blankStudent = () => ({
 	id: v4(),
 	Name: "",
+	RollNumber: "",
 	BForm: "",
 	Gender: "",
 	Phone: "",
@@ -33,6 +36,7 @@ const blankStudent = () => ({
 	Address: "",
 	Notes: "",
 	StartDate: moment(),
+	AdmissionNumber: "",
 
 	fees: {
 		[v4()]: {
@@ -78,6 +82,44 @@ class SingleStudent extends Component {
 		const student = this.state.profile;
 
 		// verify 
+
+
+		if( 
+			this.state.profile.Name    === "" || this.state.profile.Phone      === "" || 
+			this.state.profile.Phone   === "" || this.state.profile.section_id === "" || 
+			this.state.profile.ManName === "" || this.state.profile.RollNumber === "" ||
+			this.state.profile.AdmissionNumber === "" ) 
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Please Fill Account Information"
+				}
+			})
+		}
+
+		if(Object.values(this.props.students).some(student => student.section_id === this.state.profile.section_id && student.id !== this.state.profile.id && student.RollNumber === this.state.profile.RollNumber ))
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Roll No Already Exists"
+				}
+			})
+		}
+
+		if(Object.values(this.props.students).some(student => student.id !== this.state.profile.id && student.AdmissionNumber === this.state.profile.AdmissionNumber))
+		{
+			return this.setState({
+				banner: {
+					visible : true,
+					good: false,
+					text: "Admission Number Already Exists"
+				}
+			})
+		}
 
 		for(let fee of Object.values(this.state.profile.fees)) {
 			console.log('fees', fee)
@@ -200,10 +242,17 @@ class SingleStudent extends Component {
 
 				<div className="form">
 					<div className="divider">Personal Information</div>
+					
 					<div className="row">
 						<label>Full Name</label>
 						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
 					</div>
+
+					<div className="row">
+						<label>Roll No</label>
+						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" />
+					</div>
+					
 					<div className="row">
 						<label>B-Form Number</label>
 						<input type="number" {...this.former.super_handle(["BForm"])} placeholder="BForm" />
@@ -251,14 +300,11 @@ class SingleStudent extends Component {
 						<label>Class Section</label>
 						<select {...this.former.super_handle(["section_id"])}>
 							{
-								 [{id: '', name: 'Please Select a Section'}, ...Object.values(this.props.classes) // collapse into label class - section name. value is section id
-								 	.reduce((agg, c) => {
-										 return [...agg, ...Object.entries(c.sections)
-										 	.reduce((agg2, [id, section]) => { 
-												return [...agg2, { id, name:`${c.name}-${section.name}` }]
-											 }, [])]
-									 }, [])]
-									.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+								 [
+									<option key="" value="">Please Select a Section</option>,
+									 ...getSectionsFromClasses(this.props.classes)
+										 .map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+								]
 							}
 						</select>
 					</div>
@@ -273,8 +319,13 @@ class SingleStudent extends Component {
 					</div>
 
 					<div className="row">
-						<label>Start Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Start Date"/>
+						<label>Admission Date</label>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date"/>
+					</div>
+
+					<div className="row">
+						<label>Admission Number</label>
+						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" />
 					</div>
 
 					<div className="row">
@@ -286,6 +337,7 @@ class SingleStudent extends Component {
 					{
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
+								<div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>
 								<div className="row">
 									<label>Type</label>
 									<select {...this.former.super_handle(["fees", id, "type"])}>
@@ -310,13 +362,12 @@ class SingleStudent extends Component {
 										<option value="MONTHLY">Every Month</option>
 									</select>
 								</div>
-								<div className="button orange" onClick={this.removeFee(id)}>Remove Fee</div>
 							</div>
 						})
 					}
 					<div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
 					<div className="save-delete">
-						<div className="button orange" onClick={this.onDelete}>Delete</div>
+						<div className="button red" onClick={this.onDelete}>Delete</div>
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
 				</div>

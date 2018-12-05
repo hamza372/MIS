@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import './style.css'
 
-const Layout = ({ user, settings, children }) => {
+const Layout = ({ user, children }) => {
 	return <div className="layout">
 		<Header user={user} />
 		{ children }
@@ -13,7 +13,7 @@ const Layout = ({ user, settings, children }) => {
 
 const Header = ({user}) => <div className="header">
 	<div className="left"><Link to="/">MIS</Link></div>
-	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>Profile</Link> : false }
+	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
 
 export const PrintHeader = ({settings}) => <div className="print-only school-header">
@@ -25,5 +25,14 @@ export const PrintHeader = ({settings}) => <div className="print-only school-hea
 export default connect(state => ({ 
 	user: Object.values(state.db.faculty)
 		.find(x => x.Name === state.auth.name),
-	settings: state.db.settings
 }))(Layout)
+
+const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div className="layout">
+	<Header user={user} />
+	<WrappedComponent {...props} />
+</div>
+
+export const LayoutWrap = WrappedComponent => connect(state => ({
+	user: Object.values(state.db.faculty)
+		.find(x => x.name === state.auth.name),
+}))(SpecialLayoutWrap(WrappedComponent))

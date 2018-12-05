@@ -15,6 +15,7 @@ def ok():
 def school(school_id):
 
 	school = schools[school_id]
+	print("hello")
 
 	return json.dumps({"id": school_id, **school}), 200, {"content-type": "application/json", "Access-Control-Allow-Origin": "*"}
 

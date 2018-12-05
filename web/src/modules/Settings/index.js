@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { createTemplateMerges } from 'actions'
 import { mergeSettings } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
@@ -11,18 +12,69 @@ const defaultSettings = {
 	schoolAddress: "",
 	schoolPhoneNumber: "",
 }
-class Settings extends Component {
+
+const defaultTemplates = () => ({
+	attendance: "ہے $Status اسکول میں $Name",
+	fee: "ہے۔ $BALANCE کی ادائگی کردی ہے۔ جبکہ آپ کا بقایا حساب $AMOUNT نے $NAME",
+	result: "\n$REPORT کے امتحان کا نتیجہ آگیا ہے $NAME"
+})
+
+class Settings extends Component {$Name
 
 	constructor(props){ 
 		super(props);
 		this.state = {
-			settings: props.settings || defaultSettings
+			templates: Object.keys(props.sms_templates).length === 0 ? defaultTemplates() : this.props.sms_templates,
+			settings: props.settings || defaultSettings,
+			templateMenu: false
 		}
-		this.former = new Former(this, ["settings"])
+
+		this.former = new Former(this, [])
+	}
+
+	changeSMStemplates = () => {
+		return <div>
+			<div className="divider">Attendance Template</div>
+			<div className="section">
+				<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+				<div className="row"><div>Use <code>$STATUS</code> to insert the attendance status.</div></div>
+				<div className="row">
+					<textarea {...this.former.super_handle(["templates", "attendance"])} placeholder="Enter SMS template here" />
+				</div>
+			</div>
+
+			<div className="divider">Fees Template</div>
+			<div className="section">
+				<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+				<div className="row"><div>Use <code>$AMOUNT</code> to insert the fee amount.</div></div>
+				<div className="row"><div>Use <code>$BALANCE</code> to insert the total fee balance.</div></div>
+				<div className="row">
+					<label>SMS Template</label>
+					<textarea {...this.former.super_handle(["templates", "fee"])} placeholder="Enter SMS template here" />
+				</div>
+			</div>
+
+			<div className="divider">Results Template</div>
+			<div className="section">
+				<div className="row">
+					<div>Use <code>$NAME</code> to insert the child's name.</div>
+				</div>index.
+				<div className="row">
+					<div>Use <code>$REPORT</code> to send report line by line.</div>
+				</div>
+				<div className="row">
+					<label>SMS Template</label>
+					<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
+				</div>
+
+			</div>
+		</div>
 	}
 
 	onSave = () => {
-		this.props.saveSettings(this.state.settings)
+		this.props.saveSettings(this.state.settings);
+		this.props.saveTemplates(this.state.templates);
+		this.setState({templateMenu: false});
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -35,40 +87,52 @@ class Settings extends Component {
 
 	render() {
 		return <Layout>
-			<div className="settings">
+			<div className="settings" style={{ width: "100%" }}>
 				<div className="title">Settings</div>
 
-				<div className="form">
+				<div className="form" style={{width: "90%"}}>
 					<div className="row">
 						<label>School Name</label>
-						<input type="text" {...this.former.super_handle(["schoolName"])} placeholder="School Name" />
+						<input type="text" {...this.former.super_handle(["settings", "schoolName"])} placeholder="School Name" />
 					</div>
 
 					<div className="row">
 						<label>School Address</label>
-						<input type="text" {...this.former.super_handle(["schoolAddress"])} placeholder="School Address" />
+						<input type="text" {...this.former.super_handle(["settings", "schoolAddress"])} placeholder="School Address" />
 					</div>
 
 					<div className="row">
 						<label>School Phone Number</label>
-						<input type="text" {...this.former.super_handle(["schoolPhoneNumber"])} placeholder="School Phone Number" />
+						<input type="text" {...this.former.super_handle(["settings", "schoolPhoneNumber"])} placeholder="School Phone Number" />
 					</div>
 
 					<div className="row">
 						<label>Data Sharing</label>
-						<select {...this.former.super_handle(["shareData"])}>
+						<select {...this.former.super_handle(["settings", "shareData"])}>
 							<option value={true}>Yes, share anonymous data with CERP</option>
 							<option value={false}>No, don't share data</option>
 						</select>
 					</div>
 
+					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
+						Change SMS Templates
+					</div>
+					{
+						this.state.templateMenu ? this.changeSMStemplates() : false
+					}				
+					</div>
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
-			</div>
 		</Layout>
 	}
 }
 
-export default connect(state => ({ settings: state.db.settings }), dispatch => ({
-	saveSettings: settings => dispatch(mergeSettings(settings))
+export default connect(
+	state => ({ 
+		settings: state.db.settings, 
+		sms_templates: state.db.sms_templates 
+	}), 
+	dispatch => ({
+		saveTemplates: templates => dispatch(createTemplateMerges(templates)),
+		saveSettings: settings => dispatch(mergeSettings(settings))
 }))(Settings);

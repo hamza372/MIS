@@ -12,7 +12,7 @@ class StudentAttendance extends Component {
 
 		const attendance = student.attendance || {};
 
-		console.log(attendance)
+		console.log(attendance);
 
 		const { PRESENT: num_present, ABSENT: num_absent, LEAVE: num_leave } = Object.values(attendance).reduce((agg, curr) => {
 			agg[curr.status] += 1;

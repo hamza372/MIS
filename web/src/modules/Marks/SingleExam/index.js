@@ -18,7 +18,7 @@ const blankExam = () => ({
 	total_score: "",
 	date: new Date().getTime(),
 	student_marks: {
-
+		
 	}
 })
 
@@ -55,8 +55,10 @@ class SingleExam extends Component {
 		return Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id())
 			.reduce((agg, [id, student]) => {
-
-				const exam = student.exams[exam_id]
+				if(student.exams === undefined) {
+					return agg;
+				}
+				const exam = student.exams[exam_id]   
 				return {
 					...agg,
 					[id]: exam ? exam.score : ""
@@ -70,13 +72,36 @@ class SingleExam extends Component {
 
 	onSave = () => {
 		console.log("=====================save to exams======================")
-
+		
 		if(isNaN(parseFloat(this.state.exam.total_score))) {
 			return this.setState({
 				banner: {
 					active: true,
 					good: false,
 					text: "Total Score is not set to a Number"
+				}
+			})
+		}
+
+		if(this.state.exam.name === ""){
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Please select an exam type"
+				}
+			})
+		}
+		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
+			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
+
+		if(hasScoreAboveLimit)
+		{
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Marks cannot exceed the max score"
 				}
 			})
 		}
@@ -119,7 +144,6 @@ class SingleExam extends Component {
 			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}/exam/${this.state.exam.id}`} />
 		}
 		*/
-
 		return <Layout>
 			<div className="single-exam">
 				{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -128,8 +152,16 @@ class SingleExam extends Component {
 				<div className="form">
 					<div className="row">
 						<label>Exam Name</label>
-						<input type="text" {...this.former.super_handle(["name"])} placeholder="Exam Name" />
+						<select {...this.former.super_handle(["name"])}>
+							<option value="">Select Exam</option>
+							<option value="Test">Test</option>
+							<option value="1st Term">1st Term</option>
+							<option value="2nd Term">2nd Term</option>
+							<option value="Mid-Term">Mid-Term</option>
+							<option value="Final-Term">Final-Term</option>
+						</select>
 					</div>
+
 					<div className="row">
 						<label>Subject</label>
 						<datalist id="subjects">
@@ -159,7 +191,11 @@ class SingleExam extends Component {
 								.map(([id, student]) => (
 									<div className="student row" key={id}>
 										<label><Link to={`/student/${id}/profile`}>{student.Name}</Link></label>
-										<input type="number" {...this.former.super_handle(["student_marks", id])} placeholder={`Score out of ${this.state.exam.total_score}`} />
+										<input 
+											type="number" 
+											{...this.former.super_handle(["student_marks", id])} 
+											placeholder={`Score out of ${this.state.exam.total_score}`} 
+											/>
 									</div>
 								))
 						}
