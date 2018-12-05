@@ -22,9 +22,12 @@
 	margin: 12px;
 	min-height: 100px;
 	width: 100px;
-	align-items: center;
+	align-items: flex-end;
 	justify-content: center;
 	border-radius: 20px;
+	background-size: 60%;
+	background-position: 50% 35%;
+	background-repeat: no-repeat;
 }
 
 .landing .row {
