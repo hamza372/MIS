@@ -138,9 +138,9 @@ class SMS extends Component {
 							<select onChange={this.sendMessageFilter}>
 									<option value="" >Select</option>
 									<option value="to_single_student">Single Student</option>
-									<option value="to_single_class">Class</option>
-									<option value="to_all_students">All Students</option>
+									<option value="to_single_class">Single Class</option>
 									<option value="to_single_teacher">Single Teacher</option>
+									<option value="to_all_students">All Students</option>
 									<option value="to_all_teachers">All Teachers</option>
 									<option value="to_fee_defaulters">Fee Defaulters</option>
 							</select>

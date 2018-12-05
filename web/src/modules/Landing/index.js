@@ -8,7 +8,7 @@ import Layout from 'components/Layout'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
-import feesIcon from './icons/attendance/checklist_1.svg'          //no-icon
+import feesIcon from './icons/fees/accounting.svg'          //no-icon
 import marksIcon from './icons/Marks/exam.svg'                     //
 import analyticsIcon from './icons/Analytics/increasing-stocks-graphic-of-bars.svg'   //
 import resultIcon from './icons/result_card/exam-a-plus.svg'
@@ -17,11 +17,11 @@ import teachersIcon from './icons/Teacher/teacher_1.svg'          //
 import studentsIcon from './icons/Student/student_profile_1.svg'  //
 import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
-import switchUserIcon from './icons/attendance/checklist_1.svg'    //no-icon
-
-
+import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 
 import './style.css'
+
+const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class Landing extends Component {
 
@@ -104,9 +104,9 @@ class Landing extends Component {
 				<div className="horizontal-scroll-container">
 
 					<div className="page">
-						<div className="title">Management</div>
+						<div className="title">Setup</div>
 						<div className="row">
-							<Link to="/teacher" className="button green-shadow" style={{backgroundImage: `url(${teachersIcon})` }}>Teachers</Link>
+							<Link to="/teacher" className="button green-shadow" style={{backgroundImage: `url(${teachersIcon})`}}>Teachers</Link>
 							<Link to="/student" className="button blue-shadow" style={{backgroundImage: `url(${studentsIcon})` }}>Students</Link>
 						</div>
 						
@@ -115,7 +115,7 @@ class Landing extends Component {
 							<Link to="/settings" className="button red-shadow" style={{backgroundImage: `url(${settingsIcon})` }}>Settings</Link>
 						</div>
 						<div className="row">
-							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Switch User</div>
+							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 					</div>
 
@@ -179,7 +179,7 @@ class Landing extends Component {
 						<div className="divider">Fee Collection</div>
 						<div className="row">
 							<div className="box bg-blue">
-								<div>{today_payment}</div>
+								<div>{numberWithCommas(today_payment)}</div>
 								<div>Rupees</div>
 							</div>
 

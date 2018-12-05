@@ -9,7 +9,7 @@ import qs from 'query-string'
 
 
 const ClassItem = (C) => 
-	<Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} >
+	<Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} className="">
 		{C.name}
 	</Link>
 

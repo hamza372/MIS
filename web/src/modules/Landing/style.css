@@ -25,8 +25,8 @@
 	align-items: flex-end;
 	justify-content: center;
 	border-radius: 20px;
-	background-size: 60%;
-	background-position: 50% 35%;
+	background-size: 60% 60%;
+	background-position: 50% 20%;
 	background-repeat: no-repeat;
 }
 
@@ -44,6 +44,9 @@
 
 	.landing .divider {
 		font-size: 1.5rem;
+	}
+
+	.landing .title {
 	}
 
 .landing .box {
