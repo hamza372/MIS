@@ -10,9 +10,15 @@ const rootReducer = (state, action) => {
 		{
 			const nextState = action.merges.reduce((agg, curr) => {
 				return Dynamic.put(agg, curr.path, curr.value)
-			}, state);
+			}, JSON.parse(JSON.stringify(state)))
 
-			return JSON.parse(JSON.stringify(nextState));
+			// we shouldn't accept snapshots until we get a confirm....
+			// 
+
+			return {
+				...nextState,
+				acceptSnapshot: false
+			};
 		}
 
 		case DELETES: 
@@ -21,14 +27,17 @@ const rootReducer = (state, action) => {
 			const nextState = action.paths.reduce((agg, curr) => {
 				console.log(curr.path)
 				return Dynamic.delete(agg, curr.path)
-			}, state);
+			}, JSON.parse(JSON.stringify(state)));
 
 			console.log(nextState)
 
-			//return JSON.parse(JSON.stringify(nextState))
-			return JSON.parse(JSON.stringify(state))
+			return {
+				...nextState,
+				acceptSnapshot: false
+			}
 		}
 		
+		// don't need this anymore i think
 		case DELETE:
 		{
 			return {...Dynamic.delete(state, action.path)}

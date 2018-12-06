@@ -81,7 +81,12 @@ export const saveDB = (db) => {
 		console.error(err)
 	}
 
-	saveDbToFilesystem(db);
+	try {
+		saveDbToFilesystem(db);
+	}
+	catch(e) {
+		console.error(e)
+	}
 
 }
 

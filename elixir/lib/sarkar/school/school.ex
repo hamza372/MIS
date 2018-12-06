@@ -48,6 +48,13 @@ defmodule Sarkar.School do
 		else
 			writes
 		end
+
+		human_client = case client_id do
+			"1918cdd5-e734-467c-bdca-f4b932580583" -> "Pixel 2XL"
+			"edef4d0e-9f79-4bb7-a525-6e47f46f26c4" -> "Chrome laptop"
+			"e8227de3-f729-4638-b234-f238ddaef39a" -> "Tablet"
+			other -> "other client"
+		end
 		
 		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
@@ -65,6 +72,9 @@ defmodule Sarkar.School do
 						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
 							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+							IO.puts "rejected #{human_client} change"
+							IO.puts "#{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+							# IO.inspect write
 							{agg_db, agg_writes, agg_new_writes, max_date}
 						other -> 
 							IO.puts "OTHER!!!!!!!!!!!!!"

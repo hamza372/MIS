@@ -51,9 +51,11 @@ class Login extends Component {
 					<div className="row">
 						<label>Teacher Name</label>
 						<select {...this.former.super_handle(["name"])}>
-						{
-							Object.values(this.props.users).map(u => <option key={u.username} value={u.name}>{u.name}</option>)
-						}
+							<option key="blah" value="" disabled>Select User</option>
+							{
+								Object.entries(this.props.users)
+									.map(([uid, u]) => <option key={uid} value={u.name}>{u.name}</option>)
+							}
 						</select>
 					</div>
 					<div className="row">

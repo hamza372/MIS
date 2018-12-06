@@ -18,7 +18,6 @@ defmodule Sarkar.Store.School do
 
 	def save(school_id, db, writes) do
 		GenServer.cast(:school_db, {:save, school_id, db})
-		IO.puts "saving writes"
 		GenServer.cast(:school_db, {:save_writes, school_id, writes})
 	end
 
@@ -39,7 +38,7 @@ defmodule Sarkar.Store.School do
 				{:ok, resp} ->
 					[[db]] = resp.rows
 
-					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 1]) do
+					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
 								|> Enum.map(fn([ [_ | p] = path, value, time, type]) -> {Enum.join(p, ","), %{
@@ -100,13 +99,9 @@ defmodule Sarkar.Store.School do
 				x = (i - 1) * 5 + 1
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4})" end)
 
-		IO.inspect gen_value_strings
-
 		flattened_writes = Map.values(writes)
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type} -> [school_id, path, value, date, type] end)
 			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
-
-		IO.inspect flattened_writes
 
 		case Postgrex.query(
 			Sarkar.School.DB,
