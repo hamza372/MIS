@@ -159,6 +159,10 @@ class SingleClass extends Component {
 						<option value={"Class 6"} />
 						<option value={"Class 7"} />
 						<option value={"Class 8"} />
+						<option value={"Class 9"} />
+						<option value={"Class 10"} />
+						<option value={"O Level"} />
+						<option value={"A Level"} />
 					</datalist>
 					<input list="class-name" {...this.former.super_handle(["name"])} placeholder="Name" />
 				</div>

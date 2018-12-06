@@ -14,7 +14,7 @@ const defaultSettings = {
 }
 
 const defaultTemplates = () => ({
-	attendance: "ہے $Status اسکول میں $Name",
+	attendance: "ہے $STATUS اسکول میں $Name",
 	fee: "ہے۔ $BALANCE کی ادائگی کردی ہے۔ جبکہ آپ کا بقایا حساب $AMOUNT نے $NAME",
 	result: "\n$REPORT کے امتحان کا نتیجہ آگیا ہے $NAME"
 })

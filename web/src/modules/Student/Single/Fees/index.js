@@ -238,7 +238,8 @@ const PaymentTable = ({ payments }) => {
 		</div>
 	{
 		
-			payments.map(([id, payment]) => {
+			payments
+			.map(([id, payment]) => {
 				return <div className="payment" key={id}>
 					<div className="table row">
 						<div>{moment(payment.date).format("DD/MM")}</div>

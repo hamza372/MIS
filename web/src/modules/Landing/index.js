@@ -6,7 +6,22 @@ import moment from 'moment'
 import { createLogout } from 'actions'
 import Layout from 'components/Layout'
 
+import attendanceIcon from './icons/attendance/checklist_1.svg'            //
+import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
+import feesIcon from './icons/fees/accounting.svg'          //no-icon
+import marksIcon from './icons/Marks/exam.svg'                     //
+import analyticsIcon from './icons/Analytics/increasing-stocks-graphic-of-bars.svg'   //
+import resultIcon from './icons/result_card/exam-a-plus.svg'
+import smsIcon from './icons/SMS/sms_1.svg'                       //
+import teachersIcon from './icons/Teacher/teacher_1.svg'          //
+import studentsIcon from './icons/Student/student_profile_1.svg'  //
+import classesIcon from './icons/Classes/classes_1.svg'           //
+import settingsIcon from './icons/Settings/settings-gears.svg'    //
+import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
+
 import './style.css'
+
+const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class Landing extends Component {
 
@@ -84,43 +99,42 @@ class Landing extends Component {
 			}
 		}
 
-
 		return <Layout>
 			<div className="landing">
 				<div className="horizontal-scroll-container">
 
 					<div className="page">
-						<div className="title">Management</div>
+						<div className="title">Setup</div>
 						<div className="row">
-							<Link to="/teacher" className="button green-shadow">Teachers</Link>
-							<Link to="/student" className="button blue-shadow">Students</Link>
+							<Link to="/teacher" className="button green-shadow" style={{backgroundImage: `url(${teachersIcon})`}}>Teachers</Link>
+							<Link to="/student" className="button blue-shadow" style={{backgroundImage: `url(${studentsIcon})` }}>Students</Link>
 						</div>
 						
 						<div className="row">
-							<Link to="/class" className="button purple-shadow">Classes</Link>
-							<Link to="/settings" className="button red-shadow">Settings</Link>
+							<Link to="/class" className="button purple-shadow" style={{backgroundImage: `url(${classesIcon})` }}>Classes</Link>
+							<Link to="/settings" className="button red-shadow" style={{backgroundImage: `url(${settingsIcon})` }}>Settings</Link>
 						</div>
 						<div className="row">
-							<div className="button yellow-shadow" onClick={logout}>Switch User</div>
+							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 					</div>
 
 					<div className="page">
 						<div className="title">Actions</div>
 						<div className="row">
-							<Link to="/attendance" className="button green-shadow">Attendance</Link>
-							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow">Teacher Attendance</Link> : false }
+							<Link to="/attendance" className="button green-shadow" style={{backgroundImage: `url(${attendanceIcon})` }}>Attendance</Link>
+							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow" style={{backgroundImage: `url(${teacherAttendanceIcon})` }}>Teacher Attendance</Link> : false }
 						</div>
 						<div className="row">
-							<Link to="/student?forwardTo=payment" className="button blue-shadow">Fees</Link>
-							<Link to="/reports" className="button yellow-shadow">Marks</Link>
+							<Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link>
+							<Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link>
 						</div>
 						<div className="row">
-							<Link to="/analytics/fees" className="button purple-shadow">Analytics</Link>
-							<Link to="/reports-menu" className="button green-shadow">Result Card</Link>
+							<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
+							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
 						</div>
 						<div className="row">
-							<Link to="/sms" className="button red-shadow">SMS</Link>
+							<Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link>
 						</div>
 					</div>
 
@@ -165,7 +179,7 @@ class Landing extends Component {
 						<div className="divider">Fee Collection</div>
 						<div className="row">
 							<div className="box bg-blue">
-								<div>{today_payment}</div>
+								<div>{numberWithCommas(today_payment)}</div>
 								<div>Rupees</div>
 							</div>
 
