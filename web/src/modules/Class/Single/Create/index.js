@@ -97,7 +97,7 @@ class SingleClass extends Component {
 			}
 		})
 
-		setTimeout(() => this.setState({redirect: this.id() === undefined, banner: { active : false} }), 3000);
+		setTimeout(() => this.setState({redirect: this.id() === undefined, banner: { active : false} }), 1500);
 	}
 
 	addSubject = () => {
@@ -168,7 +168,7 @@ class SingleClass extends Component {
 	render() {
 
 		if(this.state.redirect) {
-			return <Redirect to={`/class/${this.state.class.id}/profile`} />
+			return <Redirect to={`/class`} />
 		}
 		return <div className="single-class">
 		{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
