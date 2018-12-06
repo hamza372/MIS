@@ -106,8 +106,7 @@ defmodule Sarkar.School do
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
-				Sarkar.Store.School.save(school_id, nextDb, new_writes) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
-				Sarkar.Store.School.save(school_id, nextDb) #TODO: also store writes. Only keep latest writes per path in memory, but keep history on disk.
+				Sarkar.Store.School.save(school_id, nextDb, new_writes)
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
 				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
