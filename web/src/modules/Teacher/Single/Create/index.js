@@ -101,7 +101,6 @@ class CreateTeacher extends Component {
 				})
 
 				this.setState({
-					redirect: this.isFirst() ? "/login" : (this.isNew() ? `/faculty/${id}/profile` : false),
 					banner: {
 						active: true,
 						good: true,
@@ -110,8 +109,12 @@ class CreateTeacher extends Component {
 				})
 
 				setTimeout(() => {
-					this.setState({ banner: { active: false }})
-				}, 3000);
+					this.setState({ 
+						redirect: this.isFirst() ? "/login" : (this.isNew() ? `/teacher` : false),
+
+						banner: { active: false }
+					})
+				}, 1500);
 
 			})
 		}
@@ -127,7 +130,7 @@ class CreateTeacher extends Component {
 					good: true,
 					text: "Saved!"
 				},
-				redirect: this.isNew() ? `/faculty/${id}/profile` : false
+				redirect: this.isNew() ? `/teacher` : false
 			})
 
 			setTimeout(() => {
