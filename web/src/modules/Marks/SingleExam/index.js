@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+
 import { mergeExam } from 'actions'
 import Banner from 'components/Banner'
 import Layout from 'components/Layout'
@@ -73,25 +75,26 @@ class SingleExam extends Component {
 	onSave = () => {
 		console.log("=====================save to exams======================")
 		
-		if(isNaN(parseFloat(this.state.exam.total_score))) {
+
+		const compulsoryFileds = checkCompulsoryFields(this.state.exam, [
+			["name"],
+			["subject"],
+			["total_score"] 
+		]);
+		
+		if(compulsoryFileds){
+
+			const errorText = "Please Fill " + compulsoryFileds  + " !!!"
+
 			return this.setState({
 				banner: {
 					active: true,
 					good: false,
-					text: "Total Score is not set to a Number"
+					text: errorText,
 				}
 			})
 		}
 
-		if(this.state.exam.name === ""){
-			return this.setState({
-				banner:{
-					active: true,
-					good: false,
-					text: "Please select an exam type"
-				}
-			})
-		}
 		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
 			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
 

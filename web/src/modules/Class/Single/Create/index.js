@@ -4,10 +4,11 @@ import { v4 } from 'node-uuid'
 import { Link, Redirect } from 'react-router-dom'
 
 import Former from 'utils/former'
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+
 import Banner from 'components/Banner'
 
 import Dropdown from 'components/Dropdown'
-
 import { createEditClass, addStudentToSection, removeStudentFromSection } from 'actions'
 
 import './style.css'
@@ -23,7 +24,8 @@ const blankClass = () => ({
 	},
 	subjects: {
 		// these need to come from a central list of subjects...
-	}
+	},
+	new_subject: ""
 })
 
 class SingleClass extends Component {
@@ -32,13 +34,16 @@ class SingleClass extends Component {
 		super(props);
 
 		const id = props.match.params.id;
-		console.log(id)
 		const currClass = id === undefined ? blankClass() : this.props.classes[id]
 
 		this.state = {
 			class: currClass,
-			saveBanner: false,
-			redirect: false,
+			redirect : false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, ["class"])
@@ -65,18 +70,39 @@ class SingleClass extends Component {
 
 	onSave = () => {
 
-		// create an id
-		// will be overriden if its already in class
+		const compulsoryFields = checkCompulsoryFields(this.state.class, [
+			["name"] 
+		]);
+
+		if(compulsoryFields)
+		{
+			const errorText = "Please Fill " + compulsoryFields  + " !!!";
+
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: errorText
+				}
+			})
+		}
+
 		this.props.save(this.state.class);
 
 		this.setState({
-			saveBanner: true
+			banner:{
+				active: true,
+				good: true,
+				text: "Saved"
+			}
 		})
 
-		setTimeout(() => this.setState({ saveBanner: false, redirect: this.id() === undefined }), 3000);
+		setTimeout(() => this.setState({redirect: this.id() === undefined, banner: { active : false} }), 3000);
 	}
 
-	addSubject = (new_subject) => {
+	addSubject = () => {
+
+		const new_subject = this.state.class.new_subject;
 
 		if(new_subject.trim() === "") {
 			return;
@@ -89,6 +115,7 @@ class SingleClass extends Component {
 					...this.state.class.subjects,
 					[new_subject]: true
 				},
+				new_subject: ""
 			}
 		})
 	}
@@ -144,7 +171,7 @@ class SingleClass extends Component {
 			return <Redirect to={`/class/${this.state.class.id}/profile`} />
 		}
 		return <div className="single-class">
-		{ this.state.saveBanner ? <Banner isGood={true} text="Saved!" /> : false }
+		{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 			<div className="title">Edit Class</div>
 			<div className="form">
 				<div className="row">
@@ -181,13 +208,15 @@ class SingleClass extends Component {
 					</div>)
 				}
 
-				<div className="row">
-					<Dropdown
-						items={[...this.uniqueSubjects().keys()]}
-						toLabel={s => s} 
-						onSelect={this.addSubject} 
-						toKey={s => s} 
-						placeholder="Subject Name" />
+				<div className="subject row">
+					<input list="subjects" {...this.former.super_handle(["new_subject"])} placeholder="Type or Select Subject" />
+					<datalist id="subjects">
+					{
+						[...this.uniqueSubjects().keys()]
+						.map(subj => <option key={subj} value={subj} />)
+					}
+					</datalist>
+					<div className="button green" onClick={this.addSubject}>+</div>
 				</div>
 
 				{ Object.values(this.state.class.sections).length === 1 ? false : <div className="divider">Sections</div> }

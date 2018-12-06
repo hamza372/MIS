@@ -7,8 +7,10 @@ import { Redirect } from 'react-router-dom';
 import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
 
+
 import Banner from 'components/Banner'
 import Former from 'utils/former'
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
 import './style.css'
 
@@ -23,7 +25,7 @@ const blankTeacher = (isFirst = false) => ({
 	Password: "",
 	Married: false,
 	Phone: "",
-	Salary: 0,
+	Salary: "",
 	Active: true,
 
 	ManCNIC: "",
@@ -72,11 +74,19 @@ class CreateTeacher extends Component {
 
 		// check if they set a username and password. 
 
-		if(this.state.profile.Name === "" || this.state.profile.Password === "" || this.state.profile.Phone === "" || this.state.profile.Salary === "" ) {
+		const compulsoryFileds = checkCompulsoryFields(this.state.profile, [
+			["Name"], 
+			["Password"]
+		]);
+		
+		if(compulsoryFileds){
+
+			const errorText = "Please Fill " + compulsoryFileds  + " !!!"
+
 			return this.setState({
 				banner: {
 					active: true,
-					text: "Please Fill Account Information",
+					text: errorText,
 					good: false
 				}
 			})
