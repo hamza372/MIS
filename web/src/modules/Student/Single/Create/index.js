@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+
 
 import { createStudentMerge, deleteStudent } from 'actions'
 
@@ -83,18 +85,20 @@ class SingleStudent extends Component {
 
 		// verify 
 
+		const compulsoryFields = checkCompulsoryFields(this.state.profile, [
+			["Name"], 
+			["section_id"]
+		]);
 
-		if( 
-			this.state.profile.Name    === "" || this.state.profile.Phone      === "" || 
-			this.state.profile.Phone   === "" || this.state.profile.section_id === "" || 
-			this.state.profile.ManName === "" || this.state.profile.RollNumber === "" ||
-			this.state.profile.AdmissionNumber === "" ) 
+		if(compulsoryFields) 
 		{
-			return this.setState({
+			const errorText = "Please Fill " + compulsoryFields + " !!!"
+			
+				return this.setState({
 				banner: {
 					visible : true,
 					good: false,
-					text: "Please Fill Account Information"
+					text: errorText
 				}
 			})
 		}
