@@ -164,13 +164,13 @@ class SingleExam extends Component {
 
 					<div className="row">
 						<label>Subject</label>
-						<datalist id="subjects">
+						<select {...this.former.super_handle(["subject"])}>
+							<option value="" disabled>Please Select a Subject</option>
 						{
 							Object.keys(this.props.classes[this.class_id()].subjects)
 								.map(s => <option value={s} key={s}>{s}</option>)
 						}
-						</datalist>
-						<input list="subjects" {...this.former.super_handle(["subject"])} placeholder="Exam Subject" />
+						</select>
 					</div>
 
 					<div className="row">
@@ -179,7 +179,7 @@ class SingleExam extends Component {
 					</div>
 
 					<div className="row">
-						<label>Date</label>
+						<label>Date of Test</label>
 						<input type="date" onChange={this.former.handle(["date"])} value={moment(this.state.exam.date).format("YYYY-MM-DD")} placeholder="Exam Date" />
 					</div>
 
