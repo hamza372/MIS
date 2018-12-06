@@ -34,7 +34,6 @@ class SingleClass extends Component {
 		super(props);
 
 		const id = props.match.params.id;
-		console.log(id)
 		const currClass = id === undefined ? blankClass() : this.props.classes[id]
 
 		this.state = {
@@ -44,7 +43,8 @@ class SingleClass extends Component {
 				active: false,
 				good: true,
 				text: "Saved!"
-			}		}
+			}
+		}
 
 		this.former = new Former(this, ["class"])
 	}
@@ -70,21 +70,14 @@ class SingleClass extends Component {
 
 	onSave = () => {
 
-		// create an id
-		// will be overriden if its already in class
-		
-
 		const compulsoryFields = checkCompulsoryFields(this.state.class, [
 			["name"] 
 		]);
 
-		console.log("fields",compulsoryFields)
-
-
 		if(compulsoryFields)
 		{
 			const errorText = "Please Fill " + compulsoryFields  + " !!!";
-			console.log("inCheck",compulsoryFields)
+
 			return this.setState({
 				banner:{
 					active: true,
