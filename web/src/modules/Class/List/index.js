@@ -16,7 +16,7 @@ const ClassItem = (C) =>
 export const ClassListModule = ({ classes, forwardTo }) => {
 
 	const items = Object.values(classes)
-		.sort((a, b) => (b.classYear || 0) - (a.classYear || 0))
+		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		.map(c => ({...c, forwardTo}))
 	
 	return <div className="class-module">
