@@ -96,7 +96,7 @@ class SingleStudent extends Component {
 
 		if(compulsoryFields) 
 		{
-			const errorText = "Please Fill " + compulsoryFields + " !!!"
+			const errorText = "Please fill " + compulsoryFields.map(x => x[0] === "section_id" ? "Section ID" : x[0]).join(", ");
 			
 				return this.setState({
 				banner: {
