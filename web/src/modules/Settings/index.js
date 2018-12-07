@@ -11,6 +11,7 @@ const defaultSettings = {
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
+	sendSMSOption: "SIM" // API
 }
 
 const defaultTemplates = () => ({
@@ -107,6 +108,14 @@ class Settings extends Component {$Name
 					</div>
 
 					<div className="row">
+						<label>SMS Option</label>
+						<select {...this.former.super_handle(["settings", "sendSMSOption"])}>
+							<option value="">Select SMS Option</option>
+							<option value="SIM">Send SMS from Local SIM Card</option>
+							<option value="API" disabled>Send SMS from API</option>
+						</select>
+					</div>
+					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
 							<option value={true}>Yes, share anonymous data with CERP</option>
@@ -121,7 +130,7 @@ class Settings extends Component {$Name
 						this.state.templateMenu ? this.changeSMStemplates() : false
 					}				
 					</div>
-					<div className="button save" onClick={this.onSave}>Save</div>
+					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>
 		</Layout>
 	}

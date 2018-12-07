@@ -19,6 +19,7 @@ const blankExam = () => ({
 	subject: "",
 	total_score: "",
 	date: new Date().getTime(),
+	sendSMS: false,
 	student_marks: {
 		
 	}
@@ -73,18 +74,16 @@ class SingleExam extends Component {
 	class_id = () => this.props.match.params.class_id
 
 	onSave = () => {
-		console.log("=====================save to exams======================")
-		
 
-		const compulsoryFileds = checkCompulsoryFields(this.state.exam, [
+		const compulsoryFields = checkCompulsoryFields(this.state.exam, [
 			["name"],
 			["subject"],
 			["total_score"] 
 		]);
 		
-		if(compulsoryFileds){
+		if(compulsoryFields){
 
-			const errorText = "Please Fill " + compulsoryFileds  + " !!!"
+			const errorText = "Please Fill " + compulsoryFields  + " !!!"
 
 			return this.setState({
 				banner: {
@@ -98,16 +97,18 @@ class SingleExam extends Component {
 		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
 			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
 
-		if(hasScoreAboveLimit)
-		{
-			return this.setState({
-				banner:{
-					active: true,
-					good: false,
-					text: "Marks cannot exceed the max score"
-				}
-			})
-		}
+		/*
+			if(hasScoreAboveLimit)
+			{
+				return this.setState({
+					banner:{
+						active: true,
+						good: false,
+						text: "Marks cannot exceed the max score"
+					}
+				})
+			}
+		*/
 
 		this.props.saveExam(this.state.exam, this.class_id(), this.section_id());
 
@@ -127,6 +128,29 @@ class SingleExam extends Component {
 				}
 			})
 		}, 3000)
+
+
+		// send sms
+		/*
+		if(this.state.payment.sendSMS) {
+			// send SMS with replace text for regex etc.
+			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
+			const message = this.props.feeSMSTemplate
+					.replace(/\$BALANCE/g, balance)
+					.replace(/\$AMOUNT/g, payment.amount)
+					.replace(/\$NAME/g, this.student().Name)
+
+			
+			if(this.props.settings.sendSMSOption !== "SIM") {
+				alert("can only send messages from local SIM");
+			}
+			else {
+				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
+
+				//this.props.history.push(url);
+				window.location.href = url;
+			}
+		*/
 	}
 
 	// TODO: get students marks again when this rerenders, if the new studentMarks are different from the old ones.
@@ -186,6 +210,14 @@ class SingleExam extends Component {
 						<input type="date" onChange={this.former.handle(["date"])} value={moment(this.state.exam.date).format("YYYY-MM-DD")} placeholder="Exam Date" />
 					</div>
 
+					<div className="row">
+						<label>SMS Notification</label>
+						<select {...this.former.super_handle(["sendSMS"])}>
+							<option value={false}>No SMS Notification</option>
+							<option value={true}>Send Marks to Students with Local SIM</option>
+						</select>
+					</div>
+
 						<div className="divider">Marks</div>
 						<div className="section">
 						{
@@ -203,6 +235,7 @@ class SingleExam extends Component {
 								))
 						}
 						</div>
+
 
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>

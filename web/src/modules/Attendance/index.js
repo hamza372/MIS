@@ -177,6 +177,7 @@ export default connect(state => {
 		current_faculty: state.db.faculty[state.auth.faculty_id],
 		students: state.db.students,
 		classes: state.db.classes,
+		settings: state.db.settings,
 		connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {}).attendance || ""
 	}

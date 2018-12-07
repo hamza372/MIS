@@ -40,7 +40,8 @@ class StudentMarksContainer extends Component {
 					</div>
 				</div>
 				<StudentMarks student={student} exams={exams} settings={settings} startDate={moment(this.state.start).unix() * 1000} endDate={moment(this.state.end).unix() * 1000}/>
-				<div className="print button" onClick={() => window.print()}>Print</div>
+
+				<div className="print button" onClick={() => window.print()} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end", }}>Print</div>
 			</div>
 	}
 }
@@ -104,12 +105,14 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		}
 		</div>
 	
-		<div style={{ marginTop: "100px" }}>
-			<div>Signature: ___________________</div>
-		</div>
+		<div className="print-only">
+			<div style={{ marginTop: "100px" }}>
+				<div>Signature: ___________________</div>
+			</div>
 
-		<div style={{ marginTop: "50px" }}>
-			<div>Parent Signature: ___________________</div>
+			<div style={{ marginTop: "50px" }}>
+				<div>Parent Signature: ___________________</div>
+			</div>
 		</div>
 	</div>
 }

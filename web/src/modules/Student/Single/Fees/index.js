@@ -95,8 +95,8 @@ class StudentFees extends Component {
 					.replace(/\$NAME/g, this.student().Name)
 
 			
-			if(this.props.connected) {
-				this.props.sendSMS(message, this.student().Phone)
+			if(this.props.settings.sendSMSOption !== "SIM") {
+				alert("can only send messages from local SIM");
 			}
 			else {
 				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
@@ -104,7 +104,6 @@ class StudentFees extends Component {
 				//this.props.history.push(url);
 				window.location.href = url;
 			}
-
 		}
 
 	}
