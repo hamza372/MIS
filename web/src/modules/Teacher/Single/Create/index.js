@@ -245,7 +245,7 @@ class CreateTeacher extends Component {
 					<select {...this.former.super_handle(["StructuredQualification"])}>
 						<option value='' disabled>Please select a Qualification</option>
 						<option value='Matric'>Matric</option>
-						<option value='Inter'>Intermidiate</option>
+						<option value='Inter'>Intermediate</option>
 						<option value='BS'>Bachelors Degree (BS)</option>
 						<option value='MS'>Masters Degree (MS)</option>
 						<option value='diploma'>Diploma</option>

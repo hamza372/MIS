@@ -88,6 +88,7 @@ class StudentFees extends Component {
 
 		if(this.state.payment.sendSMS) {
 			// send SMS with replace text for regex etc.
+			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
 			const message = this.props.feeSMSTemplate
 					.replace(/\$BALANCE/g, balance)
 					.replace(/\$AMOUNT/g, payment.amount)
@@ -230,30 +231,30 @@ class StudentFees extends Component {
 
 const PaymentTable = ({ payments }) => {
 
+	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+
+	const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
+
 	return <div className="payment-history section">
 		<div className="table row heading">
 			<label><b>Date</b></label>
 			<label><b>Label</b></label>
 			<label><b>Amount</b></label>
 		</div>
-	{
-		
+		{
 			payments
-			.map(([id, payment]) => {
-				return <div className="payment" key={id}>
-					<div className="table row">
-						<div>{moment(payment.date).format("DD/MM")}</div>
-						<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-						<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
-					</div>
-				</div>})
-	}
+				.map(([id, payment]) => {
+					return <div className="payment" key={id}>
+						<div className="table row">
+							<div>{moment(payment.date).format("DD/MM")}</div>
+							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
+							<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
+						</div>
+					</div> })
+		}
 		<div className="table row last">
-			<label><b>Amount Owed:</b></label>
-			<div><b>{
-				payments
-					.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-				}</b></div>
+			<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
+			<div style={style}><b>{Math.abs(owed)}</b></div>
 		</div>
 	</div>
 

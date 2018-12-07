@@ -13,7 +13,7 @@ class StudentMarksContainer extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			start: moment().subtract(1, "month"),
+			start: moment().subtract(3, "month"),
 			end: moment.now()
 		}
 
@@ -102,6 +102,14 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 					</div> 
 			]
 		}
+		</div>
+	
+		<div style={{ marginTop: "100px" }}>
+			<div>Signature: ___________________</div>
+		</div>
+
+		<div style={{ marginTop: "50px" }}>
+			<div>Parent Signature: ___________________</div>
 		</div>
 	</div>
 }

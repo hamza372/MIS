@@ -21,18 +21,16 @@ const ClassReports = ({ match, classes, students, exams, settings }) => {
 
 	console.log(relevant_students[0])
 
-	return <Layout>
-		<div className="class-report">
+	return <div className="class-report" style={{height: "100%"}}>
 			<div className="print button" onClick={() => window.print()}>Print</div>
 			{
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
-					<div className="print-page student-report" key={s.id}>
+					<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
 						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} />
 					</div>)
 			}
 		</div>
-	</Layout>
 }
 
 export default connect(state => ({

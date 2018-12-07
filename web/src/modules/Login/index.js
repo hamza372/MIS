@@ -30,6 +30,14 @@ class Login extends Component {
 		this.props.login(this.state.login)
 	}
 
+	onSwitchSchool = () => {
+
+		// this needs to be looked into...
+		localStorage.removeItem("db");
+		this.props.history.push("/")
+		window.location.reload()
+	}
+
 	componentWillReceiveProps(newProps) {
 		if(newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
 			this.props.history.push('/')
@@ -38,9 +46,11 @@ class Login extends Component {
 
 	render() {
 
-		const num_users = Object.keys(this.props.users).length;
+		if(!this.props.auth.token) {
+			return <Redirect to="/school-login" />
+		}
 
-		if(num_users === 0) {
+		if(this.props.num_users === 0) {
 			return <Redirect to="/faculty/first" />
 		}
 
@@ -53,7 +63,7 @@ class Login extends Component {
 						<select {...this.former.super_handle(["name"])}>
 							<option value="" disabled>Select a User</option>
 						{
-							Object.values(this.props.users).map(u => <option key={u.username} value={u.name}>{u.name}</option>)
+							Object.entries(this.props.users).map(([uid, u]) => <option key={uid} value={u.name}>{u.name}</option>)
 						}
 						</select>
 					</div>
@@ -64,6 +74,7 @@ class Login extends Component {
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>
 				{ this.props.auth.attempt_failed ? <div>Login Attempt Failed.</div> : false }
+				{ this.props.connected ? <div className="button red" onClick={this.onSwitchSchool} style={{ position: "absolute", bottom: "20px", left: "20px" }}>Switch School</div> : false }
 			</div>
 		</Layout>
 
@@ -73,7 +84,8 @@ class Login extends Component {
 export default connect(state => ({ 
 	auth: state.auth,
 	users: state.db.users,
-	num_users: Object.keys(state.db.users).length
+	num_users: Object.keys(state.db.users).length,
+	connected: state.connected
 }), dispatch => ({
 	login: (login) => {
 		dispatch(createLogin(login.name, login.password))

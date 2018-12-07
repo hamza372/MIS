@@ -13,7 +13,7 @@ class ClassReportMenu extends Component {
 
 		this.state = {
 			report_dates: {
-				start: moment().subtract(1, "month").unix() * 1000,
+				start: moment().subtract(3, "month").unix() * 1000,
 				end: moment.now(),
 				exam_name: ""
 			}

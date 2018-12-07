@@ -85,10 +85,14 @@ class SingleStudent extends Component {
 
 		// verify 
 
-		const compulsoryFields = checkCompulsoryFields(this.state.profile, [
-			["Name"], 
-			["section_id"]
-		]);
+		let compulsory_paths = [ ["Name"] ];
+		if(student.Active) {
+			compulsory_paths.push(["section_id"])
+		} else {
+			student.section_id = ""
+		}
+
+		const compulsoryFields = checkCompulsoryFields(this.state.profile, compulsory_paths);
 
 		if(compulsoryFields) 
 		{
@@ -300,7 +304,7 @@ class SingleStudent extends Component {
 
 					<div className="divider">School Information</div>
 
-					{ this.state.profile.class_id === '' ? false : <div className="row">
+					{ !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
 						<select {...this.former.super_handle(["section_id"])}>
 							{

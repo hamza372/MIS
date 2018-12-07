@@ -66,7 +66,7 @@ return <div className="section table" style={{margin: "20px 0"}}>
 						<label><b>{total.OWED}</b></label>
 						<label><b>{total.PAID}</b></label>
 						<label><b>{total.FORGIVEN}</b></label>
-						<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{total.PAID - total.OWED}</b></label>
+						<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{-total.OWED + total.PAID}</b></label>
 					</div>
 				]
 			}
