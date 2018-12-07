@@ -19,13 +19,19 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		.map(c => ({...c, forwardTo}))
 	
+		let create = '/class/new'
+
+		if(forwardTo === 'report-menu'){
+			create = '';
+		}
+		
 	return <div className="class-module">
 		<div className="title">Classes</div>
 		
 		<List
 			items={items}
 			Component={ClassItem}
-			create={'/class/new'} 
+			create={create} 
 			createText={"Add new Class"} 
 			toLabel={C => C.name} 
 			/>

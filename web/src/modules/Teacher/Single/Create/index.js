@@ -81,7 +81,7 @@ class CreateTeacher extends Component {
 		
 		if(compulsoryFileds){
 
-			const errorText = "Please Fill " + compulsoryFileds  + " !!!"
+			const errorText = "Please Fill " + compulsoryFileds ;
 
 			return this.setState({
 				banner: {
@@ -219,7 +219,7 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Husband/Father CNIC</label>
-					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 13)} placeholder="Father/Husband CNIC" />
+					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15)} placeholder="Father/Husband CNIC" />
 				</div>
 				
 				<div className="divider">Account Information</div>
