@@ -83,17 +83,16 @@ class SingleStudent extends Component {
 
 		const student = this.state.profile;
 
-		// verify 
-
 		const compulsoryFields = checkCompulsoryFields(this.state.profile, [
 			["Name"], 
 			["section_id"]
-		]);
+		]).map(item => item[0] === "section_id" ? ["Class Section"]: item );
+
+		console.log("CFields",compulsoryFields)
 
 		if(compulsoryFields) 
 		{
-			const errorText = "Please Fill " + compulsoryFields + " !!!"
-			
+			const errorText = "Please Fill " + compulsoryFields ;			
 				return this.setState({
 				banner: {
 					visible : true,
@@ -259,7 +258,7 @@ class SingleStudent extends Component {
 					
 					<div className="row">
 						<label>B-Form Number</label>
-						<input type="number" {...this.former.super_handle(["BForm"])} placeholder="BForm" />
+						<input type="number" {...this.former.super_handle(["BForm"], (num) => num.length <= 15)} placeholder="BForm" />
 					</div>
 
 					<div className="row">
@@ -283,14 +282,14 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Father CNIC</label>
-						<input type="number" {...this.former.super_handle(["ManCNIC"])} placeholder="Father CNIC" />
+						<input type="number" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15)} placeholder="Father CNIC" />
 					</div>
 
 					<div className="divider">Contact Information</div>
 
 					<div className="row">
 						<label>Phone Number</label>
-						<input type="tel" {...this.former.super_handle(["Phone"])} placeholder="Phone Number" />
+						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" />
 					</div>
 
 					<div className="row">

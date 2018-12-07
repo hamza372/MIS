@@ -49,13 +49,19 @@ export const StudentList = ({ classes, students, settings, forwardTo }) => {
 		} 
 	});	
 
+	let create = '/student/new'
+
+	if(forwardTo === 'marks' || forwardTo === 'payment'){
+		create = '';
+	}
+
 	return <div className="student-list">
 		<PrintHeader settings={settings} />
 		<Title className="title">Students</Title>
 		<List 
 			items = {[ { Name: "", header: true }, ...items]}
 			Component = {StudentItem}
-			create = {'/student/new'} 
+			create = {create} 
 			createText = {"Add new Student"} 
 			toLabel = {s => s.Name} /> 
 
