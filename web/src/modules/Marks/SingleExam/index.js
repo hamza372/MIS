@@ -19,7 +19,6 @@ const blankExam = () => ({
 	subject: "",
 	total_score: "",
 	date: new Date().getTime(),
-	sendSMS: false,
 	student_marks: {
 		
 	}
@@ -38,16 +37,17 @@ class SingleExam extends Component {
 			exam: this.exam_id() === undefined ? {
 				...blankExam(),
 				student_marks
-			 } : { 
+			} : { 
 				 ...this.props.exams[this.exam_id()],
 				student_marks: this.getGradesForExistingExam(this.exam_id())
-			 },
-			 redirect: false,
-			 banner: {
-				 active: false,
-				 good: true,
-				 text: "Saved!"
-			 }
+			},
+			sendSMS: false,
+			redirect: false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, ["exam"])
@@ -132,7 +132,7 @@ class SingleExam extends Component {
 
 		// send sms
 		/*
-		if(this.state.payment.sendSMS) {
+		if(this.state.sendSMS) {
 			// send SMS with replace text for regex etc.
 			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
 			const message = this.props.feeSMSTemplate
@@ -210,13 +210,17 @@ class SingleExam extends Component {
 						<input type="date" onChange={this.former.handle(["date"])} value={moment(this.state.exam.date).format("YYYY-MM-DD")} placeholder="Exam Date" />
 					</div>
 
-					<div className="row">
-						<label>SMS Notification</label>
-						<select {...this.former.super_handle(["sendSMS"])}>
-							<option value={false}>No SMS Notification</option>
-							<option value={true}>Send Marks to Students with Local SIM</option>
-						</select>
-					</div>
+					{
+						/*
+						<div className="row">
+							<label>SMS Notification</label>
+							<select {...this.former.super_handle(["sendSMS"])}>
+								<option value={false}>No SMS Notification</option>
+								<option value={true}>Send Marks to Students with Local SIM</option>
+							</select>
+						</div>
+						*/
+					}
 
 						<div className="divider">Marks</div>
 						<div className="section">

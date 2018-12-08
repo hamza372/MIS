@@ -67,7 +67,6 @@ class Settings extends Component {$Name
 					<label>SMS Template</label>
 					<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
 				</div>
-
 			</div>
 		</div>
 	}

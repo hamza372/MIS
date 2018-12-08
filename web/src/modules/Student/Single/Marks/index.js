@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 
+import { smsIntentLink } from 'utils/intent'
+
 import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
@@ -21,10 +23,18 @@ class StudentMarksContainer extends Component {
 	}
 
 	render() {
-		const {match, students, exams, settings} = this.props;
+		const {match, students, exams, settings, sms_templates } = this.props;
 		const id = match.params.id;
 
 		const student = students[id];
+		const startDate = moment(this.state.start).unix() * 1000
+		const endDate = moment(this.state.end).unix() * 1000
+
+		const report_string = reportStringForStudent(student, exams, startDate, endDate);
+
+		const text = sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, report_string);
+
+		const url = smsIntentLink({ messages: [{ number: student.Phone, text: text }], return_link: window.location.href })
 
 		return <div className="student-marks-container">
 				<div className="no-print">
@@ -39,11 +49,30 @@ class StudentMarksContainer extends Component {
 						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={moment(this.state.start).unix() * 1000} endDate={moment(this.state.end).unix() * 1000}/>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate}/>
 
+
+				{ settings.sendSMSOption === "SIM" ? <a href={url} className="button blue">Send SMS from Local SIM</a> : false }
 				<div className="print button" onClick={() => window.print()} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end", }}>Print</div>
 			</div>
 	}
+}
+
+export const reportStringForStudent = (student, exams, startDate=0, endDate=moment.now()) => {
+
+	// we want a line for each exam. subject - exam name - marks / out of (percent)
+
+	const start = moment(startDate)
+	const end = moment(endDate)
+
+	const report_string = Object.keys(student.exams || {})
+		.map(exam_id => exams[exam_id])
+		.filter(exam => moment(exam.date).isBetween(start, end))
+		.sort((a, b) => a.date - b.date)
+		.map(exam => `${exam.subject} - ${exam.name} - ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}%)`)
+		.join('\n')
+	
+	return report_string;
 }
 
 export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now()}) => {
@@ -121,5 +150,6 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 export default connect(state => ({
 	students: state.db.students,
 	exams: state.db.exams,
-	settings: state.db.settings
+	settings: state.db.settings,
+	sms_templates: state.db.sms_templates
 }))(StudentMarksContainer)

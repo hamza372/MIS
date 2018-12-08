@@ -34,7 +34,7 @@ class ClassReportMenu extends Component {
 					<label>End Date</label>
 					<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_dates.end).format("YYYY-MM-DD")} placeholder="End Date" />
 				</div>
-				<Link className="button grey block" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Print Preview</Link>
+				<Link className="button grey block" to={`reports/${moment(this.state.report_dates.start).unix() * 1000}/${moment(this.state.report_dates.end).unix() * 1000}`}>Preview</Link>
 			</div>
 		</div>
 	}
