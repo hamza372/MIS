@@ -65,7 +65,7 @@ class Landing extends Component {
 
 		for(let student of Object.values(students)) {
 
-			const record = student.attendance[today_date];
+			const record = (student.attendance || {})[today_date];
 			if(record) {
 				today_attendance[record.status] += 1;
 			}
@@ -82,7 +82,7 @@ class Landing extends Component {
 		}
 
 		for(let teacher of Object.values(faculty)) {
-			const record = teacher.attendance[today_date];
+			const record = (teacher.attendance || {})[today_date];
 
 			if(record === undefined) {
 				continue;
