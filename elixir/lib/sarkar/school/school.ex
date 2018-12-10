@@ -32,13 +32,15 @@ defmodule Sarkar.School do
 		# key is path separated by comma
 		# value is { action: {path, value}, date}
 
-		have_all_in_memory? = writes 
-			|> Enum.any?(fn {path_string, %{"date" => path_date}} -> last_sync_date > path_date end)
+		# make sure we aren't missing any writes between last sync_date and the least path_date.
+		{_, %{"date" => min_write_date}} = writes |> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+		have_all_in_memory? = min_write_date < last_sync_date
 
 		writes = if not have_all_in_memory? do
 				case Sarkar.Store.School.get_writes(school_id, last_sync_date) do
 					{:ok, aug_writes} -> 
-						IO.puts "SUCCESSFUL DB RECOVERY"
+						# whats in aug_writes that isnt in writes??
+						IO.puts "SUCCESSFUL DB RECOVERY @ #{:os.system_time(:millisecond)}. last_sync_date: #{last_sync_date} min_write_date: #{min_write_date}"
 						aug_writes
 					{:error, err} -> 
 						IO.puts "ERROR ON DB RECOVERY"
@@ -55,7 +57,7 @@ defmodule Sarkar.School do
 			"e8227de3-f729-4638-b234-f238ddaef39a" -> "Tablet"
 			other -> "other client"
 		end
-		
+
 		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
 			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
