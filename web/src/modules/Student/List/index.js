@@ -19,7 +19,7 @@ const StudentItem = (S) => {
 			<label> <b> Father Name </b></label>
 			<label> <b> Class Section </b></label>
 		</div>
-	}
+	} 
 
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
 	//const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
@@ -31,6 +31,15 @@ const StudentItem = (S) => {
 				<div>{S.ManName !== "" || null ? S.ManName : "Not Entered" }</div>
 				<div> {cname /*+ "/" + sname */}</div>
 			</div>
+}
+
+const toLabel = (S) => {
+	
+	const cname = S.relevant_section ? S.relevant_section.className : "no class";
+
+	return S.Name + S.ManName + cname ;
+
+
 }
 
 export const StudentList = ({ classes, students, settings, forwardTo }) => {
@@ -63,7 +72,7 @@ export const StudentList = ({ classes, students, settings, forwardTo }) => {
 			Component = {StudentItem}
 			create = {create} 
 			createText = {"Add new Student"} 
-			toLabel = {s => s.Name} /> 
+			toLabel = {toLabel} /> 
 
 		<div className="print button" onClick={() => window.print()}>Print</div>
 	</div>
