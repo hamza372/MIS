@@ -83,10 +83,13 @@ class SingleStudent extends Component {
 
 		const student = this.state.profile;
 
-		const compulsoryFields = checkCompulsoryFields(this.state.profile, [
+		let compulsoryFields = checkCompulsoryFields(this.state.profile, 
+		[
 			["Name"], 
 			["section_id"]
-		]).map(item => item[0] === "section_id" ? ["Class Section"]: item );
+		]);
+		
+		compulsoryFields =  compulsoryFields !== false ? compulsoryFields.map(item => item[0] === "section_id" ? ["Class Section"]: item ) : false
 
 		console.log("CFields",compulsoryFields)
 
