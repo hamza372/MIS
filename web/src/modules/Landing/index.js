@@ -70,7 +70,7 @@ class Landing extends Component {
 				today_attendance[record.status] += 1;
 			}
 
-			const additional_payment = Object.values(student.payments)
+			const additional_payment = Object.values(student.payments || {})
 				.filter(x => moment(x.date).format("YYYY-MM-DD") === today_date)
 				.reduce((agg, curr) => agg + curr.amount, 0);
 
