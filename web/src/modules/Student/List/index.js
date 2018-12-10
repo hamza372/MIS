@@ -28,7 +28,7 @@ const StudentItem = (S) => {
 				<Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
 					{S.Name} 
 				</Link>
-				<div>{S.ManName !== "" || null ? S.ManName : "Not Entered" }</div>
+				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
 				<div> {cname /*+ "/" + sname */}</div>
 			</div>
 }
