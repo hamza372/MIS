@@ -88,7 +88,6 @@ const rootReducer = (state, action) => {
 					return state.queued[t].date > action.date
 				})
 				.reduce((agg, curr) => {
-					console.log(curr)
 					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
 				}, {})
 
@@ -96,7 +95,12 @@ const rootReducer = (state, action) => {
 				// remove queued items
 
 				const nextState = Object.values(action.new_writes)
-					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path)
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
 
 				return  {
 					...nextState, 
@@ -122,7 +126,12 @@ const rootReducer = (state, action) => {
 			if(state.acceptSnapshot && Object.keys(action.new_writes).length > 0) {
 
 				const nextState = Object.values(action.new_writes)
-					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path);
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
 				
 				return {
 					...nextState,

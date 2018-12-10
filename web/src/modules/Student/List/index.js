@@ -22,7 +22,7 @@ const StudentItem = (S) => {
 	} 
 
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
-	//const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
+//const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
 	
 	return <div className="table row" key={S.id}>
 				<Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>

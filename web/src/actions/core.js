@@ -183,7 +183,8 @@ export const connected = () => (dispatch, getState, syncr) => {
 				dispatch(resp)
 			})
 			.catch(err => {
-				console.error(err)
+				console.error(err);
+				alert("Authorization Failed. Log out and Log in again.")
 			})
 	}
 }
