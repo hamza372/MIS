@@ -107,34 +107,29 @@ class SingleStudent extends Component {
 				})
 		}
 
-		// @ALI: this needs to happen in one loop
-		if(Object.values(this.props.students).some(student => 
-					student.section_id === this.state.profile.section_id 
-					&& student.id !== this.state.profile.id 
-					&& student.RollNumber !== ""
-					&& student.RollNumber === this.state.profile.RollNumber ))
-		{
-			return this.setState({
-				banner: {
-					visible : true,
-					good: false,
-					text: "Roll No Already Exists"
-				}
-			})
-		}
 
-		if(Object.values(this.props.students).some(student => 
-					student.id !== this.state.profile.id 
-					&& student.AdmissionNumber !== "" 
-					&& student.AdmissionNumber === this.state.profile.AdmissionNumber))
+		for(let student of Object.values(this.props.students))
 		{
-			return this.setState({
-				banner: {
-					visible : true,
-					good: false,
-					text: "Admission Number Already Exists"
-				}
-			})
+			const RollNumber = student.section_id === this.state.profile.section_id && student.RollNumber !== undefined
+				&& student.id !== this.state.profile.id 
+				&& student.RollNumber !== "" 
+				&& student.RollNumber === this.state.profile.RollNumber
+
+			const AdmissionNumber = student.id !== this.state.profile.id 
+				&& student.AdmissionNumber !== undefined 
+				&& student.AdmissionNumber !== "" 
+				&& student.AdmissionNumber === this.state.profile.AdmissionNumber	
+
+			if(AdmissionNumber || RollNumber)
+			{
+				return this.setState({
+					banner: {
+						visible : true,
+						good: false,
+						text: RollNumber ? "Roll Number Already Exists": "Admission Number Already Exists"
+					}
+				})
+			}
 		}
 
 		for(let fee of Object.values(this.state.profile.fees)) {
