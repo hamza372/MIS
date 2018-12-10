@@ -107,7 +107,11 @@ class SingleStudent extends Component {
 			})
 		}
 
-		if(Object.values(this.props.students).some(student => student.section_id === this.state.profile.section_id && student.id !== this.state.profile.id && student.RollNumber !== "" && student.RollNumber === this.state.profile.RollNumber ))
+		if(Object.values(this.props.students).some(student => student.section_id === this.state.profile.section_id 
+			&& student.RollNumber !== undefined
+			&& student.id !== this.state.profile.id 
+			&& student.RollNumber !== "" 
+			&& student.RollNumber === this.state.profile.RollNumber ))
 		{
 			return this.setState({
 				banner: {
@@ -118,7 +122,10 @@ class SingleStudent extends Component {
 			})
 		}
 
-		if(Object.values(this.props.students).some(student => student.id !== this.state.profile.id && student.AdmissionNumber !== "" && student.AdmissionNumber === this.state.profile.AdmissionNumber))
+		if(Object.values(this.props.students).some(student => student.id !== this.state.profile.id 
+			&& student.AdmissionNumber !== undefined 
+			&& student.AdmissionNumber !== "" 
+			&& student.AdmissionNumber === this.state.profile.AdmissionNumber))
 		{
 			return this.setState({
 				banner: {
