@@ -19,6 +19,7 @@ const initState = {
 	// but will get to that later
 	auth: {
 		school_id: undefined,
+		faculty_id: undefined,
 		token: undefined,
 		username: undefined,
 		name: undefined,

@@ -99,14 +99,13 @@ class SingleStudent extends Component {
 			const errorText = "Please fill " + compulsoryFields.map(x => x[0] === "section_id" ? "Section ID" : x[0]).join(", ");
 			
 				return this.setState({
-				banner: {
-					visible : true,
-					good: false,
-					text: errorText
-				}
-			})
+					banner: {
+						visible : true,
+						good: false,
+						text: errorText
+					}
+				})
 		}
-
 
 
 		for(let student of Object.values(this.props.students))
@@ -246,6 +245,8 @@ class SingleStudent extends Component {
 			return <Redirect to={this.state.redirect} />
 		}
 
+		const admin = !this.props.user.Admin;
+
 		return <div className="single-student">
 				{ this.state.banner.visible ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
@@ -257,27 +258,27 @@ class SingleStudent extends Component {
 					
 					<div className="row">
 						<label>Full Name</label>
-						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" />
+						<input type="text" {...this.former.super_handle(["Name"])} placeholder="Full Name" disabled={admin} />
 					</div>
 
 					<div className="row">
 						<label>Roll No</label>
-						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" />
+						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={admin} />
 					</div>
 					
 					<div className="row">
 						<label>B-Form Number</label>
-						<input type="number" {...this.former.super_handle(["BForm"], (num) => num.length <= 15)} placeholder="BForm" />
+						<input type="number" {...this.former.super_handle(["BForm"], (num) => num.length <= 15)} placeholder="BForm" disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Date of Birth</label>
-						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" />
+						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Gender</label>
-						<select {...this.former.super_handle(["Gender"])}>
+						<select {...this.former.super_handle(["Gender"])} disabled={admin} >
 							<option value='' disabled>Please Set a Gender</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
@@ -286,31 +287,31 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Father Name</label>
-						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name" />
+						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name"  disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Father CNIC</label>
-						<input type="number" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15)} placeholder="Father CNIC" />
+						<input type="number" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15)} placeholder="Father CNIC"  disabled={admin}/>
 					</div>
 
 					<div className="divider">Contact Information</div>
 
 					<div className="row">
 						<label>Phone Number</label>
-						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" />
+						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Address</label>
-						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" />
+						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={admin}/>
 					</div>
 
 					<div className="divider">School Information</div>
 
 					{ !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
-						<select {...this.former.super_handle(["section_id"])}>
+						<select {...this.former.super_handle(["section_id"])} disabled={admin}>
 							{
 								 [
 									<option key="" value="">Please Select a Section</option>,
@@ -324,7 +325,7 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Active Status</label>
-						<select {...this.former.super_handle(["Active"])}>
+						<select {...this.former.super_handle(["Active"])} disabled={admin}>
 							<option value={true}>Student Currently goes to this School</option>
 							<option value={false}>Student No Longer goes to this School</option>
 						</select>
@@ -332,27 +333,27 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Admission Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date"/>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date" disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Admission Number</label>
-						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" />
+						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={admin}/>
 					</div>
 
 					<div className="row">
 						<label>Notes</label>
-						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" />
+						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={admin}/>
 					</div>
 
 					<div className="divider">Payment</div>
 					{
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
-								<div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>
+								{admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
 								<div className="row">
 									<label>Type</label>
-									<select {...this.former.super_handle(["fees", id, "type"])}>
+									<select {...this.former.super_handle(["fees", id, "type"])} disabled={admin}>
 										<option value="" disabled>Select Fee or Scholarship</option>
 										<option value="FEE">Fee</option>
 										<option value="SCHOLARSHIP">Scholarship</option>
@@ -360,15 +361,15 @@ class SingleStudent extends Component {
 								</div>
 								<div className="row">
 									<label>Name</label>
-									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} />
+									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={admin}/>
 								</div>
 								<div className="row">
 									<label>Amount</label>
-									<input type="number" {...this.former.super_handle(["fees", id, "amount"])} placeholder="Amount" />
+									<input type="number" {...this.former.super_handle(["fees", id, "amount"])} placeholder="Amount" disabled={admin}/>
 								</div>
 								<div className="row">
 									<label>Fee Period</label>
-									<select {...this.former.super_handle(["fees", id, "period"])}>
+									<select {...this.former.super_handle(["fees", id, "period"])} disabled={admin}>
 										<option value="" disabled>Please Select a Time Period</option>
 										<option value="SINGLE">One Time</option>
 										<option value="MONTHLY">Every Month</option>
@@ -377,18 +378,22 @@ class SingleStudent extends Component {
 							</div>
 						})
 					}
-					<div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div>
-					<div className="save-delete">
+					{ admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
+					{ admin ? false : <div className="save-delete">
 						<div className="button red" onClick={this.onDelete}>Delete</div>
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
+					}
 				</div>
 			</div>
 	}
 }
 
 export default connect(state => ({
-	students: state.db.students, classes: state.db.classes }) , dispatch => ({ 
+	students: state.db.students,
+	classes: state.db.classes,
+	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
-	delete: (student) => dispatch(deleteStudent(student))
+	delete: (student) => dispatch(deleteStudent(student)),
+	
  }))(SingleStudent);
