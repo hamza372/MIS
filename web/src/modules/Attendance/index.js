@@ -129,7 +129,7 @@ class Attendance extends Component {
 		});
 
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="attendance">
 				<div className="title">Attendance</div>
 

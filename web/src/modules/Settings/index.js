@@ -86,7 +86,7 @@ class Settings extends Component {$Name
 	}
 
 	render() {
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
 				<div className="title">Settings</div>
 

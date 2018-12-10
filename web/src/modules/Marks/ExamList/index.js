@@ -24,7 +24,7 @@ class ReportList extends Component {
 			.map(([id, exam]) => ({ ...exam, id }))
 		
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="reports-list">
 				<div className="title">Exams</div>
 

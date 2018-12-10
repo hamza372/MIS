@@ -42,7 +42,7 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, history }) => {
 
 	const sections = getSectionsFromClasses(classes)	
 	
