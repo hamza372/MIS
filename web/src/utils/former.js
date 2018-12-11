@@ -49,7 +49,18 @@ export default class Former {
 			return moment(event.target.value, "YYYY-MM-DD").unix() * 1000;
 		}
 
-		return event.target.value;
+		// booleanify
+		let val = event.target.value;
+
+		if(val === "true") {
+			val = true;
+		}
+
+		if(val === "false") {
+			val = false;
+		}
+
+		return val;
 	}
 
 }

@@ -30,9 +30,9 @@ class List extends Component {
 			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
 			
 			<div className="list">
-				{
-					filteredList.map(item => Component(item))
-				}
+			{
+				filteredList.map(item => Component(item))
+			}
 			
 			</div>
 		</div>

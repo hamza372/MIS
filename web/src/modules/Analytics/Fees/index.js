@@ -12,52 +12,61 @@ import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip 
 const MonthlyFeesChart = (props) => {
 			
 	return <ResponsiveContainer width="100%" height={200}>
-				<ComposedChart data={Object.entries(props.monthly_payments).map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
-					month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED - FORGIVEN
-				}))}>
+				<ComposedChart data={
+						Object.entries(props.monthly_payments)
+							.sort(([m1,], [m2,]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
+							.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
+								month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED 
+							}))}>
 					<Legend />
 					<XAxis dataKey="month" />
 					<YAxis />
 					<Tooltip />
+
+					<Bar dataKey='OWED' name="Owed" fill="#74aced" />
 					<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Payed" />
 					<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
-					<Bar dataKey='net' name="Profit" fill="#ff6b68" />
+					<Bar dataKey='net' name="Paid - Owed" fill="#ff6b68" />
+
 			  </ComposedChart>
 			</ResponsiveContainer> 
 }
 
-const MonthlyFeesTable = (props) =>{
+const MonthlyFeesTable = (props) => {
 	
 	const total = props.total_debts;
 	const monthly_payments = props.monthly_payments;
 
-return <div className="section table">
+return <div className="section table" style={{margin: "20px 0"}}>
 			<div className="table row heading">
 				<label><b>Date</b></label>
 				<label><b>Owed</b></label>
 				<label><b>Paid</b></label>
 				<label><b>Forgiven</b></label>
-				<label><b>Balance</b></label>
+				<label><b>Paid - Owed</b></label>
 			</div>				
 			{
 				[...Object.entries(monthly_payments)
-					.sort(([month, ], [m2, ]) => month.localeCompare(m2))
-					.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => 
+					.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
+					.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
 													
-						<div className="table row" key={month}>
+						const prof = SUBMITTED - OWED;
+						const red = "#FC6171"
+
+						return <div className="table row" key={month}>
 							<div>{month}</div>
 							<div>{OWED}</div>
-							<div>{SUBMITTED}</div>							
+							<div>{SUBMITTED}</div>
 							<div>{FORGIVEN}</div>
-							<div>{SUBMITTED - OWED - FORGIVEN}</div>
+							<div style={{ color: prof < 0 ? red : "inherit" }}>{SUBMITTED - OWED}</div>
 						</div>
-					),				
+					}),
 					<div className="table row footing" key={Math.random()}>   
 						<label><b>Total</b></label>
+						<label><b>{total.OWED}</b></label>
 						<label><b>{total.PAID}</b></label>
 						<label><b>{total.FORGIVEN}</b></label>
-						<label><b>{total.OWED}</b></label>
-						<label><b>{total.PAID - total.OWED - total.FORGIVEN}</b></label>
+						<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{-total.OWED + total.PAID}</b></label>
 					</div>
 				]
 			}

@@ -1,6 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETE, DELETES, CONFIRM_SYNC, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED } from 'actions/core'
+import { MERGES, DELETE, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
+import { bindActionCreators } from 'redux';
 
 const rootReducer = (state, action) => {
 
@@ -10,25 +11,31 @@ const rootReducer = (state, action) => {
 		{
 			const nextState = action.merges.reduce((agg, curr) => {
 				return Dynamic.put(agg, curr.path, curr.value)
-			}, state);
+			}, JSON.parse(JSON.stringify(state)))
 
-			return JSON.parse(JSON.stringify(nextState));
+			// we shouldn't accept snapshots until we get a confirm....
+			// 
+
+			return {
+				...nextState,
+				acceptSnapshot: false
+			};
 		}
 
 		case DELETES: 
 		{
 
-			const nextState = action.paths.reduce((agg, curr) => {
-				console.log(curr.path)
-				return Dynamic.delete(agg, curr.path)
-			}, state);
+			const state_copy = JSON.parse(JSON.stringify(state));
+			
+			action.paths.forEach(a => Dynamic.delete(state_copy, a.path));
 
-			console.log(nextState)
-
-			//return JSON.parse(JSON.stringify(nextState))
-			return JSON.parse(JSON.stringify(state))
+			return {
+				...state_copy,
+				acceptSnapshot: false
+			}
 		}
 		
+		// don't need this anymore i think
 		case DELETE:
 		{
 			return {...Dynamic.delete(state, action.path)}
@@ -54,8 +61,8 @@ const rootReducer = (state, action) => {
 			// remove all queued writes less than this last date.
 			const newQ = Object.keys(state.queued)
 				.filter(t => state.queued[t].date > last)
-				.reduce((agg, curr) => {
-					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
+				.reduce((agg, curr_key) => {
+					return {...agg, [curr_key]: state.queued[curr_key]}
 				}, {})
 
 			let next = Dynamic.put(state, ["queued"], newQ);
@@ -69,6 +76,73 @@ const rootReducer = (state, action) => {
 				acceptSnapshot: true,
 				lastSnapshot: new Date().getTime()
 			}
+		}
+
+		case CONFIRM_SYNC_DIFF:
+		{
+			console.log("confirm sync diff: ", Object.keys(action.new_writes).length, " changes synced")
+
+			const newQ = Object.keys(state.queued)
+				.filter(t => {
+					console.log(state.queued[t].date, action.date, state.queued[t].date - action.date);
+					return state.queued[t].date > action.date
+				})
+				.reduce((agg, curr) => {
+					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
+				}, {})
+
+			if(Object.keys(action.new_writes).length > 0) {
+				// remove queued items
+
+				const nextState = Object.values(action.new_writes)
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path)
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
+
+				return  {
+					...nextState, 
+					queued: newQ,
+					acceptSnapshot: true,
+					lastSnapshot: new Date().getTime()
+				}
+			}
+
+			return {
+				...state,
+				queued: newQ,
+				acceptSnapshot: true,
+				lastSnapshot: new Date().getTime()
+			}
+		}
+
+		case SNAPSHOT_DIFF: 
+		{
+
+			console.log("snapshot_diff: ", Object.keys(action.new_writes).length, "changes broadcasted")
+
+			if(state.acceptSnapshot && Object.keys(action.new_writes).length > 0) {
+
+				const nextState = Object.values(action.new_writes)
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path);
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
+				
+				return {
+					...nextState,
+					lastSnapshot: new Date().getTime()
+				}
+			}
+
+			return {
+				...state,
+				lastSnapshot: new Date().getTime()
+			};
 		}
 
 		case SNAPSHOT:
@@ -174,11 +248,11 @@ const rootReducer = (state, action) => {
 			return {
 				...state,
 				auth,
-				db: 
-				{
+				db: {
 					...state.db,
 					...action.db
-				}
+				},
+				lastSnapshot: new Date().getTime()
 			}
 		}
 

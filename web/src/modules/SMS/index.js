@@ -27,7 +27,7 @@ class SMS extends Component {
 				good: true,
 				text: "Saved!"
 			},
-			smsFilter : ""
+			smsFilter: "to_single_student"
 		}
 
 		this.former = new former(this, [])
@@ -72,7 +72,6 @@ class SMS extends Component {
 		this.setState({ smsFilter : e.target.value})
 	}
 
-
 	getFilteredFunctionality = (value) =>{
 		switch(value){
 			case "to_single_student":
@@ -80,6 +79,7 @@ class SMS extends Component {
 							students={this.props.students} 
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 
 			case "to_single_class":
@@ -88,6 +88,7 @@ class SMS extends Component {
 							students={this.props.students} 
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 			
 			case "to_all_students":
@@ -95,6 +96,7 @@ class SMS extends Component {
 							students={this.props.students} 
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 
 			case "to_single_teacher":
@@ -102,6 +104,7 @@ class SMS extends Component {
 							teachers={this.props.teachers} 
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 			
 			case "to_all_teachers":
@@ -109,6 +112,7 @@ class SMS extends Component {
 							teachers={this.props.teachers} 
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 			
 			case "to_fee_defaulters":
@@ -116,6 +120,7 @@ class SMS extends Component {
 							students={this.props.students} 
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
+							smsOption={this.props.smsSetting}
 							/>
 			
 			default:
@@ -135,8 +140,8 @@ class SMS extends Component {
 					<div className="section">
 						<div className="row"> 
 						<label>Send By</label>		
-							<select onChange={this.sendMessageFilter}>
-									<option value="" >Select</option>
+							<select onChange={this.sendMessageFilter} value={this.state.smsFilter}>
+									<option value="" disabled>Select</option>
 									<option value="to_single_student">Single Student</option>
 									<option value="to_single_class">Single Class</option>
 									<option value="to_single_teacher">Single Teacher</option>
@@ -158,7 +163,8 @@ export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	teachers:state.db.faculty,
-	connected: state.connected
+	connected: state.connected,
+	smsSetting: state.db.settings.sendSMSOption
 }), dispatch => ({
 	sendMessage: (text, number) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages) => dispatch(sendBatchSMS(messages))
