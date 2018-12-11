@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom';
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 
 
 import { createStudentMerge, deleteStudent } from 'actions'
@@ -146,7 +147,21 @@ class SingleStudent extends Component {
 			}
 		}
 
-		this.props.save(student)
+		const payments = checkStudentDuesReturning(student)
+			.reduce((agg, p) => ({ 
+				...agg, 
+				[p.payment_id]: {
+					amount: p.amount,
+					date: p.date,
+					type: p.type,
+					fee_id: p.fee_id,
+					fee_name: p.fee_name
+				}
+			}), {});
+
+		student.payments = payments;
+		this.props.save(student);
+		
 		this.setState({
 			banner: {
 				visible: true,
@@ -394,6 +409,5 @@ export default connect(state => ({
 	classes: state.db.classes,
 	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
-	delete: (student) => dispatch(deleteStudent(student)),
-	
+	delete: (student) => dispatch(deleteStudent(student))
  }))(SingleStudent);
