@@ -14,16 +14,10 @@ import Former from 'utils/former'
 import './style.css'
 
 const deriveSelectedStudents = (selected_section, students) =>  getStudentsForSection(selected_section, students)
-	.reduce((agg, curr) => {
-		console.log('deriving students', agg)
-		return {...agg, [curr.id]: true}
-	}, {})
+	.reduce((agg, curr) => ({...agg, [curr.id]: true}), {})
 
 const getStudentsForSection = (section_id, students) => Object.values(students)
-	.filter(s => {
-		console.log('finding student');
-		return s.section_id === section_id
-	})
+	.filter(s => s.section_id === section_id)
 
 class Attendance extends Component {
 
