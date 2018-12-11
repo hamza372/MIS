@@ -33,7 +33,14 @@ defmodule Sarkar.School do
 		# value is { action: {path, value}, date}
 
 		# make sure we aren't missing any writes between last sync_date and the least path_date.
-		{_, %{"date" => min_write_date}} = writes |> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+		min_write_date = if writes != %{} do
+
+			{_, %{"date" => mwd }} = writes 
+				|> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+			
+			mwd
+		end
+
 		have_all_in_memory? = min_write_date < last_sync_date
 
 		writes = if not have_all_in_memory? do
