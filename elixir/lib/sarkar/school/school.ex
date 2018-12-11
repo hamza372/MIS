@@ -33,6 +33,8 @@ defmodule Sarkar.School do
 		# value is { action: {path, value}, date}
 
 		# make sure we aren't missing any writes between last sync_date and the least path_date.
+
+		# This is happening way more than expected. It should only happen for very out of date clients - which should not be the case in 1 day and no GC
 		min_write_date = if writes != %{} do
 
 			{_, %{"date" => mwd }} = writes 
@@ -58,6 +60,8 @@ defmodule Sarkar.School do
 			writes
 		end
 
+		# end weird section
+
 		human_client = case client_id do
 			"1918cdd5-e734-467c-bdca-f4b932580583" -> "Pixel 2XL"
 			"edef4d0e-9f79-4bb7-a525-6e47f46f26c4" -> "Chrome laptop"
@@ -81,7 +85,6 @@ defmodule Sarkar.School do
 						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
 							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
-							IO.puts "rejected #{human_client} change"
 							IO.puts "#{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
 							# IO.inspect write
 							{agg_db, agg_writes, agg_new_writes, max_date}
@@ -118,7 +121,7 @@ defmodule Sarkar.School do
 		relevant = nextWrites 
 					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
 					|> Enum.into(%{})
-
+		
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
 			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
