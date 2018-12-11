@@ -1,6 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGES, DELETE, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
+import { bindActionCreators } from 'redux';
 
 const rootReducer = (state, action) => {
 
@@ -24,15 +25,12 @@ const rootReducer = (state, action) => {
 		case DELETES: 
 		{
 
-			const nextState = action.paths.reduce((agg, curr) => {
-				console.log(curr.path)
-				return Dynamic.delete(agg, curr.path)
-			}, JSON.parse(JSON.stringify(state)));
-
-			console.log(nextState)
+			const state_copy = JSON.parse(JSON.stringify(state));
+			
+			action.paths.forEach(a => Dynamic.delete(state_copy, a.path));
 
 			return {
-				...nextState,
+				...state_copy,
 				acceptSnapshot: false
 			}
 		}
@@ -90,7 +88,6 @@ const rootReducer = (state, action) => {
 					return state.queued[t].date > action.date
 				})
 				.reduce((agg, curr) => {
-					console.log(curr)
 					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
 				}, {})
 
@@ -98,7 +95,12 @@ const rootReducer = (state, action) => {
 				// remove queued items
 
 				const nextState = Object.values(action.new_writes)
-					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path)
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
 
 				return  {
 					...nextState, 
@@ -124,7 +126,12 @@ const rootReducer = (state, action) => {
 			if(state.acceptSnapshot && Object.keys(action.new_writes).length > 0) {
 
 				const nextState = Object.values(action.new_writes)
-					.reduce((agg, curr) => Dynamic.put(agg, curr.path, curr.value), JSON.parse(JSON.stringify(state)))
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path);
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
 				
 				return {
 					...nextState,

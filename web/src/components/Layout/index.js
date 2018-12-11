@@ -33,6 +33,5 @@ const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div classN
 </div>
 
 export const LayoutWrap = WrappedComponent => connect(state => ({
-	user: Object.values(state.db.faculty)
-		.find(x => x.name === state.auth.name),
+	user: state.db.faculty[state.auth.faculty_id]
 }))(SpecialLayoutWrap(WrappedComponent))
