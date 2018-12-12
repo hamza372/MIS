@@ -191,7 +191,7 @@ class SingleClass extends Component {
 						<option value={"O Level"} />
 						<option value={"A Level"} />
 					</datalist>
-					<input list="class-name" {...this.former.super_handle(["name"])} placeholder="Name" />
+					<input list="class-name" {...this.former.super_handle_flex(["name"] , { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
 				</div>
 				<div className="row">
 					<label>Class Order</label>

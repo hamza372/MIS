@@ -8,6 +8,4 @@ export const checkCompulsoryFields = (obj,fields) =>{
 		return filteredList.length === 0 ? false : filteredList;
 
 }
-
-
 export default checkCompulsoryFields;

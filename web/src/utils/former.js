@@ -40,6 +40,31 @@ export default class Former {
 		}
 	}
 
+	super_handle_flex = (path, args) => {
+
+		const default_args = {
+			validate: (val) => true,
+			cb: () => { },
+			styles: (val) => ({})
+		}
+
+		const { validate, cb, styles } = {...default_args, ...args};
+		const full_path = [...this.base_path, ...path]
+
+		return {
+			onChange: e => {
+				const value = this._getValue(e)
+				if(validate(value))
+				{
+					this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+				}
+			},
+			value: Dynamic.get(this._component.state, full_path),
+			checked: Dynamic.get(this._component.state, full_path),
+			style: styles(Dynamic.get(this._component.state, full_path))
+		}
+	}
+
 	_getValue(event) {
 		if(event.target.type === "checkbox") {
 			return event.target.checked;
