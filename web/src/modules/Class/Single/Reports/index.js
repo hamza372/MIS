@@ -1,8 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import Layout from 'components/Layout'
-
 import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { smsIntentLink } from 'utils/intent'
 

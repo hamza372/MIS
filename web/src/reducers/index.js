@@ -1,7 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGES, DELETE, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
-import { bindActionCreators } from 'redux';
 
 const rootReducer = (state, action) => {
 
@@ -14,7 +13,6 @@ const rootReducer = (state, action) => {
 			}, JSON.parse(JSON.stringify(state)))
 
 			// we shouldn't accept snapshots until we get a confirm....
-			// 
 
 			return {
 				...nextState,
@@ -123,7 +121,11 @@ const rootReducer = (state, action) => {
 
 			console.log("snapshot_diff: ", Object.keys(action.new_writes).length, "changes broadcasted")
 
-			if(state.acceptSnapshot && Object.keys(action.new_writes).length > 0) {
+			if(!state.acceptSnapshot) {
+				return state;
+			}
+
+			if(Object.keys(action.new_writes).length > 0) {
 
 				const nextState = Object.values(action.new_writes)
 					.reduce((agg, curr) => {
@@ -252,7 +254,8 @@ const rootReducer = (state, action) => {
 					...state.db,
 					...action.db
 				},
-				lastSnapshot: new Date().getTime()
+				lastSnapshot: new Date().getTime(),
+				acceptSnapshot: true
 			}
 		}
 

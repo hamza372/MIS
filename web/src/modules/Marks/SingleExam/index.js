@@ -94,20 +94,20 @@ class SingleExam extends Component {
 			})
 		}
 
+		/*
 		const hasScoreAboveLimit = Object.values(this.state.exam.student_marks)
 			.some(mark => parseFloat(mark) > parseFloat(this.state.exam.total_score))
 
-		/*
-			if(hasScoreAboveLimit)
-			{
-				return this.setState({
-					banner:{
-						active: true,
-						good: false,
-						text: "Marks cannot exceed the max score"
-					}
-				})
-			}
+		if(hasScoreAboveLimit)
+		{
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Marks cannot exceed the max score"
+				}
+			})
+		}
 		*/
 
 		this.props.saveExam(this.state.exam, this.class_id(), this.section_id());
