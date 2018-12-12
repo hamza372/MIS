@@ -183,7 +183,7 @@ class CreateTeacher extends Component {
 			<div className="form">
 				<div className="divider">Personal Information</div>
 				<div className="row">
-					<label>*Full Name</label>
+					<label><span style={{color: "#fc6171"}}>*</span>Full Name</label>
 					<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!canEdit} />
 				</div>
 				<div className="row">
@@ -228,7 +228,7 @@ class CreateTeacher extends Component {
 				
 				<div className="divider">Account Information</div>
 				<div className="row">
-					<label>*Password</label>
+					<label><span style={{color: "#fc6171"}}>*</span>Password</label>
 					<input type="password" {...this.former.super_handle_flex(["Password"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Password" disabled={!canEdit}/>
 				</div>
 

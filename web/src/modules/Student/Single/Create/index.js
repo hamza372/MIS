@@ -261,7 +261,7 @@ class SingleStudent extends Component {
 					<div className="divider">Personal Information</div>
 					
 					<div className="row">
-						<label>*Full Name</label>
+						<label><span style={{color: "#fc6171"}}>*</span>Full Name</label>
 						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={admin} />
 					</div>
 
@@ -314,7 +314,7 @@ class SingleStudent extends Component {
 					<div className="divider">School Information</div>
 
 					{ !this.state.profile.Active ? false : <div className="row">
-						<label>*Class Section</label>
+						<label><span style={{color: "#fc6171"}}>*</span>Class Section</label>
 						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={admin}>
 							{
 								 [
@@ -368,7 +368,7 @@ class SingleStudent extends Component {
 									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={admin}/>
 								</div>
 								<div className="row">
-									<label>Amount</label>
+									<label><span style={{color: "#fc6171"}}>*</span>Amount</label>
 									<input type="number" {...this.former.super_handle_flex(["fees", id, "amount"],{ styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Amount" disabled={admin}/>
 								</div>
 								<div className="row">
