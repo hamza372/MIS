@@ -1,6 +1,12 @@
 import { v4 } from 'node-uuid'
 import requestFS from 'utils/requestFS'
 
+const defaultTemplates = () => ({
+	attendance: "$NAME has been marked $STATUS",
+	fee: "$NAME has paid $AMOUNT Rs, Your remaining Balance is $BALANCE Rs",
+	result: "Report is ready for $NAME:\n $REPORT"
+})
+
 const initState = {
 	client_id: v4(),
 	queued: { },
@@ -11,7 +17,7 @@ const initState = {
 		users: { }, // username: passwordhash, permissions, etc.  
 		students: { },
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
-		sms_templates: { },
+		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
 		settings: { }
 	},
@@ -28,6 +34,9 @@ const initState = {
 	},
 	connected: false,
 }
+
+"ہے $STATUS اسکول میں $NAME"
+
 
 export const loadDB = () => {
 	try {

@@ -14,18 +14,12 @@ const defaultSettings = {
 	sendSMSOption: "SIM" // API
 }
 
-const defaultTemplates = () => ({
-	attendance: "ہے $STATUS اسکول میں $Name",
-	fee: "ہے۔ $BALANCE کی ادائگی کردی ہے۔ جبکہ آپ کا بقایا حساب $AMOUNT نے $NAME",
-	result: "\n$REPORT کے امتحان کا نتیجہ آگیا ہے $NAME"
-})
-
 class Settings extends Component {$Name
 
 	constructor(props){ 
 		super(props);
 		this.state = {
-			templates: Object.keys(props.sms_templates).length === 0 ? defaultTemplates() : this.props.sms_templates,
+			templates: this.props.sms_templates,
 			settings: props.settings || defaultSettings,
 			templateMenu: false
 		}

@@ -14,6 +14,7 @@ import Syncr from 'syncr'
 const debug_host = 'wss://ab9eae32.ngrok.io'
 
 const host = process.env.REACT_APP_MIS_HOST || debug_host;
+
 const initialState = loadDB();
 
 const syncr = new Syncr(`${host}/ws`, msg => store.dispatch(msg))
