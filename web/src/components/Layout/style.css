@@ -143,6 +143,22 @@ a.block {
 		font-weight: bold;
 	}
 
+/* 	.row input.compulsory {
+		color:  #fc6171;
+		border-color: #fc6171;
+	}
+ */
+/* 	.row> label + input.compulsory[value=""] {
+		border-color: #fc6171;
+	}
+ */
+
+	
+	input.compulsory:placeholder-shown {
+		border-color : #fc6171;
+	}
+	
+
 	@media only screen and (min-width: 768px) {
 
 		.form .row {
