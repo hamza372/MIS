@@ -175,7 +175,7 @@ class SingleClass extends Component {
 			<div className="title">Edit Class</div>
 			<div className="form">
 				<div className="row">
-					<label><span style={{color: "#fc6171"}}>*</span>Name</label>
+					<label>Name</label>
 					<datalist id="class-name">
 						<option value={"Nursery"} />
 						<option value={"Class 1"} />
