@@ -35,9 +35,6 @@ const initState = {
 	connected: false,
 }
 
-"ہے $STATUS اسکول میں $NAME"
-
-
 export const loadDB = () => {
 	try {
 		const serialized = localStorage.getItem('db');

@@ -18,7 +18,6 @@ export default class StudentPage extends Component {
 		// if student is new, just render the profile. when they hit save, redirect to the right page.
 		
 		const loc = this.props.location.pathname.split('/').slice(-1).pop();
-		console.log("PROPS FROM SINGLE/CLASS",this.props)
 
 		return <Layout>
 			<div className="single-student">

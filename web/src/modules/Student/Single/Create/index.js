@@ -228,10 +228,6 @@ class SingleStudent extends Component {
 		})
 	}
 
-	setCompulsory=(value)=>{
-		return value === "" ? "#fc6171" : "#bbb"
-	}
-
 	componentWillReceiveProps(newProps) {
 		// this means every time students upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
