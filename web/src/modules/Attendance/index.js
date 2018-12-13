@@ -14,16 +14,10 @@ import Former from 'utils/former'
 import './style.css'
 
 const deriveSelectedStudents = (selected_section, students) =>  getStudentsForSection(selected_section, students)
-	.reduce((agg, curr) => {
-		console.log('deriving students', agg)
-		return {...agg, [curr.id]: true}
-	}, {})
+	.reduce((agg, curr) => ({...agg, [curr.id]: true}), {})
 
 const getStudentsForSection = (section_id, students) => Object.values(students)
-	.filter(s => {
-		console.log('finding student');
-		return s.section_id === section_id
-	})
+	.filter(s => s.section_id === section_id)
 
 class Attendance extends Component {
 
@@ -36,7 +30,7 @@ class Attendance extends Component {
 
 		const my_sections = sections.filter(s => s.faculty_id === props.current_faculty.id)
 
-		const selected_section = my_sections.length > 0 ? my_sections[0].id : "";
+		const selected_section = my_sections.length > 0 ? my_sections[0].id : (sections.length > 0 ? sections[0].id : "");
 
 		this.state = {
 			date: moment.now(),
@@ -177,6 +171,7 @@ export default connect(state => {
 		current_faculty: state.db.faculty[state.auth.faculty_id],
 		students: state.db.students,
 		classes: state.db.classes,
+		settings: state.db.settings,
 		connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {}).attendance || ""
 	}

@@ -10,12 +10,14 @@ import './style.css'
 
 export default (props) => {
 
-		const loc = props.location.pathname.split('/').slice(-1).pop();
+		const splits = props.location.pathname.split('/')
+		const loc = splits.slice(-1).pop();
+		const isPrintPage = splits.length === 6 && splits[3] === "reports"
 
 	return <Layout>
 		<div className="single-class-container">
 
-			{loc === "new" ? false : 
+			{loc === "new" || isPrintPage ? false : 
 				<div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "red" : false}`} to="profile" replace={true}>Profile</Link>
 					<Link className={`button ${loc === "report-menu" ? "purple" : false}`} to="report-menu" replace={true}>Reports</Link>

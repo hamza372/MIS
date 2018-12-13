@@ -12,7 +12,7 @@ const Layout = ({ user, children }) => {
 }
 
 const Header = ({user}) => <div className="header">
-	<div className="left"><Link to="/">MIS</Link></div>
+	<div className="left"><Link to="/">MISchool</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
 
@@ -23,8 +23,7 @@ export const PrintHeader = ({settings}) => <div className="print-only school-hea
 		</div>
 
 export default connect(state => ({ 
-	user: Object.values(state.db.faculty)
-		.find(x => x.Name === state.auth.name),
+	user: state.db.faculty[state.auth.faculty_id]
 }))(Layout)
 
 const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div className="layout">
@@ -33,6 +32,5 @@ const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div classN
 </div>
 
 export const LayoutWrap = WrappedComponent => connect(state => ({
-	user: Object.values(state.db.faculty)
-		.find(x => x.name === state.auth.name),
+	user: state.db.faculty[state.auth.faculty_id]
 }))(SpecialLayoutWrap(WrappedComponent))

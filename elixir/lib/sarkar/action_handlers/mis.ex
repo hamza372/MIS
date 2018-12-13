@@ -2,7 +2,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "LOGIN", "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password}}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
-			{:ok, token} -> 
+			{:ok, token} ->
 				start_school(school_id)
 				register_connection(school_id, client_id)
 				db = Sarkar.School.get_db(school_id)
@@ -13,18 +13,18 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
 		case Sarkar.Auth.verify({school_id, client_id, token}) do
-			{:ok, _} -> 
+			{:ok, _} ->
 				start_school(school_id)
 				register_connection(school_id, client_id)
 				{:reply, succeed(), %{school_id: school_id, client_id: client_id}}
-			{:error, msg} -> 
+			{:error, msg} ->
 				IO.inspect msg
 				{:reply, fail(), state}
 		end
 	end
 
-	def handle_action(%{"type" => "SYNC", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
-		res = Sarkar.School.sync_changes(school_id, client_id, payload)
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "lastSnapshot" => last_sync_date}, %{school_id: school_id, client_id: client_id} = state) do
+		res = Sarkar.School.sync_changes(school_id, client_id, payload, last_sync_date)
 		{:reply, succeed(res), state}
 	end
 

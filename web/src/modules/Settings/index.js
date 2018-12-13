@@ -11,20 +11,15 @@ const defaultSettings = {
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
+	sendSMSOption: "SIM" // API
 }
-
-const defaultTemplates = () => ({
-	attendance: "ہے $STATUS اسکول میں $Name",
-	fee: "ہے۔ $BALANCE کی ادائگی کردی ہے۔ جبکہ آپ کا بقایا حساب $AMOUNT نے $NAME",
-	result: "\n$REPORT کے امتحان کا نتیجہ آگیا ہے $NAME"
-})
 
 class Settings extends Component {$Name
 
 	constructor(props){ 
 		super(props);
 		this.state = {
-			templates: Object.keys(props.sms_templates).length === 0 ? defaultTemplates() : this.props.sms_templates,
+			templates: this.props.sms_templates,
 			settings: props.settings || defaultSettings,
 			templateMenu: false
 		}
@@ -66,7 +61,6 @@ class Settings extends Component {$Name
 					<label>SMS Template</label>
 					<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
 				</div>
-
 			</div>
 		</div>
 	}
@@ -107,6 +101,14 @@ class Settings extends Component {$Name
 					</div>
 
 					<div className="row">
+						<label>SMS Option</label>
+						<select {...this.former.super_handle(["settings", "sendSMSOption"])}>
+							<option value="">Select SMS Option</option>
+							<option value="SIM">Send SMS from Local SIM Card</option>
+							<option value="API" disabled>Send SMS from API</option>
+						</select>
+					</div>
+					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
 							<option value={true}>Yes, share anonymous data with CERP</option>
@@ -121,7 +123,7 @@ class Settings extends Component {$Name
 						this.state.templateMenu ? this.changeSMStemplates() : false
 					}				
 					</div>
-					<div className="button save" onClick={this.onSave}>Save</div>
+					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>
 		</Layout>
 	}

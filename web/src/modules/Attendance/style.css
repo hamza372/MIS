@@ -8,6 +8,10 @@
 	margin: 0 5px;
 }
 
+.attendance .list-row input {
+	flex-shrink: 0;
+}
+
 .attendance .list {
 	margin-top: 5px;
 }

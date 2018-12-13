@@ -16,7 +16,7 @@ export default class ToAllTeachers extends Component {
 	
   render() {
 
-	const { teachers, sendBatchMessages } = this.props;
+	const { teachers, sendBatchMessages, smsOption } = this.props;
 	
 	const messages = Object.values(teachers).filter( teacher => teacher.Phone !== undefined && teacher.Phone !== "" )
 						.map (T => { 
@@ -29,12 +29,15 @@ export default class ToAllTeachers extends Component {
 					<label>Message</label>
 					<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 				</div> 
-					{ !this.props.connected ? 
-						<div className="button" onClick={() => sendBatchMessages(messages)}>Send</div> : 
-						<a href={smsIntentLink({
-							messages,
-							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> }
+					{
+						smsOption === "SIM" ? 
+							<a href={smsIntentLink({
+								messages,
+								return_link: window.location.href 
+								})} className="button blue">Send using Local SIM</a> :
+
+							<div className="button" onClick={() => sendBatchMessages(messages)}>Can only send using Local SIM</div>
+					}
 			</div>
 		)
   }

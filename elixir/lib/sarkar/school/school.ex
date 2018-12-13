@@ -10,14 +10,14 @@ defmodule Sarkar.School do
 
 		# state is school_id, map of writes, map of db.
 		# TODO: map of writes: (path) -> date
-
-		GenServer.start_link(__MODULE__, {school_id, %{}, Sarkar.Store.School.load(school_id)}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		{db, writes} = Sarkar.Store.School.load(school_id)
+		GenServer.start_link(__MODULE__, {school_id, writes, db}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
 
-	def sync_changes(school_id, client_id, changes) do
-		GenServer.call(via(school_id), {:sync_changes, client_id, changes})
+	def sync_changes(school_id, client_id, changes, last_sync_date) do
+		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date})
 	end
 
 	def get_db(school_id) do
@@ -26,40 +26,112 @@ defmodule Sarkar.School do
 
 	# SERVER
 
-	def handle_call({:sync_changes, client_id, changes}, _from, {school_id, writes, db} = state) do
+	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {school_id, writes, db} = state) do
 
 		# map of changes.
 		# key is path separated by comma
 		# value is { action: {path, value}, date}
-		# we need to keep a dictionary of path/date to decide if we should execute that write
-		# for now we'll just execute and last write wins.
 
-		{nextDb, last_date} = Enum.reduce(changes, {db, 0}, fn({path_key, payload}, {agg_db, max_date}) -> 
+		# make sure we aren't missing any writes between last sync_date and the least path_date.
+
+		# This is happening way more than expected. It should only happen for very out of date clients - which should not be the case in 1 day and no GC
+		min_write_date = if writes != %{} do
+
+			{_, %{"date" => mwd }} = writes 
+				|> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+			
+			mwd
+		end
+
+		have_all_in_memory? = min_write_date < last_sync_date
+
+		writes = if not have_all_in_memory? do
+				case Sarkar.Store.School.get_writes(school_id, last_sync_date) do
+					{:ok, aug_writes} -> 
+						# whats in aug_writes that isnt in writes??
+						IO.puts "SUCCESSFUL DB RECOVERY @ #{:os.system_time(:millisecond)}. last_sync_date: #{last_sync_date} min_write_date: #{min_write_date}"
+						aug_writes
+					{:error, err} -> 
+						IO.puts "ERROR ON DB RECOVERY"
+						IO.inspect err
+						writes
+				end
+		else
+			writes
+		end
+
+		# end weird section
+
+		human_client = case client_id do
+			"1918cdd5-e734-467c-bdca-f4b932580583" -> "Pixel 2XL"
+			"edef4d0e-9f79-4bb7-a525-6e47f46f26c4" -> "Chrome laptop"
+			"e8227de3-f729-4638-b234-f238ddaef39a" -> "Tablet"
+			other -> "other client"
+		end
+
+		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
 			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
 			[prefix | p ] = path
 
+			p_key = Enum.join(p, ",")
+			write = %{"date" => date, "value" => value, "path" => path, "type" => type}
+
 			case type do
 				"MERGE" ->
-					{Dynamic.put(agg_db, p, value), max(date, max_date)}
+					case Map.get(agg_writes, p_key) do
+						nil -> 
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+							IO.puts "#{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+							# IO.inspect write
+							{agg_db, agg_writes, agg_new_writes, max_date}
+						other -> 
+							IO.puts "OTHER!!!!!!!!!!!!!"
+							IO.inspect other
+							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+					end
+
 				"DELETE" -> 
-					{Dynamic.delete(agg_db, p), max(date, max_date)}
+					case Map.get(agg_writes, p_key) do
+						nil -> 
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date} when prev_date <= date ->
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+						%{"date" => prev_date} when prev_date > date ->
+							{agg_db, agg_writes, agg_new_writes, max_date}
+						other ->
+							IO.puts "OTHER!!!!!!!!!!!"
+							IO.inspect other
+							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
+					end
 				other -> 
 					IO.puts "unrecognized type"
 					{agg_db, max_date}
 			end
-
 		end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
-		# TODO: think about just sending the changes.
 
-		case length(Map.keys(changes)) do
-			0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+		# each client has sent its "last received data" date. when it connects, we should send all the latest writes that have happened since then, not the full db.
+		# get that data for it here.
+
+		relevant = nextWrites 
+					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
+					|> Enum.into(%{})
+		
+		case map_size(new_writes) do
+			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
+			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
 			_ -> 
-				broadcast(school_id, client_id, snapshot(nextDb))
-				Sarkar.Store.School.save(school_id, nextDb)
-				{:reply, confirm_sync(last_date, nextDb), {school_id, writes, nextDb}}
+				#broadcast(school_id, client_id, snapshot(nextDb))
+				broadcast(school_id, client_id, snapshot_diff(new_writes))
+				Sarkar.Store.School.save(school_id, nextDb, new_writes)
+				# what do we do about attendance?? there are so many paths...
+				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
+				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
 		end
 	end
 
@@ -80,6 +152,21 @@ defmodule Sarkar.School do
 		%{
 			type: "SNAPSHOT",
 			db: db
+		}
+	end
+
+	defp snapshot_diff(new_writes) do
+		%{
+			type: "SNAPSHOT_DIFF",
+			new_writes: new_writes
+		}
+	end
+
+	defp confirm_sync_diff(date, new_writes) do
+		%{
+			type: "CONFIRM_SYNC_DIFF",
+			date: date,
+			new_writes: new_writes # client should only have to check these against queued / pending writes.
 		}
 	end
 

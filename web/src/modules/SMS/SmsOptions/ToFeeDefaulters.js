@@ -16,7 +16,7 @@ export default class ToFeeDefaulters extends Component {
 	
   render() {
 
-	const { students, sendBatchMessages } = this.props;
+	const { students, sendBatchMessages, smsOption } = this.props;
 	
 	const messages = Object.values(students)
 	.filter(student => Object.values(student.payments)
@@ -29,12 +29,15 @@ export default class ToFeeDefaulters extends Component {
 					<label>Message</label>
 					<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 				</div> 
-					{ !this.props.connected ? 
-						<div className="button" onClick={() => sendBatchMessages(messages)}>Send</div> : 
-						<a href={smsIntentLink({
-							messages,
-							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> }
+					{
+						smsOption === "SIM" ? 
+							<a href={smsIntentLink({
+								messages,
+								return_link: window.location.href 
+								})} className="button blue">Send using Local SIM</a> :
+
+							<div className="button" onClick={() => sendBatchMessages(messages)}>Can only send using Local SIM</div>
+					}
 			</div>
 		)
   }

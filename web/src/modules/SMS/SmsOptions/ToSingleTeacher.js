@@ -17,7 +17,7 @@ export default class ToSingleTeacher extends Component {
 	
   render() {
 
-	const { teachers, sendMessage } = this.props;
+	const { teachers, sendMessage, smsOption } = this.props;
 	
 	return (
 	<div>
@@ -37,12 +37,15 @@ export default class ToSingleTeacher extends Component {
 			<label>Message</label>
 			<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 		</div>
-			{ !this.props.connected ? 
-				<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_teacher_number)}>Send</div> : 
-				<a href={smsIntentLink({
-					messages: [{ number: this.state.selected_teacher_number, text: this.state.text }],
-					return_link: window.location.href 
-					})} className="button blue">Send using Local SIM</a> }
+			{
+				smsOption === "SIM" ? 
+					<a href={smsIntentLink({
+						messages: [{ number: this.state.selected_teacher_number, text: this.state.text }],
+						return_link: window.location.href 
+						})} className="button blue">Send using Local SIM</a> :
+				
+					<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_teacher_number)}>Can only send using Local SIM</div>
+			}
 	</div>
 	)
   }

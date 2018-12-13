@@ -17,33 +17,36 @@ export default class ToSingleStudent extends Component {
 	
   render() {
 
-	const { students, sendMessage } = this.props;
+	const { students, sendMessage, smsOption } = this.props;
 	
 	return (
-	<div>
-		<div className="row">
-			<label>Select student</label>		
-			<select {...this.former.super_handle(["selected_student_number"])}>
+		<div>
+			<div className="row">
+				<label>Select student</label>		
+				<select {...this.former.super_handle(["selected_student_number"])}>
+					{
+						[<option key="abcd" value="" disabled>Select a Student</option>,
+						...Object.entries(students)
+						.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
+						.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
+						]
+					}
+				</select>
+			</div>
+			<div className="row">
+				<label>Message</label>
+				<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
+			</div>
 				{
-					[<option key="abcd" value="" disabled>Select a Student</option>,
-					...Object.entries(students)
-					.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
-					.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
-					]
+					smsOption === "SIM" ?
+						<a href={smsIntentLink({
+							messages: [{ number: this.state.selected_student_number, text: this.state.text }],
+							return_link: window.location.href 
+							})} className="button blue">Send using Local SIM</a> :
+
+						<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_student_number)}>Send</div>
 				}
-			</select>
 		</div>
-		<div className="row">
-			<label>Message</label>
-			<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
-		</div>
-			{ !this.props.connected ? 
-				<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_student_number)}>Send</div> : 
-				<a href={smsIntentLink({
-					messages: [{ number: this.state.selected_student_number, text: this.state.text }],
-					return_link: window.location.href 
-					})} className="button blue">Send using Local SIM</a> }
-	</div>
 	)
   }
 }

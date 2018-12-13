@@ -1,6 +1,12 @@
 import { v4 } from 'node-uuid'
 import requestFS from 'utils/requestFS'
 
+const defaultTemplates = () => ({
+	attendance: "$NAME has been marked $STATUS",
+	fee: "$NAME has paid $AMOUNT Rs, Your remaining Balance is $BALANCE Rs",
+	result: "Report is ready for $NAME:\n $REPORT"
+})
+
 const initState = {
 	client_id: v4(),
 	queued: { },
@@ -11,7 +17,7 @@ const initState = {
 		users: { }, // username: passwordhash, permissions, etc.  
 		students: { },
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
-		sms_templates: { },
+		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
 		settings: { }
 	},
@@ -19,6 +25,7 @@ const initState = {
 	// but will get to that later
 	auth: {
 		school_id: undefined,
+		faculty_id: undefined,
 		token: undefined,
 		username: undefined,
 		name: undefined,
@@ -81,7 +88,12 @@ export const saveDB = (db) => {
 		console.error(err)
 	}
 
-	saveDbToFilesystem(db);
+	try {
+		saveDbToFilesystem(db);
+	}
+	catch(e) {
+		console.error(e)
+	}
 
 }
 
@@ -89,10 +101,10 @@ const saveDbToFilesystem = (db) => {
 
 	requestFS(20)
 		.then(fs => {
-			console.log('got fs');
+			//console.log('got fs');
 		})
 		.catch(err => {
-			console.error(err)
+			//console.error(err)
 		})
 
 }
