@@ -30,7 +30,7 @@ class Attendance extends Component {
 
 		const my_sections = sections.filter(s => s.faculty_id === props.current_faculty.id)
 
-		const selected_section = my_sections.length > 0 ? my_sections[0].id : "";
+		const selected_section = my_sections.length > 0 ? my_sections[0].id : (sections.length > 0 ? sections[0].id : "");
 
 		this.state = {
 			date: moment.now(),
