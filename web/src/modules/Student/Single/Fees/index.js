@@ -65,6 +65,10 @@ class StudentFees extends Component {
 	addPayment = () => {
 		// dispatch addPayment action 
 
+		if(this.state.payment.amount === "") {
+			return
+		}
+
 		const id = v4();
 		const payment = {
 			amount: parseFloat(this.state.payment.amount),
@@ -96,9 +100,7 @@ class StudentFees extends Component {
 			}
 		}
 
-		if(this.state.payment.amount !== "") {
-			this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
-		}
+		this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
 
 		this.setState({
 			payment: {
