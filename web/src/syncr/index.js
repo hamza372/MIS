@@ -68,8 +68,14 @@ export default class Syncr {
 	}
 
 	ping() {
-		if(this.ready)
-			this.ws.send("ping")
+		if(this.ready) {
+			try {
+				this.ws.send("ping")
+			}
+			catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	async send(message) {

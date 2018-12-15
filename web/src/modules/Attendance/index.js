@@ -43,7 +43,6 @@ class Attendance extends Component {
 	}
 
 	mark = (student, status) => () => {
-		console.log('mark student', student.Name, status)
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
