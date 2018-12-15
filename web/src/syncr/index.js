@@ -31,6 +31,10 @@ export default class Syncr {
 
 		this.ws.onclose = async (e) => {
 			if(this.ready) {
+
+				this.pending.forEach(promise => promise.reject("disconnect"));
+				this.pending.clear();
+
 				this.dispatch(disconnected())
 			}
 			this.cleanup();
