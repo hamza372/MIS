@@ -11,8 +11,8 @@ const Layout = ({ user, children, history }) => {
 	</div>
 }
 
-const Header = ({user,history}) => <div className="header"> 
-	{ history.location.pathname !== "/" ? <div className="back" onClick={() => history.goBack()} style={{backgroundImage: `url(${backIcon})`}}/> : false}
+const Header = ({user, history}) => <div className="header"> 
+	{ history.location.pathname !== "/" ? <div className="back" onClick={() => history.goBack()} style={{ backgroundImage: `url(${backIcon})`}} />: false}
 	<div className="left"><Link to="/">MISchool</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
