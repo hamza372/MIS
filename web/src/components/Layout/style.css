@@ -25,6 +25,12 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
+	.header .back {
+		padding: 10px 20px;
+		cursor: pointer;
+		background-position: 60% 20%;
+		background-repeat: no-repeat;
+	}
 
 a {
 	color: #4DA2DF;

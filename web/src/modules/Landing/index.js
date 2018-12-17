@@ -99,7 +99,7 @@ class Landing extends Component {
 			}
 		}
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="landing">
 				<div className="horizontal-scroll-container">
 

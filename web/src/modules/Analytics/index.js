@@ -15,7 +15,7 @@ class Analytics extends Component {
 
 		const loc = this.props.location.pathname.split('/').slice(-1).pop();
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="analytics">
 				<div className="row tabs">
 					<Link className={`button ${loc === "fees" ? "orange" : false}`} to="fees" replace={true}>Fees</Link>

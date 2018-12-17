@@ -36,7 +36,7 @@ class SchoolLogin extends Component {
 			return <div>Connecting.....</div>
 		}
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="school-login">
 				<div className="title">Verify your School</div>
 				<div className="form">
