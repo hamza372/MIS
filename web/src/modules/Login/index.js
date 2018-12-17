@@ -54,7 +54,7 @@ class Login extends Component {
 			return <Redirect to="/faculty/first" />
 		}
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="login">
 				<div className="title">{`Login to School ${this.props.auth.school_id}`}</div>
 				<div className="form">

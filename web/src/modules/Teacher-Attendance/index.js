@@ -32,12 +32,12 @@ class TeacherAttendance extends Component {
 	render() {
 
 		if(!this.props.user.Admin) {
-			return <Layout>
+			return <Layout history={this.props.history}>
 				<div className="title">Only Admins can visit this page</div>
 			</Layout>
 		}
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="teacher-attendance">
 				<div className="title">Teacher Attendance</div>
 

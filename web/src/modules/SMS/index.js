@@ -129,7 +129,7 @@ class SMS extends Component {
 	}
 	render() {
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="sms-page">
 				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 

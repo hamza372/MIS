@@ -171,7 +171,7 @@ class SingleExam extends Component {
 			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}/exam/${this.state.exam.id}`} />
 		}
 		*/
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="single-exam">
 				{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 

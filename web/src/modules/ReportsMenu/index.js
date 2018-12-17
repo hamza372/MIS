@@ -24,7 +24,7 @@ class ReportsMenu extends Component {
 
 	render() {
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="reports-menu">
 				<div className="title">Reports</div>
 

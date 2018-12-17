@@ -1,17 +1,18 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-
+import backIcon from './back.svg'
 import './style.css'
 
-const Layout = ({ user, children }) => {
+const Layout = ({ user, children, history }) => {
 	return <div className="layout">
-		<Header user={user} />
+		<Header user={user} history={history}/>
 		{ children }
 	</div>
 }
 
-const Header = ({user}) => <div className="header">
+const Header = ({user,history}) => <div className="header"> 
+	{ history.location.pathname !== "/" ? <div className="back" onClick={() => history.goBack()} style={{backgroundImage: `url(${backIcon})`}}/> : false}
 	<div className="left"><Link to="/">MISchool</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
@@ -27,7 +28,7 @@ export default connect(state => ({
 }))(Layout)
 
 const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div className="layout">
-	<Header user={user} />
+	<Header user={user} history={props.history}/>
 	<WrappedComponent {...props} />
 </div>
 
