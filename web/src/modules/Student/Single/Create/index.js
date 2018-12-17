@@ -3,10 +3,13 @@ import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
+import Dynamic from '@ironbay/dynamic'
+
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import Hyphenator from 'utils/Hyphenator'
 
 
 import { createStudentMerge, deleteStudent } from 'actions'
@@ -253,6 +256,12 @@ class SingleStudent extends Component {
 		})
 	}
 
+	addHyphens = (path) => () => {
+		
+		let str = Dynamic.get(this.state, path);
+		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))
+	}
+
 	render() {
 
 		if(this.state.redirect) {
@@ -283,7 +292,7 @@ class SingleStudent extends Component {
 					
 					<div className="row">
 						<label>B-Form Number</label>
-						<input type="number" {...this.former.super_handle(["BForm"], (num) => num.length <= 15)} placeholder="BForm" disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={admin}/>
 					</div>
 
 					<div className="row">
@@ -307,7 +316,7 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Father CNIC</label>
-						<input type="number" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15)} placeholder="Father CNIC"  disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={admin}/>
 					</div>
 
 					<div className="divider">Contact Information</div>
