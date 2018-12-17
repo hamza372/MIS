@@ -5,8 +5,8 @@ import { smsIntentLink } from 'utils/intent'
 
 import './style.css'
 
-export const ClassReports = (props) => {
-	const {id, classes, students, exams, settings, sms_templates, start, end} = props;
+export const ClassReports = ({id, classes, students, exams, settings, sms_templates, start, end}) => {
+	
 	const current_class = classes[id];
 	const section_set = new Set(Object.keys(current_class.sections));
 
