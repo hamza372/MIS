@@ -19,7 +19,7 @@ const tableTitle = () =>{
 
 const TeacherList = (props) => {
 	
-	return <Layout>
+	return <Layout history={props.history}>
 		<div className="teacher-list">
 			
 			<Title>Teachers</Title>

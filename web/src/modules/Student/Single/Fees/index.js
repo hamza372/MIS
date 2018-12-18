@@ -65,6 +65,10 @@ class StudentFees extends Component {
 	addPayment = () => {
 		// dispatch addPayment action 
 
+		if(this.state.payment.amount === "") {
+			return
+		}
+
 		const id = v4();
 		const payment = {
 			amount: parseFloat(this.state.payment.amount),
@@ -73,18 +77,8 @@ class StudentFees extends Component {
 			fee_id: undefined
 		}
 
-		if(this.state.payment.amount !== "") {
-			this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
-		}
-
-		this.setState({
-			payment: {
-				active: false
-			}
-		})
-
-		const balance = Object.entries(this.student().payments) 
-					.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+		const balance = [...Object.values(this.student().payments), payment]
+					.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
 		if(this.state.payment.sendSMS) {
 			// send SMS with replace text for regex etc.
@@ -105,6 +99,14 @@ class StudentFees extends Component {
 				window.location.href = url;
 			}
 		}
+
+		this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
+
+		this.setState({
+			payment: {
+				active: false
+			}
+		})
 
 	}
 	getFilterCondition = (payment) =>

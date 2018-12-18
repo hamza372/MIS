@@ -150,19 +150,22 @@ class SingleStudent extends Component {
 			}
 		}
 
-		const payments = checkStudentDuesReturning(student)
-			.reduce((agg, p) => ({ 
-				...agg, 
-				[p.payment_id]: {
-					amount: p.amount,
-					date: p.date,
-					type: p.type,
-					fee_id: p.fee_id,
-					fee_name: p.fee_name
-				}
-			}), {});
+		if(this.isNew()) {
+			const payments = checkStudentDuesReturning(student)
+				.reduce((agg, p) => ({ 
+					...agg, 
+					[p.payment_id]: {
+						amount: p.amount,
+						date: p.date,
+						type: p.type,
+						fee_id: p.fee_id,
+						fee_name: p.fee_name
+					}
+				}), {});
 
-		student.payments = payments;
+			student.payments = payments;
+		}
+
 		this.props.save(student);
 		
 		this.setState({

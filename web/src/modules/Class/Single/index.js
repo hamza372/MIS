@@ -14,7 +14,7 @@ export default (props) => {
 		const loc = splits.slice(-1).pop();
 		const isPrintPage = splits.length === 6 && splits[3] === "reports"
 
-	return <Layout>
+	return <Layout history={props.history}>
 		<div className="single-class-container">
 
 			{loc === "new" || isPrintPage ? false : 

@@ -3,8 +3,8 @@
   "name": "MISchool",
   "icons": [
     {
-	  "src": "favicon.png",
-	  "size": "128x128",
+	  "src": "favicon.ico",
+	  "sizes": "72x72 96x96 128x128 192x192 256x256 512x512",
       "type": "image/png"
     }
   ],

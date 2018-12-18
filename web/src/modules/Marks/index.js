@@ -9,7 +9,7 @@ class Reports extends Component {
 	render() {
 
 		const sections = getSectionsFromClasses(this.props.classes)
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="reports-page">
 				<div className="title">Sections</div>
 				<div className="list">

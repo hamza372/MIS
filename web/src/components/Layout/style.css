@@ -25,10 +25,15 @@ html,body, #root, .layout{
 	font-size: 1.5rem;
 }
 
+	.header .back {
+		padding: 10px 20px;
+		cursor: pointer;
+		background-position: 60% 20%;
+		background-repeat: no-repeat;
+	}
 
 a {
-	color: #4DA2DF;
-	color: #189cec;
+	color: #74aced;
 }
 
 a.block {
@@ -315,8 +320,6 @@ textarea {
 	}
 
 	.button.blue, .button.save {
-		/*background-color: #4DA2DF;*/
-		background-color: #189cec;
 		background-color: #74aced;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
@@ -327,9 +330,6 @@ textarea {
 	}
 
 	.button.green {
-		/*background-color: #4DA2DF;*/
-		background-color: #4ec9b3;
-		background-color: #6dc4b5;
 		background-color: #5ecdb9;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
@@ -341,8 +341,6 @@ textarea {
 	}
 
 	.button.yellow {
-		/*background-color: #4DA2DF;*/
-		background-color: #ffca7b;
 		background-color: #f4d29f;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
@@ -380,7 +378,6 @@ textarea {
 	}
 
 	.button.purple {
-		background-color: #5c6af8;
 		background-color: #7e88f7;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);

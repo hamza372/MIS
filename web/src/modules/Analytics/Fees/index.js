@@ -24,7 +24,7 @@ const MonthlyFeesChart = (props) => {
 					<Tooltip />
 
 					<Bar dataKey='OWED' name="Owed" fill="#74aced" />
-					<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Payed" />
+					<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Paid" />
 					<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
 					<Bar dataKey='net' name="Paid - Owed" fill="#ff6b68" />
 
@@ -44,7 +44,7 @@ return <div className="section table" style={{margin: "20px 0"}}>
 				<label><b>Paid</b></label>
 				<label><b>Forgiven</b></label>
 				<label><b>Paid - Owed</b></label>
-			</div>				
+			</div>
 			{
 				[...Object.entries(monthly_payments)
 					.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))

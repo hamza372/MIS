@@ -19,7 +19,7 @@ export default class StudentPage extends Component {
 		
 		const loc = this.props.location.pathname.split('/').slice(-1).pop();
 
-		return <Layout>
+		return <Layout history={this.props.history}>
 			<div className="single-student">
 				{ loc === "new" ? false : 
 				<div className="row tabs">

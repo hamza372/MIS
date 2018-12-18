@@ -13,13 +13,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 
 	dispatch(action)
 
-	const state = getState()
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: merges.reduce((agg, curr) => ({
+	const new_merges = merges.reduce((agg, curr) => ({
 			...agg, 
 			[curr.path.join(',')]: {
 				action: {
@@ -30,11 +24,24 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 				date: new Date().getTime()
 			}
 		}), {})
+
+		// assume the merge we are writing on the client is newer than the previous stuff...
+	
+	
+	const state = getState()
+	const rationalized_merges = {...state.queued, ...new_merges};
+
+	const payload = {
+		type: SYNC,
+		school_id: state.auth.school_id,
+		client_type,
+		lastSnapshot: state.lastSnapshot,
+		payload: rationalized_merges
 	}
 
 	syncr.send(payload)
 		.then(dispatch)
-		.catch(err => dispatch(QueueUp(payload.payload)))
+		.catch(err => dispatch(QueueUp(new_merges)))
 }
 
 export const SMS = "SMS"
@@ -84,6 +91,8 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 	}
 
 	dispatch(action)
+
+	const state = getState();
 	const payload = paths.reduce((agg, curr) => ({
 			...agg, 
 			[curr.path.join(',')]: {
@@ -95,14 +104,14 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 				date: new Date().getTime()
 			}
 		}), {})
+	const rationalized_deletes = {...state.queued, ...payload}
 
-	const state = getState();
 	syncr.send({
 		type: SYNC,
 		client_type,
 		school_id: state.auth.school_id,
 		lastSnapshot: state.lastSnapshot,
-		payload 
+		payload: rationalized_deletes
 	})
 	.then(dispatch)
 	.catch(err => dispatch(QueueUp(payload)))
@@ -171,6 +180,7 @@ export const connected = () => (dispatch, getState, syncr) => {
 				}
 			})
 			.then(res => {
+
 				return syncr.send({
 					type: SYNC,
 					client_type,
