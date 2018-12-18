@@ -26,7 +26,6 @@ export default (props) => {
 
 			<Route path="/class/new" component={Create} />
 			<Route path="/class/:id/profile" component={Create} />
-			<Route path="/class/:id/reports/:start/:end" component={Reports} />
 			<Route path="/class/:id/report-menu" component={ReportMenu} />
 
 		</div>

@@ -261,7 +261,7 @@ class SingleStudent extends Component {
 
 	addHyphens = (path) => () => {
 		
-		let str = Dynamic.get(this.state, path);
+		const str = Dynamic.get(this.state, path);
 		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))
 	}
 

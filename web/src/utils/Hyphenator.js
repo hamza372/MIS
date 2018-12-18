@@ -1,5 +1,5 @@
 
-export const Hyphenator = (str) => {
+const Hyphenator = (str) => {
 	
 	if(str.length <= 15)
 	{	
