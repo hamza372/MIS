@@ -45,7 +45,7 @@ class ReportsMenu extends Component {
 
 			</div>
 		</Layout>
-
+ 
 	}
 
 }
