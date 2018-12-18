@@ -35,7 +35,7 @@ const blankStudent = () => ({
 
 	ManCNIC: "",
 	ManName: "",
-	Birthdate: moment().subtract(20, "year"),
+	Birthdate: "", //moment().subtract(20, "year"),
 	Address: "",
 	Notes: "",
 	StartDate: moment(),

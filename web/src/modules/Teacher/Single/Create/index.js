@@ -30,7 +30,7 @@ const blankTeacher = (isFirst = false) => ({
 
 	ManCNIC: "",
 	ManName: "",
-	Birthdate: moment().subtract(20, "year"),
+	Birthdate: "",
 	Address: "",
 	StructuredQualification: "",
 	Qualification: "",
