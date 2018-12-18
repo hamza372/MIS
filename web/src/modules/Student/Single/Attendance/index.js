@@ -19,8 +19,6 @@ class StudentAttendance extends Component {
 			return agg;
 		}, {PRESENT: 0, ABSENT: 0, LEAVE: 0})
 
-		console.log(num_absent, num_present, num_leave)
-
 		return <div className="student-attendance">
 			<div className="row">
 				<label>Days Present:</label>
