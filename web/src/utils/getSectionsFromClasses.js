@@ -13,6 +13,7 @@ export const getSectionsFromClasses = (classes) => {
 							class_id: c.id,
 							namespaced_name: arr.length === 1 && section.name === "DEFAULT" ? c.name : `${c.name}-${section.name}`,
 							className: c.name,
+							classYear: c.classYear,
 							...section
 						}
 					]

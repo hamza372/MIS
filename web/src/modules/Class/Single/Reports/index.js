@@ -1,17 +1,12 @@
 import React from 'react'
-import { connect } from 'react-redux'
 
 import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { smsIntentLink } from 'utils/intent'
 
 import './style.css'
 
-const ClassReports = ({ match, classes, students, exams, settings, sms_templates }) => {
-
-	const id = match.params.id;
-	const start = parseFloat(match.params.start)
-	const end = parseFloat(match.params.end)
-
+export const ClassReports = ({id, classes, students, exams, settings, sms_templates, start, end}) => {
+	
 	const current_class = classes[id];
 	const section_set = new Set(Object.keys(current_class.sections));
 
@@ -33,7 +28,8 @@ const ClassReports = ({ match, classes, students, exams, settings, sms_templates
 
 	return <div className="class-report" style={{height: "100%"}}>
 			<div className="print button" onClick={() => window.print()}>Print</div>
-			{ settings.sendSMSOption === "SIM" ? <a className="button blue" href={url} style={{display: "block"}}>Send Reports using SMS</a> : false }
+			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" href={url}>Send Reports using SMS</a> : false }
+
 			{
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
@@ -41,13 +37,8 @@ const ClassReports = ({ match, classes, students, exams, settings, sms_templates
 						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} />
 					</div>)
 			}
+			
 		</div>
 }
 
-export default connect(state => ({
-	classes: state.db.classes,
-	students: state.db.students,
-	settings: state.db.settings,
-	exams: state.db.exams,
-	sms_templates: state.db.sms_templates
-}))(ClassReports)
+export default ClassReports;
