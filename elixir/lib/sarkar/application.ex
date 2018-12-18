@@ -17,7 +17,7 @@ defmodule Sarkar.Application do
 					name: Sarkar.School.DB,
 					hostname: System.get_env("POSTGRES_HOST") || "localhost",
 					username: "postgres",
-					password: "postgres",
+					password: System.get_env("POSTGRES_PASS") || "postgres",
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
 					types: Sarkar.PostgrexTypes
