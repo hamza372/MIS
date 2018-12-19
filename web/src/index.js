@@ -13,7 +13,7 @@ import Syncr from 'syncr'
 
 const debug_host = 'wss://c1f30056.ngrok.io'
 
-const host = process.env.REACT_APP_MIS_HOST || debug_host;
+const host = window.api_url || debug_host;
 
 const initialState = loadDB();
 
