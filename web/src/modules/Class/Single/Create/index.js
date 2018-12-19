@@ -9,7 +9,7 @@ import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import Banner from 'components/Banner'
 
 import Dropdown from 'components/Dropdown'
-import { createEditClass, addStudentToSection, removeStudentFromSection } from 'actions'
+import { createEditClass, addStudentToSection, removeStudentFromSection, deleteClass } from 'actions'
 
 import './style.css'
 
@@ -134,7 +134,6 @@ class SingleClass extends Component {
 	removeSection = (id) => () => {
 
 		const {[id]: removed, ...rest} = this.state.class.sections;
-
 		this.setState({
 			class: {
 				...this.state.class,
@@ -165,8 +164,34 @@ class SingleClass extends Component {
 		this.props.removeStudent(student)
 	}
 
-	render() {
+	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
+	removeClass = Class => {
+		
+		Object.values(this.props.students)
+			.forEach(student => Object.keys(Class.sections)
+					.forEach(section => 
+						{ 
+							if(section === student.section_id) 
+							this.addStudent("")(this.props.students[student.id])
+						})
+					)
+
+		this.props.removeClass(Class)
+
+		this.setState({
+			banner:{
+				active: true,
+				good: false,
+				text: "DELETED"
+			}
+		})
+
+		setTimeout(() => this.setState({redirect: true, banner: { active : false} }), 1000);
+		
+	}
+
+	render() {
 		if(this.state.redirect) {
 			return <Redirect to={`/class`} />
 		}
@@ -269,8 +294,10 @@ class SingleClass extends Component {
 						})
 				}
 				<div className="button green" onClick={this.addSection}>Add Another Section</div>
-
-				<div className="button save" onClick={this.onSave}>Save</div>
+				<div className="save-delete">
+					{ !this.isNew() ? <div className="button red" onClick={() => this.removeClass(this.state.class)}>Delete</div> : false }
+					<div className="button save" onClick={this.onSave}>Save</div>
+				</div>
 			</div>
 		</div>
 	}
@@ -283,5 +310,6 @@ export default connect(state => ({
 }), dispatch => ({
 	save: (c) => dispatch(createEditClass(c)),
 	addStudent: (section_id, student) => dispatch(addStudentToSection(section_id, student)),
-	removeStudent: (student) => dispatch(removeStudentFromSection(student))
+	removeStudent: (student) => dispatch(removeStudentFromSection(student)),
+	removeClass: (Class) => dispatch(deleteClass(Class))  //////
 }))(SingleClass)

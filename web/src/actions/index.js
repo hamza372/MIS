@@ -105,6 +105,14 @@ export const createEditClass = newClass => dispatch => {
 	))
 }
 
+export const deleteClass = (Class) => dispatch => {
+	dispatch(createDeletes([
+		{
+			path:["db", "classes", Class.id]
+		}
+	]))
+}
+
 export const addStudentToSection = (section_id, student) => dispatch => {
 
 	dispatch(createMerges([
