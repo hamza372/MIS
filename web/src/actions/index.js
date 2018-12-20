@@ -138,7 +138,6 @@ export const removeStudentFromSection = (student) => dispatch => {
 }
 
 export const markStudent = (student, date, status, time = moment.now()) => dispatch => {
-	console.log('mark student', student, ' as', status)
 
 	dispatch(createMerges([
 		{
