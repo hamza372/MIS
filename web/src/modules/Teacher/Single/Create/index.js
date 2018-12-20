@@ -3,9 +3,13 @@ import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
+import Dynamic from '@ironbay/dynamic'
+
 
 import { createFacultyMerge } from 'actions'
 import { hash } from 'utils'
+import Hyphenator from 'utils/Hyphenator'
+
 
 
 import Banner from 'components/Banner'
@@ -30,7 +34,7 @@ const blankTeacher = (isFirst = false) => ({
 
 	ManCNIC: "",
 	ManName: "",
-	Birthdate: moment().subtract(20, "year"),
+	Birthdate: "",
 	Address: "",
 	StructuredQualification: "",
 	Qualification: "",
@@ -150,16 +154,12 @@ class CreateTeacher extends Component {
 		})
 	}
 
-/* 	formatCNIC = () => {
+	addHyphens = (path) => () => {
+		
+		const str = Dynamic.get(this.state, path);
+		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))	
+	}
 
-		// substring
-		console.log('substr(4,6): ',this.state.profile.CNIC.substr(5,6))
-
-		if (this.state.profile.CNIC.length === 5 && this.state.profile.CNIC.substr(5,6) === "" || this.state.profile.CNIC.length === 13 && this.state.profile.CNIC.substr(13,1) === undefined)
-		{
-			this.setState({ profile: { CNIC: this.state.profile.CNIC + '-' }})
-		}
-	} */
 
 	render() {
 
@@ -188,7 +188,7 @@ class CreateTeacher extends Component {
 				</div>
 				<div className="row">
 					<label>CNIC</label>
-					<input type="text" {...this.former.super_handle(["CNIC"], (num) => num.length <= 15)}  placeholder="CNIC" disabled={!canEdit}/>
+					<input type="tel" {...this.former.super_handle(["CNIC"], (num) => num.length <= 15,this.addHyphens(["profile","CNIC"]))}  placeholder="CNIC" disabled={!canEdit}/>
 				</div>
 				<div className="row">
 					<label>Gender</label>
@@ -223,7 +223,7 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Husband/Father CNIC</label>
-					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15)} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
+					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile","ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
 				</div>
 				
 				<div className="divider">Account Information</div>

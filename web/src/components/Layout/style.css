@@ -69,8 +69,9 @@ a.block {
 	.header {
 		display: none;
 	}
+	
 	.button {
-		display: none;
+		display: none!important;
 	}
 
 	.print-only {
@@ -292,6 +293,7 @@ textarea {
 	text-align: center;
 	user-select: none;
 	box-shadow: none;
+	display: block;
 }
 
 

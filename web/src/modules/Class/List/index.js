@@ -41,4 +41,4 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 export default connect((state, { location }) => ({
 	classes: state.db.classes,
 	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
-}))(LayoutWrap(ClassListModule))
+}))(LayoutWrap(ClassListModule)) 

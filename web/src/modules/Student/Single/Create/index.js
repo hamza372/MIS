@@ -3,10 +3,13 @@ import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom';
+import Dynamic from '@ironbay/dynamic'
+
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import Hyphenator from 'utils/Hyphenator'
 
 
 import { createStudentMerge, deleteStudent } from 'actions'
@@ -35,7 +38,7 @@ const blankStudent = () => ({
 
 	ManCNIC: "",
 	ManName: "",
-	Birthdate: moment().subtract(20, "year"),
+	Birthdate: "",
 	Address: "",
 	Notes: "",
 	StartDate: moment(),
@@ -256,6 +259,12 @@ class SingleStudent extends Component {
 		})
 	}
 
+	addHyphens = (path) => () => {
+		
+		const str = Dynamic.get(this.state, path);
+		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))
+	}
+
 	render() {
 
 		if(this.state.redirect) {
@@ -278,15 +287,10 @@ class SingleStudent extends Component {
 						<label>Full Name</label>
 						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={admin} />
 					</div>
-
-					<div className="row">
-						<label>Roll No</label>
-						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={admin} />
-					</div>
 					
 					<div className="row">
 						<label>B-Form Number</label>
-						<input type="number" {...this.former.super_handle(["BForm"], (num) => num.length <= 15)} placeholder="BForm" disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={admin}/>
 					</div>
 
 					<div className="row">
@@ -310,7 +314,7 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Father CNIC</label>
-						<input type="number" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15)} placeholder="Father CNIC"  disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={admin}/>
 					</div>
 
 					<div className="divider">Contact Information</div>
@@ -327,6 +331,14 @@ class SingleStudent extends Component {
 
 					<div className="divider">School Information</div>
 
+					<div className="row">
+						<label>Active Status</label>
+						<select {...this.former.super_handle(["Active"])} disabled={admin}>
+							<option value={true}>Student Currently goes to this School</option>
+							<option value={false}>Student No Longer goes to this School</option>
+						</select>
+					</div>
+
 					{ !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
 						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={admin}>
@@ -334,7 +346,8 @@ class SingleStudent extends Component {
 								 [
 									<option key="" value="">Please Select a Section</option>,
 									 ...getSectionsFromClasses(this.props.classes)
-										 .map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+									 	.sort((a,b) => a.classYear - b.classYear )
+										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
 								]
 							}
 						</select>
@@ -342,11 +355,8 @@ class SingleStudent extends Component {
 					}
 
 					<div className="row">
-						<label>Active Status</label>
-						<select {...this.former.super_handle(["Active"])} disabled={admin}>
-							<option value={true}>Student Currently goes to this School</option>
-							<option value={false}>Student No Longer goes to this School</option>
-						</select>
+						<label>Roll No</label>
+						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={admin} />
 					</div>
 
 					<div className="row">
