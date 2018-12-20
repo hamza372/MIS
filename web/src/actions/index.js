@@ -105,6 +105,24 @@ export const createEditClass = newClass => dispatch => {
 	))
 }
 
+export const deleteClass = (Class) => (dispatch, getState) => {
+	const state = getState();
+	
+	const students = Object.values(state.db.students)
+						.filter(student => Class.sections[student.section_id] !== undefined )
+						.map(student => (
+							{ path: ["db","students",student.id, "section_id"], value:"" }
+						))
+						
+	dispatch( createMerges(students) )
+
+	dispatch(createDeletes([
+		{
+			path:["db", "classes", Class.id]
+		}
+	])) 
+}
+
 export const addStudentToSection = (section_id, student) => dispatch => {
 
 	dispatch(createMerges([
