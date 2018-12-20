@@ -52,7 +52,7 @@ class Landing extends Component {
 
 	render() {
 
-		const { logout, user, students, faculty, lastSnapshot } = this.props;
+		const { logout, user, students, faculty, lastSnapshot, unsyncd } = this.props;
 
 		const current_page = Math.floor(this.state.scroll / window.innerWidth);
 
@@ -195,6 +195,10 @@ class Landing extends Component {
 								<div>{moment(lastSnapshot).format("HH:mm")}</div>
 								<div>{moment(lastSnapshot).format("D-M-YYYY")}</div>
 							</div>
+							<div className="box bg-grey">
+								<div>{unsyncd}</div>
+								<div>{unsyncd === 1 ? "Unsyncd Change" : "Unsynced Changes"}</div>
+							</div>
 						</div>
 
 					</div>
@@ -217,7 +221,8 @@ export default connect(state => ({
 		user: state.db.faculty[state.auth.faculty_id],
 		students: state.db.students,
 		faculty: state.db.faculty,
-		lastSnapshot: state.lastSnapshot
+		lastSnapshot: state.lastSnapshot,
+		unsyncd: Object.keys(state.queued).length
 	}), 
 	dispatch => ({
 		logout: () => dispatch(createLogout())

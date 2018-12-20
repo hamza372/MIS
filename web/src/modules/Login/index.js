@@ -33,6 +33,7 @@ class Login extends Component {
 	onSwitchSchool = () => {
 
 		// this needs to be looked into...
+		// we should keep client_id....
 		localStorage.removeItem("db");
 		this.props.history.push("/")
 		window.location.reload()
