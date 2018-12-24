@@ -106,6 +106,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 				<label><b>Marks</b></label>
 				<label><b>Out of</b></label>
 				<label><b>Percent</b></label>
+				<label><b>Grade</b></label>
 			</div>
 		{
 			[...Object.keys(student.exams || {})
@@ -119,6 +120,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 						<div>{student.exams[exam.id].score}</div>
 						<div >{exam.total_score}</div>
 						<div>{(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}</div>
+						<div>{student.exams[exam.id].grade}</div>
 					</div>),
 					<div className="table row footing" key={`${student.id}-total-footing`}>
 						<label><b>Total Marks</b></label>

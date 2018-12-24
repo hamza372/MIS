@@ -223,8 +223,11 @@ export const mergeExam = (exam, class_id, section_id) => dispatch => {
 		.reduce((agg, [student_id, score]) => ([
 			...agg,
 			{
-				path: ["db", "students", student_id, "exams", id, "score"],
-				value: score
+				path: ["db", "students", student_id, "exams", id ],
+				value: {
+					score: score.marks, 
+					grade: score.grade
+				}
 			}
 		]), [])
 
