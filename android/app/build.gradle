@@ -30,6 +30,10 @@ repositories {
 
 dependencies {
     implementation 'com.beust:klaxon:3.0.1'
+
+    def work_version = "1.0.0-beta01"
+    implementation "android.arch.work:work-runtime:$work_version"
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0'

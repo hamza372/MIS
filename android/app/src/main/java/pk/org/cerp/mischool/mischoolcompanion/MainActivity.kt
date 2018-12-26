@@ -2,16 +2,23 @@ package pk.org.cerp.mischool.mischoolcompanion
 
 import android.app.Activity
 import android.app.PendingIntent.getActivity
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.JobIntentService
 import android.support.v4.content.ContextCompat
 import android.telephony.SmsManager
 import android.util.Log
 import android.widget.Toast
+import androidx.work.PeriodicWorkRequest
 import com.beust.klaxon.Klaxon
 import java.lang.Exception
 import java.util.jar.Manifest
@@ -42,11 +49,15 @@ class MainActivity : AppCompatActivity() {
             val json_string = java.net.URLDecoder.decode(dataString.split("=")[1], "UTF-8")
             Log.d(TAG, json_string)
 
+            val max_count = Settings.Secure.getInt(this.contentResolver, "sms_ougtgoing_checK_max_count")
+            Log.d(TAG, "MAX COUNT: " + max_count.toString())
+
             val parsed : SMSPayload? = Klaxon().parse(json_string)
 
             for(p in parsed?.messages.orEmpty()) {
                 Log.d(TAG, "send " + p.text + " to " + p.number)
                 sendSMS(p.text, p.number)
+                Thread.sleep(100)
             }
 
             Toast.makeText(applicationContext, parsed?.messages.orEmpty().size.toString() + " messages Sent", Toast.LENGTH_SHORT).show()
@@ -60,6 +71,7 @@ class MainActivity : AppCompatActivity() {
                 */
             }
 
+            val smsWork = PeriodicWorkRequest.Builder<SMSDispatcher>().build()
 
         }
 
