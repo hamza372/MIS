@@ -220,13 +220,13 @@ export const mergeExam = (exam, class_id, section_id) => dispatch => {
 	// make sure date is a unix timestamp
 
 	const student_merges = Object.entries(student_marks)
-		.reduce((agg, [student_id, score]) => ([
+		.reduce((agg, [student_id, student_mark]) => ([
 			...agg,
 			{
 				path: ["db", "students", student_id, "exams", id ],
 				value: {
-					score: score.marks, 
-					grade: score.grade
+					score: student_mark.score, 
+					grade: student_mark.grade
 				}
 			}
 		]), [])

@@ -31,7 +31,7 @@ class SingleExam extends Component {
 
 		const student_marks = Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id() )
-			.reduce((agg, [id, student]) => ({ ...agg, [id]: { marks: "", grade: "" }}), {})
+			.reduce((agg, [id, student]) => ({ ...agg, [id]: { score: "", grade: "" }}), {})
 
 		this.state = {
 			exam: this.exam_id() === undefined ? {
@@ -232,7 +232,7 @@ class SingleExam extends Component {
 										<label><Link to={`/student/${id}/profile`} >{student.Name}</Link></label>
 										<input 
 											type="number" 
-											{...this.former.super_handle(["student_marks", id, "marks"])} 
+											{...this.former.super_handle(["student_marks", id, "score"])} 
 											placeholder={`Score out of ${this.state.exam.total_score}`} 
 											style={{width:"68%"}}/>
 										<select {...this.former.super_handle(["student_marks", id, "grade"])} 
