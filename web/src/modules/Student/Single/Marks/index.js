@@ -91,8 +91,6 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			total_marks: 0
 		})
 
-		console.log("EXAMS",Object.keys(student.exams).map(exam_id => student.exams[exam_id]))
-
 	return <div className="student-marks">
 		<PrintHeader settings={settings} />
 
