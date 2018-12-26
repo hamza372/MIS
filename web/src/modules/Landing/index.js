@@ -20,6 +20,7 @@ import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 
 import './style.css'
+import { stat } from 'fs';
 
 const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -52,7 +53,7 @@ class Landing extends Component {
 
 	render() {
 
-		const { logout, user, students, faculty, lastSnapshot, unsyncd } = this.props;
+		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions } = this.props;
 
 		const current_page = Math.floor(this.state.scroll / window.innerWidth);
 
@@ -126,11 +127,17 @@ class Landing extends Component {
 							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow" style={{backgroundImage: `url(${teacherAttendanceIcon})` }}>Teacher Attendance</Link> : false }
 						</div>
 						<div className="row">
-							<Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link>
+						{ !user.Admin ? 
+							permissions.fee.teacher ? <Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> : false 
+						  : <Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link>
+						}
 							<Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link>
 						</div>
 						<div className="row">
-							<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
+						{ !user.Admin ?
+						    permissions.analyticsModule.teacher ? <Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> : false
+						  : <Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
+						}
 							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
 						</div>
 						<div className="row">
@@ -221,6 +228,7 @@ export default connect(state => ({
 		user: state.db.faculty[state.auth.faculty_id],
 		students: state.db.students,
 		faculty: state.db.faculty,
+		permissions: state.db.settings.permissions,
 		lastSnapshot: state.lastSnapshot,
 		unsyncd: Object.keys(state.queued).length
 	}), 

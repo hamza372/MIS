@@ -12,6 +12,21 @@ export const mergeSettings = (settings) => dispatch => {
 			path: ["db", "settings"],
 			value: settings
 		}
+	])) 
+}
+
+export const MERGE_PERMISSIONS = "MERGE_PERMISSIONS"
+export const mergePermissions = (permissions) => dispatch => {
+
+	if(permissions === undefined) {
+		console.log("PERMISSIONS ARE UNDEFINED")
+		return 
+	}
+	dispatch(createMerges([
+		{
+		path:["db", "settings", "permissions"],
+		value: permissions
+		}
 	]))
 }
  
