@@ -31,13 +31,13 @@ class SingleExam extends Component {
 
 		const student_marks = Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id() )
-			.reduce((agg, [id, student]) => ({ ...agg, [id]: ""}), {})
+			.reduce((agg, [id, student]) => ({ ...agg, [id]: { score: "", grade: "" }}), {})
 
 		this.state = {
 			exam: this.exam_id() === undefined ? {
 				...blankExam(),
 				student_marks
-			} : { 
+ 			} : { 
 				 ...this.props.exams[this.exam_id()],
 				student_marks: this.getGradesForExistingExam(this.exam_id())
 			},
@@ -54,14 +54,14 @@ class SingleExam extends Component {
 	}
 
 	getGradesForExistingExam = exam_id => {
-		// 
+		//
 		return Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id())
 			.reduce((agg, [id, student]) => {
 				if(student.exams === undefined) {
 					return agg;
 				}
-				const exam = student.exams[exam_id]   
+				const exam = student.exams[exam_id]  
 				return {
 					...agg,
 					[id]: exam ? exam.score : ""
@@ -229,12 +229,23 @@ class SingleExam extends Component {
 								.filter(([id, student]) => student.section_id === this.section_id())
 								.map(([id, student]) => (
 									<div className="student row" key={id}>
-										<label><Link to={`/student/${id}/profile`}>{student.Name}</Link></label>
+										<label><Link to={`/student/${id}/profile`} >{student.Name}</Link></label>
 										<input 
 											type="number" 
-											{...this.former.super_handle(["student_marks", id])} 
+											{...this.former.super_handle(["student_marks", id, "score"])} 
 											placeholder={`Score out of ${this.state.exam.total_score}`} 
-											/>
+											style={{width:"68%"}}/>
+										<select {...this.former.super_handle(["student_marks", id, "grade"])} 
+										style={{width:"32%"}}>
+											<option value="">grade</option>
+											<option value="A+">A+</option>
+											<option value="A">A</option>
+											<option value="B">B</option>
+											<option value="C">C</option>
+											<option value="D">D</option>
+											<option value="Fail">Fail</option>
+											<option value="Absent">Absent</option>
+										</select>
 									</div>
 								))
 						}
