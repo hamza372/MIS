@@ -15,11 +15,21 @@ const defaultSettings = {
 	schoolPhoneNumber: "",
 	sendSMSOption: "SIM", // API
 	permissions: {
-		addTeacher:		 { teacher: true },
-		addClass:   	 { teacher: true },
-		addStudent: 	 { teacher: true },
-		fee: 			 { teacher: true },
-		analyticsModule: { teacher: true }
+		addTeacher:		 			{ teacher: false  }, //added
+		addClass:   	 			{ teacher: false  }, //added
+		addStudent: 	 			{ teacher: false  }, //added
+		fee: 			 			{ teacher: false }, //added
+		analyticsModule: 			{ teacher: true  }, //added
+		result_card_module:			{ teacher: true  }, //added
+		student_attendance_module:	{ teacher: true  }, //added
+		teacher_attendance_module:	{ teacher: true  }, //didn't needed to add as only admin can see it
+		sms_module:					{ teacher: true  }, //added
+		marks_module:				{ teacher: true  }, //added
+
+		student_profile:			{ teacher: true  }, 
+		teacher_profile:			{ teacher: false  },
+		class_profile:				{ teacher: true  },
+		student_fee_information:	{ teacher: false }
 	}
 }
 
@@ -38,10 +48,7 @@ class Settings extends Component {$Name
 	}
 
 	changeTeacherPermissions = () => {
-		/* this.setState({ permissions : {
-			...this.state.permissions,
-			addTeacher: false
-		}}) */ 
+
 		return <div className="table">
 
 			<div className="row">
@@ -63,6 +70,38 @@ class Settings extends Component {$Name
 			<div className="row">
 				<label> Analytics </label>
 				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "analyticsModule","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Result Card Module </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "result_card_module","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Student Attendance Module </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "student_attendance_module","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> SMS Module </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "sms_module","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Marks Module </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "marks_module","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Student Profile </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "student_profile","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Teacher Profile </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "teacher_profile","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Class Edit/Information </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "class_profile","teacher"])}/>
+			</div>
+			<div className="row">
+				<label> Student Fee Information </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "student_fee_information","teacher"])}/>
 			</div>
 		</div>
 	}
@@ -164,7 +203,7 @@ class Settings extends Component {$Name
 						this.state.templateMenu ? this.changeSMStemplates() : false
 					}
 
-					{
+{/* 					{
 						this.props.user.Admin ?
 							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
 								Change Teacher Permissions
@@ -173,7 +212,7 @@ class Settings extends Component {$Name
 					}
 					{
 						this.state.permissionMenu ? this.changeTeacherPermissions() : false
-					}
+					} */} 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>

@@ -54,4 +54,6 @@ export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
+	admin: state.db.faculty[state.auth.faculty_id].Admin,
+	permissions: state.db.settings.permissions,
 }))(ReportsMenu)

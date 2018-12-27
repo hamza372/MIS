@@ -8,7 +8,7 @@ import Layout from 'components/Layout'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
-import feesIcon from './icons/fees/accounting.svg'          //no-icon
+import feesIcon from './icons/fees/accounting.svg'          //
 import marksIcon from './icons/Marks/exam.svg'                     //
 import analyticsIcon from './icons/Analytics/increasing-stocks-graphic-of-bars.svg'   //
 import resultIcon from './icons/result_card/exam-a-plus.svg'
@@ -17,7 +17,7 @@ import teachersIcon from './icons/Teacher/teacher_1.svg'          //
 import studentsIcon from './icons/Student/student_profile_1.svg'  //
 import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
-import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
+import switchUserIcon from './icons/switch_user/logout.svg'    //
 
 import './style.css'
 import { stat } from 'fs';
@@ -123,7 +123,10 @@ class Landing extends Component {
 					<div className="page">
 						<div className="title">Actions</div>
 						<div className="row">
-							<Link to="/attendance" className="button green-shadow" style={{backgroundImage: `url(${attendanceIcon})` }}>Attendance</Link>
+							{ !user.Admin ?
+								permissions.student_attendance_module.teacher ? <Link to="/attendance" className="button green-shadow" style={{backgroundImage: `url(${attendanceIcon})` }}>Attendance</Link> : false
+								: <Link to="/attendance" className="button green-shadow" style={{backgroundImage: `url(${attendanceIcon})` }}>Attendance</Link>
+							}
 							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow" style={{backgroundImage: `url(${teacherAttendanceIcon})` }}>Teacher Attendance</Link> : false }
 						</div>
 						<div className="row">
@@ -131,17 +134,29 @@ class Landing extends Component {
 							permissions.fee.teacher ? <Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> : false 
 						  : <Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link>
 						}
-							<Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link>
+
+						{ !user.Admin ? 
+							permissions.marks_module.teacher ? <Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link> : false
+						  : <Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link>
+						}
 						</div>
+						
 						<div className="row">
 						{ !user.Admin ?
 						    permissions.analyticsModule.teacher ? <Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> : false
 						  : <Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
 						}
-							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
+
+						{ !user.Admin ?
+						    permissions.result_card_module.teacher ? <Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link> : false
+						  : <Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>	
+						}
 						</div>
 						<div className="row">
-							<Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link>
+						{ !user.Admin ?
+						    permissions.sms_module.teacher ? <Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link> : false
+						  : <Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link>
+						}
 						</div>
 					</div>
 

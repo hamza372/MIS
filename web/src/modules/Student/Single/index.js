@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import Layout from 'components/Layout'
 
@@ -10,7 +11,7 @@ import Marks from './Marks'
 
 import './style.css'
 
-export default class StudentPage extends Component {
+class StudentPage extends Component {
 
 	render() {
 		// three buttons, 
@@ -24,7 +25,7 @@ export default class StudentPage extends Component {
 				{ loc === "new" ? false : 
 				<div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "red" : false}`} to="profile" replace={true}>Profile</Link>
-					<Link className={`button ${loc === "payment" ? "green": false}`} to="payment" replace={true}>Payment</Link>
+					{this.props.user.Admin ? <Link className={`button ${loc === "payment" ? "green": false}`} to="payment" replace={true}>Payment</Link> : false}
 					<Link className={`button ${loc === "attendance" ? "purple" : false}`} to="attendance" replace={true}>Attendance</Link>
 					<Link className={`button ${loc === "marks" ? "blue" : false}`} to="marks" replace={true}>Marks</Link>
 				</div>
@@ -39,3 +40,7 @@ export default class StudentPage extends Component {
 		</Layout>
 	}
 }
+
+export default connect(state => ({  
+	user: state.db.faculty[state.auth.faculty_id] 
+}))(StudentPage);

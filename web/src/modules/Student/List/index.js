@@ -25,9 +25,15 @@ const StudentItem = (S) => {
 //const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
 	
 	return <div className="table row" key={S.id}>
+		{ !S.permission.isAdmin ?
+			S.permission.profile_info_permission ?
 				<Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
 					{S.Name} 
-				</Link>
+				</Link> : <div key={S.id}> {S.Name} </div> 
+		 : <Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
+					{S.Name} 
+		   </Link>
+		}
 				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
 				<div> {cname /*+ "/" + sname */}</div>
 			</div>
@@ -42,9 +48,13 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo, history }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, permissions, admin }) => {
 
-	const sections = getSectionsFromClasses(classes)	
+	const sections = getSectionsFromClasses(classes);
+	const permission = { 
+				isAdmin: admin,
+				profile_info_permission: permissions.student_profile.teacher
+			}	
 	
 	const items = Object.entries(students)
 	.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
@@ -54,11 +64,12 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 			...student,
 			relevant_section,
 			id,
-			forwardTo
+			forwardTo,
+			permission
 		} 
 	});	
 
-	let create = '/student/new'
+	let create = admin ? '/student/new' : permissions.addStudent.teacher ? '/student/new' : '';	
 
 	if(forwardTo === 'marks' || forwardTo === 'payment'){
 		create = '';
@@ -72,7 +83,9 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 			Component = {StudentItem}
 			create = {create} 
 			createText = {"Add new Student"} 
-			toLabel = {toLabel} /> 
+			toLabel = {toLabel}
+			create_permission = {admin ? true : permissions.addStudent.teacher}
+			 /> 
 
 		<div className="print button" onClick={() => window.print()}>Print</div>
 	</div>
@@ -80,7 +93,9 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 
 export default connect((state, { location }) => ({ 
 	students: state.db.students,
+	admin: state.db.faculty[state.auth.faculty_id].Admin,
 	classes: state.db.classes,
 	settings: state.db.settings,
+	permissions: state.db.settings.permissions,
 	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
 }))(LayoutWrap(StudentList));

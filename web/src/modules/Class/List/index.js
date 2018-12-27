@@ -8,18 +8,31 @@ import qs from 'query-string'
 
 
 
-const ClassItem = (C) => 
-	<Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} className="">
-		{C.name}
-	</Link>
+const ClassItem = (C) => {
 
-export const ClassListModule = ({ classes, forwardTo }) => {
+	console.log("CLASS_ID", C.id)
+ return <div className="table row">	
+	{ !C.permission.isAdmin ? 
+		C.permission.profile_info_permission ? <Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} className="">
+			{C.name}
+		</Link> : <div key={C.id}> {C.name} </div> 
+	  : <Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} className="">
+			{C.name}
+		</Link>
+	}
+	</div>
+}
+export const ClassListModule = ({ classes, forwardTo, permissions, admin }) => {
 
+	const permission = {
+		isAdmin: admin,
+		profile_info_permission: permissions.class_profile.teacher
+	 }
 	const items = Object.values(classes)
 		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
-		.map(c => ({...c, forwardTo}))
+		.map(c => ({...c, forwardTo, permission}))
 	
-		let create = '/class/new'
+		let create = admin ? '/class/new' : permissions.addClass.teacher ? '/class/new' : '';
 
 		if(forwardTo === 'report-menu'){
 			create = '';
@@ -33,12 +46,14 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 			Component={ClassItem}
 			create={create} 
 			createText={"Add new Class"} 
-			toLabel={C => C.name} 
+			toLabel={C => C.name}
 			/>
 	</div>
 }
 
 export default connect((state, { location }) => ({
 	classes: state.db.classes,
+	admin: state.db.faculty[state.auth.faculty_id].Admin,
+	permissions: state.db.settings.permissions,
 	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
 }))(LayoutWrap(ClassListModule)) 

@@ -373,9 +373,10 @@ class SingleStudent extends Component {
 						<label>Notes</label>
 						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={admin}/>
 					</div>
-
-					<div className="divider">Payment</div>
-					{
+					
+					
+					{!admin ? <div className="divider">Payment</div> : false}
+					{!admin ? 
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
 								{admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
@@ -405,7 +406,7 @@ class SingleStudent extends Component {
 								</div>
 							</div>
 						})
-					}
+					: false }
 					{ admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
 					{ admin ? false : <div className="save-delete">
 						<div className="button red" onClick={this.onDelete}>Delete</div>

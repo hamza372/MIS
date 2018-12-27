@@ -17,7 +17,7 @@ class List extends Component {
 	}
 
 	render() {
-		const {items, toLabel, Component } = this.props;
+		const {items, toLabel, Component} = this.props;
 		
 		const filteredList = items.filter(item => {
 			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
