@@ -1,15 +1,43 @@
 package pk.org.cerp.mischool.mischoolcompanion
 
-import android.content.Context
-import androidx.work.Worker
-import androidx.work.WorkerParameters
+import android.telephony.SmsManager
+import com.evernote.android.job.Job
+import com.evernote.android.job.JobCreator
+import com.evernote.android.job.JobRequest
+import com.evernote.android.job.util.support.PersistableBundleCompat
 
-class SMSDispatcher(context : Context, params : WorkerParameters) : Worker(context, params) {
+class SMSDispatcher : JobCreator {
 
-    override fun doWork(): Result {
+    override fun create(tag: String): Job? {
 
-        // sms manager send your queue of messages.
-        return Result.success()
+        return when(tag) {
+            SMSJob.TAG -> SMSJob()
+            else -> null
+        }
+    }
+}
+
+class SMSJob : Job() {
+
+    companion object {
+        val TAG = "SMS_JOB"
+
+        fun scheduleJob() = {
+
+            JobRequest.Builder(TAG)
+                    .setPeriodic(60000)
+                    .setUpdateCurrent(true)
+                    .build()
+                    .schedule()
+        }
+    }
+
+    override fun onRunJob(params: Params): Result {
+        // do job
+
+        val smsargs = params.extras
+
+        return Result.SUCCESS
     }
 
 }

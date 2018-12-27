@@ -3,6 +3,7 @@
     package="pk.org.cerp.mischool.mischoolcompanion">
 
     <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,7 @@
                     android:path="/android-sms" />
             </intent-filter>
         </activity>
+        <service android:name=".SMSDispatcherService" />
     </application>
 
 </manifest>
