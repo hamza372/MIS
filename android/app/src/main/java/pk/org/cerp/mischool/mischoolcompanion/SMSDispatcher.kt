@@ -49,8 +49,9 @@ class SMSJob : Job() {
             val history = messageHistory()
             val last_min_messages = history.first
             val last_15_min_messages = history.second
-            val max_per_minute = 25
+            val max_per_minute = 25 // this should be variable depending on android version
             val max_per_pta_rule = 12
+            val max_sendable = max_per_minute - last_min_messages
 
             Log.d(TAG, "${pending.size} items queued")
 
@@ -71,8 +72,8 @@ class SMSJob : Job() {
                 (last_15_min_messages + num_messages) in 30..185 -> {
                     // we don't need to worry about the pta rule, so fire off max per minute this round.
                     Log.d(TAG, "between 30 and 185 messages")
-                    sendBatchSMS(pending.take(max_per_minute - last_min_messages))
-                    pending.drop(max_per_minute - last_min_messages)
+                    sendBatchSMS(pending.take(max_sendable))
+                    pending.drop(max_sendable)
                 }
                 (num_messages + last_15_min_messages) > 200 -> {
                     // fire the messages off at a rate that cares about the pta limit (200 / 15 min) 12 per minute...
@@ -81,14 +82,13 @@ class SMSJob : Job() {
                 }
                 else -> {
                     Log.d(TAG, "unforseen combination of numbers. last_min: $last_min_messages, 15 min: $last_15_min_messages, pending: $num_messages")
-                    sendBatchSMS(pending.take(max_per_minute))
-                    pending.drop(max_per_minute)
-                    // really this should do something more extreme....
+                    sendBatchSMS(pending.take(max_sendable))
+                    pending.drop(max_sendable)
                 }
             }
 
             writeMessagesToFile(next_list)
-            reschedule = next_list.size > 0
+            reschedule = next_list.isNotEmpty()
 
             Result.SUCCESS
         }
@@ -106,8 +106,6 @@ class SMSJob : Job() {
             sendSMS(p.text, p.number)
             Thread.sleep(100)
         }
-
-        //Toast.makeText(context, messages.size.toString() + " messages Sent", Toast.LENGTH_SHORT).show()
 
     }
 
@@ -197,6 +195,10 @@ class SMSJob : Job() {
         file.writeBytes(res.toByteArray())
 
         Log.d(TAG, "DONE writing file")
+    }
+
+    fun getMaxMessagesPerMinute() {
+
     }
 
 }
