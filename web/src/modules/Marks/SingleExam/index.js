@@ -228,16 +228,13 @@ class SingleExam extends Component {
 							Object.entries(this.props.students)
 								.filter(([id, student]) => student.section_id === this.section_id())
 								.map(([id, student]) => (
-									<div className="student row" key={id}>
+									<div className="marks row" key={id}>
 										<label><Link to={`/student/${id}/profile`} >{student.Name}</Link></label>
-										<input 
-											type="number" 
+										<input type="number" 
 											{...this.former.super_handle(["student_marks", id, "score"])} 
-											placeholder={`Score out of ${this.state.exam.total_score}`} 
-											style={{width:"68%"}}/>
-										<select {...this.former.super_handle(["student_marks", id, "grade"])} 
-										style={{width:"32%"}}>
-											<option value="">grade</option>
+											placeholder="Score" />
+										<select {...this.former.super_handle(["student_marks", id, "grade"])}>
+											<option value="">Grade</option>
 											<option value="A+">A+</option>
 											<option value="A">A</option>
 											<option value="B">B</option>
