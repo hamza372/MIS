@@ -374,8 +374,8 @@ class SingleStudent extends Component {
 						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={admin}/>
 					</div>
 
-					<div className="divider">Payment</div>
-					{
+					{!admin || this.props.permissions.fee.teacher ? <div className="divider">Payment</div> : false}
+					{!admin || this.props.permissions.fee.teacher ? 
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
 								{admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
@@ -405,7 +405,7 @@ class SingleStudent extends Component {
 								</div>
 							</div>
 						})
-					}
+					: false }
 					{ admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
 					{ admin ? false : <div className="save-delete">
 						<div className="button red" onClick={this.onDelete}>Delete</div>
@@ -420,6 +420,7 @@ class SingleStudent extends Component {
 export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes,
+	permissions: state.db.settings.permissions,
 	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
 	delete: (student) => dispatch(deleteStudent(student))

@@ -158,5 +158,5 @@ const addFacultyID = state => {
 // this modifies db in case any schema changes have happened
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
-	addFacultyID,
+	addFacultyID
 ];
