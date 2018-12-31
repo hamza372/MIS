@@ -47,6 +47,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 	const sections = getSectionsFromClasses(classes)	
 	
 	const items = Object.entries(students)
+	.filter(([, s]) => s.id && s.Name) // hiding the error for now.... need to build reporting mechanism
 	.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 	.map( ([id, student]) => {
 		const relevant_section = sections.find(section => student.section_id === section.id);

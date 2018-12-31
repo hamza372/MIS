@@ -4,7 +4,6 @@ import Layout from 'components/Layout'
 
 import Create from './Create'
 import ReportMenu from './ReportsMenu'
-import Reports from './Reports'
 
 import './style.css'
 
