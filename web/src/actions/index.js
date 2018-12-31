@@ -14,20 +14,6 @@ export const mergeSettings = (settings) => dispatch => {
 		}
 	]))
 }
-export const MERGE_PERMISSIONS = "MERGE_PERMISSIONS"
-export const mergePermissions = (permissions) => dispatch => {
-
-	if(permissions === undefined) {
-		console.log("PERMISSIONS ARE UNDEFINED")
-		return 
-	}
-	dispatch(createMerges([
-		{
-		path:["db", "settings", "permissions"],
-		value: permissions
-		}
-	]))
-}
 
 export const MERGE_FACULTY = "MERGE_FACULTY"
 export const createFacultyMerge = (faculty) => dispatch => {

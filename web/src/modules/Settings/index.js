@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { createTemplateMerges } from 'actions'
-import { mergeSettings,mergePermissions  } from 'actions'
+import { mergeSettings } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 
@@ -83,7 +83,6 @@ class Settings extends Component {$Name
 
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
-		this.props.savePermissions(this.state.settings.permissions);
 		this.setState({templateMenu: false});
 	}
 
@@ -165,6 +164,5 @@ export default connect(
 	}), 
 	dispatch => ({
 		saveTemplates: templates => dispatch(createTemplateMerges(templates)),
-		saveSettings: settings => dispatch(mergeSettings(settings)),
-		savePermissions: permissions => dispatch(mergePermissions(permissions))
+		saveSettings: settings => dispatch(mergeSettings(settings))
 }))(Settings);

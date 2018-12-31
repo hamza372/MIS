@@ -128,7 +128,7 @@ class Landing extends Component {
 						
 						<div className="row">
 						{ 
-							user.Admin || permissions.fee.teacher ? 
+							user.Admin || permissions.fee.teacher ?   
 							<Link 
 								to="/student?forwardTo=payment" 
 								className="button blue-shadow" 

@@ -272,7 +272,7 @@ class SingleStudent extends Component {
 			return <Redirect to={this.state.redirect} />
 		}
 
-		const admin = !this.props.user.Admin;
+		const admin = this.props.user.Admin;
 
 		return <div className="single-student">
 				{ this.state.banner.visible ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -285,22 +285,22 @@ class SingleStudent extends Component {
 					
 					<div className="row">
 						<label>Full Name</label>
-						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={admin} />
+						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!admin} />
 					</div>
 					
 					<div className="row">
 						<label>B-Form Number</label>
-						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Date of Birth</label>
-						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" disabled={admin}/>
+						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Gender</label>
-						<select {...this.former.super_handle(["Gender"])} disabled={admin} >
+						<select {...this.former.super_handle(["Gender"])} disabled={!admin} >
 							<option value='' disabled>Please Set a Gender</option>
 							<option value="male">Male</option>
 							<option value="female">Female</option>
@@ -309,31 +309,31 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Father Name</label>
-						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name"  disabled={admin}/>
+						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name"  disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Father CNIC</label>
-						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={!admin}/>
 					</div>
 
 					<div className="divider">Contact Information</div>
 
 					<div className="row">
 						<label>Phone Number</label>
-						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" disabled={admin}/>
+						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Address</label>
-						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={admin}/>
+						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={!admin}/>
 					</div>
 
 					<div className="divider">School Information</div>
 
 					<div className="row">
 						<label>Active Status</label>
-						<select {...this.former.super_handle(["Active"])} disabled={admin}>
+						<select {...this.former.super_handle(["Active"])} disabled={!admin}>
 							<option value={true}>Student Currently goes to this School</option>
 							<option value={false}>Student No Longer goes to this School</option>
 						</select>
@@ -341,7 +341,7 @@ class SingleStudent extends Component {
 
 					{ !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
-						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={admin}>
+						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
 							{
 								 [
 									<option key="" value="">Please Select a Section</option>,
@@ -356,32 +356,32 @@ class SingleStudent extends Component {
 
 					<div className="row">
 						<label>Roll No</label>
-						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={admin} />
+						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={!admin} />
 					</div>
 
 					<div className="row">
 						<label>Admission Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date" disabled={admin}/>
+						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date" disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Admission Number</label>
-						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={admin}/>
+						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={!admin}/>
 					</div>
 
 					<div className="row">
 						<label>Notes</label>
-						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={admin}/>
+						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={!admin}/>
 					</div>
 
-					{!admin || this.props.permissions.fee.teacher ? <div className="divider">Payment</div> : false}
-					{!admin || this.props.permissions.fee.teacher ? 
+					{admin || this.props.permissions.fee.teacher ? <div className="divider">Payment</div> : false}
+					{admin || this.props.permissions.fee.teacher ? 
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
-								{admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
+								{!admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
 								<div className="row">
 									<label>Type</label>
-									<select {...this.former.super_handle(["fees", id, "type"])} disabled={admin}>
+									<select {...this.former.super_handle(["fees", id, "type"])} disabled={!admin}>
 										<option value="" disabled>Select Fee or Scholarship</option>
 										<option value="FEE">Fee</option>
 										<option value="SCHOLARSHIP">Scholarship</option>
@@ -389,15 +389,15 @@ class SingleStudent extends Component {
 								</div>
 								<div className="row">
 									<label>Name</label>
-									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={admin}/>
+									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={!admin}/>
 								</div>
 								<div className="row">
 									<label>Amount</label>
-									<input type="number" {...this.former.super_handle_flex(["fees", id, "amount"],{ styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Amount" disabled={admin}/>
+									<input type="number" {...this.former.super_handle_flex(["fees", id, "amount"],{ styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Amount" disabled={!admin}/>
 								</div>
 								<div className="row">
 									<label>Fee Period</label>
-									<select {...this.former.super_handle(["fees", id, "period"])} disabled={admin}>
+									<select {...this.former.super_handle(["fees", id, "period"])} disabled={!admin}>
 										<option value="" disabled>Please Select a Time Period</option>
 										<option value="SINGLE">One Time</option>
 										<option value="MONTHLY">Every Month</option>
@@ -406,8 +406,8 @@ class SingleStudent extends Component {
 							</div>
 						})
 					: false }
-					{ admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
-					{ admin ? false : <div className="save-delete">
+					{ !admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
+					{ !admin ? false : <div className="save-delete">
 						<div className="button red" onClick={this.onDelete}>Delete</div>
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
