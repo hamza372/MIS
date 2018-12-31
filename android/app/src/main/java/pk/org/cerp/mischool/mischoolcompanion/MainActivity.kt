@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-
         Log.d(TAG, dataString)
 
         val json_string = java.net.URLDecoder.decode(dataString.split("=")[1], "UTF-8")
