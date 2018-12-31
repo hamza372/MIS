@@ -46,7 +46,7 @@ class SMS extends Component {
 			}
 		})
 
-		setTimeout(() => this.setState({ banner: {active: false}}), 3000);
+		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
 	}
 
 	sendMessage = (text, number) => {

@@ -24,7 +24,7 @@ const TeacherList = (props) => {
 			
 			<Title>Teachers</Title>
 			<List
-				items={Object.values(props.teachers)}
+				items={Object.values(props.teachers).filter(f => f.Name && f.id)}
 				tableTitle={tableTitle}
 				Component={TeacherItem}
 				create={'/faculty/new'} 
