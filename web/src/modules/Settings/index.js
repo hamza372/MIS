@@ -11,7 +11,10 @@ const defaultSettings = {
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
-	sendSMSOption: "SIM" // API
+	sendSMSOption: "SIM", // API
+	permissions: {
+		fee:  { teacher: false } //added
+	}
 }
 
 class Settings extends Component {
@@ -21,10 +24,21 @@ class Settings extends Component {
 		this.state = {
 			templates: this.props.sms_templates,
 			settings: props.settings || defaultSettings,
-			templateMenu: false
+			templateMenu: false,
+			permissionMenu: false
 		}
 
 		this.former = new Former(this, [])
+	}
+
+	changeTeacherPermissions = () => {
+
+		return <div className="table">
+			<div className="row">
+				<label> Fee </label>
+				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}/>
+			</div>
+		</div>
 	}
 
 	changeSMStemplates = () => {
@@ -66,6 +80,7 @@ class Settings extends Component {
 	}
 
 	onSave = () => {
+
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});
@@ -78,6 +93,7 @@ class Settings extends Component {
 			settings: nextProps.settings
 		})
 	}
+
 
 	render() {
 		return <Layout history={this.props.history}>
@@ -121,7 +137,18 @@ class Settings extends Component {
 					</div>
 					{
 						this.state.templateMenu ? this.changeSMStemplates() : false
-					}				
+					}
+					{
+						this.props.user.Admin ?
+							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
+								Change Teacher Permissions
+							</div>
+							: false
+					}
+					{
+						this.state.permissionMenu ? this.changeTeacherPermissions() : false
+					}
+
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>
@@ -132,6 +159,7 @@ class Settings extends Component {
 export default connect(
 	state => ({ 
 		settings: state.db.settings, 
+		user: state.db.faculty[state.auth.faculty_id], 
 		sms_templates: state.db.sms_templates 
 	}), 
 	dispatch => ({

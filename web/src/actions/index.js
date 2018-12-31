@@ -14,7 +14,7 @@ export const mergeSettings = (settings) => dispatch => {
 		}
 	]))
 }
- 
+
 export const MERGE_FACULTY = "MERGE_FACULTY"
 export const createFacultyMerge = (faculty) => dispatch => {
 
