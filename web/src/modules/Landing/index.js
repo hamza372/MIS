@@ -128,7 +128,7 @@ class Landing extends Component {
 						
 						<div className="row">
 						{ 
-							user.Admin || permissions.fee.teacher ?   
+							user.Admin || permissions.fee.teacher ?
 							<Link 
 								to="/student?forwardTo=payment" 
 								className="button blue-shadow" 
@@ -145,7 +145,11 @@ class Landing extends Component {
 
 						
 						<div className="row">
-							<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
+							{
+								user.Admin || permissions.fee.teacher ? 
+									<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
+									: false
+							}
 							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
 						</div>
 						<div className="row">
