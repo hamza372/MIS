@@ -1,17 +1,12 @@
 package pk.org.cerp.mischool.mischoolcompanion
 
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.telephony.SmsManager
 import android.util.Log
-import android.widget.Toast
 import com.beust.klaxon.Klaxon
-import com.evernote.android.job.util.support.PersistableBundleCompat
 import java.io.File
 import kotlin.Exception
 
@@ -39,13 +34,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        Log.d(TAG, "scheduling....")
-        try {
-            SMSJob.scheduleJob()
-        }
-        catch(e : Exception) {
-            Log.e(TAG, e.message)
-        }
 
         Log.d(TAG, dataString)
 
@@ -70,11 +58,19 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, e.toString())
         }
 
+        Log.d(TAG, "scheduling....")
+        try {
+            SMSJob.scheduleJobImmediate()
+        }
+        catch(e : Exception) {
+            Log.e(TAG, e.message)
+        }
+
         finish()
 
     }
 
-    fun appendMessagesToFile( messages : List<SMSItem>) {
+    private fun appendMessagesToFile( messages : List<SMSItem>) {
 
         // first read the file as json
 
@@ -86,12 +82,6 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, file.absolutePath)
 
         var content : String? = null
-
-        /*
-        if(file.exists()) {
-            file.delete()
-        }
-        */
 
         if(file.exists()) {
             val bytes = file.readBytes()
@@ -122,39 +112,12 @@ class MainActivity : AppCompatActivity() {
 
         if(ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED ||
            ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED ) {
-          // ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // no permission granted
             ActivityCompat.requestPermissions(this@MainActivity, arrayOf(android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_SMS), MY_PERMISSIONS_SEND_SMS)
-
         }
         else {
             Log.d(TAG, "Permissions are granted...")
         }
-    }
-
-    fun sendAllSMS(messages : List<SMSItem>) {
-        for(p in messages) {
-            Log.d(TAG, "send " + p.text + " to " + p.number)
-            sendSMS(p.text, p.number)
-            Thread.sleep(100)
-        }
-
-        Toast.makeText(applicationContext, messages.size.toString() + " messages Sent", Toast.LENGTH_SHORT).show()
-
-    }
-
-    fun sendSMS(text: String, phoneNumber: String) {
-        try {
-
-            // check permission first
-            val smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, text, null, null)
-
-            //Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
-        } catch( e: Exception) {
-            Log.d(TAG, e.message)
-        }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

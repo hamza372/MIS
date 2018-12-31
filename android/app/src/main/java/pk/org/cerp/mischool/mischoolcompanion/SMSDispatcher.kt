@@ -36,6 +36,15 @@ class SMSJob : Job() {
                     .build()
                     .schedule()
         }
+
+        fun scheduleJobImmediate() {
+            Log.d(TAG, "inside scheduleJob function")
+            JobRequest.Builder(JOB_TAG)
+                    .startNow()
+                    .setUpdateCurrent(true)
+                    .build()
+                    .schedule()
+        }
     }
 
     override fun onRunJob(params: Params): Result {
@@ -49,7 +58,7 @@ class SMSJob : Job() {
             val history = messageHistory()
             val last_min_messages = history.first
             val last_15_min_messages = history.second
-            val max_per_minute = 25 // this should be variable depending on android version
+            val max_per_minute = 30 // this should be variable depending on android version
             val max_per_pta_rule = 12
             val max_sendable = max_per_minute - last_min_messages
 
@@ -114,6 +123,16 @@ class SMSJob : Job() {
 
             // check permission first
             val smsManager = SmsManager.getDefault();
+
+            val messages = smsManager.divideMessage(text)
+
+            Log.d(TAG, "size of messages: ${messages.size}")
+
+            if(messages.size > 1) {
+                Log.d(TAG, "SENDING MULTIPART")
+                smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
+            }
+
             smsManager.sendTextMessage(phoneNumber, null, text, null, null)
 
             //Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
