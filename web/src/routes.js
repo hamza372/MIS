@@ -2,6 +2,8 @@ import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
+import ErrorComponent from 'components/Error'
+
 import Landing from 'modules/Landing'
 import TeacherList from 'modules/Teacher/List'
 import TeacherSingle from 'modules/Teacher/Single'
@@ -23,40 +25,67 @@ import ReportsMenu from 'modules/ReportsMenu'
 
 import AuthedRoute from 'components/AuthedRoute'
 
-export default ({ store }) => (
-	<Provider store={store}>
-		<BrowserRouter>
-			<Switch>
-				<AuthedRoute exact path="/" component={Landing} />
+export default class Routes extends React.Component {
 
-				<Route path="/faculty/first" component={TeacherSingle} />
-				<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
-				<AuthedRoute path="/teacher" component={TeacherList} />
+	constructor(props) {
+		super(props);
 
-				<AuthedRoute path="/student/:id" component={StudentSingle} />
-				<AuthedRoute path="/student" component={StudentList} />
+		this.state = {
+			error: false,
+			err: false,
+			errInfo: false
+		}
+	}
 
-				<AuthedRoute path="/class/:id" component={ClassSingle} />
-				<AuthedRoute path="/class" component={ClassModule} />
+	componentDidCatch(err, errinfo) {
+		console.error("component did catch: ", err)
+		this.setState({
+			error: true,
+			err,
+			errInfo: errinfo
+		})
+	}
 
-				<AuthedRoute path="/attendance" component={Attendance} />
-				<AuthedRoute path="/teacher-attendance" component={TeacherAttendance} />
+	render() {
 
-				<AuthedRoute path="/sms" component={SMS} />
+		if(this.state.error) {
+			return <ErrorComponent err={this.state.err} errInfo={this.state.errInfo} />
+		}
 
-				<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
-				<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
-				<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
-				<AuthedRoute path="/reports" component={Marks} />
+		return <Provider store={this.props.store}>
+			<BrowserRouter>
+				<Switch>
+					<AuthedRoute exact path="/" component={Landing} />
 
-				<AuthedRoute path="/settings" component={Settings} />
-				<AuthedRoute path="/analytics" component={Analytics} />
+					<Route path="/faculty/first" component={TeacherSingle} />
+					<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
+					<AuthedRoute path="/teacher" component={TeacherList} />
 
-				<AuthedRoute path="/reports-menu" component={ReportsMenu} />
+					<AuthedRoute path="/student/:id" component={StudentSingle} />
+					<AuthedRoute path="/student" component={StudentList} />
 
-				<Route path="/school-login" component={SchoolLogin} />
-				<Route path="/login" component={Login} />
-			</Switch>
-		</BrowserRouter>
-	</Provider>
-)
+					<AuthedRoute path="/class/:id" component={ClassSingle} />
+					<AuthedRoute path="/class" component={ClassModule} />
+
+					<AuthedRoute path="/attendance" component={Attendance} />
+					<AuthedRoute path="/teacher-attendance" component={TeacherAttendance} />
+
+					<AuthedRoute path="/sms" component={SMS} />
+
+					<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
+					<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
+					<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
+					<AuthedRoute path="/reports" component={Marks} />
+
+					<AuthedRoute path="/settings" component={Settings} />
+					<AuthedRoute path="/analytics" component={Analytics} />
+
+					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
+
+					<Route path="/school-login" component={SchoolLogin} />
+					<Route path="/login" component={Login} />
+				</Switch>
+			</BrowserRouter>
+		</Provider>
+	}
+}
