@@ -98,6 +98,7 @@ export const createSchoolLogin = (school_id, password) => (dispatch, getState, s
 	})
 }
 
+
 export const createEditClass = newClass => dispatch => {
 	dispatch(createMerges([
 			{path: ["db", "classes", newClass.id], value: newClass}
@@ -161,6 +162,21 @@ export const markFaculty = (faculty, date, status, time = moment.now()) => dispa
 		}
 	]))
 }
+
+export const undoFacultyAttendance = (faculty, date) => dispatch => {
+	console.log("BEFORE UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
+
+	dispatch(createDeletes([
+		{
+			path:["db", "faculty", faculty.id, "attendance", date]
+		}
+	]))
+
+	console.log("AFTER UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
+
+
+} 
+
 
 export const addPayment = (student, payment_id, amount, date = moment.now(), type = "SUBMITTED", fee_id = undefined, fee_name = "Fee") => dispatch => {
 	console.log('add payment', student.Name, 'amount', amount)

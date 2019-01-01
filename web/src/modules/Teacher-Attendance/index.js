@@ -6,7 +6,7 @@ import moment from 'moment'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 
-import { markFaculty } from 'actions'
+import { markFaculty, undoFacultyAttendance } from 'actions'
 
 import './style.css'
 
@@ -27,6 +27,10 @@ class TeacherAttendance extends Component {
 		console.log(faculty.Name, status)
 
 		this.props.markFaculty(faculty, moment(this.state.date).format("YYYY-MM-DD"), status);
+	}
+
+	undo = (faculty) => {
+		this.props.undoFaculty(faculty, moment(this.state.date).format("YYYY-MM-DD"));
 	}
 
 	render() {
@@ -56,14 +60,25 @@ class TeacherAttendance extends Component {
 							return <div className="list-row" key={f.id}>
 								<Link to={`/faculty/${f.id}/attendance`}>{f.Name}</Link>
 								<div className="status">
+								
 									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? false : <div className="button check_in blue" onClick={this.mark(f, "check_in")}>Check In</div> }
+									
 									{ !current_attendance.check_in || current_attendance.check_out ? false : <label>Check In: { moment(current_attendance.check_in).format("HH:mm") }</label> }
+
 									{ !current_attendance.check_in || current_attendance.check_out ? false : <div className="button check_out green" onClick={this.mark(f, "check_out")}>Check Out</div>}
+
 									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button absent orange" onClick={this.mark(f, "absent")}>Absent</div> }
+
 									{ current_attendance.check_in || current_attendance.absent || current_attendance.leave ? false : <div className="button leave grey" onClick={this.mark(f, "leave")}>Leave</div> }
+
 									{ current_attendance.check_in && current_attendance.check_out ?  <div>Check In: <b>{moment(current_attendance.check_in).format("HH:mm")}</b> Check Out: <b>{moment(current_attendance.check_out).format("HH:mm")}</b></div>: false}
+
 									{ current_attendance.absent ? <label>Absent</label> : false }
+									
 									{ current_attendance.leave ? <label>Leave</label> : false }
+
+									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? <div className="button leave grey" onClick={() => this.undo(f)}>Undo</div> : false }
+
 								</div>
 							</div>
 						})
@@ -80,6 +95,7 @@ export default connect(state => (
 		faculty: state.db.faculty
 	}), dispatch => (
 	{
-		markFaculty: (faculty, date, status) => dispatch(markFaculty(faculty, date, status))
+		markFaculty: (faculty, date, status) => dispatch(markFaculty(faculty, date, status)),
+		undoFaculty: (faculty, date) => dispatch(undoFacultyAttendance(faculty,date))
 	})
 	)(TeacherAttendance);
