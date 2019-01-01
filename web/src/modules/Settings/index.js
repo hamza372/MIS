@@ -132,6 +132,11 @@ class Settings extends Component {
 						</select>
 					</div>
 
+					<div className="row">
+					<label>MISchool Version</label>
+					<label>{window.version || "no version set"}</label>
+					</div>
+
 					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
 						Change SMS Templates
 					</div>
