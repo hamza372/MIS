@@ -16,3 +16,7 @@
 	width: 5rem;
 }
 
+.single-exam .marks.row label {
+	width: 100%;
+}
+
