@@ -10,5 +10,6 @@ RUN npm install
 ADD . .
 RUN npm run build
 RUN rm -rf node_modules
+ENV VERSION=$VERSION
 
 CMD ./set_config.sh > build/config.js && serve -s ./build
