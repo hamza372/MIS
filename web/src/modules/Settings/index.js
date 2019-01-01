@@ -5,6 +5,7 @@ import { createTemplateMerges } from 'actions'
 import { mergeSettings } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
+import Banner from 'components/Banner'
 
 const defaultSettings = {
 	shareData: true,
@@ -25,7 +26,12 @@ class Settings extends Component {$Name
 			templates: this.props.sms_templates,
 			settings: props.settings || defaultSettings,
 			templateMenu: false,
-			permissionMenu: false
+			permissionMenu: false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, [])
@@ -35,8 +41,11 @@ class Settings extends Component {$Name
 
 		return <div className="table">
 			<div className="row">
-				<label> Fee </label>
-				<input type="checkbox" {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}/>
+				<label> Allow teacher to view Fee Information ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
 			</div>
 		</div>
 	}
@@ -84,6 +93,22 @@ class Settings extends Component {$Name
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});
+
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -98,6 +123,8 @@ class Settings extends Component {$Name
 	render() {
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
+			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+
 				<div className="title">Settings</div>
 
 				<div className="form" style={{width: "90%"}}>
@@ -140,7 +167,7 @@ class Settings extends Component {$Name
 					}
 					{
 						this.props.user.Admin ?
-							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
+							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })} style={{ marginTop: "5px"}}>
 								Change Teacher Permissions
 							</div>
 							: false

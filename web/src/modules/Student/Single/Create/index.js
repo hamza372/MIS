@@ -104,7 +104,7 @@ class SingleStudent extends Component {
 			
 				return this.setState({
 					banner: {
-						visible : true,
+						active : true,
 						good: false,
 						text: errorText
 					}
@@ -128,7 +128,7 @@ class SingleStudent extends Component {
 			{
 				return this.setState({
 					banner: {
-						visible : true,
+						active : true,
 						good: false,
 						text: RollNumber ? "Roll Number Already Exists": "Admission Number Already Exists"
 					}
@@ -142,7 +142,7 @@ class SingleStudent extends Component {
 			if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
 				return this.setState({
 					banner: {
-						visible: true,
+						active: true,
 						good: false,
 						text: "Please fill out all Fee Information"
 					}
@@ -170,7 +170,7 @@ class SingleStudent extends Component {
 		
 		this.setState({
 			banner: {
-				visible: true,
+				active: true,
 				good: true,
 				text: "Saved!"
 			}
@@ -179,7 +179,7 @@ class SingleStudent extends Component {
 		setTimeout(() => {
 			this.setState({
 				banner: {
-					visible: false
+					active: false
 				},
 				redirect: this.isNew() ? `/student` : false
 			})
@@ -275,7 +275,7 @@ class SingleStudent extends Component {
 		const admin = this.props.user.Admin;
 
 		return <div className="single-student">
-				{ this.state.banner.visible ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
 				<div className="title">Edit Student</div>
 
