@@ -47,6 +47,24 @@ class StudentMarksContainer extends Component {
 							<label>End Date</label>
 							<input type="date" onChange={this.former.handle(["end"])} value={moment(this.state.end).format("YYYY-MM-DD")} placeholder="End Date" />
 						</div>
+
+{/* To be added Later to filter result cards
+							<div className="row">
+						<label>Test Type</label>
+							<select> 
+								<option value="">Test</option>
+								<option value="A+"> Mid Term</option>
+							</select>
+						</div>
+
+						<div className="row">
+							<label>Subject Name</label>
+							<select> 
+								<option value="">Science</option>
+								<option value="A+"> Economy</option>
+							</select>						
+						</div>
+ */}						
 					</div>
 				</div>
 				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate}/>
