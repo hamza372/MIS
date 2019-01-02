@@ -5,3 +5,5 @@ steps:
     - 'VERSION=$SHORT_SHA'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['set', 'image', 'deployment/mischool-web-$BRANCH_NAME', 'mischool-web=asia.gc.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
