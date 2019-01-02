@@ -52,8 +52,8 @@ class Landing extends Component {
 
 	render() {
 
-		const { logout, user, students, faculty, lastSnapshot, unsyncd } = this.props;
-
+		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions } = this.props;
+		
 		const current_page = Math.floor(this.state.scroll / window.innerWidth);
 
 		const today_date = moment().format("YYYY-MM-DD");
@@ -125,12 +125,31 @@ class Landing extends Component {
 							<Link to="/attendance" className="button green-shadow" style={{backgroundImage: `url(${attendanceIcon})` }}>Attendance</Link>
 							{ user.Admin ? <Link to="/teacher-attendance" className="button red-shadow" style={{backgroundImage: `url(${teacherAttendanceIcon})` }}>Teacher Attendance</Link> : false }
 						</div>
+						
 						<div className="row">
-							<Link to="/student?forwardTo=payment" className="button blue-shadow" style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link>
-							<Link to="/reports" className="button yellow-shadow" style={{backgroundImage: `url(${marksIcon})` }}>Marks</Link>
+						{ 
+							user.Admin || permissions.fee.teacher ?
+							<Link 
+								to="/student?forwardTo=payment" 
+								className="button blue-shadow" 
+								style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> 
+								
+							: false 
+						} 
+							<Link 
+								to="/reports" 
+								className="button yellow-shadow" 
+								style={{backgroundImage: `url(${marksIcon})` }}> Marks</Link> 
+						
 						</div>
+
+						
 						<div className="row">
-							<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link>
+							{
+								user.Admin || permissions.fee.teacher ? 
+									<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
+									: false
+							}
 							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
 						</div>
 						<div className="row">
@@ -221,6 +240,7 @@ export default connect(state => ({
 		user: state.db.faculty[state.auth.faculty_id],
 		students: state.db.students,
 		faculty: state.db.faculty,
+		permissions: state.db.settings.permissions,
 		lastSnapshot: state.lastSnapshot,
 		unsyncd: Object.keys(state.queued).length
 	}), 

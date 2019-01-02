@@ -10,5 +10,7 @@ RUN npm install
 ADD . .
 RUN npm run build
 RUN rm -rf node_modules
+ARG VERSION
+ENV SHA_VERSION=$VERSION
 
-CMD ./swap_urls.sh > build/url.js && serve -s ./build
+CMD ./set_config.sh > build/config.js && serve -s ./build

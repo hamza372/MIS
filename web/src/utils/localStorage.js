@@ -155,8 +155,25 @@ const addFacultyID = state => {
 	return state;
 }
 
+const checkPermissions = state => {
+	if(state.db.settings.permissions !== undefined){
+		console.log("NOT Running Permission Scripts")
+		return state
+	}
+	console.log("Running Permissions Scripts");
+
+	state.db.settings = {
+		...state.db.settings,
+		permissions:{
+			fee:{ teacher: true }
+		}
+	}
+	return state;
+}
+
 // this modifies db in case any schema changes have happened
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
+	checkPermissions
 ];

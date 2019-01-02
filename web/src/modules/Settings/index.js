@@ -5,26 +5,49 @@ import { createTemplateMerges } from 'actions'
 import { mergeSettings } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
+import Banner from 'components/Banner'
 
 const defaultSettings = {
 	shareData: true,
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
-	sendSMSOption: "SIM" // API
+	sendSMSOption: "SIM", // API
+	permissions: {
+		fee:  { teacher: false } //added
+	}
 }
 
-class Settings extends Component {$Name
+class Settings extends Component {
 
 	constructor(props){ 
 		super(props);
 		this.state = {
 			templates: this.props.sms_templates,
 			settings: props.settings || defaultSettings,
-			templateMenu: false
+			templateMenu: false,
+			permissionMenu: false,
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			}
 		}
 
 		this.former = new Former(this, [])
+	}
+
+	changeTeacherPermissions = () => {
+
+		return <div className="table">
+			<div className="row">
+				<label> Allow teacher to view Fee Information ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
+			</div>
+		</div>
 	}
 
 	changeSMStemplates = () => {
@@ -66,9 +89,26 @@ class Settings extends Component {$Name
 	}
 
 	onSave = () => {
+
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});
+
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -79,9 +119,12 @@ class Settings extends Component {$Name
 		})
 	}
 
+
 	render() {
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
+			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+
 				<div className="title">Settings</div>
 
 				<div className="form" style={{width: "90%"}}>
@@ -116,12 +159,28 @@ class Settings extends Component {$Name
 						</select>
 					</div>
 
+					<div className="row">
+					<label>MISchool Version</label>
+					<label>{window.version || "no version set"}</label>
+					</div>
+
 					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
 						Change SMS Templates
 					</div>
 					{
 						this.state.templateMenu ? this.changeSMStemplates() : false
-					}				
+					}
+					{
+						this.props.user.Admin ?
+							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })} style={{ marginTop: "5px"}}>
+								Change Teacher Permissions
+							</div>
+							: false
+					}
+					{
+						this.state.permissionMenu ? this.changeTeacherPermissions() : false
+					}
+
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>
@@ -132,6 +191,7 @@ class Settings extends Component {$Name
 export default connect(
 	state => ({ 
 		settings: state.db.settings, 
+		user: state.db.faculty[state.auth.faculty_id], 
 		sms_templates: state.db.sms_templates 
 	}), 
 	dispatch => ({
