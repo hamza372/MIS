@@ -12,7 +12,7 @@ steps:
     - 'CLOUDSDK_CONTAINER_CLUSTER=mischool-web-cluster'
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
--name: 'curl'
+- name: 'curl'
   args: 
   - '-X'
   - 'POST'
