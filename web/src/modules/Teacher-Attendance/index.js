@@ -52,6 +52,7 @@ class TeacherAttendance extends Component {
 				<div className="list">
 				{
 					Object.values(this.props.faculty)
+						.filter(f => f.Active)
 						.map(f => {
 							const current_attendance = ((f.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")]) || { }
 
