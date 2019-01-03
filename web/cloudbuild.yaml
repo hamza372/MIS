@@ -16,7 +16,7 @@ steps:
   args:
   - '-X'
   - 'POST'
-  - "https://api.cloudflare.come/client/v4/zones/$(cat api-zone-slack-email | awk '{print $2}')/purge_cache"
+  - "https://api.cloudflare.com/client/v4/zones/$(cat api-zone-slack-email | awk '{print $2}')/purge_cache"
   - "-H"
   - "X-Auth-Email: $(cat api-zone-slack-email | awk '{print $4}')"
   - "-H"
