@@ -42,5 +42,5 @@ steps:
   - '-X' 
   - 'POST' 
   - '--data-urlencode'
-  - 'payload={"channel": "#mis", "username": "deploybot", "text": "MISchool has been succesfully deployed to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
+  - 'payload={"channel": "#mis", "username": "deploybot", "text": "MISchool has been succesfully deployed version $SHORT_SHA to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
   - "$_SLACK_URL"
