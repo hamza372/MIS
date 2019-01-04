@@ -5,7 +5,7 @@ import { smsIntentLink } from 'utils/intent'
 
 import './style.css'
 
-export const ClassReports = ({id, classes, students, exams, settings, sms_templates, start, end}) => {
+export const ClassReports = ({id, classes, students, exams, settings, sms_templates, start, end, examFilter, subjectFilter}) => {
 	
 	const current_class = classes[id];
 	const section_set = new Set(Object.keys(current_class.sections));
@@ -34,11 +34,11 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
 					<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
-						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} />
+						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} examFilter={examFilter} subjectFilter={subjectFilter}/>
 					</div>)
 			}
 			
 		</div>
 }
-
+ 
 export default ClassReports;
