@@ -28,27 +28,7 @@ steps:
   args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
 - name: 'gcr.io/cloud-builders/curl'
   entrypoint: 'bash'
-  args:
-  - '-c'
-  - 'curl'
-  - '-X'
-  - 'POST'
-  - "https://api.cloudflare.com/client/v4/zones/$(cat /workspace/api-zone-slack-email | awk '{print $2}')/purge_cache"
-  - "-H"
-  - "X-Auth-Email: $(cat /workspace/api-zone-slack-email | awk '{print $4}')"
-  - "-H"
-  - "X-Auth-Key: $(cat /workspace/api-zone-slack-email | awk '{print $1}')"
-  - "-H"
-  - "Content-Type: application/json"
-  - "-d"
-  - '{"purge_everything": true}'
+  args: ['clear-cloudflare-cache.sh']
 - name: 'gcr.io/cloud-builders/curl'
   entrypoint: 'bash'
-  args:
-  - '-c'
-  - 'curl'
-  - '-X'
-  - 'POST'
-  - '--data-urlencode'
-  - 'payload={\"channel\": \"#mis\", \"username\": \"Builder\", \"text\": \"MISchool has been successfully deployed from branch $BRANCH_NAME\", \"icon_emoji\": \":construction_worker:\"}'
-  - "$(cat api-zone-slack-email | awk '{print $2}')"
+  args: ['post-slack.sh']

@@ -1,0 +1,1 @@
+curl -X POST "https://api.cloudflare.com/client/v4/zones/$(cat /workspace/api-zone-slack-email | awk '{print $2}')/purge_cache" -H "X-Auth-Email: $(cat /workspace/api-zone-slack-email | awk '{print $4}')" -H "X-Auth-Key: $(cat /workspace/api-zone-slack-email | awk '{print $1}')" -H "Content-Type: application/json" -d '{"purge_everything": true}'
