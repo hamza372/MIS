@@ -1,10 +1,24 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA', '--build-arg', 'VERSION=$SHORT_SHA', 'web']
+  args: ['pull', 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--cache-from'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME'
+  - '-t'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA'
+  - '-t'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME'
+  - '--build-arg'
+  - 'VERSION=$SHORT_SHA'
+  - 'web'
   env:
     - 'VERSION=$SHORT_SHA'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME']
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['set', 'image', 'deployment/mischool-web-$BRANCH_NAME', 'mischool-web=asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
   env:
@@ -13,20 +27,22 @@ steps:
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
 - name: 'gcr.io/cloud-builders/curl'
-  args:
+  entrypoint:
+  - 'curl'
   - '-X'
   - 'POST'
-  - "https://api.cloudflare.com/client/v4/zones/$(cat api-zone-slack-email | awk '{print $2}')/purge_cache"
+  - "https://api.cloudflare.com/client/v4/zones/$(cat /workspace/api-zone-slack-email | awk '{print $2}')/purge_cache"
   - "-H"
-  - "X-Auth-Email: $(cat api-zone-slack-email | awk '{print $4}')"
+  - "X-Auth-Email: $(cat /workspace/api-zone-slack-email | awk '{print $4}')"
   - "-H"
-  - "X-Auth-Key: $(cat api-zone-slack-email | awk '{print $1}')"
+  - "X-Auth-Key: $(cat /workspace/api-zone-slack-email | awk '{print $1}')"
   - "-H"
   - "Content-Type: application/json"
   - "-d"
   - '{"purge_everything": true}'
 - name: 'gcr.io/cloud-builders/curl'
-  args:
+  entrypoint:
+  - 'curl'
   - '-X'
   - 'POST'
   - '--data-urlencode'
