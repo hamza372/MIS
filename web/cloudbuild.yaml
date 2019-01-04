@@ -27,7 +27,9 @@ steps:
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
 - name: 'gcr.io/cloud-builders/curl'
-  entrypoint:
+  entrypoint: 'bash'
+  args:
+  - '-c'
   - 'curl'
   - '-X'
   - 'POST'
@@ -41,7 +43,9 @@ steps:
   - "-d"
   - '{"purge_everything": true}'
 - name: 'gcr.io/cloud-builders/curl'
-  entrypoint:
+  entrypoint: 'bash'
+  args:
+  - '-c'
   - 'curl'
   - '-X'
   - 'POST'
