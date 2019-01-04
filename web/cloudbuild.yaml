@@ -31,4 +31,4 @@ steps:
   args: ['./web/scripts/clear-cloudflare-cache.sh']
 - name: 'gcr.io/cloud-builders/curl'
   entrypoint: 'bash'
-  args: ['./web/scripts/post-slack.sh']
+  args: ['./web/scripts/post-slack.sh', $BRANCH_NAME]
