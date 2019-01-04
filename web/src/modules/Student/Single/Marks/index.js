@@ -187,11 +187,11 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		</div>
 	
 		<div className="print-only">
-			<div style={{ marginTop: "100px" }}>
+			<div style={{ marginTop: "80px" }}>
 				<div>Signature: ___________________</div>
 			</div>
 
-			<div style={{ marginTop: "50px" }}>
+			<div style={{ marginTop: "40px", marginBottom:"40px" }}>
 				<div>Parent Signature: ___________________</div>
 			</div>
 		</div>
