@@ -24,11 +24,23 @@ steps:
   env:
     - 'CLOUDSDK_COMPUTE_ZONE=asia-southeast1-c'
     - 'CLOUDSDK_CONTAINER_CLUSTER=mischool-web-cluster'
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
 - name: 'gcr.io/cloud-builders/curl'
-  entrypoint: 'bash'
-  args: ['./web/scripts/clear-cloudflare-cache.sh']
+  args:
+  - '-X'
+  - 'POST'
+  - "https://api.cloudflare.com/client/v4/zones/$(_CLOUDFLARE_ZONE)/purge_cache"
+  - '-H'
+  - "X-Auth-Email: $_EMAIL"
+  - "-H "
+  - "X-Auth-Key: $_CLOUDFLARE_API" 
+  - "-H"
+  - "Content-Type: application/json" 
+  - '-d' 
+  - '{"purge_everything": true}'
 - name: 'gcr.io/cloud-builders/curl'
-  entrypoint: 'bash'
-  args: ['./web/scripts/post-slack.sh', $BRANCH_NAME]
+  args:
+  - '-X' 
+  - 'POST' 
+  - '--data-urlencode'
+  - 'payload={"channel": "#mis", "username": "deploybot", "text": "MISchool has been succesfully deployed to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
+  - "$_SLACK_URL"
