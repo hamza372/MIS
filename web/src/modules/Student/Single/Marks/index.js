@@ -129,13 +129,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
-	
-	console.log("AFTER DOING SUBJCET FILTER", 
-		Object.keys(student.exams)
-			.map(exam_id => exams[exam_id])
-	)
-	
-	
+		
 	const { total_possible, total_marks } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))

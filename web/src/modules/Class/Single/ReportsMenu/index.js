@@ -45,7 +45,7 @@ class ClassReportMenu extends Component {
 		}
 
 		return <div className="class-report-menu" style={{width: "100%"}}>
-			<div className="title">Print Reports for {this.props.curr_class.name}</div>
+			<div className="title no-print">Print Reports for {this.props.curr_class.name}</div>
 			<div className="form no-print" style={{width: "90%", margin: "auto"}}>
 				<div className="row">
 					<label>Start Date</label>
