@@ -1,1 +1,0 @@
-curl -X POST --data-urlencode "payload={\"channel\": \"#mis\", \"username\": \"deploybot\", \"text\": \"MISchool has been succesfully deployed to $1\", \"icon_emoji\": \":construction_worker:\"}" $(cat /workspace/api-zone-slack-email | awk '{print $3}')
