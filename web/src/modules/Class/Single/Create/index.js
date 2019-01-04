@@ -28,6 +28,22 @@ const blankClass = () => ({
 	new_subject: ""
 })
 
+const defaultClasses = {
+	"Nursery": 0,
+	"Class 1": 1,
+	"Class 2": 2,
+	"Class 3": 3,
+	"Class 4": 4,
+	"Class 5": 5,
+	"Class 6": 6,
+	"Class 7": 7,
+	"Class 8": 8,
+	"Class 9": 9,
+	"Class 10": 10,
+	"O Level": 11,
+	"A Level": 12
+}
+
 class SingleClass extends Component {
 
 	constructor(props) {
@@ -191,6 +207,17 @@ class SingleClass extends Component {
 		
 	}
 
+	setClassOrder = () => {
+		if(defaultClasses[this.state.class.name]) {
+			this.setState({
+				class: {
+					...this.state.class,
+					classYear: defaultClasses[this.state.class.name]
+				}
+			})
+		}
+	}
+
 	render() {
 		if(this.state.redirect) {
 			return <Redirect to={`/class`} />
@@ -216,7 +243,7 @@ class SingleClass extends Component {
 						<option value={"O Level"} />
 						<option value={"A Level"} />
 					</datalist>
-					<input list="class-name" {...this.former.super_handle_flex(["name"] , { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
+					<input list="class-name" {...this.former.super_handle_flex(["name"], { cb: this.setClassOrder, styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
 				</div>
 				<div className="row">
 					<label>Class Order</label>
