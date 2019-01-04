@@ -31,9 +31,9 @@ steps:
   - "https://api.cloudflare.com/client/v4/zones/$_CLOUDFLARE_ZONE/purge_cache"
   - '-H'
   - "X-Auth-Email: $_EMAIL"
-  - "-H "
+  - '-H'
   - "X-Auth-Key: $_CLOUDFLARE_API" 
-  - "-H"
+  - '-H'
   - "Content-Type: application/json" 
   - '-d' 
   - '{"purge_everything": true}'
