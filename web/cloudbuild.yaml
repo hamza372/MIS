@@ -28,7 +28,7 @@ steps:
   args: ['cp', 'gs://mischool-secrets/api-zone-slack-email', '/workspace/api-zone-slack-email']
 - name: 'gcr.io/cloud-builders/curl'
   entrypoint: 'bash'
-  args: ['clear-cloudflare-cache.sh']
+  args: ['./scripts/clear-cloudflare-cache.sh']
 - name: 'gcr.io/cloud-builders/curl'
   entrypoint: 'bash'
-  args: ['post-slack.sh']
+  args: ['./scripts/post-slack.sh']
