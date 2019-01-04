@@ -28,7 +28,7 @@ steps:
   args:
   - '-X'
   - 'POST'
-  - "https://api.cloudflare.com/client/v4/zones/$(_CLOUDFLARE_ZONE)/purge_cache"
+  - "https://api.cloudflare.com/client/v4/zones/$_CLOUDFLARE_ZONE/purge_cache"
   - '-H'
   - "X-Auth-Email: $_EMAIL"
   - "-H "
