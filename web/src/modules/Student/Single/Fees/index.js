@@ -8,9 +8,9 @@ import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
 
-import { addPayment } from 'actions'
+import { addMultiplePayments, addPayment } from 'actions'
 import { sendSMS } from 'actions/core'
-import checkStudentDues from 'utils/checkStudentDues'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { smsIntentLink } from 'utils/intent'
 
 import './style.css'
@@ -133,7 +133,10 @@ class StudentFees extends Component {
 	} 
 	componentDidMount() {
 		// loop through fees, check if we have added 
-		checkStudentDues(this.student(), this.props.addPayment);
+		const owedPayments = checkStudentDuesReturning(this.student());
+		this.props.addMultiplePayments(owedPayments);
+
+
 	}
 
 	render() {
@@ -268,5 +271,6 @@ export default connect(state => ({
 	feeSMSTemplate: (state.db.sms_templates || {}).fee || ""
 }), dispatch => ({
 	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
+	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text, number) => dispatch(sendSMS(text, number))
 }))(withRouter(StudentFees))

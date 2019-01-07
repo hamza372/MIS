@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Migrate do
 						["payment"] -> {:ok, add_payment_name(school_id, school_db)}
 						["users"] -> {:ok, adjust_users_table(school_id, school_db)}
 						["fix-fees"] -> {:ok, remove_november_payments(school_id, school_db)}
+						["duplicate-fees"] -> {:ok, remove_duplicate_payments(school_id, school_db)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -127,5 +128,41 @@ defmodule Mix.Tasks.Migrate do
 			
 		Map.put(school_db, "students", next_students)
 			
+	end
+
+	defp remove_duplicate_payments(school_id, school_db) do
+		next_students = Map.get(school_db, "students", %{})
+			|> Enum.map(
+				fn({id, student}) ->
+					
+					payments = Map.get(student, "payments", %{})
+
+					# if anything has same date and fee_id, remove one of them and is type owed
+					{nextPayments, existing} = payments
+					|> Enum.reduce({%{}, %{}}, fn({id, payment}, {agg, existing}) -> 
+						d = Map.get(payment, "date")
+						fid = Map.get(payment, "fee_id")
+						type = Map.get(payment, "type")
+						nkey = "#{d}-#{fid}"
+
+						IO.inspect existing
+						if type == "OWED" and Map.has_key?(existing, nkey) do
+							IO.puts "duplicate payment!!"
+							IO.inspect Map.get(existing, nkey)
+							IO.inspect payment
+							{agg, existing}
+						else
+							{Map.put(agg, id, payment), Map.put(existing, nkey, true)}
+						end
+
+					end)
+
+					# IO.inspect nextPayments
+
+					{id, Map.put(student, "payments", nextPayments)}
+				end)
+			|> Enum.into(%{})
+		Map.put(school_db, "students", next_students)
+
 	end
 end
