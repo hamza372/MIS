@@ -14,14 +14,16 @@ class Reports extends Component {
 				<div className="title">Sections</div>
 				<div className="list">
 				{
-					sections.map(s => <Link to={`/reports/${s.class_id}/${s.id}`} key={s.id}>{s.namespaced_name}</Link>)
+					sections
+					   .sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
+					   .map(s => <Link to={`/reports/${s.class_id}/${s.id}`} key={s.id}>{s.namespaced_name}</Link>)
 				}
 				</div>
 			</div>
 		</Layout>
 
 	}
-}
+} 
 
 export default connect(state => ({
 	classes: state.db.classes
