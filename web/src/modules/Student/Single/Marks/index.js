@@ -16,21 +16,32 @@ class StudentMarksContainer extends Component {
 		super(props)
 		this.state = {
 			start: moment().subtract(3, "month"),
-			end: moment.now()
+			end: moment.now(),
+			examFilterText: "",
+			subjectFilterText: ""
 		}
 
 		this.former = new Former(this, []);
 	}
 
 	render() {
-		const {match, students, exams, settings, sms_templates } = this.props;
+		const {match, students, settings, sms_templates, exams } = this.props;
 		const id = match.params.id;
 
 		const student = students[id];
+		const subjectSet = new Set(); 
+		const examSet = new Set();   
+
+		for(let e of Object.values(exams)){
+			if(e.section_id === student.section_id){
+				examSet.add(e.name)
+				subjectSet.add(e.subject)
+			}
+		}
 		const startDate = moment(this.state.start).unix() * 1000
 		const endDate = moment(this.state.end).unix() * 1000
 
-		const report_string = reportStringForStudent(student, exams, startDate, endDate);
+		const report_string = reportStringForStudent(student, exams, startDate, endDate, this.state.examFilterText, this.state.subjectFilterText );
 
 		const text = sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, report_string);
 
@@ -47,9 +58,33 @@ class StudentMarksContainer extends Component {
 							<label>End Date</label>
 							<input type="date" onChange={this.former.handle(["end"])} value={moment(this.state.end).format("YYYY-MM-DD")} placeholder="End Date" />
 						</div>
+
+						 <div className="row">
+							<label>Exam Name</label>
+							<select {...this.former.super_handle(["examFilterText"])}> 
+								<option value="">Select Exam</option>
+								{
+									Array.from(examSet).map(exam => {
+										return <option key={exam} value={exam}>{exam}</option>	
+									})
+								}
+							</select>
+						</div> 
+
+						<div className="row">
+							<label>Subject Name</label>
+							<select {...this.former.super_handle(["subjectFilterText"])}> 
+								<option value="">Select Subject</option>
+								{
+									Array.from(subjectSet).map(subject => {
+										return <option key={subject} value={subject}>{subject}</option>	
+									})
+								}
+							</select>						
+						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate}/>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText}/>
 
 
 				{ settings.sendSMSOption === "SIM" ? <a href={url} className="button blue">Send SMS from Local SIM</a> : false }
@@ -58,7 +93,12 @@ class StudentMarksContainer extends Component {
 	}
 }
 
-export const reportStringForStudent = (student, exams, startDate=0, endDate=moment.now()) => {
+export const getReportFilterCondition = (examFilter, exam, subjectFilter, subject) => 
+{
+	return (examFilter === exam || examFilter === "") && (subjectFilter === subject || subjectFilter === "")
+}
+
+export const reportStringForStudent = (student, exams, startDate=0, endDate=moment.now(), examFilter = "", subjectFilter = "") => {
 
 	// we want a line for each exam. subject - exam name - marks / out of (percent)
 
@@ -67,7 +107,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 
 	const report_string = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
-		.filter(exam => moment(exam.date).isBetween(start, end))
+		.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, student.exams[exam.id].name, subjectFilter, student.exams[exam.id].subject ))
 		.sort((a, b) => a.date - b.date)
 		.map(exam => `${exam.subject} - ${exam.name} - ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}%)`)
 		.join('\n')
@@ -75,14 +115,14 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_string;
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now()}) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter}) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
-
+		
 	const { total_possible, total_marks } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
-		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent")
+		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 		.reduce((agg, curr) => ({
 			total_possible: agg.total_possible + parseFloat(curr.total_score),
 			total_marks: agg.total_marks + parseFloat(student.exams[curr.id].score)
@@ -111,7 +151,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		{
 			[...Object.keys(student.exams || {})
 				.map(exam_id => exams[exam_id])
-				.filter(exam => moment(exam.date).isBetween(start, end))
+				.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 				.sort((a, b) => a.date - b.date)
 				.map(exam => <div className="table row" key={exam.id}>
 						<div>{moment(exam.date).format("MM/DD")}</div>
@@ -137,11 +177,11 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		</div>
 	
 		<div className="print-only">
-			<div style={{ marginTop: "100px" }}>
+			<div style={{ marginTop: "80px" }}>
 				<div>Signature: ___________________</div>
 			</div>
 
-			<div style={{ marginTop: "50px" }}>
+			<div style={{ marginTop: "40px", marginBottom:"40px" }}>
 				<div>Parent Signature: ___________________</div>
 			</div>
 		</div>
