@@ -41,7 +41,7 @@ class StudentMarksContainer extends Component {
 		const startDate = moment(this.state.start).unix() * 1000
 		const endDate = moment(this.state.end).unix() * 1000
 
-		const report_string = reportStringForStudent(student, exams, startDate, endDate, this.state.examFilterText, this.state.subjectFilterText);
+		const report_string = reportStringForStudent(student, exams, this.state.examFilterText, this.state.subjectFilterText, startDate, endDate, );
 
 		const text = sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, report_string);
 
@@ -62,24 +62,24 @@ class StudentMarksContainer extends Component {
 						 <div className="row">
 							<label>Exam Name</label>
 							<select {...this.former.super_handle(["examFilterText"])}> 
-							<option value="">Select Exam</option>
-							{
-								Array.from(examSet).map(exam => {
-									return <option key={exam} value={exam}>{exam}</option>	
-								})
-							}
+								<option value="">Select Exam</option>
+								{
+									Array.from(examSet).map(exam => {
+										return <option key={exam} value={exam}>{exam}</option>	
+									})
+								}
 							</select>
 						</div> 
 
 						<div className="row">
 							<label>Subject Name</label>
 							<select {...this.former.super_handle(["subjectFilterText"])}> 
-							<option value="">Select Subject</option>
-							{
-								Array.from(subjectSet).map(subject => {
-									return <option key={subject} value={subject}>{subject}</option>	
-								})
-							}
+								<option value="">Select Subject</option>
+								{
+									Array.from(subjectSet).map(subject => {
+										return <option key={subject} value={subject}>{subject}</option>	
+									})
+								}
 							</select>						
 						</div>
 					</div>
@@ -93,22 +93,15 @@ class StudentMarksContainer extends Component {
 	}
 }
 
-export const getReportFilterCondition = (examFilter, exam, subjectFilter, subject) => {
-	
-	if(examFilter !== "" && subjectFilter !== "")
-		return examFilter === exam && subjectFilter === subject 
-	else if(examFilter !== ""){
-		return examFilter === exam
-	}
-	else if(subjectFilter !== ""){
-		return subjectFilter === subject
-	}
-	else
+export const getReportFilterCondition = (examFilter, exam, subjectFilter, subject) => 
+{
+	if((examFilter === exam || examFilter === "") && (subjectFilter === subject || subjectFilter === "")){
 		return true
-	
+	}
+
 }
 
-export const reportStringForStudent = (student, exams, startDate=0, endDate=moment.now(), examFilter, subjectFilter) => {
+export const reportStringForStudent = (student, exams, examFilter, subjectFilter, startDate=0, endDate=moment.now()) => {
 
 	// we want a line for each exam. subject - exam name - marks / out of (percent)
 

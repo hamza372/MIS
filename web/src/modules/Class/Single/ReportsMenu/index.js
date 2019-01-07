@@ -20,7 +20,7 @@ class ClassReportMenu extends Component {
 				examFilterText: "",
 				subjectFilterText: ""
 			}
-					}
+		}
 		this.report_former = new Former(this, ["report_filters"])
 	}
 
@@ -28,10 +28,9 @@ class ClassReportMenu extends Component {
 		
 		const subjects = new Set()
 		const exams = new Set()
-		const section_set = new Set(Object.keys(this.props.curr_class.sections));
 		
 		const relevant_students = Object.values(this.props.students)
-			.filter(s => section_set.has(s.section_id))
+			.filter(s => this.props.curr_class.sections[s.section_id] !== undefined)
 
 		for(let s of relevant_students)
 		{
@@ -59,23 +58,23 @@ class ClassReportMenu extends Component {
 				<div className="row">
 					<label>Exam Name</label>
 					<select {...this.report_former.super_handle(["examFilterText"])}> 
-					<option value="">Select Exam</option>
-					{
-						Array.from(exams).map(exam => {
-							return <option key={exam} value={exam}>{exam}</option>	
-						})
-					}
+						<option value="">Select Exam</option>
+						{
+							Array.from(exams).map(exam => {
+								return <option key={exam} value={exam}>{exam}</option>	
+							})
+						}
 					</select>
 				</div> 
 				<div className="row">
 					<label>Subject Name</label>
 					<select {...this.report_former.super_handle(["subjectFilterText"])}> 
-					<option value="">Select Subject</option>
-					{
-						Array.from(subjects).map(subject => {
-							return <option key={subject} value={subject}>{subject}</option>	
-						})
-					}
+						<option value="">Select Subject</option>
+						{
+							Array.from(subjects).map(subject => {
+								return <option key={subject} value={subject}>{subject}</option>	
+							})
+						}
 					</select>						
 				</div>
 			</div>
