@@ -8,7 +8,7 @@ import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
 
-import { addMultiplePayments } from 'actions'
+import { addMultiplePayments, addPayment } from 'actions'
 import { sendSMS } from 'actions/core'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { smsIntentLink } from 'utils/intent'
@@ -270,6 +270,7 @@ export default connect(state => ({
 	settings: state.db.settings,
 	feeSMSTemplate: (state.db.sms_templates || {}).fee || ""
 }), dispatch => ({
+	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text, number) => dispatch(sendSMS(text, number))
 }))(withRouter(StudentFees))
