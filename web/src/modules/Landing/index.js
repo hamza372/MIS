@@ -139,7 +139,7 @@ class Landing extends Component {
 							<Link 
 								to="/reports" 
 								className="button yellow-shadow" 
-								style={{backgroundImage: `url(${marksIcon})` }}> Marks </Link> 
+								style={{backgroundImage: `url(${marksIcon})` }}> Marks</Link> 
 						
 						</div>
 
