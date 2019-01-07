@@ -41,7 +41,7 @@ class StudentMarksContainer extends Component {
 		const startDate = moment(this.state.start).unix() * 1000
 		const endDate = moment(this.state.end).unix() * 1000
 
-		const report_string = reportStringForStudent(student, exams, this.state.examFilterText, this.state.subjectFilterText, startDate, endDate, );
+		const report_string = reportStringForStudent(student, exams, startDate, endDate, this.state.examFilterText, this.state.subjectFilterText );
 
 		const text = sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, report_string);
 
@@ -95,13 +95,10 @@ class StudentMarksContainer extends Component {
 
 export const getReportFilterCondition = (examFilter, exam, subjectFilter, subject) => 
 {
-	if((examFilter === exam || examFilter === "") && (subjectFilter === subject || subjectFilter === "")){
-		return true
-	}
-
+	return (examFilter === exam || examFilter === "") && (subjectFilter === subject || subjectFilter === "")
 }
 
-export const reportStringForStudent = (student, exams, examFilter, subjectFilter, startDate=0, endDate=moment.now()) => {
+export const reportStringForStudent = (student, exams, startDate=0, endDate=moment.now(), examFilter = "", subjectFilter = "") => {
 
 	// we want a line for each exam. subject - exam name - marks / out of (percent)
 
