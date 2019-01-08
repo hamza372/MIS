@@ -25,7 +25,7 @@ defmodule Sarkar.Server.Analytics do
 
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "text/plain"},
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
 			csv,
 			req
 		)
@@ -55,7 +55,7 @@ defmodule Sarkar.Server.Analytics do
 		
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "text/plain"},
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
 			csv,
 			req
 		)
@@ -82,7 +82,7 @@ defmodule Sarkar.Server.Analytics do
 		
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "text/plain"},
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
 			csv,
 			req
 		)
@@ -107,7 +107,7 @@ defmodule Sarkar.Server.Analytics do
 		
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "text/plain"},
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
 			csv,
 			req
 		)
@@ -132,7 +132,7 @@ defmodule Sarkar.Server.Analytics do
 		
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "text/plain"},
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
 			csv,
 			req
 		)
