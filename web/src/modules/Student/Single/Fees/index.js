@@ -17,13 +17,13 @@ import './style.css'
 
 /*
 
-Write a payment has been received
-Forgive a fee
-View past payments
-Compare to the expected amount
+	Write a payment has been received
+	Forgive a fee
+	View past payments
+	Compare to the expected amount
 
-Multiple students will have the same payer (parent)
-We need to know when the school year starts and ends (fee period)
+	Multiple students will have the same payer (parent)
+	We need to know when the school year starts and ends (fee period)
 
 */
 
