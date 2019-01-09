@@ -126,7 +126,7 @@ defmodule Sarkar.Server.Analytics do
 			GROUP BY d, school_id
 			ORDER BY d desc", [])
 
-		csv = [ ["date", "school_id", "students_marked"] | resp.rows] 
+		csv = [ ["date", "school_id", "teachers_marked"] | resp.rows] 
 			|> CSV.encode
 			|> Enum.join("\n")
 		
