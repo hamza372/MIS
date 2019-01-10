@@ -26,12 +26,9 @@ class StudentMarksContainer extends Component {
 
 	render() {
 		const {match, students, settings, sms_templates, exams, classes } = this.props;
-
 		const id = match.params.id;
 		const student = students[id];
-
 		const curr_class = Object.values(classes).find(c => c.sections[student.section_id]!== undefined)		
-
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
@@ -41,7 +38,6 @@ class StudentMarksContainer extends Component {
 				subjectSet.add(e.subject)
 			}
 		}
-
 		const startDate = moment(this.state.start).unix() * 1000
 		const endDate = moment(this.state.end).unix() * 1000
 
@@ -135,8 +131,8 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		})
 
 	return <div className="student-marks">
-		
 		<PrintHeader settings={settings} />
+		
 		<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
 		<div className="student-info">
 			<div className="row">
