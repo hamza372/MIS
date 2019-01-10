@@ -29,12 +29,12 @@ class ReportList extends Component {
 				<div className="title">Exams</div>
 
 				<List 
-					  items={items}
-					  Component={ExamItem} 
-					  create={`/reports/${class_id}/${section_id}/new`} 
-					  createText="New Exam" 
-					  toLabel={examLabel}
-					  />
+					items={items}
+					Component={ExamItem} 
+					create={`/reports/${class_id}/${section_id}/new`} 
+					createText="New Exam" 
+					toLabel={examLabel}
+					/>
 
 			</div>
 		</Layout>
