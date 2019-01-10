@@ -210,6 +210,8 @@ class SMSJob : Job() {
     fun writeMessagesToFile(messages : List<SMSItem>) {
 
         val file = File(context.filesDir, "$filename")
+
+        Log.d(TAG, "messages length is ${messages.size}")
         val res = Klaxon().toJsonString(messages)
         file.writeBytes(res.toByteArray())
 

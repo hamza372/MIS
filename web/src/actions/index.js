@@ -47,6 +47,19 @@ export const deleteStudent = (student) => dispatch => {
 	]))
 }
 
+export const promoteStudents = (promotion_map) => dispatch => {
+
+	// accept a map of key: student_id, value: new section_id
+
+	dispatch(createMerges(
+		Object.entries(promotion_map)
+			.map(([student_id, section_id]) => ({
+				path: ["db", "students", student_id, "section_id"],
+				value: section_id
+			}))
+	))
+}
+
 export const LOCAL_LOGOUT = "LOCAL_LOGOUT"
 export const createLogout = () => {
 	return {
