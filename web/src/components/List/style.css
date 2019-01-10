@@ -58,10 +58,10 @@
 	flex-shrink: 1000000000;
 }
 
-.list-wrap .list .table.row>*:first-child {
+.list .table.row>*:first-child {
 	margin-left: 10px;
 }
-.list-wrap .list .table.row>*:last-child {
+.list .table.row>*:last-child {
 	margin-right: 10px;
 }
 

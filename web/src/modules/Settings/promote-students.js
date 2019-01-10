@@ -20,24 +20,21 @@ class PromotePage extends Component {
 		// key: year, value: section_id
 		this.state = {
 			promotions: Object.values(props.students)
+				.filter(x => x.Name && x.Name != "")
 				.reduce((agg, curr) => {
 
 					const s = sections.find(x => x.id === curr.section_id)
 					if(s === undefined) {
-						console.log('cant find s')
 						return { ...agg, [curr.id]:  ""}
 					}
 
 					const current_year = parseInt(s.classYear, 10);
-
 					const s2 = sections.find(x => parseInt(x.classYear, 10) === current_year + 1);
 
 					if(s2 === undefined) {
-						console.log("s2 undefined")
 						return { ...agg, [curr.id]:  ""}
 					}
 
-					console.log(s2.id)
 					return {...agg, [curr.id]: s2.id }
 				}, {})
 		}
@@ -47,11 +44,9 @@ class PromotePage extends Component {
 
 	save = () => {
 
-		console.log("save")
-
 		const filtered_promotions = Object.entries(this.state.promotions)
 			.reduce((agg, [student_id, section_id]) => {
-				if(section_id !== "") {
+				if(section_id !== "" && section_id !== undefined) {
 					return {
 						...agg,
 						[student_id]: section_id
@@ -59,7 +54,7 @@ class PromotePage extends Component {
 				}
 
 				return agg;
-			});
+			}, {});
 
 		this.props.save(filtered_promotions);
 
@@ -71,8 +66,6 @@ class PromotePage extends Component {
 
 		const sections = getSectionsFromClasses(classes);
 		const class_options = sections.map(x => <option value={x.id} key={x.id}>{x.namespaced_name}</option>)
-
-		console.log(this.state.promotions)
 
 		return <Layout history={history}>
 			<div className="promote-student">
@@ -86,15 +79,16 @@ class PromotePage extends Component {
 					</div>
 					{
 						Object.values(students)
+						.filter(x => x.Name)
 						.sort((a, b) => a.Name - b.Name)
 						.map(student => {
 							const s = sections.find(x => x.id === student.section_id);
 
 							return <div className="table row" key={student.id}>
-								<Link to={`/students/${student.id}/profile`}>{student.Name}</Link>
+								<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
 								<div>{s ? s.namespaced_name : "No Class"}</div>
 								<select {...this.Former.super_handle([student.id])}>
-									<option value="" disabled>Select Class</option>
+									<option value="">Select Class</option>
 									{ class_options }
 								</select>
 							</div>
@@ -103,7 +97,7 @@ class PromotePage extends Component {
 					}
 				</div>
 
-				<div className="blue button" onClick={this.save} style={{ alignSelf: "flex-end", marginRight: "5%", marginTop: "15px"}}>Save</div>
+				<div className="blue button" onClick={this.save} style={{ alignSelf: "flex-end", marginRight: "5%", marginTop: "15px" }}>Save</div>
 			</div>
 		</Layout>
 	}
@@ -113,5 +107,5 @@ export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes
 }), dispatch => ({
-	save: promotion_map => dispatch(promoteStudents)
+	save: promotion_map => dispatch(promoteStudents(promotion_map))
 }))(PromotePage)
