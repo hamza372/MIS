@@ -31,14 +31,14 @@ class SingleExam extends Component {
 
 		const student_marks = Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id() )
-			.reduce((agg, [id, student]) => ({ ...agg, [id]: { score: "", grade: "" }}), {})
+			.reduce((agg, [id, student]) => ({ ...agg, [id]: { score: "", grade: "", remarks:"" }}), {})
 
 		this.state = {
 			exam: this.exam_id() === undefined ? {
 				...blankExam(),
 				student_marks
  			} : { 
-				 ...this.props.exams[this.exam_id()],
+				...this.props.exams[this.exam_id()],
 				student_marks: this.getGradesForExistingExam(this.exam_id())
 			},
 			sendSMS: false,
@@ -64,7 +64,7 @@ class SingleExam extends Component {
 				const exam = student.exams[exam_id]  
 				return {
 					...agg,
-					[id]: exam ? exam.score : ""
+					[id]: exam || { score: "", grade: "", remarks: "" }
 				}
 			}, {})
 	}
@@ -202,7 +202,7 @@ class SingleExam extends Component {
 
 					<div className="row">
 						<label>Total Score</label>
-						<input type="number" {...this.former.super_handle(["total_score"])} placeholder="Maximum Possible Score" />
+						<input type="number" {...this.former.super_handle(["total_score"])} placeholder="Maximum Score" />
 					</div>
 
 					<div className="row">
@@ -237,12 +237,24 @@ class SingleExam extends Component {
 											<option value="">Grade</option>
 											<option value="A+">A+</option>
 											<option value="A">A</option>
-											<option value="B">B+</option>
+											<option value="B+">B+</option>
 											<option value="B">B</option>
 											<option value="C">C</option>
 											<option value="D">D</option>
 											<option value="Fail">Fail</option>
 											<option value="Absent">Absent</option>
+										</select>
+										<select {...this.former.super_handle(["student_marks", id, "remarks"])}>
+											<option value="">Remarks</option>
+											<option value="Excellent">Excellent</option>
+											<option value="Very Good">Very Good</option>
+											<option value="Good">Good</option>
+											<option value="Average">Average</option>
+											<option value="Needs Improvement">Needs Improvement</option>
+											<option value="Pass">Pass</option>
+											<option value="Fail">Fail</option>
+											<option value="Better">Better</option>
+											<option value="Shown Improvement">Shown Improvement</option>
 										</select>
 									</div>
 								))

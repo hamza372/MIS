@@ -25,10 +25,10 @@ class StudentMarksContainer extends Component {
 	}
 
 	render() {
-		const {match, students, settings, sms_templates, exams } = this.props;
+		const {match, students, settings, sms_templates, exams, classes } = this.props;
 		const id = match.params.id;
-
 		const student = students[id];
+		const curr_class = Object.values(classes).find(c => c.sections[student.section_id]!== undefined)		
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
@@ -58,8 +58,7 @@ class StudentMarksContainer extends Component {
 							<label>End Date</label>
 							<input type="date" onChange={this.former.handle(["end"])} value={moment(this.state.end).format("YYYY-MM-DD")} placeholder="End Date" />
 						</div>
-
-						 <div className="row">
+						<div className="row">
 							<label>Exam Name</label>
 							<select {...this.former.super_handle(["examFilterText"])}> 
 								<option value="">Select Exam</option>
@@ -84,7 +83,7 @@ class StudentMarksContainer extends Component {
 						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText}/>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class}/>
 
 
 				{ settings.sendSMSOption === "SIM" ? <a href={url} className="button blue">Send SMS from Local SIM</a> : false }
@@ -115,7 +114,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_string;
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter}) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class }) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
@@ -133,20 +132,25 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 
 	return <div className="student-marks">
 		<PrintHeader settings={settings} />
-
-		<div className="title">Result Card</div>
+		
+		<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
 		<div className="student-info">
-			<div className="name"><b>Student Name:</b> {student.Name}</div>
+			<div className="row">
+				<div className="name"><b>Student Name:</b> {student.Name}</div>
+				<div style={{ marginLeft: "1em"}}><b>Roll No:</b> {student.RollNumber !== undefined ? student.RollNumber : "______"}</div>
+				<div style={{ marginLeft: "1em"}}><b>Class Name:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
+			</div>
 		</div>
 		<div className="section table">
 			<div className="table row heading">
 				<label><b>Date</b></label>
 				<label><b>Subject</b></label>
-				<label><b>Name</b></label>
-				<label><b>Marks</b></label>
-				<label><b>Out of</b></label>
+				{examFilter === "" ? <label><b>Name</b></label> : false}
+				<label><b>Total</b></label>
+				<label><b>Obtained</b></label>
 				<label><b>Percent</b></label>
 				<label><b>Grade</b></label>
+				<label><b>Remarks</b></label>
 			</div>
 		{
 			[...Object.keys(student.exams || {})
@@ -156,11 +160,12 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 				.map(exam => <div className="table row" key={exam.id}>
 						<div>{moment(exam.date).format("MM/DD")}</div>
 						<div>{exam.subject}</div>
-						<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link>
-						<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
+						{examFilter === "" ? <Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
 						<div>{exam.total_score}</div>
+						<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
 						<div>{student.exams[exam.id].grade !== "Absent" ? (student.exams[exam.id].score / exam.total_score * 100).toFixed(2) : "N/A"}</div>
 						<div>{student.exams[exam.id].grade}</div>
+						<label>{student.exams[exam.id].remarks}</label>
 					</div>),
 					<div className="table row footing" key={`${student.id}-total-footing`}>
 						<label><b>Total Marks</b></label>
@@ -176,15 +181,22 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		}
 		</div>
 	
-		<div className="print-only">
-			<div style={{ marginTop: "80px" }}>
+    	<div className="print-only">
+
+			<div style={{marginTop: "40px"}}>
+				<div>Principal Comments </div> 
+				<div style={{marginTop: "10px"}}> _______________________________________________________________</div>
+				<div style={{marginTop: "10px"}}> _______________________________________________________________</div>
+			</div>
+
+			<div style={{ marginTop: "40px" }}>
 				<div>Signature: ___________________</div>
 			</div>
 
-			<div style={{ marginTop: "40px", marginBottom:"40px" }}>
+			<div style={{ marginTop: "20px", marginBottom:"80px" }}>
 				<div>Parent Signature: ___________________</div>
 			</div>
-		</div>
+		</div> 
 	</div>
 }
 
@@ -192,6 +204,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 export default connect(state => ({
 	students: state.db.students,
 	exams: state.db.exams,
+	classes: state.db.classes,
 	settings: state.db.settings,
 	sms_templates: state.db.sms_templates
 }))(StudentMarksContainer)
