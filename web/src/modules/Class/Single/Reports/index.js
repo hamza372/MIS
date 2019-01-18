@@ -15,7 +15,7 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 
 	const messages = relevant_students.map(student => ({
 		number: student.Phone,
-		text: sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end))
+		text: sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end, examFilter, subjectFilter))
 	}))
 
 	console.log(messages)
