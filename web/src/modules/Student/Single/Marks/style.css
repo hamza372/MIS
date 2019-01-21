@@ -37,8 +37,8 @@
 
 .student-marks .table.row * {
 	flex-wrap: nowrap;
-	flex: 0 0 auto;
-	min-width: 6rem;
+	flex: 1 1 100%;
+	min-width: 1rem;
 	width: initial;
 	text-align: left;
 }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import './style.css'
+
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Line, Tooltip } from 'recharts'
 
 const MonthlyAttendanceChart = (props) => {
