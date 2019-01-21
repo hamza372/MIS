@@ -17,7 +17,8 @@ defmodule Sarkar.Server do
 		:cowboy_router.compile([
 			{:_, [
 				{"/ws", Sarkar.Websocket, []},
-				{"/", Sarkar.Server.OK, []}
+				{"/", Sarkar.Server.OK, []},
+				{"/analytics/:type", Sarkar.Server.Analytics, []}
 			]}
 		])
 	end

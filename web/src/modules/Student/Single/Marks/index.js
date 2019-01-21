@@ -106,7 +106,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 
 	const report_string = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
-		.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, student.exams[exam.id].name, subjectFilter, student.exams[exam.id].subject ))
+		.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 		.sort((a, b) => a.date - b.date)
 		.map(exam => `${exam.subject} - ${exam.name} - ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}%)`)
 		.join('\n')

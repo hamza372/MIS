@@ -64,7 +64,7 @@ class SingleExam extends Component {
 				const exam = student.exams[exam_id]  
 				return {
 					...agg,
-					[id]: exam ? exam.score : ""
+					[id]: exam || { score: "", grade: "", remarks: "" }
 				}
 			}, {})
 	}
