@@ -19,10 +19,3 @@
 	margin: auto;
 	margin-top: 0;
 }
-
-@media print {
-	.class-report .student-report {
-		page-break-after: always;
-		page-break-inside: avoid;
-	}	
-}

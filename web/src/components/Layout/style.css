@@ -51,12 +51,19 @@ a.block {
 @media print {
 	@page {
 		size: auto;
-		margin: 0;
+		margin: 10px;
 	}
 
-	div.print-page {
+	* {
+		transition: none !important;
+	}
+
+	.print-page {
 		page-break-after: always;
 		page-break-inside: avoid;
+		break-before: page;
+		break-after: page;
+		break-inside: avoid;
 		display: block!important;
 		position: relative!important;
 	}
@@ -76,8 +83,18 @@ a.block {
 
 	.print-only {
 		display: block!important;
+	}
+
+	.school-header {
 		text-align: center;
 		font-weight: bolder;
+
+		display: block!important;
+		position: relative!important;
+		break-inside: avoid;
+		break-before: page;
+		page-break-before: always;
+		page-break-inside: avoid;
 	}
 
 	.no-print {
