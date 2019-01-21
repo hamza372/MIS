@@ -50,3 +50,12 @@
 		padding-top: 20px;
 		border-top: 3px solid #222;
 	}
+
+@media print {
+
+	.student-marks .table.row {
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 10pt;
+		line-height: 2em;
+	}
+}
