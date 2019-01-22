@@ -176,7 +176,7 @@ a.block {
 		.form .row>* {
 			width: 30%;
 		}
-
+		
 		.form .row>*:last-child {
 			margin-left: auto;
 		}
