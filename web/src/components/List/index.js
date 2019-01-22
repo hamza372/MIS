@@ -25,11 +25,11 @@ class List extends Component {
 
 		return <div className="list-wrap">
 			
-
-			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
-
+			<div className="total">
+				<div className="label"> Total: <strong> {filteredList.length} </strong></div>
+				{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
+			</div>
 			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
-			
 			<div className="list">
 			{
 				filteredList.map(item => Component(item))

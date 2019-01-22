@@ -86,3 +86,32 @@
 		background-color: black;
 		color: white;
 	}
+
+	.total {
+		flex-direction: row;
+		display: flex;
+		width: 90%;
+		align-items: center;
+	}
+		.total .label{
+			width: 100%;
+			font-size: 1.2rem;
+		}
+		.total .button.blue{
+			width: 60%;
+			margin-right: auto;
+			font-size: 0.9rem;
+		}
+	
+	@media only screen and (min-width: 768px) {
+		
+			.total .label{
+				width: 100%;
+				font-size: 1.2rem;
+			}
+			.total .button.blue{
+				width: 20%;
+				margin-right: auto;
+				font-size: 1rem;
+			}
+	}
