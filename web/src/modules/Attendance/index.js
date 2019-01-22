@@ -115,7 +115,7 @@ class Attendance extends Component {
 				}]
 
 			}, [])
-
+			
 		const url = smsIntentLink({
 			messages,
 			return_link: window.location.href

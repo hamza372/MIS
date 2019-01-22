@@ -11,7 +11,7 @@ import Routes from './routes'
 import { saveDB, loadDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
-const debug_host = 'wss://d0acd908.ngrok.io'
+const debug_host = 'wss://2f65fc74.ngrok.io'
 
 const host = window.api_url || debug_host;
 

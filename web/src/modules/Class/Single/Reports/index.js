@@ -40,5 +40,5 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 			
 		</div>
 }
- 
+
 export default ClassReports;

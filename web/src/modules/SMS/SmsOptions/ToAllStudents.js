@@ -5,22 +5,34 @@ import former from 'utils/former'
 
 export default class ToAllStudents extends Component {
 	constructor(props) {
-	  super(props)
+		super(props)
 	
-	  this.state = {
-		  text: ""
-	  }
+		this.state = {
+			text: ""
+		}
 
-	  this.former = new former(this, [])
+		this.former = new former(this, [])
 	}
-	
-  render() {
+
+	render() {
 
 	const { students, sendBatchMessages, smsOption } = this.props;
 	console.log(smsOption)
 
-	const messages = Object.values(students).filter(student => student.Phone !== undefined && student.Phone !== "")
-		.map(S => ({ number: S.Phone, text : this.state.text }))
+	const messages = Object.values(students)
+						.filter(s => s.Phone !== undefined && s.Phone !== "")
+						.reduce((agg,student)=> {
+							const index  = agg.findIndex(s => s.number === student.Phone)		
+							if(index >= 0 ){
+								return agg
+							}
+
+							return [...agg,{
+								number: student.Phone,
+								text : this.state.text
+							}]
+						}, [])
+						
 
 	return (
 		<div>
@@ -36,6 +48,6 @@ export default class ToAllStudents extends Component {
 					<div className="button" onClick={() => sendBatchMessages(messages)}>Can Only send using Local SIM</div> }
 		</div>
 		)
-  }
+	}
 }
 
