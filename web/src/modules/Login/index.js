@@ -6,6 +6,7 @@ import { createLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 
+import './style.css'
 
 // login is a different kind of action.
 // first time they do it, no schools are syncd.
