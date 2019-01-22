@@ -255,7 +255,8 @@ export const mergeExam = (exam, class_id, section_id) => dispatch => {
 				path: ["db", "students", student_id, "exams", id ],
 				value: {
 					score: student_mark.score, 
-					grade: student_mark.grade
+					grade: student_mark.grade,
+					remarks: student_mark.remarks
 				}
 			}
 		]), [])

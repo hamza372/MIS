@@ -15,7 +15,7 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 
 	const messages = relevant_students.map(student => ({
 		number: student.Phone,
-		text: sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end))
+		text: sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end, examFilter, subjectFilter))
 	}))
 
 	console.log(messages)
@@ -34,11 +34,11 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
 					<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
-						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} examFilter={examFilter} subjectFilter={subjectFilter}/>
+						<StudentMarks student={s} exams={exams} settings={settings} startDate={start} endDate={end} examFilter={examFilter} subjectFilter={subjectFilter} curr_class={current_class}/>
 					</div>)
 			}
 			
 		</div>
 }
- 
+
 export default ClassReports;

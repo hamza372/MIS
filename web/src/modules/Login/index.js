@@ -6,6 +6,7 @@ import { createLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 
+import './style.css'
 
 // login is a different kind of action.
 // first time they do it, no schools are syncd.
@@ -70,7 +71,7 @@ class Login extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
+						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" />
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>
