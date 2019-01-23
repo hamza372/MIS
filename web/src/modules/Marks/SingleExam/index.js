@@ -20,7 +20,7 @@ const blankExam = () => ({
 	total_score: "",
 	date: new Date().getTime(),
 	student_marks: {
-		
+
 	}
 })
 
@@ -54,13 +54,16 @@ class SingleExam extends Component {
 	}
 
 	getGradesForExistingExam = exam_id => {
-		//
+
+		// first check students in this section....
+		// but we should really check all students
 		return Object.entries(this.props.students)
 			.filter(([id, student]) => student.section_id === this.section_id())
 			.reduce((agg, [id, student]) => {
 				if(student.exams === undefined) {
 					return agg;
 				}
+
 				const exam = student.exams[exam_id]  
 				return {
 					...agg,

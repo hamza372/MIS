@@ -17,8 +17,9 @@ class PromotePage extends Component {
 
 		const sections = getSectionsFromClasses(props.classes);
 
-		// key: year, value: section_id
+		// key: year, value: { current: section_id, next: section_id }
 		this.state = {
+			current_section: "",
 			promotions: Object.values(props.students)
 				.filter(x => x.Name && x.Name != "")
 				.reduce((agg, curr) => {
@@ -39,24 +40,27 @@ class PromotePage extends Component {
 				}, {})
 		}
 
-		this.Former = new former(this, ["promotions"])
+		this.Former = new former(this, [])
 	}
 
 	save = () => {
 
 		const filtered_promotions = Object.entries(this.state.promotions)
 			.reduce((agg, [student_id, section_id]) => {
-				if(section_id !== "" && section_id !== undefined) {
+				if(section_id !== "" && section_id !== undefined && this.props.students[student_id].section_id === this.state.current_section) {
 					return {
 						...agg,
-						[student_id]: section_id
+						[student_id]: {
+							current: this.props.students[student_id].section_id,
+							next: section_id
+						}
 					}
 				}
 
 				return agg;
 			}, {});
 
-		this.props.save(filtered_promotions);
+		this.props.save(filtered_promotions, getSectionsFromClasses(this.props.classes));
 
 		// for all students in this.state.promotions who are not empty string, promote them.
 	}
@@ -71,6 +75,13 @@ class PromotePage extends Component {
 			<div className="promote-student">
 				<div className="title">Promote Students</div>
 
+				<select {...this.Former.super_handle(["current_section"])}>
+					<option value="">Select Class</option>
+					{
+						sections.map(x => <option value={x.id} key={x.id}>{x.namespaced_name}</option>)
+					}
+				</select>
+
 				<div className="list">
 					<div className="table row" style={{ fontWeight: "bold" }}>
 						<div>Student</div>
@@ -79,7 +90,7 @@ class PromotePage extends Component {
 					</div>
 					{
 						Object.values(students)
-						.filter(x => x.Name)
+						.filter(x => x.Name && x.section_id === this.state.current_section)
 						.sort((a, b) => a.Name - b.Name)
 						.map(student => {
 							const s = sections.find(x => x.id === student.section_id);
@@ -87,7 +98,7 @@ class PromotePage extends Component {
 							return <div className="table row" key={student.id}>
 								<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
 								<div>{s ? s.namespaced_name : "No Class"}</div>
-								<select {...this.Former.super_handle([student.id])}>
+								<select {...this.Former.super_handle(["promotions", student.id])}>
 									<option value="">Select Class</option>
 									{ class_options }
 								</select>
@@ -107,5 +118,5 @@ export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes
 }), dispatch => ({
-	save: promotion_map => dispatch(promoteStudents(promotion_map))
+	save: (promotion_map, sections) => dispatch(promoteStudents(promotion_map, sections))
 }))(PromotePage)

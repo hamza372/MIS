@@ -113,7 +113,7 @@ class SMSJob : Job() {
         for(p in messages) {
             Log.d(TAG, "send " + p.text + " to " + p.number)
             sendSMS(p.text, p.number)
-            Thread.sleep(100)
+            Thread.sleep(1000)
         }
 
     }

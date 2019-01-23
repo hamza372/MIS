@@ -38,7 +38,7 @@ defmodule Sarkar.School do
 		min_write_date = if writes != %{} do
 
 			{_, %{"date" => mwd }} = writes 
-				|> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+				|> Enum.min_by(fn {path_string, %{"date" => path_date}} -> path_date end)
 			
 			mwd
 		end

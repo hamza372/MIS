@@ -1,4 +1,4 @@
-FROM elixir:1.7-alpine
+FROM elixir:1.8-alpine
 
 RUN apk add --no-cache alpine-sdk
 RUN apk add --no-cache bash

@@ -47,16 +47,35 @@ export const deleteStudent = (student) => dispatch => {
 	]))
 }
 
-export const promoteStudents = (promotion_map) => dispatch => {
+export const promoteStudents = (promotion_map, section_metadata) => dispatch => {
 
 	// accept a map of key: student_id, value: new section_id
 
-	dispatch(createMerges(
-		Object.entries(promotion_map)
-			.map(([student_id, section_id]) => ({
+	dispatch(createMerges([
+		...Object.entries(promotion_map)
+			.map(([student_id, { current, next }]) => ({
 				path: ["db", "students", student_id, "section_id"],
-				value: section_id
-			}))
+				value: next
+			})),
+		...Object.entries(promotion_map)
+			.map(([student_id, { current, next }]) => ({
+				path: ["db", "students", student_id, "class_history", current, "end_date"],
+				value: new Date().getTime()
+			})),
+		...Object.entries(promotion_map)
+			.map(([student_id, { current, next }]) => {
+				const meta = section_metadata.find(x => x.id === next);
+				return {
+					path: ["db", "students", student_id, "class_history", next],
+					value: {
+						start_date: new Date().getTime(),
+						class_id: meta.class_id, // class id
+						class_name: meta.className,
+						namespaced_name: meta.namespaced_name
+					}
+				}
+			})
+		]
 	))
 }
 
