@@ -51,6 +51,8 @@ export const promoteStudents = (promotion_map, section_metadata) => dispatch => 
 
 	// accept a map of key: student_id, value: new section_id
 
+	// think about the case when someone promotes up and down repeatedly. 
+	// this will overwrite their history... instead of adding to it.
 	dispatch(createMerges([
 		...Object.entries(promotion_map)
 			.map(([student_id, { current, next }]) => ({

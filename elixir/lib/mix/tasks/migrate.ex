@@ -51,8 +51,6 @@ defmodule Mix.Tasks.Migrate do
 
 				end)
 
-				# IO.puts "formatted class sections"
-				# IO.inspect formatted_sections
 				formatted_sections
 			end)
 			|> Enum.reduce([], fn x, acc -> acc ++ x end)

@@ -58,7 +58,10 @@ class SingleExam extends Component {
 		// first check students in this section....
 		// but we should really check all students
 		return Object.entries(this.props.students)
-			.filter(([id, student]) => student.section_id === this.section_id())
+			.filter(([id, student]) => {
+				console.log('looking up student', student.exams && student.exams[exam_id]);
+				return student.exams && student.exams[exam_id] 
+			})
 			.reduce((agg, [id, student]) => {
 				if(student.exams === undefined) {
 					return agg;
@@ -228,15 +231,17 @@ class SingleExam extends Component {
 						<div className="divider">Marks</div>
 						<div className="section">
 						{
-							Object.entries(this.props.students)
-								.filter(([id, student]) => student.section_id === this.section_id())
-								.map(([id, student]) => (
-									<div className="marks row" key={id}>
-										<label><Link to={`/student/${id}/profile`} >{student.Name}</Link></label>
+							// Object.entries(this.props.students)
+							// 	.filter(([id, student]) => student.section_id === this.section_id())
+							Object.keys(this.state.exam.student_marks)
+								.map(xid => this.props.students[xid])
+								.map(student => (
+									<div className="marks row" key={student.id}>
+										<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
 										<input type="number" 
-											{...this.former.super_handle(["student_marks", id, "score"])} 
+											{...this.former.super_handle(["student_marks", student.id, "score"])} 
 											placeholder="Score" />
-										<select {...this.former.super_handle(["student_marks", id, "grade"])}>
+										<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
 											<option value="">Grade</option>
 											<option value="A+">A+</option>
 											<option value="A">A</option>
@@ -247,7 +252,7 @@ class SingleExam extends Component {
 											<option value="Fail">Fail</option>
 											<option value="Absent">Absent</option>
 										</select>
-										<select {...this.former.super_handle(["student_marks", id, "remarks"])}>
+										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])}>
 											<option value="">Remarks</option>
 											<option value="Excellent">Excellent</option>
 											<option value="Very Good">Very Good</option>
