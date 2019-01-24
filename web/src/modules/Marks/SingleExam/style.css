@@ -3,17 +3,8 @@
 }
 
 .single-exam .marks.row {
-
 	display: flex;
 	flex-direction: row;
-}
-
-.single-exam .marks.row select {
-	width: 5rem;
-}
-
-.single-exam .marks.row input {
-	width: 5rem;
 }
 
 .single-exam .marks.row label {

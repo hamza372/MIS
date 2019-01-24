@@ -113,7 +113,7 @@ class SMSJob : Job() {
         for(p in messages) {
             Log.d(TAG, "send " + p.text + " to " + p.number)
             sendSMS(p.text, p.number)
-            Thread.sleep(100)
+            Thread.sleep(1000)
         }
 
     }
@@ -210,6 +210,8 @@ class SMSJob : Job() {
     fun writeMessagesToFile(messages : List<SMSItem>) {
 
         val file = File(context.filesDir, "$filename")
+
+        Log.d(TAG, "messages length is ${messages.size}")
         val res = Klaxon().toJsonString(messages)
         file.writeBytes(res.toByteArray())
 

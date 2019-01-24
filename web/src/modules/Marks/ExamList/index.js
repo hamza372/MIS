@@ -5,9 +5,13 @@ import List from 'components/List'
 import Layout from 'components/Layout'
 
 const ExamItem = (exam) => 
-	<Link key={exam.id} to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>
-		{examLabel(exam)}
-	</Link>
+	<div className="table row" key={exam.id}>
+		<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>
+			{examLabel(exam)}
+		</Link>
+
+		<div>{new Date(exam.date).toLocaleDateString()}</div>
+	</div>
 
 const examLabel = (exam) => `${exam.subject}: ${exam.name}`;
 
