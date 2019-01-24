@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Migrate do
 
 		section_metadata = Map.get(school_db, "classes", %{})
 			|> Enum.map(fn({ _, c }) ->
-				formatted_sections = Enum.map(Map.get(c, "sections", %{}), fn({ section_id, section }) -> 
+				Enum.map(Map.get(c, "sections", %{}), fn({ section_id, section }) -> 
 
 					{section_id, %{
 						class_id: Map.get(c, "id", ""),
@@ -50,8 +50,6 @@ defmodule Mix.Tasks.Migrate do
 					}}
 
 				end)
-
-				formatted_sections
 			end)
 			|> Enum.reduce([], fn x, acc -> acc ++ x end)
 			|> Enum.into(%{})
@@ -77,9 +75,7 @@ defmodule Mix.Tasks.Migrate do
 		)
 		|> Enum.into(%{})
 
-		# IO.inspect next_students
 		Map.put(school_db, "students", next_students)
-		# school_db
 	end
 
 
