@@ -53,15 +53,12 @@ class SingleExam extends Component {
 		this.former = new Former(this, ["exam"])
 	}
 
+	// what if someone is added to the section after we have saved the exam...
+	// we probably need an option to add an arbitrary student to an exam
 	getGradesForExistingExam = exam_id => {
 
-		// first check students in this section....
-		// but we should really check all students
 		return Object.entries(this.props.students)
-			.filter(([id, student]) => {
-				console.log('looking up student', student.exams && student.exams[exam_id]);
-				return student.exams && student.exams[exam_id] 
-			})
+			.filter(([id, student]) => student.exams && student.exams[exam_id])
 			.reduce((agg, [id, student]) => {
 				if(student.exams === undefined) {
 					return agg;
