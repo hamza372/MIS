@@ -14,7 +14,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	dispatch(action)
 
 	const new_merges = merges.reduce((agg, curr) => ({
-			...agg, 
+			...agg,
 			[curr.path.join(',')]: {
 				action: {
 					type: "MERGE",

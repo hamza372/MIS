@@ -16,6 +16,7 @@ defmodule Mix.Tasks.Migrate do
 						["fix-fees"] -> {:ok, remove_november_payments(school_id, school_db)}
 						["duplicate-fees"] -> {:ok, remove_duplicate_payments(school_id, school_db)}
 						["class-history"] -> {:ok, add_class_history(school_id, school_db)}
+						["delete-all-fees-wisdom-sadia"] -> {:ok, delete_wisdom_sadia_fees(school_id, school_db)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -30,10 +31,25 @@ defmodule Mix.Tasks.Migrate do
 					end
 				end)
 
-
 			{:err, msg} -> 
 				IO.puts "ERROR"
 				IO.inspect msg
+		end
+	end
+
+	defp delete_wisdom_sadia_fees(school_id, school_db) do
+
+		case school_id do
+			id when  id == "sadiaschool" or id == "wisdomschool" -> 
+				IO.puts "=========editing #{id}============"
+				next_students = Map.get(school_db, "students", %{})
+					|> Enum.map( fn({id, student}) -> 
+						Map.put(student, "fees", %{})
+						|> Map.put("payments", %{})
+					end)
+
+				Map.put(school_db, "students", next_students)
+			_ -> school_db
 		end
 	end
 
