@@ -249,6 +249,7 @@ class SingleExam extends Component {
 											<option value="Fail">Fail</option>
 											<option value="Absent">Absent</option>
 										</select>
+
 										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])}>
 											<option value="">Remarks</option>
 											<option value="Excellent">Excellent</option>
