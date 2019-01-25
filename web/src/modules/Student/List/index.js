@@ -59,10 +59,16 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 		} 
 	});	
 
-	let create = '/student/new'
-
-	if(forwardTo === 'marks' || forwardTo === 'payment'){
+	let create = '/student/new' 
+	let createText = "Add new Student"
+	
+	if(forwardTo === 'marks'){
 		create = '';
+	}
+
+	if(forwardTo === 'payment'){
+		create = '/fees/manage'
+		createText = "Manage Fees"
 	}
 
 	return <div className="student-list">
@@ -72,7 +78,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 			items = {[ { Name: "", header: true }, ...items]}
 			Component = {StudentItem}
 			create = {create} 
-			createText = {"Add new Student"} 
+			createText = {createText} 
 			toLabel = {toLabel} /> 
 
 		<div className="print button" onClick={() => window.print()}>Print</div>
