@@ -156,6 +156,9 @@ class StudentFees extends Component {
 		const filteredPayments = Object.entries(this.student().payments || {})
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 				.filter(([id,payment]) => this.getFilterCondition(payment))
+		
+		console.log("FEES", this.student().fees)
+
 
 		return <div className="student-fees">
 
