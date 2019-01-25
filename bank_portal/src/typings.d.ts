@@ -25,8 +25,13 @@ interface RootBankState {
 		loading: boolean,
 		client_type: "bank_portal"
 	},
-	filter_text: string
-
+	filter_text: string,
+	client_id: string,
+	queued: {
+		[path: string]: { action: Object, date: number }
+	},
+	last_snapshot: number,
+	accept_snapshot: boolean
 }
 
 interface SchoolLocation {

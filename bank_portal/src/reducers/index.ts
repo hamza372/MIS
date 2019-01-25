@@ -1,7 +1,10 @@
 import * as redux from 'redux'
 import locations from './narrowed.json'
+import Dynamic from '@ironbay/dynamic'
 
+import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from '~/src/actions/core'
 import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
+import { v4 } from 'node-uuid';
 
 
 const initialState : RootBankState = {
@@ -16,7 +19,11 @@ const initialState : RootBankState = {
 		loading: false,
 		client_type: "bank_portal"
 	},
-	filter_text: ""
+	filter_text: "",
+	client_id: v4(),
+	queued: {},
+	accept_snapshot: false,
+	last_snapshot: 0
 }
 
 const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
@@ -24,6 +31,43 @@ const rootReducer = (state : RootBankState = initialState, action: Actions) : Ro
 	console.log(action.type)
 
 	switch(action.type) {
+
+		case MERGES: 
+		{
+			const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
+				return Dynamic.put(agg, curr.path, curr.value)
+			}, JSON.parse(JSON.stringify(state)));
+
+			return {
+				...nextState,
+				accept_snapshot: false
+			}
+		}
+
+		case DELETES: 
+		{
+			const state_copy = JSON.parse(JSON.stringify(state)) as RootBankState;
+
+			(action as DeletesAction).paths.forEach(a => Dynamic.delete(state_copy, a.path));
+
+			return {
+				...state_copy,
+				accept_snapshot: false
+			}
+			
+		}
+
+		case QUEUE: 
+		{
+			return {
+				...state,
+				queued: {
+					...state.queued,
+					...(action as QueueAction).payload
+				}
+			}
+		}
+
 		case SELECT_LOCATION:
 		{
 			return {

@@ -1,4 +1,11 @@
 steps:
+- name: 'gcr.io/cloud-builders/curl'
+  args:
+  - '-X' 
+  - 'POST' 
+  - '--data-urlencode'
+  - 'payload={"channel": "#mis", "username": "deploybot", "text": "Starting build of $SHORT_SHA to $BRANCH_NAME...", "icon_emoji": ":construction_worker:"}'
+  - "$_SLACK_URL"
 - name: 'gcr.io/cloud-builders/docker'
   args: ['pull', 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME']
 - name: 'gcr.io/cloud-builders/docker'

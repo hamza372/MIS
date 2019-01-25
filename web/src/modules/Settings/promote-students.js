@@ -21,7 +21,7 @@ class PromotePage extends Component {
 		this.state = {
 			current_section: "",
 			promotions: Object.values(props.students)
-				.filter(x => x.Name && x.Name != "")
+				.filter(x => x.Name && x.Name !== "")
 				.reduce((agg, curr) => {
 
 					const s = sections.find(x => x.id === curr.section_id)
