@@ -113,9 +113,6 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 		max_score: agg.max_score + parseFloat(exam.total_score, 10) }),
 	{ total_score: 0, max_score: 0 })
 
-	//<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
-
-
 	const report_arr= [
 		...relevant_exams
 			.sort((a, b) => a.date - b.date)
