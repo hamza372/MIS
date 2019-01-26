@@ -73,4 +73,5 @@ export const addToSchoolDB = (school: School) => {
 	}
 }
 
-export type Actions = addSchoolAction | SetFilterAction | SelectLocationAction;
+import { MergeAction, DeletesAction, QueueAction } from './core'
+export type Actions = addSchoolAction | SetFilterAction | SelectLocationAction | MergeAction | DeletesAction | QueueAction;

@@ -18,21 +18,21 @@ export default class ToSingleStudent extends Component {
   render() {
 
 	const { students, sendMessage, smsOption } = this.props;
-	
+	console.log("Selected Number", this.state.selected_student_number)
 	return (
 		<div>
+
 			<div className="row">
-				<label>Select student</label>		
-				<select {...this.former.super_handle(["selected_student_number"])}>
-					{
-						[<option key="abcd" value="" disabled>Select a Student</option>,
-						...Object.entries(students)
+				<label>Name</label>
+				<datalist id="student-list">
+					{[	...Object.entries(students)
 						.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
 						.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
-						]
-					}
-				</select>
+					]}
+				</datalist>
+				<input list="student-list" {...this.former.super_handle(["selected_student_number"])} placeholder="Select Student" />
 			</div>
+
 			<div className="row">
 				<label>Message</label>
 				<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />

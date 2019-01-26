@@ -8,26 +8,35 @@ import former from 'utils/former'
 
 export default class ToSingleClass extends Component {
 	constructor(props) {
-	  super(props)
+	super(props)
 	
-	  this.state = {
-		  selected_section_id: "",
-		  selected_student_number: "",
-		  text: ""
-	  }
-
-	  this.former = new former(this, [])
+	this.state = {
+		selected_section_id: "",
+		selected_student_number: "",
+		text: ""
 	}
 
-  	render() {
+	this.former = new former(this, [])
+	}
+
+	render() {
 
 	const { classes, students, sendBatchMessages } = this.props;
-	
-	const messages = Object.values(students)
-			.filter( student => student.section_id === this.state.selected_section_id)
-			.map(S => ({ number: S.Phone, text : this.state.text }))
-				
 
+	const messages = Object.values(students)
+		.filter(s => s.section_id === this.state.selected_section_id && s.Phone !== undefined && s.Phone !== "")
+		.reduce((agg,student)=> {
+			const index  = agg.findIndex(s => s.number === student.Phone)		
+			if(index >= 0 ){
+				return agg
+			}
+
+			return [...agg,{
+				number: student.Phone,
+				text : this.state.text
+			}]
+		}, [])
+				
 	return (
 			<div>
 				<div className="row">
@@ -53,6 +62,6 @@ export default class ToSingleClass extends Component {
 							})} className="button blue">Send using Local SIM</a> }
 			</div>
 		)
-  }
+	}
 }
 

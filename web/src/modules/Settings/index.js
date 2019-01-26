@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import { createTemplateMerges } from 'actions'
 import { mergeSettings } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
+
+import './style.css'
 
 const defaultSettings = {
 	shareData: true,
@@ -164,22 +167,30 @@ class Settings extends Component {
 					<label>{window.version || "no version set"}</label>
 					</div>
 
-					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
-						Change SMS Templates
+					<div className="row">
+						<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
+							Change SMS Templates
+						</div>
 					</div>
 					{
 						this.state.templateMenu ? this.changeSMStemplates() : false
 					}
 					{
 						this.props.user.Admin ?
-							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })} style={{ marginTop: "5px"}}>
-								Change Teacher Permissions
+							<div className="row">
+								<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
+									Change Teacher Permissions
+								</div>
 							</div>
 							: false
 					}
 					{
 						this.state.permissionMenu ? this.changeTeacherPermissions() : false
 					}
+
+					<div className="row">
+						<Link className="button grey" to="/settings/promote">Promote Students</Link>
+					</div>
 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>

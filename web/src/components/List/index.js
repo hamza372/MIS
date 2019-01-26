@@ -19,17 +19,19 @@ class List extends Component {
 	render() {
 		const {items, toLabel, Component } = this.props;
 		
-		const filteredList = items.filter(item => {
-			return toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
-		}).sort((a,b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
+		const filteredList = items
+			.filter(item => {
+				return toLabel(item) !== undefined && toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
+			})
+			.sort((a,b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
 
 		return <div className="list-wrap">
 			
-
-			{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
-
+			<div className="total">
+				<div className="label"> Total: <strong> {filteredList.length} </strong></div>
+				{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
+			</div>
 			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
-			
 			<div className="list">
 			{
 				filteredList.map(item => Component(item))

@@ -14,7 +14,7 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 	dispatch(action)
 
 	const new_merges = merges.reduce((agg, curr) => ({
-			...agg, 
+			...agg,
 			[curr.path.join(',')]: {
 				action: {
 					type: "MERGE",
@@ -25,9 +25,6 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 			}
 		}), {})
 
-		// assume the merge we are writing on the client is newer than the previous stuff...
-	
-	
 	const state = getState()
 	const rationalized_merges = {...state.queued, ...new_merges};
 

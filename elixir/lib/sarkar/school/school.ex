@@ -24,7 +24,40 @@ defmodule Sarkar.School do
 		GenServer.call(via(school_id), {:get_db})
 	end
 
+	def broadcast_all_schools() do
+		{:ok, school_ids} = Sarkar.Store.School.get_school_ids()
+
+		school_ids
+		|> Enum.map(fn(school_id) -> broadcast_snapshot(school_id) end)
+
+	end
+
+	def broadcast_snapshot(school_id) do
+		# but what if a client is not online when we trigger this
+		# it should queue up and take place next time they come online...
+		# then we need to keep a map of client and if they got this last update
+		# if client_id existed previously, and hasn't been put on the "got update" map
+		# then it should get the new update
+
+		db = GenServer.call(via(school_id), {:reload_db})
+		broadcast(school_id, "blank", snapshot(db)) # this should be the snapshot action.
+	end
+
+	def reload_all() do
+		{:ok, school_ids} = Sarkar.Store.School.get_school_ids()
+
+		# check if the school is loaded first...
+		school_ids
+		|> Enum.map(fn(school_id) ->  GenServer.call(via(school_id), {:reload_db}) end)
+	end
+
 	# SERVER
+
+	def handle_call({:reload_db}, _from, {school_id, writes, db} = state) do
+		{new_db, new_writes} = Sarkar.Store.School.load(school_id)
+
+		{:reply, new_db, {school_id, new_writes, new_db}}
+	end
 
 	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {school_id, writes, db} = state) do
 
@@ -38,7 +71,7 @@ defmodule Sarkar.School do
 		min_write_date = if writes != %{} do
 
 			{_, %{"date" => mwd }} = writes 
-				|> Enum.min(fn {path_string, %{"date" => path_date}} -> path_date end)
+				|> Enum.min_by(fn {path_string, %{"date" => path_date}} -> path_date end)
 			
 			mwd
 		end
@@ -85,7 +118,7 @@ defmodule Sarkar.School do
 						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
 							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
 						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
-							IO.puts "#{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+							IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
 							# IO.inspect write
 							{agg_db, agg_writes, agg_new_writes, max_date}
 						other -> 

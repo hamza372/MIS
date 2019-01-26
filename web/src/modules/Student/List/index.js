@@ -39,7 +39,6 @@ const toLabel = (S) => {
 
 	return S.Name + S.ManName + cname ;
 
-
 }
 
 export const StudentList = ({ classes, students, settings, forwardTo, history }) => {

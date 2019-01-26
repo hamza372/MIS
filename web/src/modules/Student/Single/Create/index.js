@@ -137,7 +137,7 @@ class SingleStudent extends Component {
 		}
 
 		for(let fee of Object.values(this.state.profile.fees)) {
-			console.log('fees', fee)
+			//console.log('fees', fee)
 
 			if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
 				return this.setState({
@@ -165,9 +165,40 @@ class SingleStudent extends Component {
 
 			student.payments = payments;
 		}
+		
+		for(let p_id of Object.keys(student.payments)){
+			
+			const current_payment = student.payments[p_id];
+			const corresponding_fees = student.fees[current_payment.fee_id]
+
+			const curr_payment_date = moment(current_payment.date).format("MM/YYYY")
+			const curr_month = moment().format("MM/YYYY")
+			const fee_amount =  corresponding_fees !== undefined ? parseFloat(corresponding_fees.amount,10) : ""
+			
+			if( curr_payment_date === curr_month && 
+				corresponding_fees === undefined) 
+			{
+				const {[p_id]:removed, ...nextPayment} = student.payments
+				student.payments = nextPayment;
+			}
+			else if(curr_payment_date === curr_month && 
+				current_payment.type === "OWED" && 
+				corresponding_fees.period === "MONTHLY" &&
+				Math.abs(current_payment.amount) !== Math.abs(fee_amount) )
+			{
+				student.payments[p_id] = {
+					amount: corresponding_fees.type !== "SCHOLARSHIP" ?   fee_amount : (-1 * fee_amount), // check if scholarship, then make negative
+					date: current_payment.date,
+					type: current_payment.type,
+					fee_id: current_payment.fee_id,
+					fee_name: corresponding_fees.name
+				}
+			}
+
+		}
 
 		this.props.save(student);
-		
+
 		this.setState({
 			banner: {
 				active: true,
@@ -184,6 +215,7 @@ class SingleStudent extends Component {
 				redirect: this.isNew() ? `/student` : false
 			})
 		}, 2000);
+
 	}
 
 	addSibling = (sibling) => {
@@ -196,7 +228,6 @@ class SingleStudent extends Component {
 		families: {
 			[id]: { 
 				name: "",
-
 				students: { [id]: true},
 				contact: { phone: number, address: string},
 				profile: {
@@ -423,5 +454,5 @@ export default connect(state => ({
 	permissions: state.db.settings.permissions,
 	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
-	delete: (student) => dispatch(deleteStudent(student))
+	delete: (student) => dispatch(deleteStudent(student)),
  }))(SingleStudent);

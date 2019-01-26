@@ -15,6 +15,8 @@ defmodule Mix.Tasks.Migrate do
 						["users"] -> {:ok, adjust_users_table(school_id, school_db)}
 						["fix-fees"] -> {:ok, remove_november_payments(school_id, school_db)}
 						["duplicate-fees"] -> {:ok, remove_duplicate_payments(school_id, school_db)}
+						["class-history"] -> {:ok, add_class_history(school_id, school_db)}
+						["delete-all-fees-wisdom-sadia"] -> {:ok, delete_wisdom_sadia_fees(school_id, school_db)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -23,16 +25,75 @@ defmodule Mix.Tasks.Migrate do
 
 					case Postgrex.query(Sarkar.School.DB, "INSERT INTO backup(school_id, db) VALUES ($1, $2) ON CONFLICT(school_id) DO UPDATE SET db=$2", [school_id, next_school]) do
 						{:ok, _} -> IO.puts "updated school #{school_id}"
-						{:error, err} -> IO.inspect err
+						{:error, err} -> 
+							IO.puts "error on school: #{school_id}"
+							IO.inspect err
 					end
 				end)
-
 
 			{:err, msg} -> 
 				IO.puts "ERROR"
 				IO.inspect msg
 		end
 	end
+
+	defp delete_wisdom_sadia_fees(school_id, school_db) do
+
+		case school_id do
+			id when  id == "sadiaschool" or id == "wisdomschool" -> 
+				IO.puts "=========editing #{id}============"
+				next_students = Map.get(school_db, "students", %{})
+					|> Enum.map( fn({id, student}) -> 
+						Map.put(student, "fees", %{})
+						|> Map.put("payments", %{})
+					end)
+
+				Map.put(school_db, "students", next_students)
+			_ -> school_db
+		end
+	end
+
+	defp add_class_history(school_id, school_db) do
+
+		section_metadata = Map.get(school_db, "classes", %{})
+			|> Enum.map(fn({ _, c }) ->
+				Enum.map(Map.get(c, "sections", %{}), fn({ section_id, section }) -> 
+
+					{section_id, %{
+						class_id: Map.get(c, "id", ""),
+						class_name: Map.get(c, "name", ""),
+						section_name: Map.get(section, "name", "")
+					}}
+
+				end)
+			end)
+			|> Enum.reduce([], fn x, acc -> acc ++ x end)
+			|> Enum.into(%{})
+
+		next_students = Map.get(school_db, "students", %{})
+		|> Enum.map(
+			fn({id, student}) ->
+				section_id = Map.get(student, "section_id", "")
+				meta = Map.get(section_metadata, section_id, %{})
+
+				updated = case section_id do
+					"" -> Dynamic.put(student, ["class_history"], %{})
+					_ -> Dynamic.put(student, ["class_history", section_id], %{
+							"class_id" => Map.get(meta, :class_id, ""),
+							"class_name" => Map.get(meta, :class_name, ""),
+							"section_name" => Map.get(meta, :section_name, ""),
+							"start_date" => 1543604400000
+						})
+				end
+
+				{id, updated}
+			end
+		)
+		|> Enum.into(%{})
+
+		Map.put(school_db, "students", next_students)
+	end
+
 
 	defp add_payment_name(school_id, school_db) do
 

@@ -37,8 +37,8 @@
 
 .student-marks .table.row * {
 	flex-wrap: nowrap;
-	flex: 0 0 auto;
-	min-width: 6rem;
+	flex: 1 1 100%;
+	min-width: 1rem;
 	width: initial;
 	text-align: left;
 }
@@ -50,3 +50,12 @@
 		padding-top: 20px;
 		border-top: 3px solid #222;
 	}
+
+@media print {
+
+	.student-marks .table.row {
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 10pt;
+		line-height: 2em;
+	}
+}

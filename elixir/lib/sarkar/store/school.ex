@@ -25,6 +25,10 @@ defmodule Sarkar.Store.School do
 		GenServer.call(:school_db, {:load, school_id})
 	end
 
+	def get_school_ids() do
+		GenServer.call(:school_db, {:get_school_ids})
+	end
+
 	def get_writes(school_id, last_sync_date) do
 		GenServer.call(:school_db, {:get_writes, school_id, last_sync_date})
 	end
@@ -72,6 +76,17 @@ defmodule Sarkar.Store.School do
 
 				{:error, err} -> {:reply, {:error, err}, state}
 			end
+	end
+
+	def handle_call({:get_school_ids}, _from, state) do
+		case Postgrex.query(
+			Sarkar.School.DB,
+			"SELECT school_id from backup", []) do
+				{:ok, resp} -> 
+					schools = Enum.map(resp.rows, fn([ school ]) -> school end)
+					{:reply, {:ok, schools}, state}
+				{:error, err} -> {:reply, {:error, err}, state}
+		end
 	end
 
 	def handle_cast({:save, school_id, db}, state) when db == %{} do
