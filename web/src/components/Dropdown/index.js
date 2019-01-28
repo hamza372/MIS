@@ -28,7 +28,7 @@ class Dropdown extends Component {
 			<div className="dropdown-items">
 			{
 				this.state.text.length === 0 ? false : items
-					.filter(item => toLabel(item).toLowerCase().startsWith(this.state.text.toLowerCase()))
+					.filter(item => toLabel(item) && toLabel(item).toLowerCase().startsWith(this.state.text.toLowerCase()))
 					.map(item => <div onClick={() => {
 						onSelect(item);
 						this.setState({ text: "" })

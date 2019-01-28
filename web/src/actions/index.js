@@ -290,3 +290,12 @@ export const mergeExam = (exam, class_id, section_id) => dispatch => {
 		...student_merges
 	]))
 }
+
+
+export const removeStudentFromExam = (e_id, student_id) => dispatch => {
+	dispatch(createDeletes([
+		{
+			path:["db", "students", student_id, "exams", e_id ]
+		}
+	]))
+}
