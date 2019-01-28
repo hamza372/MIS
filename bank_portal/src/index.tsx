@@ -7,9 +7,10 @@ import { Actions } from './actions'
 import Syncr from './syncr'
 import reducer from './reducers'
 
-const debug_url = "ws://localhost:8080/ws"
+const debug_url = "ws://90fe7d5e.ngrok.io/ws"
 
-const host = process.env.REACT_APP_PORTAL_HOST || debug_url;
+// @ts-ignore
+const host = window.api_url || debug_url;
 
 import Routes from './routes'
 

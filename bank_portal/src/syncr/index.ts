@@ -55,7 +55,7 @@ export default class Syncr {
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
 
-			console.log("server", msg.type)
+			console.log("<--- server", msg.type)
 
 			if(msg.key) {
 				if(!this.pending.has(msg.key)) {
@@ -104,7 +104,7 @@ export default class Syncr {
 		// make a key
 		// create promise, put in map
 		// when its returned, trigger it.
-		console.log("server", message)
+		console.log("server --->", message)
 		const key = v4();
 		return new Promise((resolve, reject) => {
 

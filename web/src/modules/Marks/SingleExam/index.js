@@ -6,10 +6,11 @@ import moment from 'moment'
 
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
-import { mergeExam } from 'actions'
+import { mergeExam, removeStudentFromExam } from 'actions'
 import Banner from 'components/Banner'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
+import Dropdown from 'components/Dropdown'
 
 import './style.css'
 
@@ -166,8 +167,30 @@ class SingleExam extends Component {
 		
 	}
 
-	render() {
+	addStudent = (student) => {
+		this.setState({
+			exam:{
+				...this.state.exam,
+				student_marks: {
+					...this.state.exam.student_marks,
+					[student.id]: { score: "", grade: "", remarks: "" }
+				}
+			}
+		})
+	}
+	removeStudent = (student) => {
+		const {[student.id]: removed, ...rest} = this.state.exam.student_marks;
+		this.setState({
+			exam: {
+				...this.state.exam,
+				student_marks: rest
+			}
+		})
 
+		this.props.removeStudent(this.state.exam.id, student.id) //To remove exam from student
+	}
+
+	render() {
 		/*
 		if(this.state.redirect) {
 			console.log("REDIRECTING")
@@ -226,15 +249,21 @@ class SingleExam extends Component {
 					}
 
 						<div className="divider">Marks</div>
-						<div className="section">
+						<div>
 						{
 							// Object.entries(this.props.students)
 							// 	.filter(([id, student]) => student.section_id === this.section_id())
-							Object.keys(this.state.exam.student_marks)
+							Object.keys(this.state.exam.student_marks || {})
 								.map(xid => this.props.students[xid])
 								.map(student => (
-									<div className="marks row" key={student.id}>
-										<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
+									<div className="section" key={student.id}>
+										
+										<div className="remove row">
+											<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
+											<div className="button red" onClick={() => this.removeStudent(student)}>Remove</div>
+										</div>
+
+										<div className="marks row">
 										<input type="number" 
 											{...this.former.super_handle(["student_marks", student.id, "score"])} 
 											placeholder="Score" />
@@ -250,7 +279,7 @@ class SingleExam extends Component {
 											<option value="Absent">Absent</option>
 										</select>
 
-										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])}>
+										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
 											<option value="">Remarks</option>
 											<option value="Excellent">Excellent</option>
 											<option value="Very Good">Very Good</option>
@@ -263,11 +292,20 @@ class SingleExam extends Component {
 											<option value="Shown Improvement">Shown Improvement</option>
 										</select>
 									</div>
-								))
+								</div>
+							))
 						}
+						<div className="students">
+							<div className="row">
+								<Dropdown
+									items={Object.values(this.props.students)}
+									toLabel={s => s.Name} 
+									onSelect={s => this.addStudent(s)}
+									toKey={s => s.id} 
+									placeholder="Student Name" />
+							</div>
 						</div>
-
-
+					</div>
 					<div className="button save" onClick={this.onSave}>Save</div>
 				</div>
 			</div>
@@ -280,5 +318,6 @@ export default connect(state => ({
 	exams: state.db.exams || {},
 	students: state.db.students
 }), dispatch => ({
-	saveExam: (exam, class_id, section_id) => dispatch(mergeExam(exam, class_id, section_id))
+	saveExam: (exam, class_id, section_id) => dispatch(mergeExam(exam, class_id, section_id)),
+	removeStudent: (exam_id, student_id) => dispatch(removeStudentFromExam(exam_id,student_id)) 
 }) )(SingleExam)
