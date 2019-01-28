@@ -23,7 +23,8 @@ const initialState : RootBankState = {
 	client_id: v4(),
 	queued: {},
 	accept_snapshot: false,
-	last_snapshot: 0
+	last_snapshot: 0,
+	connected: false
 }
 
 const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
