@@ -9,7 +9,7 @@ import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
 import './style.css'
- 
+
 class StudentMarksContainer extends Component {
 
 	constructor(props) {
@@ -32,8 +32,9 @@ class StudentMarksContainer extends Component {
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
-		for(let [exam_id, e] of Object.entries(exams)){
-			if(student.exams[exam_id] !== undefined) {
+		for(let [e_id, e] of Object.entries(exams)){
+			if(student.exams[e_id] !== undefined)
+			{
 				examSet.add(e.name)
 				subjectSet.add(e.subject)
 			}
