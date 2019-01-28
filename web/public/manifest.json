@@ -1,25 +1,25 @@
 {
-  "short_name": "MISchool",
-  "name": "MISchool",
-  "icons": [
-    {
-	  "src": "favicon.ico",
-	  "sizes": "72x72 96x96 128x128 192x192 256x256 512x512",
-      "type": "image/png"
-    }
-  ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#222222",
-  "background_color": "#ffffff",
-  "developer": {
-	  "name": "Taimur Shah",
-	  "url": "http://cerp.org.pk"
-  },
-  "offline_enabled": true,
-  "permissions": [
-	"storage",
-	"unlimitedStorage",
-	{"fileSystem": ["write", "retainEntries", "directory"]}
-  ]
+	"short_name": "MISchool",
+	"name": "MISchool",
+	"icons": [
+		{
+			"src": "favicon.ico",
+			"sizes": "72x72 96x96 128x128 192x192 256x256 512x512",
+			"type": "image/png"
+		}
+	],
+	"start_url": "/",
+	"display": "standalone",
+	"theme_color": "#222222",
+	"background_color": "#ffffff",
+	"developer": {
+		"name": "Taimur Shah",
+		"url": "http://cerp.org.pk"
+	},
+	"offline_enabled": true,
+	"permissions": [
+		"storage",
+		"unlimitedStorage",
+		{"fileSystem": ["write", "retainEntries", "directory"]}
+	]
 }

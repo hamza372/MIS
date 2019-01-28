@@ -97,6 +97,30 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 	})
 }
 
+interface ServerAction {
+	type: string,
+	payload: any
+}
+
+export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+	const state = getState();
+
+	console.log('send server action...', action)
+	return syncr.send({
+		type: action.type,
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: action.payload
+	})
+	.then(dispatch)
+	.catch((err : Error) => {
+		console.error(err)
+	})
+
+	// should it get queued up....
+}
+
 export const DELETES = "DELETES"
 interface Delete {
 	path: string[]

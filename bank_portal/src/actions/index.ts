@@ -1,15 +1,28 @@
-import { Dispatch } from "redux";
 import Syncr from '~/src/syncr'
+import { MergeAction, DeletesAction, QueueAction, sendServerAction } from './core'
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
+
+type Dispatch = ( action :any) => any;
 
 export interface SelectLocationAction {
 	type: string,
 	loc: SchoolLocation
 }
 
-const debug_url = "http://localhost:5000/"
+const debug_url = "http://localhost:5000"
 const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
+
+export const createLogin = (id : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+	dispatch(sendServerAction({
+		type: "LOGIN",
+		payload: {
+			id,
+			password
+		}
+	}))
+}
+
 
 export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
 
@@ -22,6 +35,11 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 			.then(res => res.json())
 			.then((res : School) => dispatch(addToSchoolDB(res)))
 			.catch(err => console.error(err))
+		
+		dispatch(sendServerAction({
+			type: 'SET_FILTER',
+			payload: loc
+		}))
 	}
 
 	dispatch({
@@ -73,5 +91,4 @@ export const addToSchoolDB = (school: School) => {
 	}
 }
 
-import { MergeAction, DeletesAction, QueueAction } from './core'
 export type Actions = addSchoolAction | SetFilterAction | SelectLocationAction | MergeAction | DeletesAction | QueueAction;

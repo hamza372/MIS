@@ -9,6 +9,7 @@ import { v4 } from 'node-uuid';
 
 const initialState : RootBankState = {
 	school_locations: locations,
+	filter_text: "",
 	school_db: {},
 	selected: undefined,
 	auth: {
@@ -19,7 +20,6 @@ const initialState : RootBankState = {
 		loading: false,
 		client_type: "bank_portal"
 	},
-	filter_text: "",
 	client_id: v4(),
 	queued: {},
 	accept_snapshot: false,
@@ -28,7 +28,7 @@ const initialState : RootBankState = {
 
 const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
 
-	console.log(action.type)
+	console.log("action type:", action.type)
 
 	switch(action.type) {
 

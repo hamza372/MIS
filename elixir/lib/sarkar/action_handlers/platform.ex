@@ -6,11 +6,54 @@ defmodule Sarkar.ActionHandler.Platform do
 		# execute search against it, respond with just the ids of valid items.
 		# should search name of school and tehsil
 
-		{:reply, %{type: "success", payload: %{"hello" => "hey"}}, state}
+		IO.inspect action
+
+		{:reply, succeed(%{"type" => "nonsense"}), state}
 	end
+
+	def handle_action(%{"type" => "LOGIN", "payload" => %{"id" => id, "client_id" => client_id, "password" => password}}, state) do
+		case Sarkar.Auth.login({school_id, client_id, password}) do
+			{:ok, token} ->
+				register_connection(school_id, client_id)
+				db = Sarkar.School.get_db(school_id)
+				{:reply, succeed(%{token: token, db: db}), %{school_id: school_id, client_id: client_id}}
+			{:error, message} -> {:reply, fail(message), %{}}
+		end
+	end
+
+	def handle_action(%{"type" => "VERIFY", "payload" => %{"id" => id, "token" => token, "client_id" => client_id}}, state) do
+		case Sarkar.Auth.verify({id, client_id, token}) do
+			{:ok, _} ->
+				register_connection(school_id, client_id)
+				{:reply, succeed(), %{school_id: school_id, client_id: client_id}}
+			{:error, msg} ->
+				IO.inspect msg
+				{:reply, fail(), state}
+		end
 
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.puts "NOT YET READY"
+		{:reply, fail(), state}
+	end
+
+	defp register_connection(id, client_id) do
+		{:ok, _} = Registry.register(Sarkar.ConnectionRegistry, id, client_id)
+	end
+
+	defp fail(message) do
+		%{type: "failure", payload: message}
+	end
+
+	defp fail() do
+		%{type: "failure"}
+	end
+
+	defp succeed(payload) do
+		%{type: "succeess", payload: payload}
+	end
+
+	defp succeed() do
+		%{type: "success"}
 	end
 end

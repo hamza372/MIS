@@ -1,6 +1,7 @@
 import * as React from 'react'
 import DeckGL, { ScatterplotLayer } from 'deck.gl'
 import { StaticMap } from 'react-map-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 const mapbox_token = "pk.eyJ1IjoidGFpbXVyMzgiLCJhIjoiY2pucWZuY3BtMGZ6dTNxcG53NDh1N3lxZyJ9.795xICQFpWXrTJxF10EJfw"
 const mapbox_style_url = "mapbox://styles/taimur38/cjnu7h5pn4jel2rqk4pbo74ke"

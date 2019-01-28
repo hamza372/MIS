@@ -31,7 +31,8 @@ interface RootBankState {
 		[path: string]: { action: Object, date: number }
 	},
 	last_snapshot: number,
-	accept_snapshot: boolean
+	accept_snapshot: boolean,
+	connected: boolean
 }
 
 interface SchoolLocation {
