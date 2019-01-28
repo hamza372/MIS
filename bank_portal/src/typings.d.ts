@@ -10,10 +10,12 @@ declare module 'deck.gl' {
 }
 
 interface RootBankState {
+	selected?: SchoolLocation,
+	filter_text: string,
+
 	school_locations: {
 		[school_id: string]: SchoolLocation
 	},
-	selected?: SchoolLocation,
 	school_db: {
 		[school_id: string]: School
 	},
@@ -25,7 +27,6 @@ interface RootBankState {
 		loading: boolean,
 		client_type: "bank_portal"
 	},
-	filter_text: string,
 	client_id: string,
 	queued: {
 		[path: string]: { action: Object, date: number }

@@ -33,6 +33,22 @@ const rootReducer = (state : RootBankState = initialState, action: Actions) : Ro
 
 	switch(action.type) {
 
+		case ON_CONNECT:
+		{
+			return {
+				...state,
+				connected: true
+			}
+		}
+
+		case ON_DISCONNECT: 
+		{
+			return {
+				...state,
+				connected: false
+			}
+		}
+
 		case MERGES: 
 		{
 			const nextState = (action as MergeAction).merges.reduce((agg, curr) => {

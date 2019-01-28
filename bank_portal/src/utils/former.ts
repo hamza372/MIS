@@ -34,8 +34,8 @@ export default class Former {
 					this._component.setState(state => Dynamic.put(state, full_path, value), cb)
 				}
 			},
-			value: Dynamic.get(this._component.state, full_path),
-			checked: Dynamic.get(this._component.state, full_path)
+			value: Dynamic.get(this._component.state, full_path) as string,
+			checked: Dynamic.get(this._component.state, full_path) as boolean
 		}
 	}
 

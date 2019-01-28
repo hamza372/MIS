@@ -243,4 +243,4 @@ export const LOGIN_FAIL = "LOGIN_FAIL"
 export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
-export const createLoginSucceed = (id : string, db : RootBankState, token : string) => ({ type: LOGIN_SUCCEED, id, db, token })
+export const createLoginSucceed = (id : string, token : string) => ({ type: LOGIN_SUCCEED, id, token })
