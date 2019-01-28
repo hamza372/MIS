@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { createLogin } from '~/src/actions'
 
 import former from '~/src/utils/former'
-import { checkPropTypes } from 'prop-types';
 
 interface propTypes {
 	connected: boolean,
@@ -16,7 +16,7 @@ interface state {
 	password: string
 }
 
-class Login extends Component<propTypes, state>{
+class Login extends Component<propTypes & RouteComponentProps, state>{
 
 	private former: former
 
@@ -33,6 +33,13 @@ class Login extends Component<propTypes, state>{
 
 	login = () => {
 		this.props.login(this.state.username, this.state.password)
+	}
+
+	componentWillReceiveProps(nextProps : propTypes) {
+
+		if(nextProps.auth.token && nextProps.auth.token !== this.props.auth.token) {
+			this.props.history.push('/');
+		}
 	}
 
 	render() {
@@ -65,5 +72,5 @@ export default connect((state : RootBankState) => ({
 	connected: state.connected,
 	auth: state.auth
 }), (dispatch : any) => ({
-	login: (id : string, password : string) => dispatch(createLogin(id, password))
-}))(Login)
+	login: (username : string, password : string) => dispatch(createLogin(username, password))
+}))(withRouter(Login))

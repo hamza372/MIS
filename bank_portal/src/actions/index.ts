@@ -3,7 +3,7 @@ import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginS
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
-type Dispatch = ( action :any) => any;
+type Dispatch = ( action : any) => any;
 
 export interface SelectLocationAction {
 	type: string,
@@ -13,7 +13,7 @@ export interface SelectLocationAction {
 const debug_url = "http://localhost:5000"
 const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
 
-export const createLogin = (id : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const createLogin = (username : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -23,11 +23,11 @@ export const createLogin = (id : string, password : string) => (dispatch: Dispat
 		client_id: state.client_id,
 		id: state.auth.id,
 		payload: {
-			id,
+			id: username, // school_id == username here.
 			password
 		}
 	})
-	.then((res : {token: string}) => dispatch(createLoginSucceed(id, res.token)))
+	.then((res : {token: string}) => dispatch(createLoginSucceed(username, res.token)))
 
 
 }

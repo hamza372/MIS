@@ -1,33 +1,12 @@
 import * as redux from 'redux'
-import locations from './narrowed.json'
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from '~/src/actions/core'
+import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed } from '~/src/actions/core'
 import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
-import { v4 } from 'node-uuid';
 
 
-const initialState : RootBankState = {
-	school_locations: locations,
-	filter_text: "",
-	school_db: {},
-	selected: undefined,
-	auth: {
-		id: undefined,
-		token: undefined,
-		username: undefined,
-		attempt_failed: false,
-		loading: false,
-		client_type: "bank_portal"
-	},
-	client_id: v4(),
-	queued: {},
-	accept_snapshot: false,
-	last_snapshot: 0,
-	connected: false
-}
 
-const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
+const rootReducer = (state : RootBankState, action: Actions) : RootBankState => {
 
 	console.log("action type:", action.type)
 
@@ -47,6 +26,23 @@ const rootReducer = (state : RootBankState = initialState, action: Actions) : Ro
 				...state,
 				connected: false
 			}
+		}
+
+		case LOGIN_SUCCEED: 
+		{
+			//@ts-ignore
+			const succeed = <LoginSucceed>action
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					loading: false,
+					token: succeed.token,
+					attempt_failed: false,
+					id: succeed.id
+				}
+			}
+
 		}
 
 		case MERGES: 
