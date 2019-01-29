@@ -1,10 +1,19 @@
 defmodule Sarkar.ActionHandler.Platform do
 	
-	def handle_action(%{"type" => "SET_FILTER"} = action, state) do
+	# todo:
+	# there will be a table of schools, who will have their data continuously updated (jsonb)
+	# there will be a table of users with there data to be syncd
+		# they will have history with school id's 
+		# tinder for giving loans - yes, no
+			# is there a guy who first will say whether we should make the loan to the school 
+			# then theres a separate group that actually does it
+			# if so, we want to let users mark yes/no on the list of schools
+			# if school info changes since they last marked it, that info can come back up...
+		# then there is a group that consumes the "yes" list / "ToDo" list and makes the calls.
+	# make call means press the button (verify your phone number), save to db ( userid, incoming #, intended #), show # in ui
+	# keep in memory for fast reply when call comes
 
-		# TODO: have the json doc loaded up somewhere to the k/v with concurrent reads/writes
-		# execute search against it, respond with just the ids of valid items.
-		# should search name of school and tehsil
+	def handle_action(%{"type" => "SET_FILTER"} = action, state) do
 
 		IO.inspect action
 
