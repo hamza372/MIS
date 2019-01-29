@@ -33,7 +33,7 @@ class StudentMarksContainer extends Component {
 		const examSet = new Set();   
 
 		for(let [e_id, e] of Object.entries(exams)){
-			if(student.exams[e_id] !== undefined)
+			if(student.exams && student.exams[e_id] !== undefined)
 			{
 				examSet.add(e.name)
 				subjectSet.add(e.subject)
