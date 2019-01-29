@@ -17,6 +17,7 @@ defmodule Mix.Tasks.Migrate do
 						["duplicate-fees"] -> {:ok, remove_duplicate_payments(school_id, school_db)}
 						["class-history"] -> {:ok, add_class_history(school_id, school_db)}
 						["delete-all-fees-wisdom-sadia"] -> {:ok, delete_wisdom_sadia_fees(school_id, school_db)}
+						["replay-wisdom-sadia"] -> {:ok, replay_writes_for_students(school_id, school_db)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -44,11 +45,51 @@ defmodule Mix.Tasks.Migrate do
 				IO.puts "=========editing #{id}============"
 				next_students = Map.get(school_db, "students", %{})
 					|> Enum.map( fn({id, student}) -> 
-						Map.put(student, "fees", %{})
-						|> Map.put("payments", %{})
+						{id, student 
+							|> Map.put(student, "fees", %{}) 
+							|> Map.put("payments", %{})
+						}
 					end)
+					|> Enum.into(%{})
 
 				Map.put(school_db, "students", next_students)
+			_ -> school_db
+		end
+	end
+
+	defp replay_writes_for_students(school_id, school_db) do
+		case school_id do
+			id when  id == "sadiaschool" or id == "wisdomschool" or id == "six" -> 
+				IO.puts "=========editing #{id}============"
+
+				# get the writes in order
+				{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
+					"SELECT time, type, path, value
+					FROM writes
+					WHERE school_id=$1 AND path[2] = 'students'
+					ORDER BY time asc", [school_id])
+				
+				# for each write, execute Dynamic.(put|delete)[path] 
+				next_db = resp.rows
+					|> Enum.reduce(school_db, fn([ time, type, [ _ | path], value ], agg) ->
+						IO.inspect path
+						case type do
+							"MERGE" -> 
+								Dynamic.put(agg, path, value)
+							"DELETE" ->
+								Dynamic.delete(agg, path)
+							other -> 
+								IO.puts "OTHERRRR"
+								IO.inspect other
+								agg
+						end
+					end)
+			
+				# IO.inspect Dynamic.get(next_db, ["students"])
+
+				IO.inspect next_db == school_db
+				next_db
+
 			_ -> school_db
 		end
 	end
