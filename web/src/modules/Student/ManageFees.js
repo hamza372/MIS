@@ -93,7 +93,7 @@ class ManageFees extends Component {
 		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
 	}
 
-	validateFilter = () => this.state.feeFilter === "to_all_students" ? this.setState({ section_id: "" }) : true 
+	filterCallBack = () => this.state.feeFilter === "to_all_students" ? this.setState({ section_id: "" }) : true 
 
 	render() {
         const { classes } = this.props;
@@ -108,17 +108,17 @@ class ManageFees extends Component {
 					<div className="divider">Add Fees</div>
 					<div className="section">
 						<div className="row"> 
-						<label>Add To</label>		
-							<select {...this.former.super_handle(["feeFilter"], () => true, this.validateFilter)}>
-									<option value="">Select Students</option>
-									<option value="to_all_students">All Students</option>
-									<option value="to_single_class">Single Class</option>
+							<label>Add To</label>		
+							<select {...this.former.super_handle(["feeFilter"], () => true, this.filterCallBack)}>
+								<option value="">Select Students</option>
+								<option value="to_all_students">All Students</option>
+								<option value="to_single_class">Single Class</option>
 							</select>
 						</div>
-						
+
 						{this.state.feeFilter === "to_single_class" ?  //Section Wise
                         <div className="row"> 
-						<label>Select Class</label>		
+							<label>Select Class</label>		
 							<select {...this.former.super_handle(["section_id"])}>
 								<option value="" >Select</option>
 								{Object.entries(getSectionsFromClasses(classes))
@@ -127,14 +127,13 @@ class ManageFees extends Component {
 							</select>
 						</div> : false}
 					</div>
-
 					<div className="section">
                         <div className="row"> 
-						<label>Fee Type</label>		
+							<label>Fee Type</label>		
 							<select {...this.former.super_handle(["fee","type"])}>
-									<option value="">Select</option>
-									<option value="FEE">Fee</option>
-									<option value="SCHOLARSHIP">Scholarship</option>
+								<option value="">Select</option>
+								<option value="FEE">Fee</option>
+								<option value="SCHOLARSHIP">Scholarship</option>
 							</select>
 						</div>
                         <div className="row"> 
@@ -146,14 +145,13 @@ class ManageFees extends Component {
                             <input type="text" {...this.former.super_handle(["fee","amount"])} placeholder="Enter Amount"/>
 						</div>
                         <div className="row">
-                        <label>Fee Period</label>		
-							<select {...this.former.super_handle(["fee","period"])} value={this.state.smsFilter}>
-									<option value="">Select</option>
-									<option value="MONTHLY">Monthly</option>
-									<option value="SINGLE">One Time</option>
+                        	<label>Fee Period</label>		
+							<select {...this.former.super_handle(["fee","period"])}>
+								<option value="">Select</option>
+								<option value="MONTHLY">Monthly</option>
+								<option value="SINGLE">One Time</option>
 							</select>
 						</div>
-
                         <div className="button blue" onClick={this.save}> Add </div>
 					</div>
 				</div>

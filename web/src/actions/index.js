@@ -264,10 +264,8 @@ export const addMultipleFees = (fees) => dispatch => {
 			type: f.type
 		}
 	}))
-
-	console.log("MERGES", merges);
-
-	///dispatch(createMerges(merges))
+	
+	dispatch(createMerges(merges))
 }
 
 export const createTemplateMerges = templates => dispatch => {
