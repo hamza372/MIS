@@ -44,9 +44,9 @@ export const loadDB = () => {
 			return initState;
 		}
 
-		const client_id = localStorage.getItem('client_id')
-		const client_name = localStorage.getItem('client_name')
 		const prev = JSON.parse(serialized);
+		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
+		const client_name = localStorage.getItem('client_name')
 		// but should we make sure that fields that are no longer in the initState db are deleted?
 		const merged = {
 			...initState,
