@@ -251,6 +251,23 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
+export const addMultipleFees = (fees) => dispatch => {
+	
+	//fees is an array of { student, fee_id, amount, type, period, name}
+	
+	const merges = fees.map(f => ({
+		path: ["db","students", f.student.id, "fees", f.fee_id],
+		value: {
+			amount : f.amount,
+			name : f.name,
+			period: f.period,
+			type: f.type
+		}
+	}))
+	
+	dispatch(createMerges(merges))
+}
+
 export const createTemplateMerges = templates => dispatch => {
 
 	dispatch(createMerges([
