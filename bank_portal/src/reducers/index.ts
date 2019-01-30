@@ -1,29 +1,86 @@
 import * as redux from 'redux'
-import locations from './narrowed.json'
+import Dynamic from '@ironbay/dynamic'
 
+import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed } from '~/src/actions/core'
 import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
 
 
-const initialState : RootBankState = {
-	school_locations: locations,
-	school_db: {},
-	selected: undefined,
-	auth: {
-		id: undefined,
-		token: undefined,
-		username: undefined,
-		attempt_failed: false,
-		loading: false,
-		client_type: "bank_portal"
-	},
-	filter_text: ""
-}
 
-const rootReducer = (state : RootBankState = initialState, action: Actions) : RootBankState => {
+const rootReducer = (state : RootBankState, action: Actions) : RootBankState => {
 
-	console.log(action.type)
+	console.log("action type:", action.type)
 
 	switch(action.type) {
+
+		case ON_CONNECT:
+		{
+			return {
+				...state,
+				connected: true
+			}
+		}
+
+		case ON_DISCONNECT: 
+		{
+			return {
+				...state,
+				connected: false
+			}
+		}
+
+		case LOGIN_SUCCEED: 
+		{
+			//@ts-ignore
+			const succeed = <LoginSucceed>action
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					loading: false,
+					token: succeed.token,
+					attempt_failed: false,
+					id: succeed.id
+				}
+			}
+
+		}
+
+		case MERGES: 
+		{
+			const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
+				return Dynamic.put(agg, curr.path, curr.value)
+			}, JSON.parse(JSON.stringify(state)));
+
+			return {
+				...nextState,
+				accept_snapshot: false
+			}
+		}
+
+		case DELETES: 
+		{
+			const state_copy = JSON.parse(JSON.stringify(state)) as RootBankState;
+
+			(action as DeletesAction).paths.forEach(a => Dynamic.delete(state_copy, a.path));
+
+			return {
+				...state_copy,
+				accept_snapshot: false
+			}
+			
+		}
+
+		case QUEUE: 
+		{
+			return {
+				...state,
+				queued: {
+					...state.queued,
+					...(action as QueueAction).payload
+				}
+			}
+		}
+
 		case SELECT_LOCATION:
 		{
 			return {

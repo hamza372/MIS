@@ -95,64 +95,119 @@ defmodule Sarkar.School do
 
 		# end weird section
 
-		human_client = case client_id do
-			"1918cdd5-e734-467c-bdca-f4b932580583" -> "Pixel 2XL"
-			"edef4d0e-9f79-4bb7-a525-6e47f46f26c4" -> "Chrome laptop"
-			"e8227de3-f729-4638-b234-f238ddaef39a" -> "Tablet"
-			other -> "other client"
-		end
+		# TODO: sort changes by time and process in order.
 
-		{nextDb, nextWrites, new_writes, last_date} = Enum.reduce(changes, {db, writes, %{}, 0}, fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
+		{nextDb, nextWrites, new_writes, last_date} = changes
+		|> Enum.sort(fn({ _, %{"date" => d1}}, {_, %{"date" => d2}}) -> d1 < d2 end)
+		|> Enum.reduce(
+			{db, writes, %{}, 0}, 
+			fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
-			%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
-			[prefix | p ] = path
+				%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
 
-			p_key = Enum.join(p, ",")
-			write = %{"date" => date, "value" => value, "path" => path, "type" => type}
+				[prefix | p ] = path
 
-			case type do
-				"MERGE" ->
-					case Map.get(agg_writes, p_key) do
-						nil -> 
-							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-						%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
-							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-						%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
-							IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
-							# IO.inspect write
-							{agg_db, agg_writes, agg_new_writes, max_date}
-						other -> 
-							IO.puts "OTHER!!!!!!!!!!!!!"
-							IO.inspect other
-							{Dynamic.put(agg_db, p, value), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-					end
+				p_key = Enum.join(p, ",")
+				write = %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}
 
-				"DELETE" -> 
-					case Map.get(agg_writes, p_key) do
-						nil -> 
-							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-						%{"date" => prev_date} when prev_date <= date ->
-							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-						%{"date" => prev_date} when prev_date > date ->
-							{agg_db, agg_writes, agg_new_writes, max_date}
-						other ->
-							IO.puts "OTHER!!!!!!!!!!!"
-							IO.inspect other
-							{Dynamic.delete(agg_db, p), Map.put(agg_writes, p_key, write), Map.put(agg_new_writes, p_key, write), max(date, max_date)}
-					end
-				other -> 
-					IO.puts "unrecognized type"
-					{agg_db, max_date}
-			end
-		end)
+				case type do
+					"MERGE" ->
+						case Map.get(agg_writes, p_key) do
+							nil -> 
+								{
+									Dynamic.put(agg_db, p, value),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+							%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
+								{
+									Dynamic.put(agg_db, p, value),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+							%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+								IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+								# IO.inspect write
+								{
+									agg_db,
+									agg_writes,
+									agg_new_writes,
+									max_date
+								}
+							other -> 
+								IO.puts "OTHER!!!!!!!!!!!!!"
+								IO.inspect other
+								{
+									Dynamic.put(agg_db, p, value),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+						end
+
+					"DELETE" -> 
+						case Map.get(agg_writes, p_key) do
+							nil -> 
+								{
+									Dynamic.delete(agg_db, p),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+							%{"date" => prev_date} when prev_date <= date ->
+								{
+									Dynamic.delete(agg_db, p),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+							%{"date" => prev_date} when prev_date > date ->
+								{
+									agg_db,
+									agg_writes,
+									agg_new_writes,
+									max_date
+								}
+							other ->
+								IO.puts "OTHER!!!!!!!!!!!"
+								IO.inspect other
+								{
+									Dynamic.delete(agg_db, p),
+									Map.put(agg_writes, p_key, write),
+									Map.put(agg_new_writes, p_key, write),
+									max(date, max_date)
+								}
+						end
+					other -> 
+						IO.puts "unrecognized type"
+						{agg_db, max_date}
+				end
+			end)
 
 		# at this point we need to send the new snapshot to all clients that are up to date.
 
-		# each client has sent its "last received data" date. when it connects, we should send all the latest writes that have happened since then, not the full db.
+		# each client has sent its "last received data" date. 
+		# when it connects, we should send all the latest writes that have happened since then, not the full db.
 		# get that data for it here.
 
-		relevant = nextWrites 
-					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> path_date > last_sync_date and not Map.has_key?(new_writes, path_string) end)
+		relevant = nextWrites
+					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> 
+						path_date > last_sync_date and not Map.has_key?(new_writes, path_string) 
+						# but what if we sent in a previous action an update and then right after it
+						# another one that contradicts the previous before updating our last_snapshot
+						# i.e. client sends 2 messages before getting 1 response
+						# then we will record "correct/intended" on backend but frontend will 
+						# get out of sync because it will apply the write
+
+						# we can avoid this by having client_id be stored with each write
+						# this could be desirable so we have a record of who did what
+						# it should be combined with a client_id that survives "switch school"
+						# in settings we should have ability to give human readable name for device
+
+						# should also store sync_time in each write
+					end)
 					|> Enum.into(%{})
 		
 		case map_size(new_writes) do

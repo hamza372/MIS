@@ -11,6 +11,7 @@ export default class Syncr {
 	pingInterval?: NodeJS.Timeout;
 	dispatch: (action: any) => void;
 	pending: Map<string, { resolve: (a: any) => any, reject: (a :any) => any}>;
+	message_timeout: number;
 
 	constructor(url : string, dispatch: (action: any) => void) {
 
@@ -19,6 +20,7 @@ export default class Syncr {
 		this.ws = undefined;
 		this.pingInterval = undefined;
 		this.dispatch = dispatch;
+		this.message_timeout = 10000;
 
 		this.pending = new Map(); // key: uuid, value: promise
 
@@ -39,10 +41,12 @@ export default class Syncr {
 
 		this.ws.onclose = async (e) => {
 			if(this.ready) {
+				this.pending.forEach(promise => promise.reject("disconnect"));
 				this.dispatch(disconnected())
+
 			}
 			this.cleanup();
-			await sleep(5);
+			await sleep(9000 * Math.random() + 1000);
 			this.connect();
 		}
 
@@ -51,10 +55,16 @@ export default class Syncr {
 		this.ws.onmessage = event => {
 			const msg = JSON.parse(event.data)
 
-			console.log("server", msg.type)
+			console.log("<--- server", msg.type)
 
 			if(msg.key) {
+				if(!this.pending.has(msg.key)) {
+					console.error("mesage not found in pending - will not process")
+					return
+				}
+
 				const promise = this.pending.get(msg.key);
+
 				if(msg.type === "failure") {
 					promise.reject(msg.payload)
 				}
@@ -76,8 +86,14 @@ export default class Syncr {
 	}
 
 	ping() {
-		if(this.ready)
-			this.ws.send("ping")
+		if(this.ready){
+			try {
+				this.ws.send("ping")
+			}
+			catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	async send(message : any) {
@@ -88,7 +104,7 @@ export default class Syncr {
 		// make a key
 		// create promise, put in map
 		// when its returned, trigger it.
-		console.log("server", message)
+		console.log("server --->", message)
 		const key = v4();
 		return new Promise((resolve, reject) => {
 
@@ -98,6 +114,14 @@ export default class Syncr {
 				key,
 				payload: message
 			}));
+
+			setTimeout(() => {
+				if(this.pending.has(key)) {
+					console.log("MSG TIMEOUT!!!")
+					this.pending.get(key).reject("timeout")
+				}
+				this.pending.delete(key);
+			}, this.message_timeout)
 		});
 
 	}

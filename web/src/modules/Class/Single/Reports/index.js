@@ -13,10 +13,14 @@ export const ClassReports = ({id, classes, students, exams, settings, sms_templa
 	const relevant_students = Object.values(students)
 		.filter(s => section_set.has(s.section_id))
 
-	const messages = relevant_students.map(student => ({
-		number: student.Phone,
-		text: sms_templates.result.replace(/\$NAME/g, student.Name).replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end, examFilter, subjectFilter))
-	}))
+	const messages = relevant_students
+		.filter(s => s.Phone !== "")
+		.map(student => ({
+			number: student.Phone,
+			text: sms_templates.result
+				.replace(/\$NAME/g, student.Name)
+				.replace(/\$REPORT/g, reportStringForStudent(student, exams, start, end, examFilter, subjectFilter))
+		}))
 
 	console.log(messages)
 

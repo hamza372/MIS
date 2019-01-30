@@ -11,6 +11,7 @@ interface propTypes {
 	filterText: string,
 	setFilter: (x: string) => void
 }
+
 class Filter extends React.Component<propTypes, {filter_text: string}> {
 
 	constructor(props : propTypes) {
@@ -45,6 +46,6 @@ class Filter extends React.Component<propTypes, {filter_text: string}> {
 export default connect((state : RootBankState) => ({
 	filterText: state.filter_text
 }),
-dispatch => ({
+(dispatch : any) => ({
 	setFilter: debounce((filterText : string) => dispatch(setFilter(filterText)), 500)
 }))(Filter);

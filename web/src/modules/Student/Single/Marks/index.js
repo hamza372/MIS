@@ -9,7 +9,7 @@ import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
 
 import './style.css'
- 
+
 class StudentMarksContainer extends Component {
 
 	constructor(props) {
@@ -32,8 +32,9 @@ class StudentMarksContainer extends Component {
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
-		for(let e of Object.values(exams)){
-			if(e.section_id === student.section_id){
+		for(let [e_id, e] of Object.entries(exams)){
+			if(student.exams[e_id] !== undefined)
+			{
 				examSet.add(e.name)
 				subjectSet.add(e.subject)
 			}
@@ -104,14 +105,28 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	const start = moment(startDate)
 	const end = moment(endDate)
 
-	const report_string = Object.keys(student.exams || {})
-		.map(exam_id => exams[exam_id])
-		.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
-		.sort((a, b) => a.date - b.date)
-		.map(exam => `${exam.subject} - ${exam.name} - ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(2)}%)`)
-		.join('\n')
+	const relevant_exams = Object.keys(student.exams || {})
+			.map(exam_id => exams[exam_id])
+			.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 	
-	return report_string;
+	const { total_score, max_score } = relevant_exams.reduce((agg, exam) => ({ 
+		total_score: agg.total_score + parseFloat(student.exams[exam.id].score, 10), 
+		max_score: agg.max_score + parseFloat(exam.total_score, 10) }),
+	{ total_score: 0, max_score: 0 })
+
+	const report_arr= [
+		...relevant_exams
+			.sort((a, b) => a.date - b.date)
+			.map(exam => `${exam.subject} ${examFilter === "" ? `- ${exam.name} -` : ""} ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(1)}%)`),
+		`Total Marks: ${total_score.toFixed(1)}/${max_score.toFixed(1)}`,
+		`Total Percentage: ${(total_score/max_score * 100).toFixed(1)}%`
+		]
+	
+	if(examFilter !== "") {
+		report_arr.unshift(examFilter)
+	}
+	
+	return report_arr.join('\n');
 }
 
 export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class }) => {

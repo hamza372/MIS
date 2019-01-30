@@ -10,3 +10,12 @@
 .single-exam .marks.row label {
 	width: 100%;
 }
+
+.single-exam div.remove.row {
+	flex-direction: row;
+}
+
+.single-exam div.button.red {
+	width: auto;
+}
+
