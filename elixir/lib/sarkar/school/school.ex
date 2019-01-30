@@ -11,7 +11,10 @@ defmodule Sarkar.School do
 		# state is school_id, map of writes, map of db.
 		# TODO: map of writes: (path) -> date
 		{db, writes} = Sarkar.Store.School.load(school_id)
-		GenServer.start_link(__MODULE__, {school_id, writes, db}, name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+		GenServer.start_link(
+			__MODULE__,
+			{school_id, writes, db},
+			name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
 	# API 
@@ -103,12 +106,25 @@ defmodule Sarkar.School do
 			{db, writes, %{}, 0}, 
 			fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
 
-				%{"action" => %{"path" => path, "type" => type, "value" => value}, "date" => date} = payload
+				%{
+					"action" => %{
+						"path" => path,
+						"type" => type,
+						"value" => value
+					},
+					"date" => date
+				} = payload
 
 				[prefix | p ] = path
 
 				p_key = Enum.join(p, ",")
-				write = %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}
+				write = %{
+					"date" => date,
+					"value" => value,
+					"path" => path,
+					"type" => type,
+					"client_id" => client_id
+				}
 
 				case type do
 					"MERGE" ->
@@ -193,8 +209,9 @@ defmodule Sarkar.School do
 		# get that data for it here.
 
 		relevant = nextWrites
-					|> Enum.filter(fn {path_string, %{"date" => path_date}} -> 
-						path_date > last_sync_date and not Map.has_key?(new_writes, path_string) 
+					|> Enum.filter(fn {path_string, %{"date" => path_date, "client_id" => cid }} -> 
+
+						path_date > last_sync_date and not Map.has_key?(new_writes, path_string) and cid != client_id
 						# but what if we sent in a previous action an update and then right after it
 						# another one that contradicts the previous before updating our last_snapshot
 						# i.e. client sends 2 messages before getting 1 response

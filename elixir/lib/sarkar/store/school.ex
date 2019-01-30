@@ -42,11 +42,11 @@ defmodule Sarkar.Store.School do
 				{:ok, resp} ->
 					[[db]] = resp.rows
 
-					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
+					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
-								|> Enum.map(fn([ [_ | p] = path, value, time, type]) -> {Enum.join(p, ","), %{
-									"path" => path, "value" => value, "date" => time, "type" => type
+								|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
+									"path" => path, "value" => value, "date" => time, "type" => type, "client_id" => client_id
 								}} end)
 								|> Enum.reverse
 								|> Enum.into(%{})
@@ -63,12 +63,12 @@ defmodule Sarkar.Store.School do
 	def handle_call({:get_writes, school_id, last_sync_date}, _from, state) do
 		case Postgrex.query(
 			Sarkar.School.DB,
-			"SELECT path, value, time, type FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", 
+			"SELECT path, value, time, type, client_id FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", 
 			[school_id, last_sync_date]) do
 				{:ok, writes_resp} ->
 					write_formatted = writes_resp.rows
-						|> Enum.map(fn([ [_ | p] = path, value, time, type]) -> {Enum.join(p, ","), %{
-							"path" => path, "value" => value, "date" => time, "type" => type
+						|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
+							"path" => path, "value" => value, "date" => time, "type" => type, "client_id" => client_id
 						}} end)
 						|> Enum.reverse
 						|> Enum.into(%{})
@@ -113,7 +113,7 @@ defmodule Sarkar.Store.School do
 
 		gen_value_strings = Stream.with_index(Map.values(writes), 1)
 			|> Enum.map(fn {w, i} -> 
-				x = (i - 1) * 5 + 1
+				x = (i - 1) * 6 + 1
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" end)
 
 		flattened_writes = Map.values(writes)
