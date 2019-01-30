@@ -9,6 +9,7 @@ const defaultTemplates = () => ({
 
 const initState = {
 	client_id: v4(),
+	client_name: "",
 	queued: { },
 	acceptSnapshot: false,
 	lastSnapshot: 0,
@@ -44,12 +45,14 @@ export const loadDB = () => {
 		}
 
 		const client_id = localStorage.getItem('client_id')
+		const client_name = localStorage.getItem('client_name')
 		const prev = JSON.parse(serialized);
 		// but should we make sure that fields that are no longer in the initState db are deleted?
 		const merged = {
 			...initState,
 			...prev,
 			client_id: client_id,
+			client_name: client_name,
 			db: {
 				...initState.db,
 				...prev.db
@@ -158,6 +161,18 @@ const addFacultyID = state => {
 	return state;
 }
 
+const addClientName = state => {
+
+	if(state.db.settings.deviceName === undefined){
+		state.db.settings = {
+			...state.db.settings,
+			deviceName: ""
+		}
+	}
+	state.client_name = state.db.settings.deviceName
+	return state;
+}
+
 const checkPermissions = state => {
 	if(state.db.settings.permissions !== undefined){
 		console.log("NOT Running Permission Scripts")
@@ -178,5 +193,6 @@ const checkPermissions = state => {
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
-	checkPermissions
+	checkPermissions,
+	addClientName
 ];
