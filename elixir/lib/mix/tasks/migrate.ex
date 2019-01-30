@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Migrate do
 		case Postgrex.query(Sarkar.School.DB, "SELECT school_id, db from backup", []) do
 			{:ok, res} ->
 
-				next_backup = res.rows
+				res.rows
 				|> Enum.each(fn ([school_id, school_db]) ->
 
 					{:ok, next_school} = case args do
@@ -46,7 +46,7 @@ defmodule Mix.Tasks.Migrate do
 				next_students = Map.get(school_db, "students", %{})
 					|> Enum.map( fn({id, student}) -> 
 						{id, student 
-							|> Map.put(student, "fees", %{}) 
+							|> Map.put("fees", %{}) 
 							|> Map.put("payments", %{})
 						}
 					end)
@@ -71,7 +71,7 @@ defmodule Mix.Tasks.Migrate do
 				
 				# for each write, execute Dynamic.(put|delete)[path] 
 				next_db = resp.rows
-					|> Enum.reduce(school_db, fn([ time, type, [ _ | path], value ], agg) ->
+					|> Enum.reduce(school_db, fn([ _time, type, [ _ | path], value ], agg) ->
 						IO.inspect path
 						case type do
 							"MERGE" -> 
@@ -94,7 +94,7 @@ defmodule Mix.Tasks.Migrate do
 		end
 	end
 
-	defp add_class_history(school_id, school_db) do
+	defp add_class_history(_school_id, school_db) do
 
 		section_metadata = Map.get(school_db, "classes", %{})
 			|> Enum.map(fn({ _, c }) ->
@@ -136,7 +136,7 @@ defmodule Mix.Tasks.Migrate do
 	end
 
 
-	defp add_payment_name(school_id, school_db) do
+	defp add_payment_name(_school_id, school_db) do
 
 		next_students = Map.get(school_db, "students", %{})
 		|> Enum.map(
@@ -150,7 +150,7 @@ defmodule Mix.Tasks.Migrate do
 							fee = Map.get(current_fees, fee_id, %{})
 							fee_name = Map.get(fee, "name", "Fee")
 							{id, Map.put(payment, "fee_name", fee_name)}
-						other -> 
+						_other -> 
 							{id, payment}
 					end
 				end)
@@ -164,7 +164,7 @@ defmodule Mix.Tasks.Migrate do
 		Map.put(school_db, "students", next_students)
 	end
 
-	defp adjust_fees(school_id, school_db) do
+	defp adjust_fees(_school_id, school_db) do
 		# has to return the new school_db
 			next_students = Map.get(school_db, "students", %{})
 				|> Enum.map(
@@ -185,14 +185,14 @@ defmodule Mix.Tasks.Migrate do
 			Map.put(school_db, "students", next_students)
 	end
 
-	defp adjust_users_table(school_id, school_db) do
+	defp adjust_users_table(_school_id, school_db) do
 		
 		next_users = Map.get(school_db, "users", %{})
 			|> Enum.map(
 				fn({id, user}) -> 
 					# lookup against faculty
 					IO.inspect(user)
-					{uid, faculty}= Enum.find(Map.get(school_db, "faculty"), fn ({id, f}) -> 
+					{_uid, faculty}= Enum.find(Map.get(school_db, "faculty"), fn ({_id, f}) -> 
 						Map.get(f, "Username") == Map.get(user, "username")
 					end) 
 					IO.inspect faculty
@@ -205,7 +205,7 @@ defmodule Mix.Tasks.Migrate do
 		Map.put(school_db, "users", next_users)
 	end
 
-	defp remove_november_payments(school_id, school_db) do
+	defp remove_november_payments(_school_id, school_db) do
 		next_students = Map.get(school_db, "students", %{})
 			|> Enum.map(
 				fn({id, student}) ->
@@ -232,7 +232,7 @@ defmodule Mix.Tasks.Migrate do
 			
 	end
 
-	defp remove_duplicate_payments(school_id, school_db) do
+	defp remove_duplicate_payments(_school_id, school_db) do
 		next_students = Map.get(school_db, "students", %{})
 			|> Enum.map(
 				fn({id, student}) ->
@@ -240,7 +240,7 @@ defmodule Mix.Tasks.Migrate do
 					payments = Map.get(student, "payments", %{})
 
 					# if anything has same date and fee_id, remove one of them and is type owed
-					{nextPayments, existing} = payments
+					{nextPayments, _existing} = payments
 					|> Enum.reduce({%{}, %{}}, fn({id, payment}, {agg, existing}) -> 
 						d = Map.get(payment, "date")
 						fid = Map.get(payment, "fee_id")
