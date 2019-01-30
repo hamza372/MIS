@@ -37,17 +37,19 @@ const initState = {
 
 export const loadDB = () => {
 	try {
-		const serialized = localStorage.getItem('db');
+		const serialized = localStorage.getItem('db');		
 		if (serialized === null) {
 			console.log('null')
 			return initState;
 		}
-		
+
+		const client_id = localStorage.getItem('client_id')
 		const prev = JSON.parse(serialized);
 		// but should we make sure that fields that are no longer in the initState db are deleted?
 		const merged = {
 			...initState,
 			...prev,
+			client_id: client_id,
 			db: {
 				...initState.db,
 				...prev.db
@@ -83,6 +85,7 @@ export const saveDB = (db) => {
 	try {
 		const json = JSON.stringify(db);
 		localStorage.setItem('db', json)
+		localStorage.setItem("client_id", db.client_id)
 	}
 	catch(err) {
 		console.error(err)
