@@ -211,19 +211,15 @@ defmodule Sarkar.School do
 		relevant = nextWrites
 					|> Enum.filter(fn {path_string, %{"date" => path_date, "client_id" => cid }} -> 
 
-						path_date > last_sync_date and not Map.has_key?(new_writes, path_string) and cid != client_id
-						# but what if we sent in a previous action an update and then right after it
-						# another one that contradicts the previous before updating our last_snapshot
-						# i.e. client sends 2 messages before getting 1 response
-						# then we will record "correct/intended" on backend but frontend will 
-						# get out of sync because it will apply the write
+						old = path_date > last_sync_date and not Map.has_key?(new_writes, path_string) 
+						new = old and cid != client_id
 
-						# we can avoid this by having client_id be stored with each write
-						# this could be desirable so we have a record of who did what
-						# it should be combined with a client_id that survives "switch school"
-						# in settings we should have ability to give human readable name for device
+						if old and not new do
+							IO.puts "this would have been sent before but not now"
+							IO.inspect path_string
+						end
 
-						# should also store sync_time in each write
+						old and new
 					end)
 					|> Enum.into(%{})
 		
