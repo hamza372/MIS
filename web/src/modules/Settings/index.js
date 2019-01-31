@@ -16,6 +16,7 @@ const defaultSettings = {
 	schoolAddress: "",
 	schoolPhoneNumber: "",
 	sendSMSOption: "SIM", // API
+	deviceName : "",
 	permissions: {
 		fee:  { teacher: false } //added
 	}
@@ -34,7 +35,8 @@ class Settings extends Component {
 				active: false,
 				good: true,
 				text: "Saved!"
-			}
+			},
+			client_id : localStorage.getItem("client_id")
 		}
 
 		this.former = new Former(this, [])
@@ -96,6 +98,7 @@ class Settings extends Component {
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});
+		localStorage.setItem('client_name', this.state.settings.deviceName)
 
 		this.setState({
 			banner: {
@@ -163,9 +166,20 @@ class Settings extends Component {
 					</div>
 
 					<div className="row">
+						<label>Device Name</label>
+						<input type="text" {...this.former.super_handle(["settings", "deviceName"])} placeholder="Device Name" />
+					</div>
+
+					<div className="row">
 					<label>MISchool Version</label>
 					<label>{window.version || "no version set"}</label>
 					</div>
+
+					<div className="row">
+					<label>Client Id</label>
+					<label>{ this.state.client_id }</label>
+					</div>
+
 
 					<div className="row">
 						<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
