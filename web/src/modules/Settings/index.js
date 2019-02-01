@@ -160,8 +160,8 @@ class Settings extends Component {
 					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
-							<option value={true}>Yes, share anonymous data with CERP</option>
-							<option value={false}>No, don't share data</option>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
 						</select>
 					</div>
 
