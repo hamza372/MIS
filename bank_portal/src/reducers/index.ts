@@ -1,7 +1,7 @@
 import * as redux from 'redux'
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed } from '~/src/actions/core'
+import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed, ConfirmSyncAction } from '~/src/actions/core'
 import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
 
 
@@ -40,9 +40,9 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 					token: succeed.token,
 					attempt_failed: false,
 					id: succeed.id
-				}
+				},
+				sync_state: succeed.sync_state
 			}
-
 		}
 
 		case MERGES: 
@@ -78,6 +78,52 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 					...state.queued,
 					...(action as QueueAction).payload
 				}
+			}
+		}
+
+		case CONFIRM_SYNC_DIFF:
+		{
+
+			//@ts-ignore
+			const diff_action = action as ConfirmSyncAction;
+
+			console.log(
+				"confirm sync diff: ", 
+				Object.keys(diff_action.new_writes).length, 
+				" changes synced");
+			
+			const newQ = Object.keys(state.queued)
+				.filter(t => {
+					console.log(state.queued[t].date, diff_action.date, state.queued[t].date - diff_action.date)
+					return state.queued[t].date > diff_action.date
+				})
+				.reduce((agg, curr) => {
+					return Dynamic.put(agg, ["queued", state.queued[curr].action.path], state.queued[curr].action)
+				}, {})
+			
+			if(Object.keys(diff_action.new_writes).length > 0) {
+
+				const nextState = Object.values(diff_action.new_writes)
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path)
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state)))
+				
+				return {
+					...nextState,
+					queued: newQ,
+					accept_snapshot: true,
+					last_snapshot: new Date().getTime()
+				}
+			}
+
+			return {
+				...state,
+				queued: newQ,
+				accept_snapshot: true,
+				last_snapshot: new Date().getTime()
 			}
 		}
 

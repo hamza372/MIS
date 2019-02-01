@@ -56,7 +56,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 
 export const SMS = "SMS"
 export const sendSMS = (text : string, number : string) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
-	
+
 	// should i keep a log of all messages sent in the db?
 
 	const state = getState();
@@ -170,6 +170,20 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 // it will tell us it hsa confirmed sync up to { date: timestamp }
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
 export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
+export interface ConfirmSyncAction {
+	type: "CONFIRM_SYNC_DIFF",
+	date: number,
+	new_writes: Write[]
+}
+
+export interface Write {
+	date: number,
+	value: any,
+	path: string[],
+	type: "MERGE" | "DELETE",
+	client_id: string
+}
+
 export const SNAPSHOT = "SNAPSHOT"
 export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 
@@ -178,7 +192,7 @@ export const QUEUE = "QUEUE"
 interface Queuable {
 	[path: string] : {
 		action: {
-			type: string,
+			type: "MERGE" | "DELETE",
 			path: string[],
 			value?: any
 		},
@@ -218,12 +232,6 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 					client_id: state.client_id,
 				}
 			})
-			.catch(err => {
-				console.error(err)
-				alert("Authorization Failed. Log out and Log in again.")
-			})
-
-			/*
 			.then(res => {
 				return syncr.send({
 					type: SYNC,
@@ -236,7 +244,10 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 			.then(resp => {
 				dispatch(resp)
 			})
-			*/
+			.catch(err => {
+				console.error(err)
+				alert("Authorization Failed. Log out and Log in again.")
+			})
 	}
 }
 
@@ -249,10 +260,12 @@ export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
 export interface LoginSucceed {
 	type: "LOGIN_SUCCEED",
 	id: string,
-	token: string
+	token: string,
+	sync_state: RootBankState['sync_state']
 }
-export const createLoginSucceed = (id : string, token : string) => ({ 
+export const createLoginSucceed = (id : string, token : string, sync_state: RootBankState['sync_state']) => ({ 
 	type: LOGIN_SUCCEED,
 	id,
-	token
+	token,
+	sync_state
 })

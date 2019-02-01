@@ -1,14 +1,9 @@
 import Syncr from '~/src/syncr'
-import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed } from './core'
+import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges } from './core'
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
 type Dispatch = ( action : any) => any;
-
-export interface SelectLocationAction {
-	type: string,
-	loc: SchoolLocation
-}
 
 const debug_url = "http://localhost:5000"
 const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
@@ -27,11 +22,15 @@ export const createLogin = (username : string, password : string) => (dispatch: 
 			password
 		}
 	})
-	.then((res : {token: string}) => dispatch(createLoginSucceed(username, res.token)))
+	.then((res : {token: string, sync_state: RootBankState['sync_state']}) => dispatch(createLoginSucceed(username, res.token, res.sync_state)))
 
 
 }
 
+export interface SelectLocationAction {
+	type: string,
+	loc: SchoolLocation
+}
 
 export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
 
@@ -55,6 +54,13 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 		type: SELECT_LOCATION,
 		loc: loc
 	})
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", loc.id, "status"],
+			value: "NEW"
+		}
+	]))
 }
 
 export const SET_FILTER = "SET_FILTER"

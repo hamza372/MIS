@@ -27,3 +27,13 @@ create table writes (
 
 create index on writes(school_id);
 create index on writes(time);
+
+create table call_masking (
+	incomer_id text not null,
+	numbers text[] not null,
+	outgoing_num text not null,
+	mask_num text not null
+);
+
+create index on call_masking(mask_num);
+create index mask_num_idx on call_masking using GIN (numbers);

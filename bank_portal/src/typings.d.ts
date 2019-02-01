@@ -19,6 +19,13 @@ interface RootBankState {
 	school_db: {
 		[school_id: string]: School
 	},
+	sync_state: {
+		matches: {
+			[school_id : string]: {
+				status: "NEW" | "IN_PROGRESS" | "REJECTED"
+			}
+		}
+	},
 	auth: {
 		id: string,
 		token: string,
@@ -29,7 +36,14 @@ interface RootBankState {
 	},
 	client_id: string,
 	queued: {
-		[path: string]: { action: Object, date: number }
+		[path: string]: {
+			action: {
+				path: string[],
+				value?: any,
+				type: "MERGE" | "DELETE"
+			}, 
+			date: number 
+		} 
 	},
 	last_snapshot: number,
 	accept_snapshot: boolean,

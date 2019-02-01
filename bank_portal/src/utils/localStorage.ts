@@ -6,11 +6,20 @@ export const saveDB = (db : RootBankState) => {
 	try {
 		const auth_json = JSON.stringify(db.auth);
 		localStorage.setItem("auth", auth_json);
+
+		saveSyncState(db.sync_state);
+		saveSnapshot(db.last_snapshot);
 	}
 
 	catch(err) {
 		console.error(err);
 	}
+}
+
+export const clearDB = () => {
+	localStorage.removeItem("auth")
+	localStorage.removeItem("sync_state")
+	localStorage.removeItem("last_snapshot")
 }
 
 export const loadAuth = (): RootBankState['auth'] => {
@@ -39,7 +48,7 @@ export const loadAuth = (): RootBankState['auth'] => {
 	}
 }
 
-export const loadClientId = () => {
+const loadClientId = () => {
 
 	const client_id = localStorage.getItem("client_id") || v4();
 	localStorage.setItem("client_id", client_id)
@@ -47,18 +56,50 @@ export const loadClientId = () => {
 	return client_id;
 }
 
+const loadSyncState = () => {
+
+	const str = localStorage.getItem("sync_state");
+
+	if(str === undefined || str == "" || str == "null") {
+		return {
+			matches: {
+
+			}
+		} as RootBankState['sync_state']
+	}
+
+	return JSON.parse(str) as RootBankState['sync_state'];
+}
+
+const saveSyncState = (sync_state : RootBankState['sync_state']) => {
+
+	localStorage.setItem("sync_state", JSON.stringify(sync_state));
+}
+
+const saveSnapshot = (last_snapshot : number) => {
+
+	//@ts-ignore
+	localStorage.setItem("last_snapshot", last_snapshot);
+}
+
+const loadSnapshot = () => {
+	return parseInt(localStorage.getItem("last_snapshot") || "0")
+}
+
 export const loadDB = () : RootBankState => {
 
 	return {
-		school_locations: locations,
-		filter_text: "",
-		school_db: {},
 		selected: undefined,
+		filter_text: "",
+
+		school_locations: locations,
+		school_db: {},
 		client_id: loadClientId(),
 		auth: loadAuth(),
 		queued: {},
 		accept_snapshot: false,
-		last_snapshot: 0,
-		connected: false
+		last_snapshot: loadSnapshot(),
+		connected: false,
+		sync_state: loadSyncState()
 	}
 }
