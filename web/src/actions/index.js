@@ -316,3 +316,19 @@ export const removeStudentFromExam = (e_id, student_id) => dispatch => {
 		}
 	]))
 }
+
+export const deleteExam = (students, exam_id) => dispatch => {
+	//students  is an array of studentt Id's
+
+	const deletes = students.map(s_id => ({
+		path:["db", "students", s_id, "exams", exam_id]
+	}))
+	
+	dispatch(createDeletes([
+		{
+			path: ["db", "exams", exam_id]
+		},
+		...deletes
+	]))
+
+}
