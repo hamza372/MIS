@@ -25,7 +25,7 @@ defmodule Sarkar.ActionHandler.Platform do
 			{:ok, token} ->
 				start_supplier(id)
 				register_connection(id, client_id)
-				sync_state = Sarkar.Supplier.get_db(id)
+				sync_state = Sarkar.Supplier.get_sync_state(id)
 				{:reply, succeed(%{token: token, sync_state: sync_state}), %{id: id, client_id: client_id}}
 			{:error, message} -> {:reply, fail(message), %{}}
 		end
@@ -56,8 +56,12 @@ defmodule Sarkar.ActionHandler.Platform do
 
 	defp start_supplier(id) do
 		case Registry.lookup(Sarkar.SupplierRegistry, id) do
-			[{_, _}] -> {:ok}
-			[] -> DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
+			[{_, _}] -> 
+				IO.puts "already in registry"
+				{:ok}
+			[] -> 
+				IO.puts "start_child supplier"
+				DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
 		end
 	end
 

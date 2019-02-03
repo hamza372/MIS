@@ -10,28 +10,26 @@ defmodule Sarkar.Supplier do
 
 		# state is school_id, map of writes, map of db.
 		# TODO: map of writes: (path) -> date
-		{db, writes} = Sarkar.Store.School.load(id)
+		{sync_state, writes} = Sarkar.Store.Supplier.load(id)
 		GenServer.start_link(
 			__MODULE__,
-			{id, writes, db},
+			{id, writes, sync_state},
 			name: {:via, Registry, {Sarkar.SupplierRegistry, id}})
 	end
 
 	# API 
 
 	def sync_changes(id, client_id, changes, last_sync_date) do
-		IO.puts "syncing platform #{id}"
-		IO.inspect changes
 		GenServer.call(via(id), {:sync_changes, client_id, changes, last_sync_date})
 	end
 
-	def get_db(id) do
-		GenServer.call(via(id), {:get_db})
+	def get_sync_state(id) do
+		GenServer.call(via(id), {:get_sync_state})
 	end
 
 	# SERVER
 
-	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {id, writes, db} = state) do
+	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {id, writes, sync_state} = state) do
 
 		# map of changes.
 		# key is path separated by comma
@@ -51,7 +49,7 @@ defmodule Sarkar.Supplier do
 		have_all_in_memory? = min_write_date < last_sync_date
 
 		writes = if not have_all_in_memory? do
-				case Sarkar.Store.School.get_writes(id, last_sync_date) do
+				case Sarkar.Store.Supplier.get_writes(id, last_sync_date) do
 					{:ok, aug_writes} -> 
 						# whats in aug_writes that isnt in writes??
 						IO.puts "SUCCESSFUL DB RECOVERY @ #{:os.system_time(:millisecond)}. last_sync_date: #{last_sync_date} min_write_date: #{min_write_date}"
@@ -69,11 +67,11 @@ defmodule Sarkar.Supplier do
 
 		# TODO: sort changes by time and process in order.
 
-		{nextDb, nextWrites, new_writes, last_date} = changes
+		{nextSyncState, nextWrites, new_writes, last_date} = changes
 		|> Enum.sort(fn({ _, %{"date" => d1}}, {_, %{"date" => d2}}) -> d1 < d2 end)
 		|> Enum.reduce(
-			{db, writes, %{}, 0}, 
-			fn({path_key, payload}, {agg_db, agg_writes, agg_new_writes, max_date}) -> 
+			{sync_state, writes, %{}, 0}, 
+			fn({path_key, payload}, {agg_sync_state, agg_writes, agg_new_writes, max_date}) -> 
 
 				%{
 					"action" => %{
@@ -100,14 +98,14 @@ defmodule Sarkar.Supplier do
 						case Map.get(agg_writes, p_key) do
 							nil -> 
 								{
-									Dynamic.put(agg_db, p, value),
+									Dynamic.put(agg_sync_state, p, value),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
 							%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
 								{
-									Dynamic.put(agg_db, p, value),
+									Dynamic.put(agg_sync_state, p, value),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
@@ -116,7 +114,7 @@ defmodule Sarkar.Supplier do
 								IO.puts "#{id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
 								# IO.inspect write
 								{
-									agg_db,
+									agg_sync_state,
 									agg_writes,
 									agg_new_writes,
 									max_date
@@ -125,7 +123,7 @@ defmodule Sarkar.Supplier do
 								IO.puts "OTHER!!!!!!!!!!!!!"
 								IO.inspect other
 								{
-									Dynamic.put(agg_db, p, value),
+									Dynamic.put(agg_sync_state, p, value),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
@@ -136,21 +134,21 @@ defmodule Sarkar.Supplier do
 						case Map.get(agg_writes, p_key) do
 							nil -> 
 								{
-									Dynamic.delete(agg_db, p),
+									Dynamic.delete(agg_sync_state, p),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
 							%{"date" => prev_date} when prev_date <= date ->
 								{
-									Dynamic.delete(agg_db, p),
+									Dynamic.delete(agg_sync_state, p),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
 							%{"date" => prev_date} when prev_date > date ->
 								{
-									agg_db,
+									agg_sync_state,
 									agg_writes,
 									agg_new_writes,
 									max_date
@@ -159,7 +157,7 @@ defmodule Sarkar.Supplier do
 								IO.puts "OTHER!!!!!!!!!!!"
 								IO.inspect other
 								{
-									Dynamic.delete(agg_db, p),
+									Dynamic.delete(agg_sync_state, p),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
@@ -167,7 +165,7 @@ defmodule Sarkar.Supplier do
 						end
 					other -> 
 						IO.puts "unrecognized type"
-						{agg_db, max_date}
+						{agg_sync_state, max_date}
 				end
 			end)
 
@@ -194,19 +192,19 @@ defmodule Sarkar.Supplier do
 		
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-			0 -> {:reply, confirm_sync_diff(last_date, relevant), {id, nextWrites, nextDb}}
+			0 -> {:reply, confirm_sync_diff(last_date, relevant), {id, nextWrites, nextSyncState}}
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(id, client_id, snapshot_diff(new_writes))
-				Sarkar.Store.School.save(id, nextDb, new_writes)
+				Sarkar.Store.Supplier.save(id, nextSyncState, new_writes)
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-				{:reply, confirm_sync_diff(last_date, relevant), {id, nextWrites, nextDb}}
+				{:reply, confirm_sync_diff(last_date, relevant), {id, nextWrites, nextSyncState}}
 		end
 	end
 
-	def handle_call({:get_db}, _from, {id, writes, db} = state) do
-		{:reply, db, state}
+	def handle_call({:get_sync_state}, _from, {id, writes, sync_state} = state) do
+		{:reply, sync_state, state}
 	end
 
 	def handle_call(a, b, c) do 
@@ -218,10 +216,10 @@ defmodule Sarkar.Supplier do
 	end
 
 	# generates action
-	defp snapshot(db) do
+	defp snapshot(sync_state) do
 		%{
 			type: "SNAPSHOT",
-			db: db
+			sync_state: sync_state
 		}
 	end
 
@@ -240,16 +238,16 @@ defmodule Sarkar.Supplier do
 		}
 	end
 
-	defp confirm_sync(date, db) do
+	defp confirm_sync(date, sync_state) do
 		%{
 			type: "CONFIRM_SYNC",
 			date: date,
-			db: db
+			sync_state: sync_state
 		}
 	end
 
-	defp via(school_id) do
-		{:via, Registry, {Sarkar.SupplierRegistry, school_id}}
+	defp via(id) do
+		{:via, Registry, {Sarkar.SupplierRegistry, id}}
 	end
 
 	defp broadcast(school_id, sender_id, message) do

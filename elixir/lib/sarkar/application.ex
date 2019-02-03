@@ -14,6 +14,7 @@ defmodule Sarkar.Application do
 			{ DynamicSupervisor, name: Sarkar.SchoolSupervisor, strategy: :one_for_one },
 			{ DynamicSupervisor, name: Sarkar.SupplierSupervisor, strategy: :one_for_one },
 			Sarkar.Store.School,
+			Sarkar.Store.Supplier,
 			{
 				Postgrex,
 					name: Sarkar.School.DB,

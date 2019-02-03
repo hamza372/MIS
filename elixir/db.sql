@@ -28,6 +28,24 @@ create table writes (
 create index on writes(school_id);
 create index on writes(time);
 
+create table platform_writes (
+	id text,
+	path text[],
+	value jsonb,
+	time bigint,
+	type text,
+	client_id text,
+	sync_time timestamp default current_timestamp
+);
+
+create index on platform_writes(school_id);
+create index on platform_writes(time);
+
+create table suppliers (
+	id text unique not null,
+	sync_state jsonb
+);
+
 create table call_masking (
 	incomer_id text not null,
 	numbers text[] not null,
