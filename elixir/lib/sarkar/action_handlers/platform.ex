@@ -14,9 +14,7 @@ defmodule Sarkar.ActionHandler.Platform do
 	# keep in memory for fast reply when call comes
 
 	def handle_action(%{"type" => "SET_FILTER"} = action, state) do
-
 		IO.inspect action
-
 		{:reply, succeed(%{"type" => "nonsense"}), state}
 	end
 
@@ -48,6 +46,16 @@ defmodule Sarkar.ActionHandler.Platform do
 		{:reply, succeed(res), state}
 	end
 
+	def handle_action(%{"type" => "GET_CALL_MASK_PAIR", "payload" => payload}, %{id: id, client_id: client_id} = state) do
+		# for this id, get or reserve a number for a school.
+		{:reply, fail("not ready"), state}
+	end
+
+	def handle_action(%{"type" => "RELEASE_CALL_MASK_PAIR", "payload" => payload}, %{id: id, client_id: client_id} = state) do
+		# for this id, release a masked number of a school.
+		{:reply, fail("not ready"), state}
+	end
+
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.puts "NOT YET READY"
@@ -56,12 +64,8 @@ defmodule Sarkar.ActionHandler.Platform do
 
 	defp start_supplier(id) do
 		case Registry.lookup(Sarkar.SupplierRegistry, id) do
-			[{_, _}] -> 
-				IO.puts "already in registry"
-				{:ok}
-			[] -> 
-				IO.puts "start_child supplier"
-				DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
 		end
 	end
 
