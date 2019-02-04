@@ -1,9 +1,26 @@
 defmodule Mix.Tasks.Platform do
 	use Mix.Task
 
+	def run(["ingest_data"]) do
+		Application.ensure_all_started(:sarkar)
+		{:ok, body} = File.read("sample.json")
+		{:ok, json} = Poison.decode(body)
+
+		Enum.each(json, fn school_profile -> 
+			id = Map.get(school_profile, "refcode")
+
+			case Postgrex.query(Sarkar.School.DB, "INSERT INTO platform_schools(id, db) VALUES ($1, $2)", [id, school_profile]) do
+				{:ok, _} -> IO.puts "updated #{id}"
+				{:error, err} -> 
+					IO.puts "error on school #{id}"
+					IO.inspect err
+			end
+		end)
+	end
+
 	def run(args) do
 		Application.ensure_all_started(:sarkar)
-		case Postgrex.query(Sarkar.School.DB, "SELECT id, db from suppliers", []) do
+		case Postgrex.query(Sarkar.School.DB, "SELECT id, sync_state from suppliers", []) do
 			{:ok, res} ->
 				res.rows
 				|> Enum.each(fn ([id, sync_state]) ->

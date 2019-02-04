@@ -46,6 +46,11 @@ create table suppliers (
 	sync_state jsonb
 );
 
+create table platform_schools (
+	id text unique not null,
+	db jsonb 
+);
+
 create table call_masking (
 	incomer_id text not null,
 	numbers text[] not null,

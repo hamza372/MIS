@@ -56,6 +56,29 @@ defmodule Sarkar.ActionHandler.Platform do
 		{:reply, fail("not ready"), state}
 	end
 
+	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: id, client_id: client_id} = state) do
+		
+		ids = Map.get(payload, "school_ids", [])
+
+		or_str = ids
+			|> Stream.with_index(ids, 1)
+			|> Enum.map(fn {_, i}-> 
+				"id = $#{i}"
+			end)
+			|> Enum.join(" OR ")
+
+		IO.inspect "SELECT db FROM platform_schools WHERE #{or_str}"
+
+		case Postgrex.query(Sarkar.School.DB, "SELECT db FROM platform_schools WHERE #{or_str}", ids) do
+			{:ok, resp} ->
+				[[db]] = resp.rows 
+				{:reply, succeed(db), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail("db error"), state}
+		end
+	end
+
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.puts "NOT YET READY"
