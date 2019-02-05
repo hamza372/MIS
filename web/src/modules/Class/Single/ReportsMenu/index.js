@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
-import { ClassReports }  from '../../Single/Reports'
-
 import moment from 'moment'
 import { connect } from 'react-redux'
-
 import Former from 'utils/former'
+import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
+import { smsIntentLink } from 'utils/intent'
+import { addSmsHistory } from 'actions'
 
+
+import './style.css'
 
 class ClassReportMenu extends Component {
 
@@ -24,21 +26,58 @@ class ClassReportMenu extends Component {
 		this.report_former = new Former(this, ["report_filters"])
 	}
 
-	render() {
-		
-		const subjects = new Set()
-		const exams = new Set()
-		
-		const relevant_students = Object.values(this.props.students)
-			.filter(s => this.props.curr_class.sections[s.section_id] !== undefined)
+	smsHistory = (messages) => {
+		if(messages.length === 0){
+			console.log("No Message to Log")
+			return
+		}
+		const historyObj = {
+			date: moment.now(),
+			type: "EXAM",
+			count: messages.length
+		}
+	
+		this.props.addSmsHistory(this.props.faculty_id, historyObj)
+	}
 
-		for(let s of relevant_students)
+	render() {
+
+		const { students, exams, curr_class, settings, sms_templates } = this.props
+		
+		const section_set = new Set(Object.keys(curr_class.sections));
+		
+		const relevant_students = Object.values(students)
+			.filter(s => section_set.has(s.section_id))
+		
+		const messages = relevant_students
+			.filter(s => s.Phone !== "")
+			.map(student => ({
+				number: student.Phone,
+				text: sms_templates.result
+					.replace(/\$NAME/g, student.Name)
+					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilter))
+			}))
+		
+		console.log(messages)
+		
+		const url = smsIntentLink({
+			messages,
+			return_link: window.location.href
+		})
+
+		const subjects = new Set()
+		const examSet = new Set()
+		
+		const relevant_students_set = Object.values(students)
+			.filter(s => curr_class.sections[s.section_id] !== undefined)
+
+		for(let s of relevant_students_set)
 		{
-			for(let e of Object.values(this.props.exams))
+			for(let e of Object.values(exams))
 			{ 
 				if(e.section_id === s.section_id){
 					subjects.add(e.subject)
-					exams.add(e.name)
+					examSet.add(e.name)
 				}
 			}
 		}
@@ -60,7 +99,7 @@ class ClassReportMenu extends Component {
 					<select {...this.report_former.super_handle(["examFilterText"])}> 
 						<option value="">Select Exam</option>
 						{
-							Array.from(exams).map(exam => {
+							Array.from(examSet).map(exam => {
 								return <option key={exam} value={exam}>{exam}</option>	
 							})
 						}
@@ -75,30 +114,46 @@ class ClassReportMenu extends Component {
 								return <option key={subject} value={subject}>{subject}</option>	
 							})
 						}
-					</select>						
+					</select>
 				</div>
 			</div>
-			<ClassReports
-					id={this.props.curr_class.id}
-					classes={this.props.classes}
-					students={this.props.students}
-					exams={this.props.exams}
-					settings={this.props.settings}
-					sms_templates={this.props.sms_templates}
-					start={moment(this.state.report_filters.start)} 
-					end={moment(this.state.report_filters.end)}
-					examFilter={this.state.report_filters.examFilterText}
-					subjectFilter={this.state.report_filters.subjectFilterText} 
-					/>
+			
+			<div className="class-report" style={{height: "100%"}}>
+			
+			<div className="print button" onClick={() => window.print()}>Print</div>
+
+			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" onClick={() => this.smsHistory(messages)}  href={url}>Send Reports using SMS</a> : false }
+			{
+				//TODO: put in total marks, grade, signature, and remarks.
+				relevant_students.map(s => 
+					<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
+						<StudentMarks 
+							student={s} 
+							exams={this.props.exams} 
+							settings={this.props.settings} 
+							startDate={this.state.report_filters.start} 
+							endDate={this.state.report_filters.end} 
+							examFilter={this.state.report_filters.examFilterText} 
+							subjectFilter={this.state.report_filters.subjectFilterText} 
+							curr_class={this.props.curr_class}
+						/>
+					</div>)
+			}
+			
+			</div>
+
 		</div>
 	}
 }
  
 export default connect((state, { match: { params: { id } } }) => ({
 	 curr_class: state.db.classes[id],
+	 faculty_id: state.auth.faculty_id,
 	 classes : state.db.classes,
 	 students: state.db.students,
 	 settings: state.db.settings,
 	 exams: state.db.exams,
 	 sms_templates: state.db.sms_templates
+}), dispatch => ({
+	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history))
 }))(ClassReportMenu)

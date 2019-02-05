@@ -6,7 +6,7 @@ import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
 import { smsIntentLink } from 'utils/intent'
 import Layout from 'components/Layout'
-import { markStudent } from 'actions'
+import { markStudent, addSmsHistory } from 'actions'
 
 import moment from 'moment'
 import Former from 'utils/former'
@@ -46,9 +46,19 @@ class Attendance extends Component {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
-	sendBatchSMS = () => {
-		console.log('send batch sms');
+	sendBatchSMS = (messages) => {
+		if(messages.length === 0){
+			console.log("No Messages to Log")
+			return
+		}
+		const historyObj = {
+			date: moment.now(),
+			type: "ATTENDANCE",
+			count: messages.length,
+		}
 
+		this.props.addSmsHistory(this.props.current_faculty.id, historyObj)
+		
 		this.setState({
 			sending: true
 		})
@@ -158,7 +168,7 @@ class Attendance extends Component {
 						})
 				}
 				</div>
-				{ Object.values(this.state.selected_students).some(x => x) ? <a href={url} className="button blue" onClick={this.sendBatchSMS}>Send SMS</a> : false }
+				{ Object.values(this.state.selected_students).some(x => x) ? <a href={url} className="button blue" onClick={() => this.sendBatchSMS(messages)}>Send SMS</a> : false }
 			</div>
 		</Layout>
 	}
@@ -176,5 +186,6 @@ export default connect(state => {
 	}
 
 }, dispatch => ({
-	markStudent: (student, date, status) => dispatch(markStudent(student, date, status))
+	markStudent: (student, date, status) => dispatch(markStudent(student, date, status)),
+	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history))
 }))(Attendance)

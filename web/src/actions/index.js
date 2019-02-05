@@ -332,3 +332,21 @@ export const deleteExam = (students, exam_id) => dispatch => {
 	]))
 
 }
+
+export const addSmsHistory = (faculty_id, history) => (dispatch, getState ) => {
+	
+	//history is an object { date: "", type: "", count:"" }
+	
+	const state = getState()
+	
+	const newHistory = state.db.analytics.sms_history[faculty_id] === undefined ? [] : state.db.analytics.sms_history[faculty_id]
+	newHistory.push(history)
+
+  	dispatch(createMerges([
+		{
+			path: ["db", "analytics", "sms_history", faculty_id ],
+			value : newHistory
+		}
+	])) 
+
+}

@@ -56,7 +56,7 @@ class SMS extends Component {
 		}
 
 		console.log('send message', text, number);
-		this.props.sendMessage(text, number);
+		this.props.sendMessage(text, number, this.state.smsFilter);
 
 	}
 
@@ -65,7 +65,7 @@ class SMS extends Component {
 			return;
 		}
 		console.log("Sending messages", messages);
-		this.props.sendBatchMessages(messages);
+		this.props.sendBatchMessages(messages,  this.state.smsFilter);
 	}
 
 	sendMessageFilter=(e)=>{
@@ -166,6 +166,6 @@ export default connect(state => ({
 	connected: state.connected,
 	smsSetting: state.db.settings.sendSMSOption
 }), dispatch => ({
-	sendMessage: (text, number) => dispatch(sendSMS(text, number)),
-	sendBatchMessages: (messages) => dispatch(sendBatchSMS(messages))
+	sendMessage: (text, number, type) => dispatch(sendSMS(text, number, type)),
+	sendBatchMessages: (messages, type) => dispatch(sendBatchSMS(messages, type))
 }))(SMS);

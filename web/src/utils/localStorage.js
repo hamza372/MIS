@@ -20,7 +20,10 @@ const initState = {
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
 		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
-		settings: { }
+		settings: { },
+		analytics: {
+			sms_history: {}
+		}
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
@@ -194,5 +197,5 @@ const checkPermissions = state => {
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
-	addClientName
+	addClientName,
 ];

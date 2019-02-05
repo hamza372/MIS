@@ -5,8 +5,12 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
 
+import moment from 'moment'
+import { addSmsHistory } from 'actions'
+import {connect} from "react-redux"
 
-export default class ToSingleClass extends Component {
+
+class ToSingleClass extends Component {
 	constructor(props) {
 	super(props)
 	
@@ -17,6 +21,20 @@ export default class ToSingleClass extends Component {
 	}
 
 	this.former = new former(this, [])
+	}
+	smsHistory = (messages) =>{
+		if(messages.length === 0){
+			console.log("No Messaged to Log")
+			return
+		}
+		const historyObj = {
+			date: moment.now(),
+			type: "CLASS",
+			count: messages.length,
+			text: this.state.text
+		}
+
+		this.props.addSmsHistory(this.props.faculty_id, historyObj)
 	}
 
 	render() {
@@ -59,9 +77,14 @@ export default class ToSingleClass extends Component {
 						<a href={smsIntentLink({
 							messages,
 							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> }
+							})} onClick={() => this.smsHistory(messages)} className="button blue">Send using Local SIM</a> }
 			</div>
 		)
 	}
 }
 
+export default connect(state => ({
+	faculty_id: state.auth.faculty_id
+}), dispatch => ({
+	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history)),
+}))(ToSingleClass)

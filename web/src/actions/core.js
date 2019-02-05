@@ -1,3 +1,5 @@
+import moment from "moment"
+
 const SYNC = "SYNC"
 const client_type = "mis";
 
@@ -42,9 +44,15 @@ export const createMerges= (merges) => (dispatch, getState, syncr) => {
 }
 
 export const SMS = "SMS"
-export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
+export const sendSMS = (text, number, type) => (dispatch, getState, syncr) => {
 	
 	// should i keep a log of all messages sent in the db?
+	const history = {
+		date: moment.now(),
+		type: "Single " + type,
+		count: 1
+	}
+	console.log(history)
 
 	syncr.send({
 		type: SMS,
@@ -61,8 +69,14 @@ export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
 }
 
 export const BATCH_SMS = "BATCH_SMS"
-export const sendBatchSMS = (messages) => (dispatch, getState, syncr) => {
-
+export const sendBatchSMS = (messages, type) => (dispatch, getState, syncr) => {
+	
+	const history = {
+		date: moment.now(),
+		type: "Batch " + type,
+		count: messages.length()
+	}
+	console.log(history)
 	syncr.send({
 		type: BATCH_SMS,
 		client_type,
@@ -95,7 +109,7 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 			[curr.path.join(',')]: {
 				action: {
 					type: "DELETE",
-					path: curr.path.map(x => x === undefined ? "" : x),
+					path: curr.path.map(x => x === undefined ? "" : x ),
 					value: 1
 				},
 				date: new Date().getTime()
@@ -177,7 +191,6 @@ export const connected = () => (dispatch, getState, syncr) => {
 				}
 			})
 			.then(res => {
-
 				return syncr.send({
 					type: SYNC,
 					client_type,

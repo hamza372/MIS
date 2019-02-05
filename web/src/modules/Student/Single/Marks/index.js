@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
-
+import { addSmsHistory } from 'actions'
 import { smsIntentLink } from 'utils/intent'
 
 import Former from 'utils/former'
@@ -22,6 +22,17 @@ class StudentMarksContainer extends Component {
 		}
 
 		this.former = new Former(this, []);
+	}
+
+	smsHistory = () =>{
+
+		const historyObj = {
+			date: moment.now(),
+			type: "EXAM",
+			count: 1,
+		}
+
+		this.props.addSmsHistory(this.props.faculty_id, historyObj)
 	}
 
 	render() {
@@ -87,7 +98,7 @@ class StudentMarksContainer extends Component {
 				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class}/>
 
 
-				{ settings.sendSMSOption === "SIM" ? <a href={url} className="button blue">Send SMS from Local SIM</a> : false }
+				{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.smsHistory} className="button blue">Send SMS from Local SIM</a> : false }
 				<div className="print button" onClick={() => window.print()} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end", }}>Print</div>
 			</div>
 	}
@@ -217,9 +228,12 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 
 
 export default connect(state => ({
+	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	exams: state.db.exams,
 	classes: state.db.classes,
 	settings: state.db.settings,
 	sms_templates: state.db.sms_templates
+}), dispatch => ({
+	addSmsHistory: (faculty_id, history)=> dispatch(addSmsHistory(faculty_id, history)),
 }))(StudentMarksContainer)
