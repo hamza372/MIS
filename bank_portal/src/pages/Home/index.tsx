@@ -14,20 +14,20 @@ class Home extends React.Component<propTypes> {
 
 	render() {
 
-		console.log("STUFF", this.props.matches)
-
 		const blank = Object.keys(this.props.matches)
 			.filter(k => this.props.school_db[k] == undefined)
 	
 		if(this.props.connected && blank.length > 0) {
 			setTimeout(() => {
 				this.props.addSchools(blank)
-			}, 2000)
+			}, 2000) //hack
 		}
 
 		return <div className="home page">
-			Home page
 
+			<div className="title">Home Page</div>
+
+			<div className="divider">New Schools</div>
 			<div className="list">
 			{
 				Object.entries(this.props.matches)

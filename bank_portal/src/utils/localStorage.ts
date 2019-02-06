@@ -21,6 +21,7 @@ export const clearDB = () => {
 	localStorage.removeItem("auth")
 	localStorage.removeItem("sync_state")
 	localStorage.removeItem("last_snapshot")
+	localStorage.removeItem("school_db")
 }
 
 export const loadAuth = (): RootBankState['auth'] => {
