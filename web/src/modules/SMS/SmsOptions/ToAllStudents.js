@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
+import { logSms } from 'actions'
+import {connect} from "react-redux"
 
 
-export default class ToAllStudents extends Component {
+class ToAllStudents extends Component {
 	constructor(props) {
 		super(props)
 	
@@ -14,8 +16,23 @@ export default class ToAllStudents extends Component {
 		this.former = new former(this, [])
 	}
 
-	render() {
+	logSms = (messages) =>{
+		if(messages.length === 0){
+			console.log("No Message to Log")
+			return
+		}
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: "ALL_STUDENTS",
+			count: messages.length,
+			text: this.state.text
+		}
 
+		this.props.logSms(historyObj)
+	}
+
+	render() {
 	const { students, sendBatchMessages, smsOption } = this.props;
 	console.log(smsOption)
 
@@ -44,10 +61,14 @@ export default class ToAllStudents extends Component {
 					<a href={smsIntentLink({
 						messages,
 						return_link: window.location.href 
-					})} className="button blue">Send using Local SIM</a> : 
+					})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> : 
 					<div className="button" onClick={() => sendBatchMessages(messages)}>Can Only send using Local SIM</div> }
 		</div>
 		)
 	}
 }
-
+export default connect(state => ({
+	faculty_id: state.auth.faculty_id
+}), dispatch => ({
+	logSms: (faculty_id, history) => dispatch(logSms(faculty_id, history)),
+}))(ToAllStudents)

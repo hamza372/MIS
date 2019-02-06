@@ -160,8 +160,8 @@ class SingleExam extends Component {
 
 	onDelete = (exam_id) =>{
 		const students = Object.values(this.props.students)
-						  .filter(s => s.exams !== undefined && s.exams[exam_id] !== undefined)
-						  .map(s => s.id)
+							.filter(s => s.exams !== undefined && s.exams[exam_id] !== undefined)
+							.map(s => s.id)
 
 		this.props.deleteExam(students, exam_id)
 
@@ -217,7 +217,7 @@ class SingleExam extends Component {
 	}
 
 	render() {
-		
+
 		if(this.state.redirect) {
 			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}`} />
 		}

@@ -1,6 +1,7 @@
 import { hash } from 'utils'
 import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
 import moment from 'moment'
+import v4 from "node-uuid"
 
 const client_type = "mis";
 
@@ -331,4 +332,16 @@ export const deleteExam = (students, exam_id) => dispatch => {
 		...deletes
 	]))
 
+}
+
+export const logSms = (history) => dispatch => {
+	
+	//history is an object { date: "", type: "", count:"" }
+
+  	dispatch(createMerges([
+		{
+			path: ["db", "analytics", "sms_history", v4() ],
+			value : history
+		}
+	])) 
 }

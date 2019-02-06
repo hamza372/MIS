@@ -1,3 +1,4 @@
+
 const SYNC = "SYNC"
 const client_type = "mis";
 
@@ -45,7 +46,6 @@ export const SMS = "SMS"
 export const sendSMS = (text, number) => (dispatch, getState, syncr) => {
 	
 	// should i keep a log of all messages sent in the db?
-
 	syncr.send({
 		type: SMS,
 		client_type,
@@ -95,7 +95,7 @@ export const createDeletes = (paths) => (dispatch, getState, syncr) => {
 			[curr.path.join(',')]: {
 				action: {
 					type: "DELETE",
-					path: curr.path.map(x => x === undefined ? "" : x),
+					path: curr.path.map(x => x === undefined ? "" : x ),
 					value: 1
 				},
 				date: new Date().getTime()
@@ -177,7 +177,6 @@ export const connected = () => (dispatch, getState, syncr) => {
 				}
 			})
 			.then(res => {
-
 				return syncr.send({
 					type: SYNC,
 					client_type,
