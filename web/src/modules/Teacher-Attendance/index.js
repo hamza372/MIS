@@ -59,7 +59,7 @@ class TeacherAttendance extends Component {
 							// current_attendance should be something like blank if new day or, { check_in: time, check_out: time, absent: true, leave: true }
 
 							return <div className="list-row" key={f.id}>
-								<Link to={`/faculty/${f.id}/attendance`}>{f.Name}</Link>
+								<label>{f.Name}</label>
 								<div className="status">
 								
 									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? false : <div className="button check_in blue" onClick={this.mark(f, "check_in")}>Check In</div> }
