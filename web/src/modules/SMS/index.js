@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { sendSMS, sendBatchSMS } from 'actions/core'
+import { logSms } from 'actions'
 
 import former from 'utils/former'
 import Layout from 'components/Layout'
@@ -54,33 +55,33 @@ class SMS extends Component {
 			return;
 		}
 		
-		/* const type = this.getType(this.state.smsFilter)	
+		const type = this.getType(this.state.smsFilter)	
 		const historyObj = {
 			faculty: this.props.faculty_id,
 			date: new Date().getTime(),
 			type: type,
 			count: 1,
 			text: text
-		} */
-
+		}
+		//this.props.logSms(historyObj)
 		this.props.sendMessage(text, number);
 
 	}
 
-	sendBatchMessages = (messages) => {
+	sendBatchMessages = (messages, text) => {
 		if(messages.length === 0 || messages === undefined){
 			return;
 		}
-/* 		const type = this.getType(this.state.smsFilter)
+		const type = this.getType(this.state.smsFilter)
 
 		const historyObj = {
 			faculty: this.props.faculty_id,
 			date: new Date().getTime(),
 			type: type,
 			count: messages.length(),
-			text: (will get from parameters)
-		} */
-
+			text: text
+		}
+		//this.props.logSms(historyObj)
 		this.props.sendBatchMessages(messages); 
 	}
 
@@ -88,7 +89,7 @@ class SMS extends Component {
 		this.setState({ smsFilter : e.target.value})
 	}
 
-	/* getType = (value) =>{
+	getType = (value) =>{
 		switch(value){
 			case "to_single_student":
 				return "STUDENT"
@@ -111,7 +112,7 @@ class SMS extends Component {
 			default:
 				return;
 		}
-	} */
+	}
 
 	getFilteredFunctionality = (value) =>{
 		switch(value){
@@ -208,6 +209,7 @@ export default connect(state => ({
 	connected: state.connected,
 	smsSetting: state.db.settings.sendSMSOption
 }), dispatch => ({
-	sendMessage: (text, number, type) => dispatch(sendSMS(text, number, type)),
-	sendBatchMessages: (messages, type) => dispatch(sendBatchSMS(messages, type))
+	sendMessage: (text, number, type) => dispatch(sendSMS(text, number)),
+	sendBatchMessages: (messages, type) => dispatch(sendBatchSMS(messages)),
+	logSms: (faculty_id, history) => dispatch(logSms(faculty_id, history))
 }))(SMS);
