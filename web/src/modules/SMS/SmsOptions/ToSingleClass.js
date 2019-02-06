@@ -4,8 +4,6 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
-
-import moment from 'moment'
 import { logSms } from 'actions'
 import {connect} from "react-redux"
 
@@ -29,7 +27,7 @@ class ToSingleClass extends Component {
 		}
 		const historyObj = {
 			faculty: this.props.faculty_id,
-			date: moment.now(),
+			date: new Date().getTime(),
 			type: "CLASS",
 			count: messages.length,
 			text: this.state.text

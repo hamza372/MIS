@@ -53,7 +53,7 @@ class Attendance extends Component {
 		}
 		const historyObj = {
 			faculty: this.props.current_faculty.id,
-			date: moment.now(),
+			date: new Date().getTime(),
 			type: "ATTENDANCE",
 			count: messages.length,
 		}

@@ -28,7 +28,7 @@ class StudentMarksContainer extends Component {
 
 		const historyObj = {
 			faculty: this.props.faculty_id,
-			date: moment.now(),
+			date: new Date().getTime(),
 			type: "EXAM",
 			count: 1,
 		}

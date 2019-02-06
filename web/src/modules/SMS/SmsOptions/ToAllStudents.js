@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
-import moment from 'moment'
 import { logSms } from 'actions'
 import {connect} from "react-redux"
 
@@ -24,7 +23,7 @@ class ToAllStudents extends Component {
 		}
 		const historyObj = {
 			faculty: this.props.faculty_id,
-			date: moment.now(),
+			date: new Date().getTime(),
 			type: "ALL_STUDENTS",
 			count: messages.length,
 			text: this.state.text

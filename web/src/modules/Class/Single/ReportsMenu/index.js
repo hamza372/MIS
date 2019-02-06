@@ -33,7 +33,7 @@ class ClassReportMenu extends Component {
 		}
 		const historyObj = {
 			faculty: this.props.faculty_id,
-			date: moment.now(),
+			date: new Date().getTime(),
 			type: "EXAM",
 			count: messages.length
 		}
@@ -44,7 +44,7 @@ class ClassReportMenu extends Component {
 	render() {
 
 		const { students, exams, curr_class, settings, sms_templates } = this.props
-		
+
 		const relevant_students = Object.values(students)
 			.filter(s => curr_class.sections[s.section_id] !== undefined)
 			

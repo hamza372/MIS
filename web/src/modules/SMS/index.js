@@ -50,27 +50,68 @@ class SMS extends Component {
 	}
 
 	sendMessage = (text, number) => {
-
 		if(number === "") {
 			return;
 		}
+		
+		/* const type = this.getType(this.state.smsFilter)	
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: type,
+			count: 1,
+			text: text
+		} */
 
-		console.log('send message', text, number);
-		this.props.sendMessage(text, number, this.state.smsFilter);
+		this.props.sendMessage(text, number);
 
 	}
 
-	sendBatchMessages = (messages) =>{
+	sendBatchMessages = (messages) => {
 		if(messages.length === 0 || messages === undefined){
 			return;
 		}
-		console.log("Sending messages", messages);
-		this.props.sendBatchMessages(messages,  this.state.smsFilter);
+/* 		const type = this.getType(this.state.smsFilter)
+
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: type,
+			count: messages.length(),
+			text: (will get from parameters)
+		} */
+
+		this.props.sendBatchMessages(messages); 
 	}
 
 	sendMessageFilter=(e)=>{
 		this.setState({ smsFilter : e.target.value})
 	}
+
+	/* getType = (value) =>{
+		switch(value){
+			case "to_single_student":
+				return "STUDENT"
+
+			case "to_single_class":
+				return "CLASS"
+			
+			case "to_all_students":
+				return "ALL_STUDENTS"
+
+			case "to_single_teacher":
+				return "TEACHER"
+			
+			case "to_all_teachers":
+				return "ALL_TEACHERS"
+			
+			case "to_fee_defaulters":
+				return  "FEE_DEFAULTERS"
+			
+			default:
+				return;
+		}
+	} */
 
 	getFilteredFunctionality = (value) =>{
 		switch(value){
@@ -160,6 +201,7 @@ class SMS extends Component {
 }
 
 export default connect(state => ({
+	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	classes: state.db.classes,
 	teachers:state.db.faculty,

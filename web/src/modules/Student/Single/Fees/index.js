@@ -97,7 +97,7 @@ class StudentFees extends Component {
 				
 				const historyObj = {
 					faculty: this.props.faculty_id,
-					date: moment.now(),
+					date: new Date().getTime(),
 					type: "FEE",
 					count: 1,
 				}
