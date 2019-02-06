@@ -60,19 +60,21 @@ defmodule Sarkar.ActionHandler.Platform do
 		
 		ids = Map.get(payload, "school_ids", [])
 
-		or_str = ids
-			|> Stream.with_index(ids, 1)
+		or_str = Stream.with_index(ids, 1)
 			|> Enum.map(fn {_, i}-> 
-				"id = $#{i}"
+				"id=$#{i}"
 			end)
 			|> Enum.join(" OR ")
 
 		IO.inspect "SELECT db FROM platform_schools WHERE #{or_str}"
 
-		case Postgrex.query(Sarkar.School.DB, "SELECT db FROM platform_schools WHERE #{or_str}", ids) do
+		case Postgrex.query(Sarkar.School.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
-				[[db]] = resp.rows 
-				{:reply, succeed(db), state}
+				dbs = resp.rows
+				|> Enum.map(fn [id, db] -> {id, db} end)
+				|> Enum.into(%{})
+
+				{:reply, succeed(dbs), state}
 			{:error, err} ->
 				IO.inspect err
 				{:reply, fail("db error"), state}

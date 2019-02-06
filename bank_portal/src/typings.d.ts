@@ -17,7 +17,10 @@ interface RootBankState {
 		[school_id: string]: SchoolLocation
 	},
 	school_db: {
-		[school_id: string]: School
+		[school_id: string]: PMIUSchool
+	},
+	new_school_db: {
+		[school_id: string]: any
 	},
 	sync_state: {
 		matches: {
@@ -57,7 +60,7 @@ interface SchoolLocation {
 	GPS_East: string
 }
 
-interface School {
+interface PMIUSchool {
 	id: string
 	DistrictName: string
 	TehsilName: string

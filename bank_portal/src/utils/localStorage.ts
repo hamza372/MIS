@@ -9,6 +9,7 @@ export const saveDB = (db : RootBankState) => {
 
 		saveSyncState(db.sync_state);
 		saveSnapshot(db.last_snapshot);
+		saveSchoolDb(db.new_school_db)
 	}
 
 	catch(err) {
@@ -76,6 +77,15 @@ const saveSyncState = (sync_state : RootBankState['sync_state']) => {
 	localStorage.setItem("sync_state", JSON.stringify(sync_state));
 }
 
+const saveSchoolDb = (db : RootBankState['new_school_db']) => {
+
+	localStorage.setItem("school_db", JSON.stringify(db))
+}
+
+const loadSchoolDb = () => {
+	return JSON.parse(localStorage.getItem("school_db") || "{}")
+}
+
 const saveSnapshot = (last_snapshot : number) => {
 
 	//@ts-ignore
@@ -94,6 +104,7 @@ export const loadDB = () : RootBankState => {
 
 		school_locations: locations,
 		school_db: {},
+		new_school_db: loadSchoolDb(),
 		client_id: loadClientId(),
 		auth: loadAuth(),
 		queued: {},

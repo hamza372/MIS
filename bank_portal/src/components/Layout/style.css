@@ -17,15 +17,6 @@ html,body, #root, .layout{
 	padding-bottom: 60px;
 }
 
-.header {
-	display: flex;
-	height: 60px;
-	background-color: #222;
-	color: white;
-	align-items: center;
-	font-size: 1.5rem;
-}
-
 	.header .back {
 		padding: 10px 20px;
 		cursor: pointer;

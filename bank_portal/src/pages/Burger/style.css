@@ -1,0 +1,49 @@
+.root-page {
+
+	width: 100%;
+	height: 600px;
+
+	display: grid;
+	grid-template-columns: 220px;
+	grid-template-rows: 60px;
+	grid-template-areas: 
+		"header header"
+		"burger main"
+}
+
+.header {
+	display: flex;
+	grid-area: header;
+	background-color: #333;
+	color: white;
+	align-items: center;
+	font-size: 1.5rem;
+	padding-left: 20px;
+}
+
+.burger {
+	grid-area: burger;
+	background-color: #333;
+	color: whitesmoke;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.burger>a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(100% - 2px);
+	height: 2.5rem;
+	text-decoration: none;
+	transition: all .2s ease-in;
+}
+	.burger>a:hover, .burger>a.active {
+		background-color: #74aced;
+		color: whitesmoke;
+	}
+
+.burger-stub {
+	grid-area: main;
+}

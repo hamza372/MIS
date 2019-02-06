@@ -23,13 +23,42 @@ export const createLogin = (username : string, password : string) => (dispatch: 
 		}
 	})
 	.then((res : {token: string, sync_state: RootBankState['sync_state']}) => dispatch(createLoginSucceed(username, res.token, res.sync_state)))
-
-
 }
 
 export interface SelectLocationAction {
 	type: string,
 	loc: SchoolLocation
+}
+
+export const ADD_SCHOOLS = "ADD_SCHOOLS"
+export interface addNewSchoolAction {
+	type: string
+	schools: any[]
+}
+
+export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type: "GET_SCHOOL_PROFILES",
+		client_type: state.auth.client_type,
+		client_id: state.auth.id,
+		id: state.auth.id,
+		payload: {
+			school_ids
+		}
+	})
+	.then(res => {
+		console.log(res);
+		dispatch({
+			type: ADD_SCHOOLS,
+			schools: res,
+		})
+
+		return res;
+	})
+	.catch(err => console.error(err))
 }
 
 export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
@@ -41,7 +70,7 @@ export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, get
 	if(state.school_db[loc.id] === undefined) {
 		fetch(`${python_host}/school/${loc.id}`)
 			.then(res => res.json())
-			.then((res : School) => dispatch(addToSchoolDB(res)))
+			.then((res : PMIUSchool) => dispatch(addToSchoolDB(res)))
 			.catch(err => console.error(err))
 		
 		dispatch(sendServerAction({
@@ -95,10 +124,10 @@ export const setFilter = (filter_text : string) => (dispatch : Dispatch, getStat
 export const ADD_SCHOOL = "ADD_SCHOOL"
 export interface addSchoolAction {
 	type: string
-	school: School
+	school: PMIUSchool
 }
 
-export const addToSchoolDB = (school: School) => {
+export const addToSchoolDB = (school: PMIUSchool) => {
 
 	return {
 		type: ADD_SCHOOL,

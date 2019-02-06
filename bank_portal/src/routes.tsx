@@ -4,8 +4,9 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Store } from 'redux'
 
 import AuthedRoute from './components/AuthedRoute'
-import Home from './components/Home'
+
 import Login from './components/Login'
+import Burger from './pages/Burger'
 
 import './components/Layout/style.css'
 
@@ -14,9 +15,7 @@ export default ({ store } : { store: Store }) => (
 		<BrowserRouter>
 			<Switch>
 				<Route path="/login" component={Login} />
-
-				<AuthedRoute path="/school/:school_id" component={Home} />
-				<AuthedRoute path="/" component={Home} />
+				<AuthedRoute path="/" component={Burger} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>

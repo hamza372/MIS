@@ -2,7 +2,7 @@ import * as redux from 'redux'
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed, ConfirmSyncAction } from '~/src/actions/core'
-import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction } from '~/src/actions'
+import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction, ADD_SCHOOLS, addNewSchoolAction } from '~/src/actions'
 
 
 
@@ -142,6 +142,18 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 				school_db: {
 					...state.school_db,
 					[(action as addSchoolAction).school.id]: (action as addSchoolAction).school
+				}
+			}
+		}
+
+		case ADD_SCHOOLS:
+		{
+			console.log(action)
+			return {
+				...state,
+				new_school_db:  {
+					...state.new_school_db,
+					...action.schools
 				}
 			}
 		}

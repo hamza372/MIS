@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import './style.css'
 
 interface propTypes {
-	school?: School,
+	school?: PMIUSchool,
 }
 
 class Sidebar extends React.Component<propTypes, any>{

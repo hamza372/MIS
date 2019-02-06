@@ -28,6 +28,7 @@ defmodule Mix.Tasks.Platform do
 					{:ok, next_sync_state} = case args do
 						["fees"] -> {:ok, adjust_fees(id, sync_state)}
 						["add_matches"] -> {:ok, add_matches(id, sync_state)}
+						["gen_matches"] -> {:ok, gen_matches(id, sync_state)}
 						other -> 
 							IO.inspect other
 							IO.puts "ERROR: supply a recognized task to run"
@@ -46,6 +47,22 @@ defmodule Mix.Tasks.Platform do
 				IO.puts "ERROR"
 				IO.inspect msg
 		end
+	end
+
+	defp gen_matches(id, sync_state) do
+		matches = Map.get(sync_state, "matches")
+
+		# put the first 100 things into here
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB, "SELECT id, db from platform_schools limit 10", [])
+
+		next_matches = resp.rows
+		|> Enum.reduce(%{}, fn([school_id, db], agg) -> 
+			Map.put(agg, school_id, %{
+				"status" => "NEW"
+			})
+		end)
+
+		Map.put(sync_state, "matches", next_matches)
 	end
 
 	defp add_matches(id, sync_state) do
