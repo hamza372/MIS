@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Former from 'utils/former'
 import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { smsIntentLink } from 'utils/intent'
-import { addSmsHistory } from 'actions'
+import { logSms } from 'actions'
 
 
 import './style.css'
@@ -26,52 +26,32 @@ class ClassReportMenu extends Component {
 		this.report_former = new Former(this, ["report_filters"])
 	}
 
-	smsHistory = (messages) => {
+	logSms = (messages) => {
 		if(messages.length === 0){
 			console.log("No Message to Log")
 			return
 		}
 		const historyObj = {
+			faculty: this.props.faculty_id,
 			date: moment.now(),
 			type: "EXAM",
 			count: messages.length
 		}
 	
-		this.props.addSmsHistory(this.props.faculty_id, historyObj)
+		this.props.logSms(historyObj)
 	}
 
 	render() {
 
 		const { students, exams, curr_class, settings, sms_templates } = this.props
 		
-		const section_set = new Set(Object.keys(curr_class.sections));
-		
 		const relevant_students = Object.values(students)
-			.filter(s => section_set.has(s.section_id))
-		
-		const messages = relevant_students
-			.filter(s => s.Phone !== "")
-			.map(student => ({
-				number: student.Phone,
-				text: sms_templates.result
-					.replace(/\$NAME/g, student.Name)
-					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilter))
-			}))
-		
-		console.log(messages)
-		
-		const url = smsIntentLink({
-			messages,
-			return_link: window.location.href
-		})
-
+			.filter(s => curr_class.sections[s.section_id] !== undefined)
+			
 		const subjects = new Set()
 		const examSet = new Set()
 		
-		const relevant_students_set = Object.values(students)
-			.filter(s => curr_class.sections[s.section_id] !== undefined)
-
-		for(let s of relevant_students_set)
+		for(let s of relevant_students)
 		{
 			for(let e of Object.values(exams))
 			{ 
@@ -81,6 +61,21 @@ class ClassReportMenu extends Component {
 				}
 			}
 		}
+
+		const messages = relevant_students
+			.filter(s => s.Phone !== "")
+			.map(student => ({
+				number: student.Phone,
+				text: sms_templates.result
+					.replace(/\$NAME/g, student.Name)
+					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilter))
+			}))
+				
+		const url = smsIntentLink({
+			messages,
+			return_link: window.location.href
+		})
+
 
 		return <div className="class-report-menu" style={{width: "100%"}}>
 			<div className="title no-print">Print Reports for {this.props.curr_class.name}</div>
@@ -122,7 +117,7 @@ class ClassReportMenu extends Component {
 			
 			<div className="print button" onClick={() => window.print()}>Print</div>
 
-			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" onClick={() => this.smsHistory(messages)}  href={url}>Send Reports using SMS</a> : false }
+			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
 			{
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
@@ -155,5 +150,5 @@ export default connect((state, { match: { params: { id } } }) => ({
 	 exams: state.db.exams,
 	 sms_templates: state.db.sms_templates
 }), dispatch => ({
-	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history))
+	logSms: (history) => dispatch(logSms(history))
 }))(ClassReportMenu)

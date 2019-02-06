@@ -8,7 +8,7 @@ import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
 
-import { addMultiplePayments, addPayment, addSmsHistory } from 'actions'
+import { addMultiplePayments, addPayment, logSms } from 'actions'
 import { sendSMS } from 'actions/core'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { smsIntentLink } from 'utils/intent'
@@ -96,12 +96,13 @@ class StudentFees extends Component {
 				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
 				
 				const historyObj = {
+					faculty: this.props.faculty_id,
 					date: moment.now(),
 					type: "FEE",
 					count: 1,
 				}
 
-				this.props.addSmsHistory(this.props.faculty_id, historyObj)
+				this.props.logSms(historyObj)
 				//this.props.history.push(url);
 				window.location.href = url;
 			}
@@ -283,5 +284,5 @@ export default connect(state => ({
 	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text, number) => dispatch(sendSMS(text, number)),
-	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history)),
+	logSms: (history) => dispatch(logSms(history)),
 }))(withRouter(StudentFees))

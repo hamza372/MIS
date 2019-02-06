@@ -3,7 +3,7 @@ import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
 
 import moment from 'moment'
-import { addSmsHistory } from 'actions'
+import { logSms } from 'actions'
 import {connect} from "react-redux"
 
 class ToSingleTeacher extends Component {
@@ -18,19 +18,20 @@ class ToSingleTeacher extends Component {
 	  this.former = new former(this, [])
 	}
 	
-	smsHistory = () =>{
+	logSms = () =>{
 		if(this.state.selected_teacher_number === ""){
 			console.log("No Message to Log")
 			return
 		}
 		const historyObj = {
+			faculty: this.props.faculty_id,
 			date: moment.now(),
 			type: "TEACHER",
 			count: 1,
 			text: this.state.text
 		}
 
-		this.props.addSmsHistory(this.props.faculty_id, historyObj)
+		this.props.logSms(historyObj)
 	}
 
   render() {
@@ -60,7 +61,7 @@ class ToSingleTeacher extends Component {
 					<a href={smsIntentLink({
 						messages: [{ number: this.state.selected_teacher_number, text: this.state.text }],
 						return_link: window.location.href 
-						})} onClick={this.smsHistory} className="button blue">Send using Local SIM</a> :
+						})} onClick={this.logSms} className="button blue">Send using Local SIM</a> :
 				
 					<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_teacher_number)}>Can only send using Local SIM</div>
 			}
@@ -71,5 +72,5 @@ class ToSingleTeacher extends Component {
 export default connect(state => ({
 	faculty_id: state.auth.faculty_id
 }), dispatch => ({
-	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history)),
+	logSms: (history) => dispatch(logSms(history)),
 }))(ToSingleTeacher)

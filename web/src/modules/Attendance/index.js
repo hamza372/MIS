@@ -6,7 +6,7 @@ import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
 import { smsIntentLink } from 'utils/intent'
 import Layout from 'components/Layout'
-import { markStudent, addSmsHistory } from 'actions'
+import { markStudent, logSms } from 'actions'
 
 import moment from 'moment'
 import Former from 'utils/former'
@@ -52,12 +52,13 @@ class Attendance extends Component {
 			return
 		}
 		const historyObj = {
+			faculty: this.props.current_faculty.id,
 			date: moment.now(),
 			type: "ATTENDANCE",
 			count: messages.length,
 		}
 
-		this.props.addSmsHistory(this.props.current_faculty.id, historyObj)
+		this.props.logSms(historyObj)
 		
 		this.setState({
 			sending: true
@@ -187,5 +188,5 @@ export default connect(state => {
 
 }, dispatch => ({
 	markStudent: (student, date, status) => dispatch(markStudent(student, date, status)),
-	addSmsHistory: (faculty_id, history) => dispatch(addSmsHistory(faculty_id, history))
+	logSms: (history) => dispatch(logSms(history))
 }))(Attendance)
