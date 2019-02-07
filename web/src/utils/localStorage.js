@@ -9,6 +9,7 @@ const defaultTemplates = () => ({
 
 const initState = {
 	client_id: v4(),
+	client_name: "",
 	queued: { },
 	acceptSnapshot: false,
 	lastSnapshot: 0,
@@ -19,7 +20,10 @@ const initState = {
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
 		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
-		settings: { }
+		settings: { },
+		analytics: {
+			sms_history: {}
+		}
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
@@ -37,17 +41,21 @@ const initState = {
 
 export const loadDB = () => {
 	try {
-		const serialized = localStorage.getItem('db');
+		const serialized = localStorage.getItem('db');		
 		if (serialized === null) {
 			console.log('null')
 			return initState;
 		}
-		
+
 		const prev = JSON.parse(serialized);
+		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
+		const client_name = localStorage.getItem('client_name')
 		// but should we make sure that fields that are no longer in the initState db are deleted?
 		const merged = {
 			...initState,
 			...prev,
+			client_id: client_id,
+			client_name: client_name,
 			db: {
 				...initState.db,
 				...prev.db
@@ -83,6 +91,7 @@ export const saveDB = (db) => {
 	try {
 		const json = JSON.stringify(db);
 		localStorage.setItem('db', json)
+		localStorage.setItem("client_id", db.client_id)
 	}
 	catch(err) {
 		console.error(err)
@@ -155,6 +164,18 @@ const addFacultyID = state => {
 	return state;
 }
 
+const addClientName = state => {
+
+	if(state.db.settings.deviceName === undefined){
+		state.db.settings = {
+			...state.db.settings,
+			deviceName: ""
+		}
+	}
+	state.client_name = state.db.settings.deviceName
+	return state;
+}
+
 const checkPermissions = state => {
 	if(state.db.settings.permissions !== undefined){
 		console.log("NOT Running Permission Scripts")
@@ -175,5 +196,6 @@ const checkPermissions = state => {
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
-	checkPermissions
+	checkPermissions,
+	addClientName,
 ];

@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { Dispatch, AnyAction, Action } from 'redux'
 import Syncr from 'src/syncr';
 
@@ -212,12 +211,19 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 		syncr
 			.send({
 				type: "VERIFY",
+				client_type: state.auth.client_type,
 				payload: {
-					school_id: state.auth.id,
+					id: state.auth.id,
 					token: state.auth.token,
-					client_id: state.client_id
+					client_id: state.client_id,
 				}
 			})
+			.catch(err => {
+				console.error(err)
+				alert("Authorization Failed. Log out and Log in again.")
+			})
+
+			/*
 			.then(res => {
 				return syncr.send({
 					type: SYNC,
@@ -230,10 +236,7 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 			.then(resp => {
 				dispatch(resp)
 			})
-			.catch(err => {
-				console.error(err)
-				alert("Authorization Failed. Log out and Log in again.")
-			})
+			*/
 	}
 }
 
@@ -243,4 +246,13 @@ export const LOGIN_FAIL = "LOGIN_FAIL"
 export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
-export const createLoginSucceed = (id : string, db : RootBankState, token : string) => ({ type: LOGIN_SUCCEED, id, db, token })
+export interface LoginSucceed {
+	type: "LOGIN_SUCCEED",
+	id: string,
+	token: string
+}
+export const createLoginSucceed = (id : string, token : string) => ({ 
+	type: LOGIN_SUCCEED,
+	id,
+	token
+})

@@ -1,9 +1,9 @@
 import Syncr from '~/src/syncr'
-import { MergeAction, DeletesAction, QueueAction, sendServerAction } from './core'
+import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed } from './core'
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
-type Dispatch = ( action :any) => any;
+type Dispatch = ( action : any) => any;
 
 export interface SelectLocationAction {
 	type: string,
@@ -13,14 +13,23 @@ export interface SelectLocationAction {
 const debug_url = "http://localhost:5000"
 const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
 
-export const createLogin = (id : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
-	dispatch(sendServerAction({
+export const createLogin = (username : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
 		type: "LOGIN",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
 		payload: {
-			id,
+			id: username, // school_id == username here.
 			password
 		}
-	}))
+	})
+	.then((res : {token: string}) => dispatch(createLoginSucceed(username, res.token)))
+
+
 }
 
 

@@ -1,6 +1,7 @@
 import { hash } from 'utils'
 import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
 import moment from 'moment'
+import v4 from "node-uuid"
 
 const client_type = "mis";
 
@@ -251,6 +252,23 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
+export const addMultipleFees = (fees) => dispatch => {
+	
+	//fees is an array of { student, fee_id, amount, type, period, name}
+	
+	const merges = fees.map(f => ({
+		path: ["db","students", f.student.id, "fees", f.fee_id],
+		value: {
+			amount : f.amount,
+			name : f.name,
+			period: f.period,
+			type: f.type
+		}
+	}))
+	
+	dispatch(createMerges(merges))
+}
+
 export const createTemplateMerges = templates => dispatch => {
 
 	dispatch(createMerges([
@@ -298,4 +316,32 @@ export const removeStudentFromExam = (e_id, student_id) => dispatch => {
 			path:["db", "students", student_id, "exams", e_id ]
 		}
 	]))
+}
+
+export const deleteExam = (students, exam_id) => dispatch => {
+	//students  is an array of studentt Id's
+
+	const deletes = students.map(s_id => ({
+		path:["db", "students", s_id, "exams", exam_id]
+	}))
+	
+	dispatch(createDeletes([
+		{
+			path: ["db", "exams", exam_id]
+		},
+		...deletes
+	]))
+
+}
+
+export const logSms = (history) => dispatch => {
+	
+	//history is an object { date: "", type: "", count:"" }
+
+  	dispatch(createMerges([
+		{
+			path: ["db", "analytics", "sms_history", v4() ],
+			value : history
+		}
+	])) 
 }

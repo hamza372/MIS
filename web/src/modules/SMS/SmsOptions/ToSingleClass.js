@@ -4,9 +4,11 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
+import { logSms } from 'actions'
+import {connect} from "react-redux"
 
 
-export default class ToSingleClass extends Component {
+class ToSingleClass extends Component {
 	constructor(props) {
 	super(props)
 	
@@ -17,6 +19,21 @@ export default class ToSingleClass extends Component {
 	}
 
 	this.former = new former(this, [])
+	}
+	logSms = (messages) =>{
+		if(messages.length === 0){
+			console.log("No Messaged to Log")
+			return
+		}
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: "CLASS",
+			count: messages.length,
+			text: this.state.text
+		}
+
+		this.props.logSms(historyObj)
 	}
 
 	render() {
@@ -59,9 +76,14 @@ export default class ToSingleClass extends Component {
 						<a href={smsIntentLink({
 							messages,
 							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> }
+							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> }
 			</div>
 		)
 	}
 }
 
+export default connect(state => ({
+	faculty_id: state.auth.faculty_id
+}), dispatch => ({
+	logSms: (history) => dispatch(logSms(history)),
+}))(ToSingleClass)
