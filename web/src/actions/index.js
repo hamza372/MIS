@@ -48,6 +48,30 @@ export const deleteStudent = (student) => dispatch => {
 	]))
 }
 
+export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
+	
+	const state = getState()
+
+	const deletes = []
+
+	for(let c of Object.values(state.db.classes)){
+		for(let s_id of Object.keys(c.sections)){
+			if(c.sections[s_id].faculty_id !== undefined && c.sections[s_id].faculty_id === faculty_id){
+				deletes.push({
+					path:["db", "classes", c.id, "sections", s_id, "faculty_id" ]
+				})
+			}
+		}
+	}
+
+ 	dispatch(createDeletes([
+		{
+			path: ["db", "faculty", faculty_id]
+		},
+		...deletes
+	])) 
+}
+
 export const promoteStudents = (promotion_map, section_metadata) => dispatch => {
 
 	// accept a map of key: student_id, value: new section_id
@@ -325,7 +349,7 @@ export const deleteExam = (students, exam_id) => dispatch => {
 		path:["db", "students", s_id, "exams", exam_id]
 	}))
 	
-	dispatch(createDeletes([
+ 	dispatch(createDeletes([
 		{
 			path: ["db", "exams", exam_id]
 		},

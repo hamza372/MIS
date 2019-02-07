@@ -6,7 +6,7 @@ import { Redirect } from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
-import { createFacultyMerge } from 'actions'
+import { createFacultyMerge, deleteFaculty } from 'actions'
 import { hash } from 'utils'
 import Hyphenator from 'utils/Hyphenator'
 
@@ -142,6 +142,29 @@ class CreateTeacher extends Component {
 			}, 3000);
 
 		}
+	}
+
+	onDelete = () => {
+		// console.log(this.state.profile.id)
+
+		this.props.delete(this.state.profile.id)
+
+		this.setState({
+			banner: {
+				active: true,
+				good: false,
+				text: "Deleted!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				},
+				redirect: `/teacher`
+			})
+		}, 1000);
 	}
 
 	componentWillReceiveProps(newProps) {
@@ -293,12 +316,17 @@ class CreateTeacher extends Component {
 					</select>
 				</div>
 
-				<div className="save button" onClick={this.onSave}>Save</div>
+				{ !admin ? false : <div className="save-delete">
+					{ this.isNew() ? false : <div className="button red" onClick={this.onDelete}>Delete</div> }
+					<div className="button blue" onClick={this.onSave}>Save</div>
+				</div>
+				}
 			</div>
 		</div>
 	}
 }
 
 export default connect(state => ({ faculty: state.db.faculty, user: state.db.faculty[state.auth.faculty_id] }) , dispatch => ({
-	save: (teacher) => dispatch(createFacultyMerge(teacher)) 
+	save: (teacher) => dispatch(createFacultyMerge(teacher)),
+	delete: (faculty_id) => dispatch(deleteFaculty(faculty_id)) 
  }))(CreateTeacher);
