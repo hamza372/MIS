@@ -44,7 +44,7 @@ class StudentAttendance extends Component {
 				<div>{(num_present / (num_absent + num_present) * 100).toFixed(2)}%</div>
 			</div>
 			<div className="row">
-				<div className="print button" style={{ marginLeft: "auto" }} onClick={() => window.print()}>Print</div>
+				<div className="print button" onClick={() => window.print()}>Print</div>
 			</div>
 			
 			<div className="divider">Record</div>
