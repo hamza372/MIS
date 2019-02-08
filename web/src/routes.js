@@ -23,6 +23,7 @@ import Settings from 'modules/Settings'
 import Analytics from 'modules/Analytics'
 import ReportsMenu from 'modules/ReportsMenu'
 import PromotionPage from 'modules/Settings/promote-students'
+import ProspectiveStudent from 'modules/Student/Prospective'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -66,6 +67,7 @@ export default class Routes extends React.Component {
 
 					<AuthedRoute path="/student/:id" component={StudentSingle} />
 					<AuthedRoute path="/student" component={StudentList} />
+					<AuthedRoute path="/prospective-student/:id" component={ProspectiveStudent} />
 
 					<AuthedRoute path="/class/:id" component={ClassSingle} />
 					<AuthedRoute path="/class" component={ClassModule} />

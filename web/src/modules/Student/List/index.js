@@ -24,6 +24,15 @@ const StudentItem = (S) => {
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
 //const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
 	
+	if(S.forwardTo === "prospective-student"){
+		return <div className="table row" key={S.id}>
+				<Link to={`/prospective-student/${S.id}/${S.forwardTo}`} key={S.id}>
+					{S.Name} 
+				</Link>
+				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
+				<div> {cname /*+ "/" + sname */}</div>
+			</div>	
+	}
 	return <div className="table row" key={S.id}>
 				<Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
 					{S.Name} 
@@ -45,7 +54,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 
 	const sections = getSectionsFromClasses(classes)	
 	
-	const items = Object.entries(students)
+	let items = Object.entries(students)
 	.filter(([, s]) => s.id && s.Name) // hiding the error for now.... need to build reporting mechanism
 	.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 	.map( ([id, student]) => {
@@ -65,6 +74,11 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 		create = '';
 	}
 
+	if(forwardTo === "prospective-student"){
+		create = "/prospective-student/new"
+		createText = "New Prospective Student"
+		items = items.filter(s => s.tags["PROSPECTIVE"])
+	}
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"
