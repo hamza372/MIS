@@ -70,19 +70,15 @@ class ProspectiveStudent extends Component {
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
 	onSave = () => {
-		console.log('save!', this.state.profile)
-
 		const student = this.state.profile;
-
-		// verify 
-
-		let compulsory_paths = [ ["Name"] ];
+		
+		let compulsory_paths = [ ["Name"],["section_id"] ];
 
 		const compulsoryFields = checkCompulsoryFields(this.state.profile, compulsory_paths);
 
 		if(compulsoryFields) 
 		{
-			const errorText = "Please fill " + compulsoryFields.map(x => x[0]).join(", ");
+			const errorText = "Please fill " + compulsoryFields.map(x => x[0] === "section_id" ? "Section ID" : x[0]).join(", ");
 			
 				return this.setState({
 					banner: {
@@ -118,6 +114,37 @@ class ProspectiveStudent extends Component {
 			})
 		}, 2000);
 
+	}
+	onEnrolled = () => {
+
+		const {"PROSPECTIVE": removed, ...rest } = this.state.profile.tags;
+
+		const student = {
+			...this.state.profile,
+			Active: true,
+			tags:{
+				...rest
+			}
+		}
+
+		this.props.save(student);
+
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "ENROLLED!"
+			}
+		})
+		
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				},
+				redirect: `/student?forwardTo=prospective-student`
+			})
+		}, 1000);
 	}
 
 	onDelete = () => {
@@ -193,7 +220,7 @@ class ProspectiveStudent extends Component {
 
 					<div className="row">
 						<label>Class Section</label>
-						<select {...this.former.super_handle_flex(["section_id"])} disabled={!admin}>
+						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
 							{
 								 [
 									<option key="" value="">Please Select a Section</option>,
@@ -212,10 +239,13 @@ class ProspectiveStudent extends Component {
 					</div>
 
 					{ !admin ? false : <div className="save-delete">
-						{!this.isNew() ? <div className="button red" onClick={this.onDelete}>Delete</div>: false}
+						{!this.isNew() ? <div className="button red" onClick={this.onDelete}> Delete </div> : false }
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
 					}
+					<div className="row">
+					{!this.isNew() ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false }
+					</div>
 				</div>
 			</div>
 	}
