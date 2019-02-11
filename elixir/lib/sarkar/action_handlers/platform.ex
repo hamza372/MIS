@@ -46,16 +46,6 @@ defmodule Sarkar.ActionHandler.Platform do
 		{:reply, succeed(res), state}
 	end
 
-	def handle_action(%{"type" => "GET_CALL_MASK_PAIR", "payload" => payload}, %{id: id, client_id: client_id} = state) do
-		# for this id, get or reserve a number for a school.
-		{:reply, fail("not ready"), state}
-	end
-
-	def handle_action(%{"type" => "RELEASE_CALL_MASK_PAIR", "payload" => payload}, %{id: id, client_id: client_id} = state) do
-		# for this id, release a masked number of a school.
-		{:reply, fail("not ready"), state}
-	end
-
 	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: id, client_id: client_id} = state) do
 		
 		ids = Map.get(payload, "school_ids", [])

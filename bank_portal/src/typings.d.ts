@@ -25,7 +25,19 @@ interface RootBankState {
 	sync_state: {
 		matches: {
 			[school_id : string]: {
-				status: "NEW" | "IN_PROGRESS" | "REJECTED"
+				status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
+				masked_number?: string
+			}
+		},
+		numbers: {
+			[number: string]: {
+				name: string
+			}
+		},
+		mask_pairs: {
+			[masked_number: string]: {
+				status: "USED" | "FREE",
+				school_id?: string
 			}
 		}
 	},

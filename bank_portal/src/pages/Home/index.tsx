@@ -1,16 +1,37 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSchoolProfiles } from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber } from '~/src/actions'
 
 type propTypes = {
 	matches: RootBankState['sync_state']['matches'],
 	school_db: RootBankState['new_school_db'],
+	connected: boolean,
 	addSchools: (ids : string[]) => void,
-	connected: boolean
+	reserveNumber: (school_id: string) => void
 }
 
-class Home extends React.Component<propTypes> {
+interface stateType {
+	selected_school?: any
+}
+
+class Home extends React.Component<propTypes, stateType> {
+
+	constructor(props : propTypes) {
+		super(props);
+
+		this.state = {
+			selected_school: undefined
+		}
+	}
+
+	onSchoolClick = (school : any) => () => {
+		console.log(school)
+
+		// merge a masked number here. pretend pool is just my number
+		this.props.reserveNumber(school.refcode);
+
+	}
 
 	render() {
 
@@ -23,6 +44,7 @@ class Home extends React.Component<propTypes> {
 			}, 2000) //hack
 		}
 
+		console.log(this.state.selected_school)
 		return <div className="home page">
 
 			<div className="title">Home Page</div>
@@ -35,7 +57,7 @@ class Home extends React.Component<propTypes> {
 					.map(([sid, v]) => {
 						const school = this.props.school_db[sid];
 
-						return <div key={sid}>{school.pulled_schoolname}</div>
+						return <div key={sid} onClick={this.onSchoolClick(school)}>{school.pulled_schoolname}</div>
 					})
 			}
 			</div>
@@ -48,5 +70,6 @@ export default connect((state : RootBankState) => ({
 	school_db: state.new_school_db,
 	connected: state.connected
 }), (dispatch : ( thing : any) => any) => ({
-	addSchools: (school_ids : string[]) => dispatch(getSchoolProfiles(school_ids))
+	addSchools: (school_ids : string[]) => dispatch(getSchoolProfiles(school_ids)),
+	reserveNumber: (school_id : string) => dispatch(reserveMaskedNumber(school_id))
 }))(Home)

@@ -46,4 +46,7 @@
 
 .burger-stub {
 	grid-area: main;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
 }

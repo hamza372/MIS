@@ -3,10 +3,10 @@ import moment from 'moment'
 
 export default class Former {
 
-	_component : React.Component;
+	_component : React.Component<any, any, any>;
 	base_path : Array<string>;
 
-	constructor(_component : React.Component, base_path : Array<string>) {
+	constructor(_component : React.Component<any, any, any>, base_path : Array<string>) {
 
 		this._component = _component;
 		this.base_path = base_path;
@@ -19,7 +19,7 @@ export default class Former {
 			const value = this._getValue(e);
 			const full_path = [...this.base_path, ...path]
 			if(validate(value)) {
-				this._component.setState(state => Dynamic.put(state, full_path, value));
+				this._component.setState((state : any) => Dynamic.put(state, full_path, value));
 			}
 		}
 	}
@@ -31,7 +31,7 @@ export default class Former {
 			onChange: (e : React.ChangeEvent<HTMLInputElement>) => {
 				const value = this._getValue(e);
 				if(validate(value)) {
-					this._component.setState(state => Dynamic.put(state, full_path, value), cb)
+					this._component.setState((state : any) => Dynamic.put(state, full_path, value), cb)
 				}
 			},
 			value: Dynamic.get(this._component.state, full_path) as string,

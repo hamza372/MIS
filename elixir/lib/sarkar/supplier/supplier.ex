@@ -9,8 +9,8 @@ defmodule Sarkar.Supplier do
 		IO.puts "initting supplier #{id}"
 
 		# state is school_id, map of writes, map of db.
-		# TODO: map of writes: (path) -> date
 		{sync_state, writes} = Sarkar.Store.Supplier.load(id)
+
 		GenServer.start_link(
 			__MODULE__,
 			{id, writes, sync_state},
@@ -27,7 +27,17 @@ defmodule Sarkar.Supplier do
 		GenServer.call(via(id), {:get_sync_state})
 	end
 
+	def get_school_from_masked(id, masked_num) do
+		GenServer.call(via(id), {:school_from_masked_num, masked_num})
+	end
+
 	# SERVER
+
+	def handle_call({:school_from_masked_num, masked_num}, _from, {id, writes, sync_state} = state) do
+
+		school_id = Dynamic.get(sync_state, ["mask_pairs", masked_num, "school_id"])
+		{:reply, school_id, state}
+	end
 
 	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {id, writes, sync_state} = state) do
 

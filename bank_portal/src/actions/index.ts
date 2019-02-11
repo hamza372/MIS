@@ -1,5 +1,5 @@
 import Syncr from '~/src/syncr'
-import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges } from './core'
+import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes } from './core'
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
@@ -133,6 +133,75 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 		type: ADD_SCHOOL,
 		school
 	}
+}
+
+export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+	// from the pool in state.mask_pairs select an unused number
+	const state = getState();
+
+	// temp
+	const masked_num = "1111111111"
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "mask_pairs", masked_num],
+			value: {
+				status: "USED",
+				school_id
+			}
+		},
+		{
+			path: ["sync_state", "matches", school_id, "masked_number"],
+			value: masked_num
+		},
+		{
+			path: ["sync_state", "matches", school_id, "status"],
+			value: "IN_PROGRESS"
+		}
+	]))
+
+}
+
+export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+
+	const masked_num = getState().sync_state.matches[school_id].masked_number
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "mask_pairs", masked_num],
+			value: {
+				status: "FREE"
+			}
+		},
+		{
+			path: ["sync_state", "matches", school_id, "status"],
+			value: "DONE"
+		},
+		{
+			path: ["sync_state", "matches", school_id, "masked_number"],
+			value: ""
+		}
+	]))
+}
+
+export const addSupplierNumber = (number : string, name: string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "numbers", number],
+			value: {
+				name
+			}
+		}
+	]))
+}
+
+export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+	dispatch(createDeletes([
+		{
+			path: ["sync_state", "numbers", number]
+		}
+	]))
 }
 
 export type Actions = addSchoolAction | SetFilterAction | SelectLocationAction | MergeAction | DeletesAction | QueueAction;

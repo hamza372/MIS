@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, Link } from 'react-router-dom'
 
 import Home from '../Home'
+import Settings from '../Settings'
 
 import './style.css'
 
@@ -20,10 +21,12 @@ export default class Burger extends React.Component {
 				<Link to="/todo">To-Do</Link>
 				<Link to="/progress">In Progress</Link>
 				<Link to="/history">History</Link>
+				<Link to="/settings">Settings</Link>
 			</div>
 
 			<div className="burger-stub" style={{ border: "1px solid black"}}>
-				<Route path="/" component={Home} />
+				<Route exact path="/" component={Home} />
+				<Route path="/settings" component={Settings} />
 			</div>
 		</div>
 	}
