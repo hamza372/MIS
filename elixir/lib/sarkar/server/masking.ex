@@ -9,7 +9,6 @@ defmodule Sarkar.Server.Masking do
 	end
 
 	def init(req, state) do
-		IO.inspect req
 
 		query_params = :cowboy_req.parse_qs(req) 
 		|> Enum.into(%{})
@@ -25,6 +24,7 @@ defmodule Sarkar.Server.Masking do
 				[[ supplier_id ]] = resp.rows
 				IO.inspect supplier_id
 
+				start_supplier(supplier_id)
 				school_id = Sarkar.Supplier.get_school_from_masked(supplier_id, dialed)
 
 				{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'phone_number' from platform_schools where id=$1", [school_id])
@@ -43,5 +43,12 @@ defmodule Sarkar.Server.Masking do
 			%{"content-type" => "text/plain"},
 			forward,
 			req), state}
+	end
+
+	defp start_supplier(id) do
+		case Registry.lookup(Sarkar.SupplierRegistry, id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
+		end
 	end
 end

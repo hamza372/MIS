@@ -247,7 +247,6 @@ defmodule Mix.Tasks.Migrate do
 						type = Map.get(payment, "type")
 						nkey = "#{d}-#{fid}"
 
-						IO.inspect existing
 						if type == "OWED" and Map.has_key?(existing, nkey) do
 							IO.puts "duplicate payment!!"
 							IO.inspect Map.get(existing, nkey)
@@ -258,8 +257,6 @@ defmodule Mix.Tasks.Migrate do
 						end
 
 					end)
-
-					# IO.inspect nextPayments
 
 					{id, Map.put(student, "payments", nextPayments)}
 				end)

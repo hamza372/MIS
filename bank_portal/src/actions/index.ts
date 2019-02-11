@@ -4,11 +4,12 @@ import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginS
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
 type Dispatch = ( action : any) => any;
+type GetState = () => RootBankState
 
 const debug_url = "http://localhost:5000"
 const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
 
-export const createLogin = (username : string, password : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const createLogin = (username : string, password : string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -36,7 +37,8 @@ export interface addNewSchoolAction {
 	schools: any[]
 }
 
-export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+// this isn't handled well if we are offline
+export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -61,7 +63,7 @@ export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch
 	.catch(err => console.error(err))
 }
 
-export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: () => RootBankState) => {
+export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: GetState) => {
 
 	console.log("selecting location", loc.id)
 
@@ -97,7 +99,7 @@ export interface SetFilterAction {
 	type: 'SET_FILTER',
 	filter_text: string
 }
-export const setFilter = (filter_text : string) => (dispatch : Dispatch, getState: () => RootBankState, syncr : Syncr) => {
+export const setFilter = (filter_text : string) => (dispatch : Dispatch, getState: GetState, syncr : Syncr) => {
 
 	const state = getState();
 
@@ -135,7 +137,7 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 	}
 }
 
-export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: GetState) => {
 	// from the pool in state.mask_pairs select an unused number
 	const state = getState();
 
@@ -162,7 +164,7 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 
 }
 
-export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: GetState) => {
 
 	const masked_num = getState().sync_state.matches[school_id].masked_number
 
@@ -184,7 +186,7 @@ export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 	]))
 }
 
-export const addSupplierNumber = (number : string, name: string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const addSupplierNumber = (number : string, name: string) => (dispatch: Dispatch, getState: GetState) => {
 
 	dispatch(createMerges([
 		{
@@ -196,7 +198,7 @@ export const addSupplierNumber = (number : string, name: string) => (dispatch: D
 	]))
 }
 
-export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, getState: GetState) => {
 	dispatch(createDeletes([
 		{
 			path: ["sync_state", "numbers", number]
