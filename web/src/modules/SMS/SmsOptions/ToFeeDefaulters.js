@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
-import { logSms } from 'actions'
-import {connect} from "react-redux"
 
 
 class ToFeeDefaulters extends Component {
@@ -72,8 +70,4 @@ class ToFeeDefaulters extends Component {
   }
 }
 
-export default connect(state => ({
-	faculty_id: state.auth.faculty_id
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history)),
-}))(ToFeeDefaulters)
+export default ToFeeDefaulters;

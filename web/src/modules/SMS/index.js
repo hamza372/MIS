@@ -124,6 +124,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_class":
@@ -133,6 +135,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_students":
@@ -141,6 +145,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_teacher":
@@ -149,6 +155,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_teachers":
@@ -157,6 +165,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_fee_defaulters":
@@ -165,6 +175,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			case "to_prospective_students":
 			return <ToProspectiveStudents 
@@ -172,6 +184,8 @@ class SMS extends Component {
 						sendBatchMessages={this.sendBatchMessages} 
 						connected={this.props.connected}
 						smsOption={this.props.smsSetting}
+						logSms={this.props.logSms}
+						faculty_id={this.props.faculty_id}
 						/>
 			
 			default:

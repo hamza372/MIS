@@ -4,8 +4,6 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
-import { logSms } from 'actions'
-import {connect} from "react-redux"
 
 
 class ToSingleClass extends Component {
@@ -82,8 +80,4 @@ class ToSingleClass extends Component {
 	}
 }
 
-export default connect(state => ({
-	faculty_id: state.auth.faculty_id
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history)),
-}))(ToSingleClass)
+export default ToSingleClass
