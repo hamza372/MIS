@@ -31,12 +31,6 @@ export interface SelectLocationAction {
 	loc: SchoolLocation
 }
 
-export const ADD_SCHOOLS = "ADD_SCHOOLS"
-export interface addNewSchoolAction {
-	type: string
-	schools: { [id: string] : CERPSchool }
-}
-
 export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Dispatch, getState: GetState) => {
 	const state = getState();
 
@@ -47,6 +41,13 @@ export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Di
 		}
 	]))
 }
+
+export const ADD_SCHOOLS = "ADD_SCHOOLS"
+export interface addNewSchoolAction {
+	type: string
+	schools: { [id: string] : CERPSchool }
+}
+
 
 export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: GetState, syncr: Syncr) => {
 

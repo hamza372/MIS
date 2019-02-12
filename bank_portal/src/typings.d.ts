@@ -87,7 +87,7 @@ interface CERPSchool {
 	ess_current_5: string
 	ess_current_6: string
 	ess_current_7: string
-	ess_current_all: "0"
+	ess_current_all: string
 	ess_interest: string
 	ess_interest_0: string
 	ess_interest_1: string
@@ -97,13 +97,13 @@ interface CERPSchool {
 	ess_interest_5: string
 	ess_interest_6: string
 	ess_interest_7: string
-	ess_interest_all: "0"
+	ess_interest_all: string
 	ess_satisfaction: string
 	ess_satisfaction_0: string
 	ess_satisfaction_1: string
 	ess_satisfaction_2: string
 	ess_satisfaction_3: string
-	ess_satisfaction_all: "0"
+	ess_satisfaction_all: string
 	financing_interest: string
 	financing_no_other: string
 	financing_no_reason: string
@@ -116,20 +116,20 @@ interface CERPSchool {
 	financing_no_reason_6: string
 	financing_no_reason_8: string
 	financing_no_reason_777: string
-	formdef_version: "20190120"
+	formdef_version: string
 	high_fee_range: string
 	highest_fee: string
 	highest_grade: string
 	income_source: string
 	instruction_medium: string
-	key: "uuid:6e2caf0d-5537-4a6d-8c00-24ed2f33ee9c"
+	key: string
 	low_fee_range: string
 	lowest_fee: string
 	lowest_grade: string
 	monthly_fee_collected: string
 	no_of_rooms: string
 	owner_phonenumber: string
-	phone_number: "533586214"
+	phone_number: string
 	phone_number_1: string
 	phone_number_2: string
 	phone_number_3: string
@@ -142,15 +142,15 @@ interface CERPSchool {
 	previous_loan: string
 	previous_loan_amount: string
 	private_tuition: string
-	pulled_address: "VILL PO TANDA GUJRAT"
+	pulled_address: string
 	pulled_altnumber: string
-	pulled_district: "GUJRAT"
-	pulled_phonenumber: "533586214"
-	pulled_province: "PUNJAB"
-	pulled_schoolname: "JINNAH SCHOOL SYSTEM BOYS CAMPUS TANDA"
-	pulled_tehsil: "GUJRAT"
+	pulled_district: string
+	pulled_phonenumber: string
+	pulled_province: string
+	pulled_schoolname: string
+	pulled_tehsil: string
 	pulled_uc: string
-	refcode: "637"
+	refcode: string
 	refusal_reason: string
 	refusal_reason_0: string
 	refusal_reason_1: string
@@ -167,7 +167,7 @@ interface CERPSchool {
 	school_address: string
 	school_branches: string
 	school_building_rent: string
-	school_district: "GUJRAT"
+	school_district: string
 	school_district_confirm: string
 	school_facilities: string
 	school_facilities_0: string
@@ -180,15 +180,15 @@ interface CERPSchool {
 	school_facilities_7: string
 	school_facilities_8: string
 	school_fef: string
-	school_name: "JINNAH SCHOOL SYSTEM BOYS CAMPUS TANDA"
+	school_name: string 
 	school_pef: string
 	school_registration: string
 	school_sef: string
 	school_tehsil: string
 	school_uc: string
 	smart_phone: string
-	starttime: "25jan2019 13:10:19"
-	submissiondate: "25jan2019 14:07:42"
+	starttime: string
+	submissiondate: string
 	switch_call: string
 	switch_call_pos: string
 	teachers_employed: string
@@ -218,9 +218,9 @@ interface CERPSchool {
 	tuition_students: string
 	tuition_teachers: string
 	unmet_financing_needs: string
-	wrong_number_detail: "A wrong number person provide us principal number 03456784064"
-	wrong_number_detail_no: "Yes"
-	wrong_number_detail_sc: "Yes"
+	wrong_number_detail: string
+	wrong_number_detail_no: string
+	wrong_number_detail_sc: string
 	year_established: string
 
 }
