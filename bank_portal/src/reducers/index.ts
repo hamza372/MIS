@@ -32,6 +32,7 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 		{
 			//@ts-ignore
 			const succeed = <LoginSucceed>action
+			
 			return {
 				...state,
 				auth: {
@@ -41,7 +42,11 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 					attempt_failed: false,
 					id: succeed.id
 				},
-				sync_state: succeed.sync_state
+				sync_state: {
+					...state.sync_state,
+					...succeed.sync_state
+				},
+				last_snapshot: new Date().getTime()
 			}
 		}
 
@@ -148,12 +153,12 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 
 		case ADD_SCHOOLS:
 		{
-			console.log(action)
 			return {
 				...state,
 				new_school_db:  {
 					...state.new_school_db,
-					...action.schools
+					// @ts-ignore
+					...(action as addNewSchoolAction).schools
 				}
 			}
 		}

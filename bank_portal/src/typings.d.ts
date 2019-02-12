@@ -20,7 +20,7 @@ interface RootBankState {
 		[school_id: string]: PMIUSchool
 	},
 	new_school_db: {
-		[school_id: string]: any
+		[school_id: string]: CERPSchool
 	},
 	sync_state: {
 		matches: {
@@ -63,6 +63,166 @@ interface RootBankState {
 	last_snapshot: number,
 	accept_snapshot: boolean,
 	connected: boolean
+}
+
+interface CERPSchool {
+	alt_number: string
+	alt_phone_number: string
+	call_answer_no: string
+	call_back_time: string
+	call_consent: string
+	call_response: string
+	date: string
+	duration: string
+	endtime: string
+	enrolment_range: string
+	enumerator_comments: string
+	enumerator_id: string
+	ess_current: string
+	ess_current_0: string
+	ess_current_1: string
+	ess_current_2: string
+	ess_current_3: string
+	ess_current_4: string
+	ess_current_5: string
+	ess_current_6: string
+	ess_current_7: string
+	ess_current_all: "0"
+	ess_interest: string
+	ess_interest_0: string
+	ess_interest_1: string
+	ess_interest_2: string
+	ess_interest_3: string
+	ess_interest_4: string
+	ess_interest_5: string
+	ess_interest_6: string
+	ess_interest_7: string
+	ess_interest_all: "0"
+	ess_satisfaction: string
+	ess_satisfaction_0: string
+	ess_satisfaction_1: string
+	ess_satisfaction_2: string
+	ess_satisfaction_3: string
+	ess_satisfaction_all: "0"
+	financing_interest: string
+	financing_no_other: string
+	financing_no_reason: string
+	financing_no_reason_0: string
+	financing_no_reason_1: string
+	financing_no_reason_2: string
+	financing_no_reason_3: string
+	financing_no_reason_4: string
+	financing_no_reason_5: string
+	financing_no_reason_6: string
+	financing_no_reason_8: string
+	financing_no_reason_777: string
+	formdef_version: "20190120"
+	high_fee_range: string
+	highest_fee: string
+	highest_grade: string
+	income_source: string
+	instruction_medium: string
+	key: "uuid:6e2caf0d-5537-4a6d-8c00-24ed2f33ee9c"
+	low_fee_range: string
+	lowest_fee: string
+	lowest_grade: string
+	monthly_fee_collected: string
+	no_of_rooms: string
+	owner_phonenumber: string
+	phone_number: "533586214"
+	phone_number_1: string
+	phone_number_2: string
+	phone_number_3: string
+	platform_interest: string
+	platform_interest_no: string
+	platform_interest_no_other: string
+	platform_no_calling: string
+	platform_no_internet: string
+	platform_no_need: string
+	previous_loan: string
+	previous_loan_amount: string
+	private_tuition: string
+	pulled_address: "VILL PO TANDA GUJRAT"
+	pulled_altnumber: string
+	pulled_district: "GUJRAT"
+	pulled_phonenumber: "533586214"
+	pulled_province: "PUNJAB"
+	pulled_schoolname: "JINNAH SCHOOL SYSTEM BOYS CAMPUS TANDA"
+	pulled_tehsil: "GUJRAT"
+	pulled_uc: string
+	refcode: "637"
+	refusal_reason: string
+	refusal_reason_0: string
+	refusal_reason_1: string
+	refusal_reason_2: string
+	refusal_reason_3: string
+	refusal_reason_777: string
+	refusal_reason_other: string
+	respondent_consent: string
+	respondent_gender: string
+	respondent_name: string
+	respondent_owner: string
+	respondent_relation: string
+	respondent_relation_other: string
+	school_address: string
+	school_branches: string
+	school_building_rent: string
+	school_district: "GUJRAT"
+	school_district_confirm: string
+	school_facilities: string
+	school_facilities_0: string
+	school_facilities_1: string
+	school_facilities_2: string
+	school_facilities_3: string
+	school_facilities_4: string
+	school_facilities_5: string
+	school_facilities_6: string
+	school_facilities_7: string
+	school_facilities_8: string
+	school_fef: string
+	school_name: "JINNAH SCHOOL SYSTEM BOYS CAMPUS TANDA"
+	school_pef: string
+	school_registration: string
+	school_sef: string
+	school_tehsil: string
+	school_uc: string
+	smart_phone: string
+	starttime: "25jan2019 13:10:19"
+	submissiondate: "25jan2019 14:07:42"
+	switch_call: string
+	switch_call_pos: string
+	teachers_employed: string
+	textbook_provider_interest: string
+	textbook_publisher: string
+	textbook_publisher_0: string
+	textbook_publisher_1: string
+	textbook_publisher_2: string
+	textbook_publisher_3: string
+	textbook_publisher_4: string
+	textbook_publisher_5: string
+	textbook_publisher_6: string
+	textbook_publisher_7: string
+	textbook_publisher_8: string
+	textbook_publisher_9: string
+	textbook_publisher_777: string
+	textbook_publisher_other: string
+	textbook_purchase_mode: string
+	textbook_reason: string
+	textbook_reason_0: string
+	textbook_reason_1: string
+	textbook_reason_2: string
+	textbook_reason_3: string
+	textbook_reason_777: string
+	textbook_reason_other: string
+	total_enrolment: string
+	tuition_students: string
+	tuition_teachers: string
+	unmet_financing_needs: string
+	wrong_number_detail: "A wrong number person provide us principal number 03456784064"
+	wrong_number_detail_no: "Yes"
+	wrong_number_detail_sc: "Yes"
+	year_established: string
+
 }
 
 interface SchoolLocation {

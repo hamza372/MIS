@@ -56,8 +56,6 @@ defmodule Sarkar.ActionHandler.Platform do
 			end)
 			|> Enum.join(" OR ")
 
-		IO.inspect "SELECT db FROM platform_schools WHERE #{or_str}"
-
 		case Postgrex.query(Sarkar.School.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
 			{:ok, resp} ->
 				dbs = resp.rows

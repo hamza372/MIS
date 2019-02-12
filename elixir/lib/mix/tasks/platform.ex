@@ -50,7 +50,7 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	defp gen_matches(id, sync_state) do
-		matches = Map.get(sync_state, "matches")
+		matches = Map.get(sync_state, "matches", %{})
 
 		# put the first 100 things into here
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB, "SELECT id, db from platform_schools limit 10", [])

@@ -1,6 +1,8 @@
 import locations from './narrowed.json'
 import { v4 } from 'node-uuid';
 
+const mask_number_bank = Array(100).fill(1).map((x, i) => `0${4232500600 + i}`);
+
 export const saveDB = (db : RootBankState) => {
 
 	try {
@@ -58,16 +60,25 @@ const loadClientId = () => {
 	return client_id;
 }
 
-const loadSyncState = () => {
+const loadSyncState = () : RootBankState['sync_state'] => {
 
 	const str = localStorage.getItem("sync_state");
 
-	if(str === undefined || str == "" || str == "null") {
+	if(str == undefined || str == "" || str == "null") {
 		return {
 			matches: {
 
-			}
-		} as RootBankState['sync_state']
+			},
+			numbers: {
+
+			},
+			mask_pairs: mask_number_bank.reduce((agg, curr) => ({
+				...agg,
+				[curr]: {
+					status: "FREE"
+				}
+			}), {})
+		}
 	}
 
 	return JSON.parse(str) as RootBankState['sync_state'];

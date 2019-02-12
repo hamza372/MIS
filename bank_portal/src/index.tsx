@@ -17,6 +17,7 @@ const host = window.api_url || debug_url;
 import Routes from './routes'
 
 const initial_state = loadDB();
+console.log("initial state", initial_state)
 const syncr : Syncr = new Syncr(host, msg => store.dispatch(msg))
 const store = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootBankState, Actions, Syncr>));
 

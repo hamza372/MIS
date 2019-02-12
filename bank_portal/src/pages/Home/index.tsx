@@ -1,75 +1,42 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSchoolProfiles, reserveMaskedNumber } from '~/src/actions'
+import { forceSaveFullStatePotentiallyCausingProblems } from '~/src/actions'
 
-type propTypes = {
-	matches: RootBankState['sync_state']['matches'],
-	school_db: RootBankState['new_school_db'],
-	connected: boolean,
-	addSchools: (ids : string[]) => void,
-	reserveNumber: (school_id: string) => void
+interface propTypes {
+
+	sync_state: RootBankState['sync_state'],
+	saveFullState: () => void
 }
 
-interface stateType {
-	selected_school?: any
-}
+class Home extends React.Component<propTypes> {
 
-class Home extends React.Component<propTypes, stateType> {
+	componentDidMount() {
+		// if we have 0 matches, save the state from the frontend.... 
+		// though this should happen in secondary login? or something.
+		// TODO: lock in login/user flow
 
-	constructor(props : propTypes) {
-		super(props);
-
-		this.state = {
-			selected_school: undefined
+		if(Object.keys(this.props.sync_state.matches).length === 0) {
+			// no matches exist for this... we need to init this in the db
+			// this case may not exist outside of testing
+			// also we should be able to know if this is the first login
+			// it shouldn't keep happening over and over.
+			console.log("=========================")
+			console.log("force saving full state")
+			console.log("==========================")
+			this.props.saveFullState();
 		}
-	}
-
-	onSchoolClick = (school : any) => () => {
-		console.log(school)
-
-		// merge a masked number here. pretend pool is just my number
-		this.props.reserveNumber(school.refcode);
-
 	}
 
 	render() {
-
-		const blank = Object.keys(this.props.matches)
-			.filter(k => this.props.school_db[k] == undefined)
-	
-		if(this.props.connected && blank.length > 0) {
-			setTimeout(() => {
-				this.props.addSchools(blank)
-			}, 2000) //hack
-		}
-
-		console.log(this.state.selected_school)
-		return <div className="home page">
-
+		return <div className='home page'>
 			<div className="title">Home Page</div>
-
-			<div className="divider">New Schools</div>
-			<div className="list">
-			{
-				Object.entries(this.props.matches)
-					.filter(([id, v]) => v.status === "NEW" && this.props.school_db[id] !== undefined)
-					.map(([sid, v]) => {
-						const school = this.props.school_db[sid];
-
-						return <div key={sid} onClick={this.onSchoolClick(school)}>{school.pulled_schoolname}</div>
-					})
-			}
-			</div>
 		</div>
 	}
 }
 
-export default connect((state : RootBankState) => ({
-	matches: state.sync_state.matches || {},
-	school_db: state.new_school_db,
-	connected: state.connected
-}), (dispatch : ( thing : any) => any) => ({
-	addSchools: (school_ids : string[]) => dispatch(getSchoolProfiles(school_ids)),
-	reserveNumber: (school_id : string) => dispatch(reserveMaskedNumber(school_id))
+export default connect((state : RootBankState) => ({ 
+	sync_state: state.sync_state
+}), (dispatch : Function) => ({
+	saveFullState: () => dispatch(forceSaveFullStatePotentiallyCausingProblems())
 }))(Home)

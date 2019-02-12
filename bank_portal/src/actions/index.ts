@@ -34,10 +34,20 @@ export interface SelectLocationAction {
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
 export interface addNewSchoolAction {
 	type: string
-	schools: any[]
+	schools: { [id: string] : CERPSchool }
 }
 
-// this isn't handled well if we are offline
+export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Dispatch, getState: GetState) => {
+	const state = getState();
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state"],
+			value: state.sync_state
+		}
+	]))
+}
+
 export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
@@ -60,7 +70,11 @@ export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch
 
 		return res;
 	})
-	.catch(err => console.error(err))
+	.catch(err => {
+		console.error(err);
+
+		setTimeout(() => dispatch(getSchoolProfiles(school_ids)), 1000)
+	})
 }
 
 export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: GetState) => {
@@ -122,7 +136,6 @@ export const setFilter = (filter_text : string) => (dispatch : Dispatch, getStat
 	})
 }
 
-
 export const ADD_SCHOOL = "ADD_SCHOOL"
 export interface addSchoolAction {
 	type: string
@@ -141,8 +154,16 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 	// from the pool in state.mask_pairs select an unused number
 	const state = getState();
 
-	// temp
-	const masked_num = "1111111111"
+	const free = Object.entries(state.sync_state.mask_pairs)
+		.filter(([number, v]) => v.status == "FREE")
+		.map(([num, ]) => num)
+	
+	if(free.length === 0) {
+		alert("The Maximum amount of schools are in progress. To continue, you must mark an existing school as done.")
+		return;
+	}
+
+	const masked_num = free[Math.floor(Math.random() * free.length)]
 
 	dispatch(createMerges([
 		{
