@@ -54,7 +54,8 @@ const blankStudent = () => ({
 	},
 	payments: {},
 	attendance: {},
-	section_id: ""
+	section_id: "",
+	tags: {}
 })
 // should be a dropdown of choices. not just teacher or admin.
 
