@@ -24,7 +24,7 @@ class StudentPage extends Component {
 
 		return <Layout history={this.props.history}>
 			<div className="single-student">
-				{ loc === "new" ? false : 
+				{ loc === "new" || loc === "prospective-student" ? false : 
 				<div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "red" : false}`} to="profile" replace={true}>Profile</Link>
 					{ admin || permissions.fee.teacher ?
@@ -41,6 +41,9 @@ class StudentPage extends Component {
 				<Route path="/student/:id/payment" component={Fees} />
 				<Route path="/student/:id/attendance" component={Attendance} />
 				<Route path="/student/:id/marks" component={Marks} />
+
+				<Route path="/student/:id/prospective-student" component={Create} />
+				<Route path="/student/prospective-student/new" component={Create} />
 			</div>
 		</Layout>
 	}

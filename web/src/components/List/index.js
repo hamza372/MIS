@@ -28,7 +28,7 @@ class List extends Component {
 		return <div className="list-wrap">
 			
 			<div className="total">
-				<div className="label"> Total: <strong> {filteredList.length} </strong></div>
+				<div className="label"> Total: <strong> {filteredList.length -1} </strong></div>
 				{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			</div>
 			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>

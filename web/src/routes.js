@@ -66,7 +66,7 @@ export default class Routes extends React.Component {
 
 					<AuthedRoute path="/student/:id" component={StudentSingle} />
 					<AuthedRoute path="/student" component={StudentList} />
-
+					
 					<AuthedRoute path="/class/:id" component={ClassSingle} />
 					<AuthedRoute path="/class" component={ClassModule} />
 

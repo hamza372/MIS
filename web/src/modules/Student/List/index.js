@@ -45,7 +45,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 
 	const sections = getSectionsFromClasses(classes)	
 	
-	const items = Object.entries(students)
+	let items = Object.entries(students)
 	.filter(([, s]) => s.id && s.Name) // hiding the error for now.... need to build reporting mechanism
 	.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 	.map( ([id, student]) => {
@@ -65,6 +65,14 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 		create = '';
 	}
 
+	if(forwardTo === "prospective-student"){
+		create = "/student/prospective-student/new"
+		createText = "New Prospective Student"
+		items = items.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]))
+	}
+	else{
+		items = items.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]))
+	}
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"
