@@ -10,6 +10,12 @@ import Banner from 'components/Banner'
 
 import './style.css'
 
+export const defaultPermissions = {
+	fee:  { teacher: true },
+	dailyStats: { teacher: true },
+	setupPage: {teacher: true }
+}
+
 const defaultSettings = {
 	shareData: true,
 	schoolName: "",
@@ -17,18 +23,24 @@ const defaultSettings = {
 	schoolPhoneNumber: "",
 	sendSMSOption: "SIM", // API
 	deviceName : "",
-	permissions: {
-		fee:  { teacher: false } //added
-	}
+	permissions: defaultPermissions
 }
 
 class Settings extends Component {
 
 	constructor(props){ 
 		super(props);
+		
+		const settings = {
+			...(props.settings || defaultSettings),
+			permissions: {
+				...defaultPermissions,
+				...(props.settings || defaultSettings).permissions
+			}
+		}
 		this.state = {
 			templates: this.props.sms_templates,
-			settings: props.settings || defaultSettings,
+			settings,
 			templateMenu: false,
 			permissionMenu: false,
 			banner: {
@@ -48,6 +60,20 @@ class Settings extends Component {
 			<div className="row">
 				<label> Allow teacher to view Fee Information ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Daily Statistics ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "dailyStats","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Setup Page ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "setupPage","teacher"])}>
 							<option value={true}>Yes</option>
 							<option value={false}>No</option>
 						</select>
@@ -93,8 +119,7 @@ class Settings extends Component {
 		</div>
 	}
 
-	onSave = () => {
-
+	onSave = () => {		
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});

@@ -131,7 +131,7 @@ class Attendance extends Component {
 			messages,
 			return_link: window.location.href
 		});
-
+		const setupPage = this.props.settings.permissions.setupPage ? this.props.settings.permissions.setupPage.teacher : true
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
 		return <Layout history={this.props.history}>
 			<div className="attendance">
@@ -159,7 +159,7 @@ class Attendance extends Component {
 
 							return <div className="list-row" key={x.id}>
 								<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
-								<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link>
+								{setupPage ?<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link> : <div> {x.Name} </div>}
 								<div className="status">
 									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 									<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
@@ -183,7 +183,7 @@ export default connect(state => {
 		classes: state.db.classes,
 		settings: state.db.settings,
 		connected: state.connected,
-		attendance_message_template: (state.db.sms_templates || {}).attendance || ""
+		attendance_message_template: (state.db.sms_templates || {}).attendance || "",
 	}
 
 }, dispatch => ({
