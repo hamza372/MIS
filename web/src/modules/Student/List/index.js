@@ -68,10 +68,10 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 	if(forwardTo === "prospective-student"){
 		create = "/student/prospective-student/new"
 		createText = "New Prospective Student"
-		items = items.filter(s => s.tags["PROSPECTIVE"])
+		items = items.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]))
 	}
 	else{
-		items = items.filter(s => !s.tags["PROSPECTIVE"])
+		items = items.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]))
 	}
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'

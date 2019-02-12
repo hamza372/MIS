@@ -102,7 +102,7 @@ class SingleStudent extends Component {
 		// verify 
 
 		let compulsory_paths = [ ["Name"] ];
-		if(student.Active || !this.isProspective()) {
+		if(student.Active) {
 			compulsory_paths.push(["section_id"])
 		} else {
 			student.section_id = ""
@@ -484,7 +484,7 @@ class SingleStudent extends Component {
 						})
 					: false }
 					{ admin && !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
-					{ !admin && !prospective ? false : <div className="save-delete">
+					{ !admin ? false : <div className="save-delete">
 						{!this.isNew()? <div className="button red" onClick={this.onDelete}>Delete</div> : false}
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>

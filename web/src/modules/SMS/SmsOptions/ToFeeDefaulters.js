@@ -35,7 +35,7 @@ class ToFeeDefaulters extends Component {
 	const { students, sendBatchMessages, smsOption } = this.props;
 	
 	const messages = Object.values(students)
-	.filter(student => !student.tags["PROSPECTIVE"] && Object.values(student.payments)
+	.filter(student => (student.tags === undefined || !student.tags["PROSPECTIVE"]) && Object.values(student.payments)
 		.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0) > 0 && student.Phone!== undefined && student.Phone !== "" )
 	.reduce((agg,student)=> {
 		const index  = agg.findIndex(s => s.number === student.Phone)		
