@@ -70,6 +70,9 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 		createText = "New Prospective Student"
 		items = items.filter(s => s.tags["PROSPECTIVE"])
 	}
+	else{
+		items = items.filter(s => !s.tags["PROSPECTIVE"])
+	}
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"

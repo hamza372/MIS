@@ -82,9 +82,7 @@ class SingleStudent extends Component {
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
-	isProspective = () => {
-		return this.props.location.pathname.indexOf("prospective-student") === -1 ? false : true
-	}
+	isProspective = () => this.props.location.pathname.indexOf("prospective-student") > -1
 	onSave = () => {
 		console.log('save!', this.state.profile)
 		let student = this.state.profile;
@@ -104,7 +102,7 @@ class SingleStudent extends Component {
 		// verify 
 
 		let compulsory_paths = [ ["Name"] ];
-		if(student.Active || this.isProspective()) {
+		if(student.Active || !this.isProspective()) {
 			compulsory_paths.push(["section_id"])
 		} else {
 			student.section_id = ""
@@ -418,19 +416,7 @@ class SingleStudent extends Component {
 						</select>
 					</div> : false}
 
-					{ !prospective ? !this.state.profile.Active ? false : <div className="row">
-						<label>Class Section</label>
-						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
-							{
-								 [
-									<option key="" value="">Please Select a Section</option>,
-									 ...getSectionsFromClasses(this.props.classes)
-									 	.sort((a,b) => a.classYear - b.classYear )
-										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
-								]
-							}
-						</select>
-					</div> : <div className="row">
+					{ prospective || !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
 						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
 							{
@@ -443,7 +429,7 @@ class SingleStudent extends Component {
 							}
 						</select>
 					</div>
-				}
+					}
 
 					{!prospective ? <div className="row">
 						<label>Roll No</label>
@@ -465,8 +451,8 @@ class SingleStudent extends Component {
 						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={!admin}/>
 					</div>
 
-					{admin || this.props.permissions.fee.teacher ? !prospective ? <div className="divider">Payment</div> : false : false}
-					{admin || this.props.permissions.fee.teacher ? !prospective ?
+					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
+					{(admin || this.props.permissions.fee.teacher) && !prospective ?
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
 								{!admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
@@ -496,15 +482,15 @@ class SingleStudent extends Component {
 								</div>
 							</div>
 						})
-					: false : false }
-					{ !admin ? false : !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
-					{ !admin || !prospective ? false : <div className="save-delete">
+					: false }
+					{ admin && !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
+					{ !admin && !prospective ? false : <div className="save-delete">
 						{!this.isNew()? <div className="button red" onClick={this.onDelete}>Delete</div> : false}
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
 					}
 					<div className="row">
-					{prospective ? !this.isNew() ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false : false }
+					{prospective && !this.isNew() ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
 					</div>
 				</div>
 			</div>
