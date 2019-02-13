@@ -10,9 +10,7 @@ import connect from 'react-redux/lib/connect/connect';
 
 export default connect(state => ({ 
 	permissions: state.db.settings.permissions
-}))
-((props) => {
-
+}))((props) => {
 		const splits = props.location.pathname.split('/')
 		const loc = splits.slice(-1).pop();
 		const isPrintPage = splits.length === 6 && splits[3] === "reports"
