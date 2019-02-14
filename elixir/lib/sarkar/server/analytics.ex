@@ -140,6 +140,34 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "sms.csv"}} = req, state) do
+
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT 
+				to_timestamp(time/1000)::date as d, 
+				school_id, 
+				(value ->> 'type') as TYPE,
+				(value ->> 'count') as count, 
+			FROM writes 
+			WHERE path[2] = 'analytics' AND path[3] = 'sms_history'
+			GROUP BY d, school_id 
+			ORDER BY d desc", [])
+		
+		
+		csv = [ ["date", "school_id", "TYPE", "count"] | resp.rows] 
+			|> CSV.encode
+			|> Enum.join("\n")
+		
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(req, state) do 
 		req = :cowboy_req.reply(200, req)
 		IO.inspect req
