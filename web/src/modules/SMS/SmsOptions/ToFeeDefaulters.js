@@ -3,7 +3,7 @@ import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
 
 
-export default class ToFeeDefaulters extends Component {
+class ToFeeDefaulters extends Component {
 	constructor(props) {
 	super(props)
 	
@@ -13,13 +13,29 @@ export default class ToFeeDefaulters extends Component {
 
 	this.former = new former(this, [])
 	}
+
+	logSms = (messages) =>{
+		if(messages.length === 0){
+			console.log("No Message to Log")
+			return
+		}
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: "FEE_DEFAULTERS",
+			count: messages.length,
+			text: this.state.text
+		}
+
+		this.props.logSms(historyObj)
+	}
 	
 	render() {
 
 	const { students, sendBatchMessages, smsOption } = this.props;
 	
 	const messages = Object.values(students)
-	.filter(student => Object.values(student.payments)
+	.filter(student => (student.tags === undefined || !student.tags["PROSPECTIVE"]) && Object.values(student.payments)
 		.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0) > 0 && student.Phone!== undefined && student.Phone !== "" )
 	.reduce((agg,student)=> {
 		const index  = agg.findIndex(s => s.number === student.Phone)		
@@ -45,7 +61,7 @@ export default class ToFeeDefaulters extends Component {
 							<a href={smsIntentLink({
 								messages,
 								return_link: window.location.href 
-								})} className="button blue">Send using Local SIM</a> :
+								})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> :
 
 							<div className="button" onClick={() => sendBatchMessages(messages)}>Can only send using Local SIM</div>
 					}
@@ -53,3 +69,5 @@ export default class ToFeeDefaulters extends Component {
 		)
   }
 }
+
+export default ToFeeDefaulters;

@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import moment from 'moment'
 
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
-import { mergeExam, removeStudentFromExam } from 'actions'
+import { mergeExam, removeStudentFromExam, deleteExam } from 'actions'
 import Banner from 'components/Banner'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
@@ -73,6 +73,7 @@ class SingleExam extends Component {
 			}, {})
 	}
 
+	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 	exam_id = () => this.props.match.params.exam_id
 	section_id = () => this.props.match.params.section_id
 	class_id = () => this.props.match.params.class_id
@@ -157,6 +158,31 @@ class SingleExam extends Component {
 		*/
 	}
 
+	onDelete = (exam_id) =>{
+		const students = Object.values(this.props.students)
+							.filter(s => s.exams !== undefined && s.exams[exam_id] !== undefined)
+							.map(s => s.id)
+
+		this.props.deleteExam(students, exam_id)
+
+		this.setState({
+			banner: {
+				active: true,
+				good: false,
+				text: "Exam Deleted"
+			}
+		})
+
+		this.banner_timeout = setTimeout(() => {
+			this.setState({
+				redirect: true,
+				banner: {
+					active: false
+				}
+			})
+		}, 3000)
+	}
+
 	// TODO: get students marks again when this rerenders, if the new studentMarks are different from the old ones.
 
 	componentWillUnmount() {
@@ -191,12 +217,10 @@ class SingleExam extends Component {
 	}
 
 	render() {
-		/*
+
 		if(this.state.redirect) {
-			console.log("REDIRECTING")
-			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}/exam/${this.state.exam.id}`} />
+			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}`} />
 		}
-		*/
 		return <Layout history={this.props.history}>
 			<div className="single-exam">
 				{ this.state.banner.active? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -248,65 +272,68 @@ class SingleExam extends Component {
 						*/
 					}
 
-						<div className="divider">Marks</div>
-						<div>
-						{
-							// Object.entries(this.props.students)
-							// 	.filter(([id, student]) => student.section_id === this.section_id())
-							Object.keys(this.state.exam.student_marks || {})
-								.map(xid => this.props.students[xid])
-								.map(student => (
-									<div className="section" key={student.id}>
-										
-										<div className="remove row">
-											<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
-											<div className="button red" onClick={() => this.removeStudent(student)}>Remove</div>
-										</div>
-
-										<div className="marks row">
-										<input type="number" 
-											{...this.former.super_handle(["student_marks", student.id, "score"])} 
-											placeholder="Score" />
-										<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
-											<option value="">Grade</option>
-											<option value="A+">A+</option>
-											<option value="A">A</option>
-											<option value="B+">B+</option>
-											<option value="B">B</option>
-											<option value="C">C</option>
-											<option value="D">D</option>
-											<option value="Fail">Fail</option>
-											<option value="Absent">Absent</option>
-										</select>
-
-										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
-											<option value="">Remarks</option>
-											<option value="Excellent">Excellent</option>
-											<option value="Very Good">Very Good</option>
-											<option value="Good">Good</option>
-											<option value="Average">Average</option>
-											<option value="Needs Improvement">Needs Improvement</option>
-											<option value="Pass">Pass</option>
-											<option value="Fail">Fail</option>
-											<option value="Better">Better</option>
-											<option value="Shown Improvement">Shown Improvement</option>
-										</select>
+					<div className="divider">Marks</div>
+					<div>
+					{
+						// Object.entries(this.props.students)
+						// 	.filter(([id, student]) => student.section_id === this.section_id())
+						Object.keys(this.state.exam.student_marks || {})
+							.map(xid => this.props.students[xid])
+							.map(student => (
+								<div className="section" key={student.id}>
+									
+									<div className="remove row">
+										<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
+										<div className="button red" onClick={() => this.removeStudent(student)}>x</div>
 									</div>
+
+									<div className="marks row">
+									<input type="number" 
+										{...this.former.super_handle(["student_marks", student.id, "score"])} 
+										placeholder="Score" />
+									<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
+										<option value="">Grade</option>
+										<option value="A+">A+</option>
+										<option value="A">A</option>
+										<option value="B+">B+</option>
+										<option value="B">B</option>
+										<option value="C">C</option>
+										<option value="D">D</option>
+										<option value="Fail">Fail</option>
+										<option value="Absent">Absent</option>
+									</select>
+
+									<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
+										<option value="">Remarks</option>
+										<option value="Excellent">Excellent</option>
+										<option value="Very Good">Very Good</option>
+										<option value="Good">Good</option>
+										<option value="Average">Average</option>
+										<option value="Needs Improvement">Needs Improvement</option>
+										<option value="Pass">Pass</option>
+										<option value="Fail">Fail</option>
+										<option value="Better">Better</option>
+										<option value="Shown Improvement">Shown Improvement</option>
+									</select>
 								</div>
-							))
-						}
-						<div className="students">
-							<div className="row">
-								<Dropdown
-									items={Object.values(this.props.students)}
-									toLabel={s => s.Name} 
-									onSelect={s => this.addStudent(s)}
-									toKey={s => s.id} 
-									placeholder="Student Name" />
 							</div>
+						))
+					}
+					<div className="students">
+						<div className="row">
+							<Dropdown
+								items={Object.values(this.props.students)}
+								toLabel={s => s.Name} 
+								onSelect={s => this.addStudent(s)}
+								toKey={s => s.id} 
+								placeholder="Student Name" />
 						</div>
 					</div>
-					<div className="button save" onClick={this.onSave}>Save</div>
+					</div>
+					<div className="save-delete">
+						{ !this.isNew() ? <div className="button red" onClick={()=> this.onDelete(this.exam_id())}>Delete</div> : false}
+						<div className="button save" onClick={this.onSave}>Save</div>
+					</div>
 				</div>
 			</div>
 		</Layout>
@@ -319,5 +346,6 @@ export default connect(state => ({
 	students: state.db.students
 }), dispatch => ({
 	saveExam: (exam, class_id, section_id) => dispatch(mergeExam(exam, class_id, section_id)),
-	removeStudent: (exam_id, student_id) => dispatch(removeStudentFromExam(exam_id,student_id)) 
+	removeStudent: (exam_id, student_id) => dispatch(removeStudentFromExam(exam_id,student_id)),
+	deleteExam:  (students, exam_id)=> dispatch(deleteExam(students, exam_id))
 }) )(SingleExam)

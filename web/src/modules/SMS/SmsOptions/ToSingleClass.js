@@ -6,7 +6,7 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import former from 'utils/former'
 
 
-export default class ToSingleClass extends Component {
+class ToSingleClass extends Component {
 	constructor(props) {
 	super(props)
 	
@@ -18,13 +18,28 @@ export default class ToSingleClass extends Component {
 
 	this.former = new former(this, [])
 	}
+	logSms = (messages) =>{
+		if(messages.length === 0){
+			console.log("No Messaged to Log")
+			return
+		}
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: "CLASS",
+			count: messages.length,
+			text: this.state.text
+		}
+
+		this.props.logSms(historyObj)
+	}
 
 	render() {
 
 	const { classes, students, sendBatchMessages } = this.props;
 
 	const messages = Object.values(students)
-		.filter(s => s.section_id === this.state.selected_section_id && s.Phone !== undefined && s.Phone !== "")
+		.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
 		.reduce((agg,student)=> {
 			const index  = agg.findIndex(s => s.number === student.Phone)		
 			if(index >= 0 ){
@@ -59,9 +74,10 @@ export default class ToSingleClass extends Component {
 						<a href={smsIntentLink({
 							messages,
 							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> }
+							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> }
 			</div>
 		)
 	}
 }
 
+export default ToSingleClass

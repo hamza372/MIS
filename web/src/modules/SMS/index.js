@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { sendSMS, sendBatchSMS } from 'actions/core'
+import { logSms } from 'actions'
 
 import former from 'utils/former'
 import Layout from 'components/Layout'
@@ -13,6 +14,7 @@ import ToAllStudents   from './SmsOptions/ToAllStudents';
 import ToSingleTeacher from './SmsOptions/ToSingleTeacher';
 import ToAllTeachers   from './SmsOptions/ToAllTeachers';
 import ToFeeDefaulters from './SmsOptions/ToFeeDefaulters';
+import ToProspectiveStudents from './SmsOptions/ToProspectiveStudents'
 
 import './style.css'
 
@@ -50,26 +52,68 @@ class SMS extends Component {
 	}
 
 	sendMessage = (text, number) => {
-
 		if(number === "") {
 			return;
 		}
-
-		console.log('send message', text, number);
+		
+		const type = this.getType(this.state.smsFilter)	
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: type,
+			count: 1,
+			text: text
+		}
+		//this.props.logSms(historyObj)
 		this.props.sendMessage(text, number);
 
 	}
 
-	sendBatchMessages = (messages) =>{
+	sendBatchMessages = (messages, text) => {
 		if(messages.length === 0 || messages === undefined){
 			return;
 		}
-		console.log("Sending messages", messages);
-		this.props.sendBatchMessages(messages);
+		const type = this.getType(this.state.smsFilter)
+
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: type,
+			count: messages.length(),
+			text: text
+		}
+		//this.props.logSms(historyObj)
+		this.props.sendBatchMessages(messages); 
 	}
 
 	sendMessageFilter=(e)=>{
 		this.setState({ smsFilter : e.target.value})
+	}
+
+	getType = (value) =>{
+		switch(value){
+			case "to_single_student":
+				return "STUDENT"
+
+			case "to_single_class":
+				return "CLASS"
+			
+			case "to_all_students":
+				return "ALL_STUDENTS"
+
+			case "to_single_teacher":
+				return "TEACHER"
+			
+			case "to_all_teachers":
+				return "ALL_TEACHERS"
+			
+			case "to_fee_defaulters":
+				return  "FEE_DEFAULTERS"
+			case "to_prospective_students":
+				return "PROSPECTIVE"
+			default:
+				return;
+		}
 	}
 
 	getFilteredFunctionality = (value) =>{
@@ -80,6 +124,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_class":
@@ -89,6 +135,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_students":
@@ -97,6 +145,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_teacher":
@@ -105,6 +155,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_teachers":
@@ -113,6 +165,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_fee_defaulters":
@@ -121,7 +175,18 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
+			case "to_prospective_students":
+			return <ToProspectiveStudents 
+						students={this.props.students} 
+						sendBatchMessages={this.sendBatchMessages} 
+						connected={this.props.connected}
+						smsOption={this.props.smsSetting}
+						logSms={this.props.logSms}
+						faculty_id={this.props.faculty_id}
+						/>
 			
 			default:
 				return;
@@ -148,6 +213,7 @@ class SMS extends Component {
 									<option value="to_all_students">All Students</option>
 									<option value="to_all_teachers">All Teachers</option>
 									<option value="to_fee_defaulters">Fee Defaulters</option>
+									<option value="to_prospective_students">Prospective Students</option>
 							</select>
 						</div>
 
@@ -160,12 +226,14 @@ class SMS extends Component {
 }
 
 export default connect(state => ({
+	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	classes: state.db.classes,
 	teachers:state.db.faculty,
 	connected: state.connected,
 	smsSetting: state.db.settings.sendSMSOption
 }), dispatch => ({
-	sendMessage: (text, number) => dispatch(sendSMS(text, number)),
-	sendBatchMessages: (messages) => dispatch(sendBatchSMS(messages))
+	sendMessage: (text, number, type) => dispatch(sendSMS(text, number)),
+	sendBatchMessages: (messages, type) => dispatch(sendBatchSMS(messages)),
+	logSms: (faculty_id, history) => dispatch(logSms(faculty_id, history))
 }))(SMS);

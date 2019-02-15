@@ -26,6 +26,18 @@ defmodule Sarkar.Auth do
 		end
 	end
 
+	def updatePassword({id, password}) do
+		case Postgrex.query(Sarkar.School.DB,
+			"UPDATE auth SET password=$2 WHERE id=$1", 
+			[id, hash(password, 52)]) do
+				{:ok, res} -> 
+					{:ok, "updated #{id} with new password #{password}"}
+				{:error, err} -> 
+					IO.inspect err
+					{:error, "updating failed"}
+		end
+	end
+
 	def verify({id, client_id, token}) do
 		case Postgrex.query(Sarkar.School.DB,
 		"SELECT * FROM tokens WHERE id=$1 AND token=$2 AND client_id=$3",
