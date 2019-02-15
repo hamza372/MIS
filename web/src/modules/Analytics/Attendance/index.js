@@ -127,6 +127,7 @@ export default connect(state => ({
 		{
 			Object.entries(student_attendance)
 				.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
+				.filter(([ sid, { student } ]) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]) )
 				.map(([ sid, { student, PRESENT, ABSENT, LEAVE } ]) => <div className="table row">
 					<Link to={`/student/${sid}/attendance`}>{student.Name}</Link>
 					<div>{ABSENT}</div>

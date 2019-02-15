@@ -8,7 +8,7 @@ import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
 
-import { addMultiplePayments, addPayment } from 'actions'
+import { addMultiplePayments, addPayment, logSms } from 'actions'
 import { sendSMS } from 'actions/core'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { smsIntentLink } from 'utils/intent'
@@ -94,7 +94,15 @@ class StudentFees extends Component {
 			}
 			else {
 				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
+				
+				const historyObj = {
+					faculty: this.props.faculty_id,
+					date: new Date().getTime(),
+					type: "FEE",
+					count: 1,
+				}
 
+				this.props.logSms(historyObj)
 				//this.props.history.push(url);
 				window.location.href = url;
 			}
@@ -161,7 +169,6 @@ class StudentFees extends Component {
 
 
 		return <div className="student-fees">
-
 			<PrintHeader settings={this.props.settings}/>
 			<div className="divider">Payment Information</div>
 			<div className="table row">
@@ -268,6 +275,7 @@ const PaymentTable = ({ payments }) => {
 }
 
 export default connect(state => ({
+	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	connected: state.connected,
 	settings: state.db.settings,
@@ -275,5 +283,6 @@ export default connect(state => ({
 }), dispatch => ({
 	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
-	sendSMS: (text, number) => dispatch(sendSMS(text, number))
+	sendSMS: (text, number) => dispatch(sendSMS(text, number)),
+	logSms: (history) => dispatch(logSms(history)),
 }))(withRouter(StudentFees))

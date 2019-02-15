@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
 
-
-export default class ToSingleStudent extends Component {
+class ToSingleStudent extends Component {
 	constructor(props) {
 	  super(props)
 	
@@ -15,6 +14,22 @@ export default class ToSingleStudent extends Component {
 	  this.former = new former(this, [])
 	}
 	
+	logSms = () =>{
+		if(this.state.selected_student_number === ""){
+			console.log("No Message to Log")
+			return
+		}
+		const historyObj = {
+			faculty: this.props.faculty_id,
+			date: new Date().getTime(),
+			type: "STUDENT",
+			count: 1,
+			text: this.state.text
+		}
+
+		this.props.logSms(historyObj)
+	}
+
   render() {
 
 	const { students, sendMessage, smsOption } = this.props;
@@ -26,7 +41,7 @@ export default class ToSingleStudent extends Component {
 				<label>Name</label>
 				<datalist id="student-list">
 					{[	...Object.entries(students)
-						.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
+						.filter(([id, student]) => (student.tags === undefined || !student.tags["PROSPECTIVE"]) && student.Phone !== undefined && student.Phone !== "")
 						.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
 					]}
 				</datalist>
@@ -42,7 +57,7 @@ export default class ToSingleStudent extends Component {
 						<a href={smsIntentLink({
 							messages: [{ number: this.state.selected_student_number, text: this.state.text }],
 							return_link: window.location.href 
-							})} className="button blue">Send using Local SIM</a> :
+							})} onClick={this.logSms} className="button blue">Send using Local SIM</a> :
 
 						<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_student_number)}>Send</div>
 				}
@@ -50,3 +65,4 @@ export default class ToSingleStudent extends Component {
 	)
   }
 }
+export default ToSingleStudent

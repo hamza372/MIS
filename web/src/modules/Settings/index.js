@@ -10,25 +10,38 @@ import Banner from 'components/Banner'
 
 import './style.css'
 
+export const defaultPermissions = {
+	fee:  { teacher: true },
+	dailyStats: { teacher: true },
+	setupPage: {teacher: true }
+}
+
 const defaultSettings = {
 	shareData: true,
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
 	sendSMSOption: "SIM", // API
-	deviceName : "",
-	permissions: {
-		fee:  { teacher: false } //added
-	}
+	permissions: defaultPermissions,
+	devices: {}
 }
 
 class Settings extends Component {
 
 	constructor(props){ 
 		super(props);
+		
+		const settings = {
+			...(props.settings || defaultSettings),
+			permissions: {
+				...defaultPermissions,
+				...(props.settings || defaultSettings).permissions
+			},
+			devices: (props.settings ? (props.settings.devices || {}) : {})
+		}
 		this.state = {
 			templates: this.props.sms_templates,
-			settings: props.settings || defaultSettings,
+			settings,
 			templateMenu: false,
 			permissionMenu: false,
 			banner: {
@@ -36,7 +49,7 @@ class Settings extends Component {
 				good: true,
 				text: "Saved!"
 			},
-			client_id : localStorage.getItem("client_id")
+			client_id : localStorage.getItem("client_id"),
 		}
 
 		this.former = new Former(this, [])
@@ -48,6 +61,20 @@ class Settings extends Component {
 			<div className="row">
 				<label> Allow teacher to view Fee Information ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Daily Statistics ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "dailyStats","teacher"])}>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
+						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Setup Page ? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "setupPage","teacher"])}>
 							<option value={true}>Yes</option>
 							<option value={false}>No</option>
 						</select>
@@ -93,13 +120,11 @@ class Settings extends Component {
 		</div>
 	}
 
-	onSave = () => {
-
+	onSave = () => {		
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		this.setState({templateMenu: false});
-		localStorage.setItem('client_name', this.state.settings.deviceName)
-
+		
 		this.setState({
 			banner: {
 				active: true,
@@ -160,14 +185,14 @@ class Settings extends Component {
 					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
-							<option value={true}>Yes, share anonymous data with CERP</option>
-							<option value={false}>No, don't share data</option>
+							<option value={true}>Yes</option>
+							<option value={false}>No</option>
 						</select>
 					</div>
 
 					<div className="row">
 						<label>Device Name</label>
-						<input type="text" {...this.former.super_handle(["settings", "deviceName"])} placeholder="Device Name" />
+						<input type="text" {...this.former.super_handle(["settings","devices", this.state.client_id ])} placeholder="Device Name" />
 					</div>
 
 					<div className="row">

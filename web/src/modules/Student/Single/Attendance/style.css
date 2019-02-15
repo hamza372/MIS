@@ -8,3 +8,6 @@
 .student-attendance .row {
 	margin: 10px 0;
 }
+.student-attendance .print.button{
+	margin-left: auto;
+}
