@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
 
-
-class ToAllStudents extends Component {
+class ToProspectiveStudents extends Component {
 	constructor(props) {
 		super(props)
 	
@@ -22,7 +21,7 @@ class ToAllStudents extends Component {
 		const historyObj = {
 			faculty: this.props.faculty_id,
 			date: new Date().getTime(),
-			type: "ALL_STUDENTS",
+			type: "PROSPECTIVE",
 			count: messages.length,
 			text: this.state.text
 		}
@@ -35,7 +34,7 @@ class ToAllStudents extends Component {
 	console.log(smsOption)
 
 	const messages = Object.values(students)
-						.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
+						.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
 						.reduce((agg,student)=> {
 							const index  = agg.findIndex(s => s.number === student.Phone)		
 							if(index >= 0 ){
@@ -66,4 +65,4 @@ class ToAllStudents extends Component {
 	}
 }
 
-export default ToAllStudents
+export default ToProspectiveStudents

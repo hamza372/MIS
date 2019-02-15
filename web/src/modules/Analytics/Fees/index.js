@@ -149,6 +149,7 @@ export default connect(state => ({
 		{
 			Object.values(total_student_debts)
 				.sort((a, b) => calculateDebt(a.debt) - calculateDebt(b.debt))
+				.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]) )
 				.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
 					<div>{calculateDebt(debt)}</div>
