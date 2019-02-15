@@ -111,9 +111,6 @@ const loadSnapshot = () => {
 export const loadDB = () : RootBankState => {
 
 	return {
-		selected: undefined,
-		filter_text: "",
-
 		school_locations: locations,
 		school_db: {},
 		new_school_db: loadSchoolDb(),

@@ -10,9 +10,6 @@ declare module 'deck.gl' {
 }
 
 interface RootBankState {
-	selected?: SchoolLocation,
-	filter_text: string,
-
 	school_locations: {
 		[school_id: string]: SchoolLocation
 	},

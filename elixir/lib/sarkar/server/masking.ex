@@ -1,7 +1,7 @@
 defmodule Sarkar.Server.Masking do
 
 	def init(%{has_body: true} = req, state) do
-		{:ok, body, req2} = :cowboy_req.read_body(req)
+		{:ok, body, _req2} = :cowboy_req.read_body(req)
 
 		IO.inspect body
 
@@ -13,8 +13,8 @@ defmodule Sarkar.Server.Masking do
 		query_params = :cowboy_req.parse_qs(req) 
 		|> Enum.into(%{})
 
-		forward = case query_params do
-			%{"dialed" => dialed, "incoming" => incoming} -> 
+		{school_name, forward} = case query_params do
+			%{"dialed" => dialed, "caller_id" => incoming} -> 
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
 				{:ok, resp} = Postgrex.query(Sarkar.School.DB, "
@@ -27,10 +27,10 @@ defmodule Sarkar.Server.Masking do
 				start_supplier(supplier_id)
 				school_id = Sarkar.Supplier.get_school_from_masked(supplier_id, dialed)
 
-				{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'phone_number' from platform_schools where id=$1", [school_id])
-				[[ outgoing_number ]] = resp2.rows
+				{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'pulled_schoolname', db->'phone_number' from platform_schools where id=$1", [school_id])
+				[[ school_name, outgoing_number ]] = resp2.rows
 
-				outgoing_number
+				{school_name, outgoing_number}
 			other ->
 				IO.puts "unexpected query params"
 				IO.inspect other
@@ -38,10 +38,11 @@ defmodule Sarkar.Server.Masking do
 		end
 
 
+		IO.puts "would have forwarded to #{school_name} #{forward}"
 		{:ok, :cowboy_req.reply(
 			200,
 			%{"content-type" => "text/plain"},
-			forward,
+			"03351419577",
 			req), state}
 	end
 

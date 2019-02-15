@@ -31,12 +31,22 @@ defmodule Sarkar.Supplier do
 		GenServer.call(via(id), {:school_from_masked_num, masked_num})
 	end
 
+	def reload(id) do
+		GenServer.call(via(id), {:reload})
+	end
+
 	# SERVER
 
 	def handle_call({:school_from_masked_num, masked_num}, _from, {id, writes, sync_state} = state) do
 
 		school_id = Dynamic.get(sync_state, ["mask_pairs", masked_num, "school_id"])
 		{:reply, school_id, state}
+	end
+
+	def handle_call({:reload}, _from, {id, writes, sync_state} = state) do
+		{ new_sync_state, new_writes } = Sarkar.Store.Supplier.load(id)
+
+		{:reply, :ok, {id, new_sync_state, new_writes}}
 	end
 
 	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {id, writes, sync_state} = state) do

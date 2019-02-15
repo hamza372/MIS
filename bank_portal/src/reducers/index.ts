@@ -1,9 +1,7 @@
-import * as redux from 'redux'
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed, ConfirmSyncAction } from '~/src/actions/core'
-import {Actions, SELECT_LOCATION, SelectLocationAction, ADD_SCHOOL, addSchoolAction, SET_FILTER, SetFilterAction, ADD_SCHOOLS, addNewSchoolAction } from '~/src/actions'
-
+import { MERGES, MergeAction, DELETES, DeletesAction, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, QueueAction, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, LoginSucceed, ConfirmSyncAction, SnapshotDiffAction } from '~/src/actions/core'
+import {Actions, ADD_SCHOOL, addSchoolAction, ADD_SCHOOLS, addNewSchoolAction } from '~/src/actions'
 
 
 const rootReducer = (state : RootBankState, action: Actions) : RootBankState => {
@@ -132,11 +130,35 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 			}
 		}
 
-		case SELECT_LOCATION:
+		case SNAPSHOT_DIFF:
 		{
+			// @ts-ignore
+			const snapshot = action as SnapshotDiffAction;
+			console.log("snapshot_diff:", Object.keys(snapshot.new_writes).length, "changes broadcast")
+
+			if(!state.accept_snapshot) {
+				return state;
+			}
+
+			if(Object.keys(snapshot.new_writes).length > 0) {
+
+				const nextState = Object.values(snapshot.new_writes)
+					.reduce((agg, curr) => {
+						if(curr.type === "DELETE") {
+							return Dynamic.delete(agg, curr.path)
+						}
+						return Dynamic.put(agg, curr.path, curr.value)
+					}, JSON.parse(JSON.stringify(state))) as RootBankState;
+				
+				return {
+					...nextState,
+					last_snapshot: new Date().getTime()
+				}
+			}
+
 			return {
 				...state,
-				selected: (<SelectLocationAction>action).loc
+				last_snapshot: new Date().getTime()
 			}
 		}
 
@@ -160,14 +182,6 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 					// @ts-ignore
 					...(action as addNewSchoolAction).schools
 				}
-			}
-		}
-
-		case SET_FILTER:
-		{
-			return {
-				...state,
-				filter_text: (action as SetFilterAction).filter_text
 			}
 		}
 

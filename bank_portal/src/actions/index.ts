@@ -23,12 +23,14 @@ export const createLogin = (username : string, password : string) => (dispatch: 
 			password
 		}
 	})
-	.then((res : {token: string, sync_state: RootBankState['sync_state']}) => dispatch(createLoginSucceed(username, res.token, res.sync_state)))
-}
+	.then((res : {token: string, sync_state: RootBankState['sync_state']}) => 
+	{
+		if(Object.keys(res.sync_state.matches).length === 0) {
+			dispatch(forceSaveFullStatePotentiallyCausingProblems())
+		}
 
-export interface SelectLocationAction {
-	type: string,
-	loc: SchoolLocation
+		dispatch(createLoginSucceed(username, res.token, res.sync_state))
+	})
 }
 
 export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Dispatch, getState: GetState) => {
@@ -75,65 +77,6 @@ export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch
 		console.error(err);
 
 		setTimeout(() => dispatch(getSchoolProfiles(school_ids)), 1000)
-	})
-}
-
-export const selectLocation = (loc : SchoolLocation) => (dispatch: Dispatch, getState: GetState) => {
-
-	console.log("selecting location", loc.id)
-
-	const state = getState();
-
-	if(state.school_db[loc.id] === undefined) {
-		fetch(`${python_host}/school/${loc.id}`)
-			.then(res => res.json())
-			.then((res : PMIUSchool) => dispatch(addToSchoolDB(res)))
-			.catch(err => console.error(err))
-		
-		dispatch(sendServerAction({
-			type: 'SET_FILTER',
-			payload: loc
-		}))
-	}
-
-	dispatch({
-		type: SELECT_LOCATION,
-		loc: loc
-	})
-
-	dispatch(createMerges([
-		{
-			path: ["sync_state", "matches", loc.id, "status"],
-			value: "NEW"
-		}
-	]))
-}
-
-export const SET_FILTER = "SET_FILTER"
-export interface SetFilterAction {
-	type: 'SET_FILTER',
-	filter_text: string
-}
-export const setFilter = (filter_text : string) => (dispatch : Dispatch, getState: GetState, syncr : Syncr) => {
-
-	const state = getState();
-
-	syncr.send({
-		type: SET_FILTER,
-		client_type: state.auth.client_type,
-		id: state.auth.id,
-		payload: {
-			filter_text
-		}
-	})
-	.then(res => {
-		console.log("GOT RESULT", res)
-	})
-	.catch((err :Error) => console.error(err))
-
-	dispatch({
-		type: SET_FILTER,
-		filter_text
 	})
 }
 
@@ -228,4 +171,4 @@ export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, ge
 	]))
 }
 
-export type Actions = addSchoolAction | SetFilterAction | SelectLocationAction | MergeAction | DeletesAction | QueueAction;
+export type Actions = addSchoolAction | MergeAction | DeletesAction | QueueAction;

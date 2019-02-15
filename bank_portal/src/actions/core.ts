@@ -187,6 +187,16 @@ export interface Write {
 export const SNAPSHOT = "SNAPSHOT"
 export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 
+export interface SnapshotDiffAction {
+	new_writes: {
+		[path_string: string]: {
+			type: "MERGE" | "DELETE",
+			path: string[],
+			value?: any
+		}
+	}
+}
+
 export const QUEUE = "QUEUE"
 // queue up an object where key is path, value is action/date
 interface Queuable {

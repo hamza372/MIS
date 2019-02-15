@@ -28,7 +28,6 @@ class Home extends React.Component<propTypes, stateType> {
 	onSchoolClick = (school : any) => () => {
 		console.log(school)
 
-		// merge a masked number here. pretend pool is just my number
 		this.props.reserveNumber(school.refcode);
 
 	}

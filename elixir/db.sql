@@ -37,7 +37,7 @@ create table platform_writes (
 	sync_time timestamp default current_timestamp
 );
 
-create index on platform_writes(school_id);
+create index on platform_writes(id);
 create index on platform_writes(time);
 
 create table suppliers (

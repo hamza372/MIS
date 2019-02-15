@@ -3,7 +3,11 @@ defmodule Mix.Tasks.Platform do
 
 	def run(["ingest_data"]) do
 		Application.ensure_all_started(:sarkar)
-		{:ok, body} = File.read("sample.json")
+
+		{:ok, body} = case File.exists?(Application.app_dir(:sarkar, "priv/sample.json")) do
+			true -> File.read(Application.app_dir(:sarkar, "priv/sample.json"))
+			false -> File.read("priv/sample.json")
+		end
 		{:ok, json} = Poison.decode(body)
 
 		Enum.each(json, fn school_profile -> 
@@ -41,6 +45,8 @@ defmodule Mix.Tasks.Platform do
 							IO.puts "error on school: #{id}"
 							IO.inspect err
 					end
+
+					Sarkar.Supplier.reload(id)
 				end)
 
 			{:err, msg} -> 
