@@ -37,9 +37,9 @@
 
 .student-marks .table.row * {
 	flex-wrap: nowrap;
-	flex: 1 1 100%;
-	min-width: 1rem;
-	width: initial;
+	flex: 0 0 auto;
+	margin: 0 3px;
+	width: 6rem;
 	text-align: left;
 }
 	.student-marks .table.row *:last-child {
@@ -57,5 +57,12 @@
 		font-family: 'Courier New', Courier, monospace;
 		font-size: 10pt;
 		line-height: 2em;
+	}
+
+	.student-marks .table.row * {
+		flex: 1 1 100%;
+		width: initial;
+		min-width: 1rem;
+		margin: 0;
 	}
 }
