@@ -5,6 +5,8 @@ import qs from 'query-string'
 import Home from '../Home'
 import New from '../New'
 import InProgress from '../InProgress'
+import Done from '../Done'
+import Rejected from '../Rejected'
 import Settings from '../Settings'
 
 import SchoolInfo from '~/src/components/SchoolInfo'
@@ -23,7 +25,8 @@ class Burger extends React.Component<RouteComponentProps> {
 	render() {
 
 		const current = this.props.location.pathname;
-		const params = qs.parse(this.props.location.search)
+		const search = this.props.location.search;
+		const params = qs.parse(search)
 		const selected_id = params.school_id as string;
 
 		return <div className={`root-page ${selected_id ? 'double' : ''}`}>
@@ -32,11 +35,12 @@ class Burger extends React.Component<RouteComponentProps> {
 
 			<div className="burger">
 				<div className="divider">Menu</div>
-				<Link to="/" className={current === '/' ? "active" : ""}>Home</Link>
-				<Link to="/new" className={current === '/new' ? "active" : ""}>New</Link>
+				<Link to={{ pathname: "/", search }}  className={current === '/' ? "active" : ""}>Home</Link>
+				<Link to={{ pathname: "/new", search }} className={current === '/new' ? "active" : ""}>New</Link>
 				{ /* <Link to="/todo" className={current === '/todo' ? "active" : ""}>To-Do</Link> */ }
-				<Link to="/progress" className={current === '/progress' ? "active" : ""}>In Progress</Link>
-				<Link to="/history" className={current === '/history' ? "active" : ""}>Done</Link>
+				<Link to={{ pathname: "/progress", search }} className={current === '/progress' ? "active" : ""}>In Progress</Link>
+				<Link to={{ pathname: "/done", search }} className={current === '/done' ? "active" : ""}>Done</Link>
+				<Link to={{ pathname: "/rejected", search }} className={current === '/rejected' ? "active" : ""}>Rejected</Link>
 				<Link to="/settings" className={current === '/settings' ? "active" : ""}>Settings</Link>
 			</div>
 
@@ -44,11 +48,12 @@ class Burger extends React.Component<RouteComponentProps> {
 				<Route exact path="/" component={Home} />
 				<Route path="/new" component={New} />
 				<Route path="/progress" component={InProgress} />
+				<Route path="/done" component={Done} />
+				<Route path="/rejected" component={Rejected} title={"Rejected"}/>
 				<Route path="/settings" component={Settings} />
 			</div>
 				{
 					selected_id && <div className="info-panel">
-						<div className="close" onClick={this.onClose}>close</div>
 						<SchoolInfo school_id={selected_id} />
 					</div>
 				}

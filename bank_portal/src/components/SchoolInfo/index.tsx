@@ -1,6 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool } from '~/src/actions'
+
+import './style.css'
 
 interface OwnProps {
 	school_id: string
@@ -8,7 +11,7 @@ interface OwnProps {
 
 interface StateProps {
 	school?: CERPSchool
-	match?: SchoolMatch
+	schoolMatch?: SchoolMatch
 }
 
 interface DispatchProps {
@@ -18,7 +21,7 @@ interface DispatchProps {
 	rejectSchool: () => void
 }
 
-type propTypes = OwnProps & StateProps & DispatchProps
+type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 
 class SchoolInfo extends React.Component<propTypes> {
 
@@ -56,7 +59,19 @@ class SchoolInfo extends React.Component<propTypes> {
 		if(res) {
 			this.props.releaseNumber()
 		}
+	}
 
+	onMarkRejected = () => {
+		console.log('mark as reject')
+
+		this.props.rejectSchool()
+	}
+
+	onClose = () => {
+		this.props.history.push({
+			pathname: this.props.location.pathname,
+			search: ''
+		})
 	}
 
 	render() {
@@ -66,23 +81,33 @@ class SchoolInfo extends React.Component<propTypes> {
 			return <div className="loading">Loading School Info...</div>
 		}
 
-		const reserved = this.props.match && this.props.match.status === "IN_PROGRESS"
+		const reserved = this.props.schoolMatch && this.props.schoolMatch.status === "IN_PROGRESS"
 
-		return <div className="school-info page" style={{ padding: "10px" }}>
-			<div className="title" style={{ marginTop: 0 }}>{school.school_name}</div>
+		console.log(this.props.match)
+
+		return <div className="school-info page" style={{ padding: "5px" }}>
+
+			<div className="close" onClick={this.onClose}>Close</div>
+
+			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
 
 			{ reserved ? 
-				<div className="button gray" onClick={this.onMarkComplete}>Mark as Complete</div> :
+				<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
 				<div className="button green" onClick={this.onShowNumber}>Show Number</div>
 			}
 
 
+
 			<div className="form" style={{width: "90%"}}>
+				<div className="row">
+					<label>Status</label>
+					<div>{this.props.schoolMatch.status}</div>
+				</div>
 				{ 
 					reserved && 
 					<div className="row">
 						<label>Phone Number</label>
-						<a href={`tel:${this.props.match.masked_number}`} className="number">{this.props.match.masked_number}</a> 
+						<a href={`tel:${this.props.schoolMatch.masked_number}`} className="number">{this.props.schoolMatch.masked_number}</a> 
 					</div>
 				}
 				<div className="row">
@@ -133,9 +158,11 @@ class SchoolInfo extends React.Component<propTypes> {
 					<label>Address</label>
 					<div>{school.school_address}</div>
 				</div>
-				<div className="row">
-					<div className="red button" onClick={this.props.rejectSchool}>Not Interested</div>
-				</div>
+				{ reserved ? false : 
+					<div className="row">
+						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
+					</div>
+				}
 			</div>
 		</div>
 	}
@@ -147,10 +174,10 @@ class SchoolInfo extends React.Component<propTypes> {
 
 export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
-	match: state.sync_state.matches[props.school_id]
+	schoolMatch: state.sync_state.matches[props.school_id]
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
 	rejectSchool: () => dispatch(rejectSchool(props.school_id))
-}))(SchoolInfo)
+}))(withRouter(SchoolInfo))

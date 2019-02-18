@@ -1,0 +1,12 @@
+.school-info .form .row {
+	padding: .5rem 0;
+	border-bottom: 1px solid #aaa;
+}
+
+	.school-info .form .row:last-child {
+		border-bottom: none;
+	}
+
+.school-info .form .row label {
+	color: #333;
+}

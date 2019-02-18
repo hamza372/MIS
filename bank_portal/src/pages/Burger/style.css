@@ -8,11 +8,18 @@
 	grid-template-areas: 
 		"header header header"
 		"burger main panel";
+	grid-column-gap: 10px;
 	transition: all 1s ease-in;
 }
 
 .root-page.double {
 	grid-template-columns: 220px 1fr 1fr;
+}
+
+.page {
+	background-color: whitesmoke;
+	height: 100%;
+	border-radius: 8px;
 }
 
 .header {
@@ -58,6 +65,7 @@
 .info-panel {
 	grid-area: panel;
 	border-radius: 8px;
+	padding: 10px;
 	display: flex;
 	flex-direction: column;
 }
