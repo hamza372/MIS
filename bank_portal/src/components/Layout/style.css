@@ -1,11 +1,19 @@
+:root {
+	--blue: #74aced;
+	--offwhite: #fafafa;
+	--darkgrey: #333333;
+	--yellow: #f4d29f;
+	--green: #5ecdb9;
+	--red: #fc6171;
+	--purple: #7e88f7;
+}
+
 html,body, #root, .layout{
 	height: 100%;
 	width: 100%;
 	margin: 0;
 	position: absolute;
-	/*font-family: Helvetica, Arial, sans-serif;*/
 	font-family: 'Roboto', serif;
-	/*background-color: #fafafa;*/
 	background-color: #fafafa;
 	overflow: visible;
 }
@@ -33,10 +41,12 @@ html,body, #root, .layout{
 	width: 90%;
 	margin-top: 15px;
 	border-radius: 4px;
+	color: #333;
 }
 
 	.list>* {
 		display: flex;
+		cursor: pointer;
 		flex-direction: row;
 		align-items: center;
 		height: 80px;
@@ -48,6 +58,10 @@ html,body, #root, .layout{
 	}
 		.list>*:last-child {
 			border-bottom: none;
+		}
+
+		.list>*:hover {
+			background-color: #ddd;
 		}
 
 a {
@@ -289,7 +303,7 @@ a.block {
 .title {
 	margin: 20px 0;
 	font-size: 2.0rem;
-	/*color: #777;*/
+	color: #333;
 }
 
 .divider {
@@ -393,7 +407,7 @@ textarea {
 	}
 
 	.button.black {
-		background-color: #222222;
+		background-color: #333333;
 		color: #fafafa;
 		border: 3px solid rgba(0,0,0,0.2);
 	}

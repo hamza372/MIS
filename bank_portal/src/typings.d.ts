@@ -9,6 +9,11 @@ declare module 'deck.gl' {
 	export default value;
 }
 
+interface SchoolMatch {
+	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
+	masked_number?: string
+}
+
 interface RootBankState {
 	school_locations: {
 		[school_id: string]: SchoolLocation
@@ -21,10 +26,7 @@ interface RootBankState {
 	},
 	sync_state: {
 		matches: {
-			[school_id : string]: {
-				status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
-				masked_number?: string
-			}
+			[school_id : string]: SchoolMatch
 		},
 		numbers: {
 			[number: string]: {

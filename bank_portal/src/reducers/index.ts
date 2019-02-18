@@ -86,7 +86,6 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 
 		case CONFIRM_SYNC_DIFF:
 		{
-
 			//@ts-ignore
 			const diff_action = action as ConfirmSyncAction;
 

@@ -1,35 +1,25 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter, RouteComponentProps} from 'react-router-dom'
 
-import { getSchoolProfiles, reserveMaskedNumber } from '~/src/actions'
+import { getSchoolProfiles } from '~/src/actions'
 
 type propTypes = {
 	matches: RootBankState['sync_state']['matches'],
 	school_db: RootBankState['new_school_db'],
 	connected: boolean,
-	addSchools: (ids : string[]) => void,
-	reserveNumber: (school_id: string) => void
-}
+	addSchools: (ids : string[]) => void
+} & RouteComponentProps
 
-interface stateType {
-	selected_school?: any
-}
+class Home extends React.Component<propTypes> {
 
-class Home extends React.Component<propTypes, stateType> {
-
-	constructor(props : propTypes) {
-		super(props);
-
-		this.state = {
-			selected_school: undefined
-		}
-	}
-
-	onSchoolClick = (school : any) => () => {
+	onSchoolClick = (school : CERPSchool) => () => {
 		console.log(school)
 
-		this.props.reserveNumber(school.refcode);
-
+		this.props.history.push({
+			pathname: this.props.location.pathname,
+			search: `?school_id=${school.refcode}`
+		})
 	}
 
 	render() {
@@ -43,7 +33,6 @@ class Home extends React.Component<propTypes, stateType> {
 			loading = true;
 		}
 
-		console.log(this.state.selected_school)
 		return <div className="new page">
 
 			<div className="title">New Schools</div>
@@ -56,7 +45,7 @@ class Home extends React.Component<propTypes, stateType> {
 					.map(([sid, v]) => {
 						const school = this.props.school_db[sid];
 
-						return <div key={sid} onClick={this.onSchoolClick(school)}>{school.pulled_schoolname}</div>
+						return <div key={sid} onClick={this.onSchoolClick(school)}>{school.school_name}</div>
 					})
 			}
 			</div>
@@ -70,5 +59,4 @@ export default connect((state : RootBankState) => ({
 	connected: state.connected
 }), (dispatch : ( thing : any) => any) => ({
 	addSchools: (school_ids : string[]) => dispatch(getSchoolProfiles(school_ids)),
-	reserveNumber: (school_id : string) => dispatch(reserveMaskedNumber(school_id))
-}))(Home)
+}))( withRouter(Home))

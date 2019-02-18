@@ -45,11 +45,11 @@ export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Di
 }
 
 export const ADD_SCHOOLS = "ADD_SCHOOLS"
+
 export interface addNewSchoolAction {
-	type: string
+	readonly type: "ADD_SCHOOLS"
 	schools: { [id: string] : CERPSchool }
 }
-
 
 export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: GetState, syncr: Syncr) => {
 
@@ -147,6 +147,19 @@ export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 		{
 			path: ["sync_state", "matches", school_id, "masked_number"],
 			value: ""
+		}
+	]))
+}
+
+export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
+
+	// check if school was in progress... if so we need to release
+	// not sure how this could happen so ignoring for now.
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", school_id, "status"],
+			value: "REJECTED"
 		}
 	]))
 }
