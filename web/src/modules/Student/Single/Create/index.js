@@ -57,6 +57,7 @@ const blankStudent = () => ({
 	section_id: "",
 	tags:{},
 	prospective_section_id: ""
+
 })
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -218,7 +219,6 @@ class SingleStudent extends Component {
 		}
 		else{
 			this.props.save(student);
-		
 		}
 		this.setState({
 			banner: {
@@ -266,9 +266,8 @@ class SingleStudent extends Component {
 	}
 
 	onEnrolled = () => {
-
-		const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
-
+		
+    const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
 		const student = {
 			...rest_profile,
 			Active: true,
