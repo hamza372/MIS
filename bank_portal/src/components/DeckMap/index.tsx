@@ -21,7 +21,7 @@ class Map extends React.Component<propTypes, any> {
 			viewState: {
 				latitude: 31.1704,
 				longitude: 72.7097,
-				zoom: 6,
+				zoom: 5,
 				pitch: 0,
 				bearing: 0 
 			}

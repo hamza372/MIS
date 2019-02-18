@@ -3,7 +3,12 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { createLogin } from '~/src/actions'
 
+import locations from '~/src/utils/narrowed.json'
+
 import former from '~/src/utils/former'
+import DeckMap from '~/src/components/DeckMap'
+
+import './style.css'
 
 interface propTypes {
 	connected: boolean,
@@ -48,19 +53,23 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 			return <div>Connecting...</div>
 		}
 
-		return <div className="page">
+		return <div className="login page">
 
-			<div className="title">Login</div>
-			<div className="form" style={{ margin: "auto", width: "90%", display: "flex", flexDirection: "column", alignContent: "center"}}>
-				<div className="row">
-					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["username"])} placeholder="username" />
+			<div className="bg-cover" />
+			<div className="cover" style={{ }}>
+				<div className="title" style={{ fontSize: "3rem" }}>Welcome to EdMarkaz</div>
+				<div className="form" style={{ margin: "auto", width: "90%", display: "flex", flexDirection: "column", alignContent: "center"}}>
+					<div className="row">
+						<input type="text" {...this.former.super_handle(["username"])} placeholder="username" />
+					</div>
+					<div className="row">
+						<input type="password" {...this.former.super_handle(["password"])} placeholder="password" />
+					</div>
+					<div className="button blue" onClick={this.login}>Login</div>
 				</div>
-				<div className="row">
-					<label>Password</label>
-					<input type="password" {...this.former.super_handle(["password"])} placeholder="password" />
-				</div>
-				<div className="button blue" onClick={this.login}>Login</div>
+			</div>
+			<div className="mappy-boi">
+				<DeckMap onSelect={console.log} school_locations={locations}/>
 			</div>
 		</div>
 

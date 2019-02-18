@@ -6,7 +6,7 @@
   "dependencies": {
     "@ironbay/dynamic": "^1.0.10",
     "components": "^0.1.0",
-    "deck.gl": "^6.2.3",
+    "deck.gl": "^6.4.3",
     "google-map-react": "^1.0.9",
     "modules": "^0.4.0",
     "moment": "^2.22.2",
