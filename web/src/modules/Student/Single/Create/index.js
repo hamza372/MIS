@@ -55,7 +55,9 @@ const blankStudent = () => ({
 	payments: {},
 	attendance: {},
 	section_id: "",
-	tags:{}
+	tags:{},
+	prospective_section_id: ""
+
 })
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -211,8 +213,13 @@ class SingleStudent extends Component {
 			}
 		}
 
-		this.props.save(student);
-
+		if(!this.isProspective()){
+			const { prospective_section_id: removed, ...rest } = student
+			this.props.save(rest);
+		}
+		else{
+			this.props.save(student);
+		}
 		this.setState({
 			banner: {
 				active: true,
@@ -227,8 +234,8 @@ class SingleStudent extends Component {
 					active: false
 				},
 				redirect: this.isProspective() ? 
-								this.isNew() ? `/student?forwardTo=prospective-student` : false 
-							: this.isNew() ? `/student` : false
+					this.isNew() ? `/student?forwardTo=prospective-student` : false 
+					: this.isNew() ? `/student` : false
 			})
 		}, 2000);
 
@@ -259,16 +266,17 @@ class SingleStudent extends Component {
 	}
 
 	onEnrolled = () => {
-
-		const {"PROSPECTIVE": removed, ...rest } = this.state.profile.tags;
-
+		
+    const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
 		const student = {
-			...this.state.profile,
+			...rest_profile,
 			Active: true,
+			section_id,
 			tags:{
-				...rest
+				...rest_tags
 			}
 		}
+		
 		this.props.save(student);
 
 		this.setState({
@@ -419,6 +427,20 @@ class SingleStudent extends Component {
 					{ prospective || !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
 						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
+							{
+								 [
+									<option key="" value="">Please Select a Section</option>,
+									 ...getSectionsFromClasses(this.props.classes)
+									 	.sort((a,b) => a.classYear - b.classYear )
+										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+								]
+							}
+						</select>
+					</div>
+					}
+					{ !prospective ? false : <div className="row">
+						<label>Class Section</label>
+						<select {...this.former.super_handle_flex(["prospective_section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
 							{
 								 [
 									<option key="" value="">Please Select a Section</option>,
