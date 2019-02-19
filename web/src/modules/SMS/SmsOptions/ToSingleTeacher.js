@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
-import { logSms } from 'actions'
-import {connect} from "react-redux"
 
 class ToSingleTeacher extends Component {
 	constructor(props) {
@@ -67,8 +65,4 @@ class ToSingleTeacher extends Component {
 	)
   }
 }
-export default connect(state => ({
-	faculty_id: state.auth.faculty_id
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history)),
-}))(ToSingleTeacher)
+export default ToSingleTeacher

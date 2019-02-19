@@ -14,6 +14,7 @@ import ToAllStudents   from './SmsOptions/ToAllStudents';
 import ToSingleTeacher from './SmsOptions/ToSingleTeacher';
 import ToAllTeachers   from './SmsOptions/ToAllTeachers';
 import ToFeeDefaulters from './SmsOptions/ToFeeDefaulters';
+import ToProspectiveStudents from './SmsOptions/ToProspectiveStudents'
 
 import './style.css'
 
@@ -108,7 +109,8 @@ class SMS extends Component {
 			
 			case "to_fee_defaulters":
 				return  "FEE_DEFAULTERS"
-			
+			case "to_prospective_students":
+				return "PROSPECTIVE"
 			default:
 				return;
 		}
@@ -122,6 +124,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_class":
@@ -131,6 +135,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_students":
@@ -139,6 +145,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 
 			case "to_single_teacher":
@@ -147,6 +155,8 @@ class SMS extends Component {
 							sendMessage={this.sendMessage} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_all_teachers":
@@ -155,6 +165,8 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
 			
 			case "to_fee_defaulters":
@@ -163,7 +175,18 @@ class SMS extends Component {
 							sendBatchMessages={this.sendBatchMessages} 
 							connected={this.props.connected}
 							smsOption={this.props.smsSetting}
+							logSms={this.props.logSms}
+							faculty_id={this.props.faculty_id}
 							/>
+			case "to_prospective_students":
+			return <ToProspectiveStudents 
+						students={this.props.students} 
+						sendBatchMessages={this.sendBatchMessages} 
+						connected={this.props.connected}
+						smsOption={this.props.smsSetting}
+						logSms={this.props.logSms}
+						faculty_id={this.props.faculty_id}
+						/>
 			
 			default:
 				return;
@@ -190,6 +213,7 @@ class SMS extends Component {
 									<option value="to_all_students">All Students</option>
 									<option value="to_all_teachers">All Teachers</option>
 									<option value="to_fee_defaulters">Fee Defaulters</option>
+									<option value="to_prospective_students">Prospective Students</option>
 							</select>
 						</div>
 

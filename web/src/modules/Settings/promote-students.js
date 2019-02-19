@@ -25,6 +25,7 @@ class PromotePage extends Component {
 				.reduce((agg, curr) => {
 
 					const s = sections.find(x => x.id === curr.section_id)
+
 					if(s === undefined) {
 						return { ...agg, [curr.id]:  ""}
 					}
@@ -33,7 +34,7 @@ class PromotePage extends Component {
 					const s2 = sections.find(x => parseInt(x.classYear, 10) === current_year + 1);
 
 					if(s2 === undefined) {
-						return { ...agg, [curr.id]:  ""}
+						return { ...agg, [curr.id]:  "FINISHED_SCHOOL"}
 					}
 
 					return {...agg, [curr.id]: s2.id }
@@ -100,6 +101,7 @@ class PromotePage extends Component {
 								<div>{s ? s.namespaced_name : "No Class"}</div>
 								<select {...this.Former.super_handle(["promotions", student.id])}>
 									<option value="">Select Class</option>
+									<option value="FINISHED_SCHOOL">Finished School</option>
 									{ class_options }
 								</select>
 							</div>

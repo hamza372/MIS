@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
-import { logSms } from 'actions'
-import {connect} from "react-redux"
 
 class ToSingleStudent extends Component {
 	constructor(props) {
@@ -43,7 +41,7 @@ class ToSingleStudent extends Component {
 				<label>Name</label>
 				<datalist id="student-list">
 					{[	...Object.entries(students)
-						.filter(([id, student]) => student.Phone !== undefined && student.Phone !== "")
+						.filter(([id, student]) => (student.tags === undefined || !student.tags["PROSPECTIVE"]) && student.Phone !== undefined && student.Phone !== "")
 						.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
 					]}
 				</datalist>
@@ -67,8 +65,4 @@ class ToSingleStudent extends Component {
 	)
   }
 }
-export default connect(state => ({
-	faculty_id: state.auth.faculty_id
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history)),
-}))(ToSingleStudent)
+export default ToSingleStudent

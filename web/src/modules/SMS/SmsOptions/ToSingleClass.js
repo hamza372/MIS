@@ -4,8 +4,6 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
-import { logSms } from 'actions'
-import {connect} from "react-redux"
 
 
 class ToSingleClass extends Component {
@@ -41,7 +39,7 @@ class ToSingleClass extends Component {
 	const { classes, students, sendBatchMessages } = this.props;
 
 	const messages = Object.values(students)
-		.filter(s => s.section_id === this.state.selected_section_id && s.Phone !== undefined && s.Phone !== "")
+		.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
 		.reduce((agg,student)=> {
 			const index  = agg.findIndex(s => s.number === student.Phone)		
 			if(index >= 0 ){
@@ -82,8 +80,4 @@ class ToSingleClass extends Component {
 	}
 }
 
-export default connect(state => ({
-	faculty_id: state.auth.faculty_id
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history)),
-}))(ToSingleClass)
+export default ToSingleClass

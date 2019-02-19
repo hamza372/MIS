@@ -54,7 +54,10 @@ const blankStudent = () => ({
 	},
 	payments: {},
 	attendance: {},
-	section_id: ""
+	section_id: "",
+	tags:{},
+	prospective_section_id: ""
+
 })
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -81,11 +84,22 @@ class SingleStudent extends Component {
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
-
+	isProspective = () => this.props.location.pathname.indexOf("prospective-student") > -1
 	onSave = () => {
 		console.log('save!', this.state.profile)
+		let student = this.state.profile;
 
-		const student = this.state.profile;
+		if( this.isProspective()){
+			student = {
+				...this.state.profile,
+				Active: false,
+				fees:{},
+				tags:{
+					...this.state.profile.tags,
+					"PROSPECTIVE": true
+				}
+			}
+		}
 
 		// verify 
 
@@ -111,94 +125,101 @@ class SingleStudent extends Component {
 				})
 		}
 
+		if(!this.isProspective()){
 
-		for(let student of Object.values(this.props.students))
-		{
-			const RollNumber = student.section_id === this.state.profile.section_id && student.RollNumber !== undefined
-				&& student.id !== this.state.profile.id 
-				&& student.RollNumber !== "" 
-				&& student.RollNumber === this.state.profile.RollNumber
-
-			const AdmissionNumber = student.id !== this.state.profile.id 
-				&& student.AdmissionNumber !== undefined 
-				&& student.AdmissionNumber !== "" 
-				&& student.AdmissionNumber === this.state.profile.AdmissionNumber	
-
-			if(AdmissionNumber || RollNumber)
+			for(let student of Object.values(this.props.students))
 			{
-				return this.setState({
-					banner: {
-						active : true,
-						good: false,
-						text: RollNumber ? "Roll Number Already Exists": "Admission Number Already Exists"
-					}
-				})
-			}
-		}
+				const RollNumber = student.section_id === this.state.profile.section_id && student.RollNumber !== undefined
+					&& student.id !== this.state.profile.id 
+					&& student.RollNumber !== "" 
+					&& student.RollNumber === this.state.profile.RollNumber
 
-		for(let fee of Object.values(this.state.profile.fees)) {
-			//console.log('fees', fee)
+				const AdmissionNumber = student.id !== this.state.profile.id 
+					&& student.AdmissionNumber !== undefined 
+					&& student.AdmissionNumber !== "" 
+					&& student.AdmissionNumber === this.state.profile.AdmissionNumber	
 
-			if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
-				return this.setState({
-					banner: {
-						active: true,
-						good: false,
-						text: "Please fill out all Fee Information"
-					}
-				})
-			}
-		}
-
-		if(this.isNew()) {
-			const payments = checkStudentDuesReturning(student)
-				.reduce((agg, p) => ({ 
-					...agg, 
-					[p.payment_id]: {
-						amount: p.amount,
-						date: p.date,
-						type: p.type,
-						fee_id: p.fee_id,
-						fee_name: p.fee_name
-					}
-				}), {});
-
-			student.payments = payments;
-		}
-		
-		for(let p_id of Object.keys(student.payments)){
-			
-			const current_payment = student.payments[p_id];
-			const corresponding_fees = student.fees[current_payment.fee_id]
-
-			const curr_payment_date = moment(current_payment.date).format("MM/YYYY")
-			const curr_month = moment().format("MM/YYYY")
-			const fee_amount =  corresponding_fees !== undefined ? parseFloat(corresponding_fees.amount,10) : ""
-			
-			if( curr_payment_date === curr_month && 
-				corresponding_fees === undefined) 
-			{
-				const {[p_id]:removed, ...nextPayment} = student.payments
-				student.payments = nextPayment;
-			}
-			else if(curr_payment_date === curr_month && 
-				current_payment.type === "OWED" && 
-				corresponding_fees.period === "MONTHLY" &&
-				Math.abs(current_payment.amount) !== Math.abs(fee_amount) )
-			{
-				student.payments[p_id] = {
-					amount: corresponding_fees.type !== "SCHOLARSHIP" ?   fee_amount : (-1 * fee_amount), // check if scholarship, then make negative
-					date: current_payment.date,
-					type: current_payment.type,
-					fee_id: current_payment.fee_id,
-					fee_name: corresponding_fees.name
+				if(AdmissionNumber || RollNumber)
+				{
+					return this.setState({
+						banner: {
+							active : true,
+							good: false,
+							text: RollNumber ? "Roll Number Already Exists": "Admission Number Already Exists"
+						}
+					})
 				}
 			}
 
+			for(let fee of Object.values(this.state.profile.fees)) {
+				//console.log('fees', fee)
+
+				if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
+					return this.setState({
+						banner: {
+							active: true,
+							good: false,
+							text: "Please fill out all Fee Information"
+						}
+					})
+				}
+			}
+
+			if(this.isNew()) {
+				const payments = checkStudentDuesReturning(student)
+					.reduce((agg, p) => ({ 
+						...agg, 
+						[p.payment_id]: {
+							amount: p.amount,
+							date: p.date,
+							type: p.type,
+							fee_id: p.fee_id,
+							fee_name: p.fee_name
+						}
+					}), {});
+
+				student.payments = payments;
+			}
+			
+			for(let p_id of Object.keys(student.payments)){
+				
+				const current_payment = student.payments[p_id];
+				const corresponding_fees = student.fees[current_payment.fee_id]
+
+				const curr_payment_date = moment(current_payment.date).format("MM/YYYY")
+				const curr_month = moment().format("MM/YYYY")
+				const fee_amount =  corresponding_fees !== undefined ? parseFloat(corresponding_fees.amount,10) : ""
+				
+				if( curr_payment_date === curr_month && 
+					corresponding_fees === undefined) 
+				{
+					const {[p_id]:removed, ...nextPayment} = student.payments
+					student.payments = nextPayment;
+				}
+				else if(curr_payment_date === curr_month && 
+					current_payment.type === "OWED" && 
+					corresponding_fees.period === "MONTHLY" &&
+					Math.abs(current_payment.amount) !== Math.abs(fee_amount) )
+				{
+					student.payments[p_id] = {
+						amount: corresponding_fees.type !== "SCHOLARSHIP" ?   fee_amount : (-1 * fee_amount), // check if scholarship, then make negative
+						date: current_payment.date,
+						type: current_payment.type,
+						fee_id: current_payment.fee_id,
+						fee_name: corresponding_fees.name
+					}
+				}
+
+			}
 		}
 
-		this.props.save(student);
-
+		if(!this.isProspective()){
+			const { prospective_section_id: removed, ...rest } = student
+			this.props.save(rest);
+		}
+		else{
+			this.props.save(student);
+		}
 		this.setState({
 			banner: {
 				active: true,
@@ -212,7 +233,9 @@ class SingleStudent extends Component {
 				banner: {
 					active: false
 				},
-				redirect: this.isNew() ? `/student` : false
+				redirect: this.isProspective() ? 
+					this.isNew() ? `/student?forwardTo=prospective-student` : false 
+					: this.isNew() ? `/student` : false
 			})
 		}, 2000);
 
@@ -242,13 +265,44 @@ class SingleStudent extends Component {
 		*/
 	}
 
+	onEnrolled = () => {
+		
+    const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
+		const student = {
+			...rest_profile,
+			Active: true,
+			section_id,
+			tags:{
+				...rest_tags
+			}
+		}
+		
+		this.props.save(student);
+
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "ENROLLED!"
+			}
+		})
+		
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				},
+				redirect: `/student?forwardTo=prospective-student`
+			})
+		}, 1000);
+	}
 	onDelete = () => {
 		// console.log(this.state.profile.id)
 
 		this.props.delete(this.state.profile)
 
 		this.setState({
-			redirect: `/student`
+			redirect: this.isProspective() ? `/student?forwardTo=prospective-student` : `/student`
 		})
 	}
 
@@ -302,8 +356,8 @@ class SingleStudent extends Component {
 			console.log('redirecting....')
 			return <Redirect to={this.state.redirect} />
 		}
-
 		const admin = this.props.user.Admin;
+		const prospective = this.isProspective()
 
 		return <div className="single-student">
 				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -319,15 +373,15 @@ class SingleStudent extends Component {
 						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!admin} />
 					</div>
 					
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>B-Form Number</label>
 						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={!admin}/>
-					</div>
+					</div> : false}
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Date of Birth</label>
 						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" disabled={!admin}/>
-					</div>
+					</div> : false}
 
 					<div className="row">
 						<label>Gender</label>
@@ -343,10 +397,10 @@ class SingleStudent extends Component {
 						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name"  disabled={!admin}/>
 					</div>
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Father CNIC</label>
 						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={!admin}/>
-					</div>
+					</div>: false}
 
 					<div className="divider">Contact Information</div>
 
@@ -355,22 +409,22 @@ class SingleStudent extends Component {
 						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 11)} placeholder="Phone Number" disabled={!admin}/>
 					</div>
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Address</label>
 						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={!admin}/>
-					</div>
+					</div> : false }
 
 					<div className="divider">School Information</div>
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Active Status</label>
 						<select {...this.former.super_handle(["Active"])} disabled={!admin}>
 							<option value={true}>Student Currently goes to this School</option>
 							<option value={false}>Student No Longer goes to this School</option>
 						</select>
-					</div>
+					</div> : false}
 
-					{ !this.state.profile.Active ? false : <div className="row">
+					{ prospective || !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
 						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
 							{
@@ -384,29 +438,43 @@ class SingleStudent extends Component {
 						</select>
 					</div>
 					}
+					{ !prospective ? false : <div className="row">
+						<label>Class Section</label>
+						<select {...this.former.super_handle_flex(["prospective_section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
+							{
+								 [
+									<option key="" value="">Please Select a Section</option>,
+									 ...getSectionsFromClasses(this.props.classes)
+									 	.sort((a,b) => a.classYear - b.classYear )
+										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+								]
+							}
+						</select>
+					</div>
+					}
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Roll No</label>
 						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={!admin} />
-					</div>
+					</div>: false}
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Admission Date</label>
 						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date" disabled={!admin}/>
-					</div>
+					</div> : false}
 
-					<div className="row">
+					{!prospective ? <div className="row">
 						<label>Admission Number</label>
 						<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={!admin}/>
-					</div>
+					</div> : false}
 
 					<div className="row">
 						<label>Notes</label>
 						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={!admin}/>
 					</div>
 
-					{admin || this.props.permissions.fee.teacher ? <div className="divider">Payment</div> : false}
-					{admin || this.props.permissions.fee.teacher ? 
+					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
+					{(admin || this.props.permissions.fee.teacher) && !prospective ?
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							return <div className="section" key={id}>
 								{!admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
@@ -437,12 +505,15 @@ class SingleStudent extends Component {
 							</div>
 						})
 					: false }
-					{ !admin ? false : <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> }
+					{ admin && !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
 					{ !admin ? false : <div className="save-delete">
-						<div className="button red" onClick={this.onDelete}>Delete</div>
+						{!this.isNew()? <div className="button red" onClick={this.onDelete}>Delete</div> : false}
 						<div className="button blue" onClick={this.onSave}>Save</div>
 					</div>
 					}
+					<div className="row">
+					{prospective && !this.isNew() ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
+					</div>
 				</div>
 			</div>
 	}
