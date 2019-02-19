@@ -58,7 +58,8 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 			<div className="bg-cover" />
 			<div className="cover" style={{ }}>
 				<div className="title" style={{ fontSize: "3rem" }}>Welcome to EdMarkaz</div>
-				<div className="form" style={{ margin: "auto", width: "90%", display: "flex", flexDirection: "column", alignContent: "center"}}>
+				<div className="divider"></div>
+				<div className="form">
 					<div className="row">
 						<input type="text" {...this.former.super_handle(["username"])} placeholder="username" />
 					</div>
@@ -72,8 +73,6 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 				<DeckMap onSelect={console.log} school_locations={locations}/>
 			</div>
 		</div>
-
-
 	}
 }
 

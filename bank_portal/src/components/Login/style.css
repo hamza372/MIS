@@ -8,7 +8,9 @@
 
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 75px;
 }
 
 .login .bg-cover {
@@ -38,11 +40,30 @@
 	color: white;
 }
 
-.login .form .row * {
-	color: white;
+.login .form {
+	width: 30%;
+	display: flex;
+	flex-direction: column;
 }
 
-	.login .form .row input {
-		background-color: white;
-		color: black;
+	.login .form .row * {
+		color: white;
+	}
+
+		.login .form .row input {
+			background-color: white;
+			color: black;
+		}
+
+	@media only screen and (max-width: 767px) {
+
+		.login .cover {
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+		}
+
+		.login .form {
+			width: 75%;
+		}
 	}

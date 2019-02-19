@@ -43,10 +43,12 @@ class Settings extends React.Component<propTypes, stateType> {
 	render() {
 
 		console.log(this.props)
-		return <div>
+		return <div className="page">
 			<div className="title">Settings</div>
 
-			<div className="form">
+			<div className="form" style={{ width: "90%" }}>
+
+				<div className="divider">Add New Number</div>
 				<div className="row">
 					<label>Number</label>
 					<input type="tel" {...this.former.super_handle(["current_number"])} placeholder="New Number"/>
@@ -56,6 +58,7 @@ class Settings extends React.Component<propTypes, stateType> {
 					<input type="text" {...this.former.super_handle(["current_name"])} placeholder="Name" />
 				</div>
 				<div className="button green" onClick={this.addNumber}>+</div>
+				<div className="divider">Existing Numbers</div>
 				{
 					Object.entries(this.props.numbers)
 						.map(([number, info]) => {

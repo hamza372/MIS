@@ -91,12 +91,6 @@ class SchoolInfo extends React.Component<propTypes> {
 
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
 
-			{ reserved ? 
-				<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
-				<div className="button green" onClick={this.onShowNumber}>Show Number</div>
-			}
-
-
 
 			<div className="form" style={{width: "90%"}}>
 				<div className="row">
@@ -158,11 +152,15 @@ class SchoolInfo extends React.Component<propTypes> {
 					<label>Address</label>
 					<div>{school.school_address}</div>
 				</div>
-				{ reserved ? false : 
-					<div className="row">
+				<div className="save-delete">
+					{ !reserved &&
 						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
-					</div>
-				}
+					}
+					{ reserved ? 
+						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
+						<div className="button green" onClick={this.onShowNumber}>Show Number</div>
+					}
+				</div>
 			</div>
 		</div>
 	}

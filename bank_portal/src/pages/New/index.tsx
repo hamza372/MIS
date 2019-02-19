@@ -45,7 +45,9 @@ class Home extends React.Component<propTypes> {
 					.map(([sid, v]) => {
 						const school = this.props.school_db[sid];
 
-						return <div key={sid} onClick={this.onSchoolClick(school)}>{school.school_name}</div>
+						return <div key={sid} onClick={this.onSchoolClick(school)}>
+							<div>{school.school_name}</div>
+						</div>
 					})
 			}
 			</div>

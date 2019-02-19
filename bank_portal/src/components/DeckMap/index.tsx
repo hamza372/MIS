@@ -51,7 +51,7 @@ class Map extends React.Component<propTypes, any> {
 					radiusMinPixels={Object.keys(this.props.school_locations).length > 2000 ? 1 : 5}
 					radiusMaxPixels={300}
 					getPosition={(d : any) => ([parseFloat(d.GPS_East), parseFloat(d.GPS_North)])}
-					getColor={(d: any) => ([255, 140, 0])}
+					getColor={(d: any) => ([116, 172, 237])}
 					pickable={true}
 					onClick={(item : any) => this.props.onSelect(item.object as SchoolLocation)}
 					autoHighlight={true}

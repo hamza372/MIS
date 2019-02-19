@@ -39,7 +39,9 @@ class InProgress extends React.Component<propTypes> {
 			<div className="list">
 			{
 				Object.values(this.props.schools)
-					.map(s => <div key={s.refcode} onClick={this.onSchoolClick(s)}>{s.school_name}</div>)
+					.map(s => <div key={s.refcode} onClick={this.onSchoolClick(s)}>
+						<div>{s.school_name}</div>
+					</div>)
 			}
 			</div>
 

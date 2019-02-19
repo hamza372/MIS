@@ -16,12 +16,6 @@
 	grid-template-columns: 220px 1fr 1fr;
 }
 
-.page {
-	background-color: whitesmoke;
-	height: 100%;
-	border-radius: 8px;
-}
-
 .header {
 	display: flex;
 	grid-area: header;
@@ -52,6 +46,10 @@
 }
 	.burger>a:hover, .burger>a.active {
 		background-color: var(--blue);
+		color: whitesmoke;
+	}
+
+	.burger .divider {
 		color: whitesmoke;
 	}
 
