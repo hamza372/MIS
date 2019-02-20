@@ -6,10 +6,7 @@ export const SELECT_LOCATION = "SELECT_LOCATION"
 type Dispatch = ( action : any) => any;
 type GetState = () => RootBankState
 
-const debug_url = "http://localhost:5000"
-const python_host = process.env.REACT_APP_PORTAL_PYTHON || debug_url;
-
-export const createLogin = (username : string, password : string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createLogin = (username : string, password : string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -19,7 +16,7 @@ export const createLogin = (username : string, password : string) => (dispatch: 
 		client_id: state.client_id,
 		id: state.auth.id,
 		payload: {
-			id: username, // school_id == username here.
+			id: username,
 			password
 		}
 	})
@@ -29,7 +26,7 @@ export const createLogin = (username : string, password : string) => (dispatch: 
 			dispatch(forceSaveFullStatePotentiallyCausingProblems())
 		}
 
-		dispatch(createLoginSucceed(username, res.token, res.sync_state))
+		dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
 	})
 }
 
@@ -132,6 +129,8 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: GetState) => {
 
 	const masked_num = getState().sync_state.matches[school_id].masked_number
+	const time = new Date().getTime()
+	const state = getState();
 
 	dispatch(createMerges([
 		{
@@ -147,6 +146,17 @@ export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 		{
 			path: ["sync_state", "matches", school_id, "masked_number"],
 			value: ""
+		},
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: {
+				event: "MARK_DONE",
+				time,
+				user: {
+					number: state.auth.number,
+					name: state.sync_state.numbers[state.auth.number]
+				}
+			}
 		}
 	]))
 }
@@ -156,10 +166,25 @@ export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState
 	// check if school was in progress... if so we need to release
 	// not sure how this could happen so ignoring for now.
 
+	const time = new Date().getTime()
+
+	const state = getState();
+
 	dispatch(createMerges([
 		{
 			path: ["sync_state", "matches", school_id, "status"],
 			value: "REJECTED"
+		},
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: {
+				event: "MARK_REJECTED",
+				time,
+				user: {
+					number: state.auth.number,
+					name: state.sync_state.numbers[state.auth.number]
+				}
+			}
 		}
 	]))
 }
@@ -183,5 +208,12 @@ export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, ge
 		}
 	]))
 }
+
+export type EditLoginNumberAction = ReturnType<typeof editLoginNumber>
+export const EDIT_LOGIN_NUMBER = "EDIT_LOGIN_NUMBER"
+export const editLoginNumber = (number : string) => ({
+	type: EDIT_LOGIN_NUMBER as typeof EDIT_LOGIN_NUMBER,
+	number
+})
 
 export type Actions = addSchoolAction | MergeAction | DeletesAction | QueueAction;

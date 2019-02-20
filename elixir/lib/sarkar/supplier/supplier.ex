@@ -35,6 +35,64 @@ defmodule Sarkar.Supplier do
 		GenServer.call(via(id), {:reload})
 	end
 
+	def call_start_event(id, caller_id, school_id) do
+
+		sync_state = Sarkar.Supplier.get_sync_state(id)
+
+		time = :os.system_time(:millisecond)
+		path = ["sync_state", "matches", school_id, "history", "#{time}"]
+		value = %{
+			"event" => "CALL_START",
+			"time" => time,
+			"user" => %{
+				"number" => caller_id,
+				"name" => Dynamic.get(sync_state, ["numbers", caller_id])
+			}
+		}
+
+		changes = %{
+			Enum.join(path, ",") => %{
+				"action" => %{
+					"path" => path,
+					"type" => "MERGE",
+					"value" => value
+				},
+				"date" => time
+			}
+		}
+
+		GenServer.call(via(id), {:sync_changes, "elixir", changes, time})
+	end
+
+	def call_end_event(id, caller_id, school_id) do
+
+		sync_state = Sarkar.Supplier.get_sync_state(id)
+
+		time = :os.system_time(:millisecond)
+		path = ["sync_state", "matches", school_id, "history", "#{time}"]
+		value = %{
+			"event" => "CALL_END",
+			"time" => time,
+			"user" => %{
+				"number" => caller_id,
+				"name" => Dynamic.get(sync_state, ["numbers", caller_id])
+			}
+		}
+
+		changes = %{
+			Enum.join(path, ",") => %{
+				"action" => %{
+					"path" => path,
+					"type" => "MERGE",
+					"value" => value
+				},
+				"date" => time
+			}
+		}
+
+		GenServer.call(via(id), {:sync_changes, "elixir", changes, time})
+	end
+
 	# SERVER
 
 	def handle_call({:school_from_masked_num, masked_num}, _from, {id, writes, sync_state} = state) do
@@ -53,7 +111,7 @@ defmodule Sarkar.Supplier do
 
 		# map of changes.
 		# key is path separated by comma
-		# value is { action: {path, value}, date}
+		# value is { action: {path, value, type}, date}
 
 		# make sure we aren't missing any writes between last sync_date and the least path_date.
 

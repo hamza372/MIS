@@ -12,13 +12,14 @@ import './style.css'
 
 interface propTypes {
 	connected: boolean,
-	login: (id : string, password : string) => void
+	login: (id : string, password : string, number : string) => void
 	auth: RootBankState['auth'],
 }
 
 interface state {
-	username: string,
+	username: string
 	password: string
+	number: string
 }
 
 class Login extends Component<propTypes & RouteComponentProps, state>{
@@ -30,14 +31,15 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 
 		this.state = {
 			username: "",
-			password: ""
+			password: "",
+			number: ""
 		}
 
 		this.former = new former(this, [])
 	}
 
 	login = () => {
-		this.props.login(this.state.username, this.state.password)
+		this.props.login(this.state.username, this.state.password, this.state.number)
 	}
 
 	componentWillReceiveProps(nextProps : propTypes) {
@@ -66,19 +68,25 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 					<div className="row">
 						<input type="password" {...this.former.super_handle(["password"])} placeholder="password" />
 					</div>
+					<div className="row">
+						<input type="tel" {...this.former.super_handle(["number"])} placeholder="Your Cellphone Number" />
+					</div>
 					<div className="button blue" onClick={this.login}>Login</div>
 				</div>
-			</div>
-			<div className="mappy-boi">
-				<DeckMap onSelect={console.log} school_locations={locations}/>
 			</div>
 		</div>
 	}
 }
 
+/*
+			<div className="mappy-boi">
+				<DeckMap onSelect={console.log} school_locations={locations}/>
+			</div>
+*/
+
 export default connect((state : RootBankState) => ({
 	connected: state.connected,
 	auth: state.auth
 }), (dispatch : any) => ({
-	login: (username : string, password : string) => dispatch(createLogin(username, password))
+	login: (username : string, password : string, number : string) => dispatch(createLogin(username, password, number))
 }))(withRouter(Login))

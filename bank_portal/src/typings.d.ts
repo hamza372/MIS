@@ -9,9 +9,24 @@ declare module 'deck.gl' {
 	export default value;
 }
 
+// could include "history" here or "timeline"
+// with { [timestamp]: { event: 'number-revealed'}}
+// then when things are added to a supplier from backend its already in sync_state
 interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
-	masked_number?: string
+	masked_number?: string,
+	history: {
+		[timestamp: number]: SchoolMatchEvent
+	}
+}
+
+interface SchoolMatchEvent {
+	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START" | "CALL_END",
+	time: number,
+	user: {
+		name: string,
+		number: string
+	}
 }
 
 interface RootBankState {
@@ -46,7 +61,8 @@ interface RootBankState {
 		username: string,
 		attempt_failed: boolean,
 		loading: boolean,
-		client_type: "bank_portal"
+		client_type: "bank_portal",
+		number: string
 	},
 	client_id: string,
 	queued: {

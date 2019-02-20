@@ -7,6 +7,7 @@ import AuthedRoute from './components/AuthedRoute'
 
 import Login from './components/Login'
 import Burger from './pages/Burger'
+import VerifyNumber from './pages/VerifyNumber'
 
 import './components/Layout/style.css'
 
@@ -15,6 +16,7 @@ export default ({ store } : { store: Store }) => (
 		<BrowserRouter>
 			<Switch>
 				<Route path="/login" component={Login} />
+				<Route path="/verify-number" component={VerifyNumber} />
 				<AuthedRoute path="/" component={Burger} />
 			</Switch>
 		</BrowserRouter>

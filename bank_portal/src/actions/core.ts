@@ -271,11 +271,13 @@ export interface LoginSucceed {
 	type: "LOGIN_SUCCEED",
 	id: string,
 	token: string,
-	sync_state: RootBankState['sync_state']
+	sync_state: RootBankState['sync_state'],
+	number: string
 }
-export const createLoginSucceed = (id : string, token : string, sync_state: RootBankState['sync_state']) => ({ 
+export const createLoginSucceed = (id : string, token : string, sync_state: RootBankState['sync_state'], number : string) : LoginSucceed => ({ 
 	type: LOGIN_SUCCEED,
 	id,
 	token,
-	sync_state
+	sync_state,
+	number
 })
