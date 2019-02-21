@@ -46,7 +46,7 @@ defmodule Sarkar.Supplier do
 			"time" => time,
 			"user" => %{
 				"number" => caller_id,
-				"name" => Dynamic.get(sync_state, ["numbers", caller_id])
+				"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
 			}
 		}
 
@@ -75,7 +75,7 @@ defmodule Sarkar.Supplier do
 			"time" => time,
 			"user" => %{
 				"number" => caller_id,
-				"name" => Dynamic.get(sync_state, ["numbers", caller_id])
+				"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
 			}
 		}
 

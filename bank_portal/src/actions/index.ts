@@ -106,6 +106,8 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 
 	const masked_num = free[Math.floor(Math.random() * free.length)]
 
+	const time = new Date().getTime();
+
 	dispatch(createMerges([
 		{
 			path: ["sync_state", "mask_pairs", masked_num],
@@ -121,6 +123,17 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 		{
 			path: ["sync_state", "matches", school_id, "status"],
 			value: "IN_PROGRESS"
+		},
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: {
+				event: "REVEAL_NUMBER",
+				time,
+				user: {
+					number: state.auth.number,
+					name: state.sync_state.numbers[state.auth.number].name
+				}
+			}
 		}
 	]))
 
@@ -154,7 +167,7 @@ export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 				time,
 				user: {
 					number: state.auth.number,
-					name: state.sync_state.numbers[state.auth.number]
+					name: state.sync_state.numbers[state.auth.number].name
 				}
 			}
 		}
@@ -182,7 +195,7 @@ export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState
 				time,
 				user: {
 					number: state.auth.number,
-					name: state.sync_state.numbers[state.auth.number]
+					name: state.sync_state.numbers[state.auth.number].name
 				}
 			}
 		}

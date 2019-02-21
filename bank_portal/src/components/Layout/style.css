@@ -221,7 +221,7 @@ a.block {
 			margin-left: auto;
 		}
 
-		.form .row>div:last-child {
+		.form .row>:not(input):last-child {
 			text-align: right;
 		}
 

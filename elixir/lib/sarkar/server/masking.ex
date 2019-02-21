@@ -13,6 +13,8 @@ defmodule Sarkar.Server.Masking do
 		query_params = :cowboy_req.parse_qs(req) 
 		|> Enum.into(%{})
 
+		# TODO: handle different events with different code blocks inside this case
+		# i.e. if we are passing call_end or call_start events
 		{school_name, forward} = case query_params do
 			%{"dialed" => dialed, "caller_id" => incoming} -> 
 				# look up incoming against supplier db.
@@ -29,6 +31,8 @@ defmodule Sarkar.Server.Masking do
 
 				{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'pulled_schoolname', db->'phone_number' from platform_schools where id=$1", [school_id])
 				[[ school_name, outgoing_number ]] = resp2.rows
+
+				Sarkar.Supplier.call_start_event(supplier_id, incoming, school_id)
 
 				{school_name, outgoing_number}
 			other ->

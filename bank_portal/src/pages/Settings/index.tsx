@@ -2,11 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Former from '~/src/utils/former'
 
-import { addSupplierNumber } from '~/src/actions'
+import { addSupplierNumber, deleteSupplierNumber } from '~/src/actions'
 
 interface propTypes {
 	numbers: RootBankState['sync_state']['numbers'],
 	addNumber: (number: string, name: string) => void
+	removeNumber: (number: string) => void
 }
 
 interface stateType {
@@ -30,11 +31,17 @@ class Settings extends React.Component<propTypes, stateType> {
 	}
 
 	addNumber = () => {
+
 		this.props.addNumber(this.state.current_number, this.state.current_name)
+
 		this.setState({
 			current_name: "",
 			current_number: ""
 		})
+	}
+
+	removeNumber = (number : string) => () => {
+		this.props.removeNumber(number)
 	}
 
 	componentWillReceiveProps(nextProps: propTypes) {
@@ -66,6 +73,10 @@ class Settings extends React.Component<propTypes, stateType> {
 							return <div className="row" key={number}>
 								<div>{info.name}</div>
 								<div>{number}</div>
+								<div className="button red" onClick={this.removeNumber(number)} style={{
+									padding: "5px 10px",
+									borderRadius: "50%"
+								}}>X</div>
 							</div>
 						})
 				}
@@ -78,5 +89,6 @@ class Settings extends React.Component<propTypes, stateType> {
 export default connect((state : RootBankState) => ({
 	numbers: state.sync_state.numbers || {}
 }), (dispatch: (x: any) => void) => ({
-	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name))
+	addNumber: (number: string, name: string) => dispatch(addSupplierNumber(number, name)),
+	removeNumber: (number: string) => dispatch(deleteSupplierNumber(number))
 }))(Settings)

@@ -83,16 +83,23 @@ class SchoolInfo extends React.Component<propTypes> {
 
 		const reserved = this.props.schoolMatch && this.props.schoolMatch.status === "IN_PROGRESS"
 
-		console.log(this.props.match)
+		const schoolMatch = this.props.schoolMatch;
+		const hasHistory = schoolMatch.history && Object.keys(schoolMatch.history).length > 0;
 
 		return <div className="school-info page" style={{ padding: "5px" }}>
-
 			<div className="close" onClick={this.onClose}>Close</div>
-
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
 
-
 			<div className="form" style={{width: "90%"}}>
+
+				{
+					hasHistory && <SchoolHistory schoolMatch={schoolMatch} />
+				}
+
+				{
+					hasHistory && <div className="divider">Profile</div>
+				}
+
 				<div className="row">
 					<label>Status</label>
 					<div>{this.props.schoolMatch.status}</div>
@@ -158,12 +165,35 @@ class SchoolInfo extends React.Component<propTypes> {
 					}
 					{ reserved ? 
 						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
-						<div className="button green" onClick={this.onShowNumber}>Show Number</div>
+						<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 					}
 				</div>
 			</div>
 		</div>
 	}
+}
+
+interface SchoolMatchProps {
+	schoolMatch: SchoolMatch
+}
+const SchoolHistory : React.SFC<SchoolMatchProps> = (props) => {
+
+	return <div className="school history">
+		<div className="divider">History</div>
+
+		{
+			Object.values(props.schoolMatch.history)
+				.map(v => <div className="row" key={v.time}>
+					<div>{new Date(v.time).toLocaleTimeString()}</div>
+					<div>{new Date(v.time).toLocaleDateString()}</div>
+					<div>{
+						// @ts-ignore
+						v.user.name.name || v.user.name
+					}</div>
+					<div>{v.event}</div>
+				</div>)
+		}
+	</div>
 }
 
 // in the future this page should show if a call is in progress
