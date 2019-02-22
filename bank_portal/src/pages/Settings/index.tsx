@@ -64,7 +64,7 @@ class Settings extends React.Component<propTypes, stateType> {
 					<label>Name</label>
 					<input type="text" {...this.former.super_handle(["current_name"])} placeholder="Name" />
 				</div>
-				<div className="button green" onClick={this.addNumber}>+</div>
+				<div className="button green" onClick={this.addNumber}>Add Number</div>
 
 				<div className="divider">Existing Numbers</div>
 				{

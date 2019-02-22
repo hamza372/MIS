@@ -126,12 +126,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const schoolMatch = this.props.schoolMatch;
 		const hasHistory = schoolMatch.history && Object.keys(schoolMatch.history).length > 0;
 
-		// is a call in progress right now?
-		// i.e. did a call_start happen without a corresponding call_end event
-
-		// did a call JUST end? 
-
-
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
@@ -256,7 +250,7 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 		if(curr.event === "CALL_END") {
 			// is there a previous call_start event?
 			const prev = agg.pop();
-			if(prev.event === "CALL_START") {
+			if(prev && prev.event === "CALL_START") {
 				return agg;
 			}
 			return [...agg, prev, curr]
