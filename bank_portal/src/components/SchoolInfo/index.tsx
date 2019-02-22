@@ -1,7 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
+
+import Former from '~/src/utils/former'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool } from '~/src/actions'
+import Modal from '~/src/components/Modal'
+
 
 import './style.css'
 
@@ -14,6 +18,15 @@ interface StateProps {
 	schoolMatch?: SchoolMatch
 }
 
+interface StateType {
+	showSurvey: boolean
+
+	survey: {
+		random_question: string
+	}
+
+}
+
 interface DispatchProps {
 	addSchool: () => void
 	releaseNumber: () => void
@@ -23,14 +36,24 @@ interface DispatchProps {
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
 
-class SchoolInfo extends React.Component<propTypes> {
+class SchoolInfo extends React.Component<propTypes, StateType> {
 
+	former: Former
 	constructor(props : propTypes) {
 		super(props);
 
 		if(props.school === undefined) {
 			props.addSchool()
 		}
+
+		this.state = {
+			showSurvey: false,
+			survey: {
+				random_question: ""
+			}
+		}
+
+		this.former = new Former(this, ["survey"])
 
 	}
 
@@ -39,15 +62,22 @@ class SchoolInfo extends React.Component<propTypes> {
 		if(nextProps.school === undefined && nextProps.school_id !== this.props.school_id) {
 			nextProps.addSchool()
 		}
+
+		// if we currently have a call_in_progress and the next props has a call_end event
+		// then we need to display the survey.
+
+		const current_call_in_progress = call_in_progress(this.props.schoolMatch)
+		const next_call = call_in_progress(nextProps.schoolMatch)
+
+		if(current_call_in_progress && !next_call) {
+			this.setState({
+				showSurvey: true
+			})
+		}
+
 	}
 
 	onShowNumber = () => {
-		console.log('show da number')
-
-		// should mark as in progress and have a matching number
-		// we should be checking this in props to see what button to show
-		// i.e. show number or "mark done"
-
 		this.props.reserveNumber()
 	}
 
@@ -74,6 +104,16 @@ class SchoolInfo extends React.Component<propTypes> {
 		})
 	}
 
+	saveSurvey = () => {
+
+		console.log("saving survey", this.state)
+
+		this.setState({
+			showSurvey: false
+		})
+
+	}
+
 	render() {
 
 		const school = this.props.school;
@@ -85,6 +125,12 @@ class SchoolInfo extends React.Component<propTypes> {
 
 		const schoolMatch = this.props.schoolMatch;
 		const hasHistory = schoolMatch.history && Object.keys(schoolMatch.history).length > 0;
+
+		// is a call in progress right now?
+		// i.e. did a call_start happen without a corresponding call_end event
+
+		// did a call JUST end? 
+
 
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
@@ -98,6 +144,26 @@ class SchoolInfo extends React.Component<propTypes> {
 
 				{
 					hasHistory && <div className="divider">Profile</div>
+				}
+
+				{
+					this.state.showSurvey && 
+					<Modal>
+						<div className="modal">
+							<div className="title">Call Finished</div>
+
+							<div className="form" style={{ width: "90%"}}>
+								<div className="row">
+									<label>How was your call?</label>
+									<input type="text" {...this.former.super_handle(["random_question"])} placeholder={"Tell Us Now"} />
+								</div>
+
+								<div className="row">
+									<div className="button blue" onClick={this.saveSurvey}>Save</div>
+								</div>
+							</div>
+						</div>
+					</Modal>
 				}
 
 				<div className="row">
@@ -171,6 +237,39 @@ class SchoolInfo extends React.Component<propTypes> {
 			</div>
 		</div>
 	}
+}
+
+const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
+
+	if(schoolMatch.history === undefined) {
+		return false;
+	}
+
+	const call_events = Object.values(schoolMatch.history)
+		.filter(x => x.event === "CALL_START" || x.event === "CALL_END")
+		.sort((a, b) => a.time - b.time)
+
+	const unmatched_call_event = call_events.reduce((agg : SchoolMatchEvent[], curr) => {
+		if(curr.event === "CALL_START") {
+			return [...agg, curr]
+		}
+		if(curr.event === "CALL_END") {
+			// is there a previous call_start event?
+			const prev = agg.pop();
+			if(prev.event === "CALL_START") {
+				return agg;
+			}
+			return [...agg, prev, curr]
+		}
+	}, [])
+
+	if(unmatched_call_event.length > 0) {
+		console.log(unmatched_call_event);
+		return true;
+	}
+
+	return false;
+
 }
 
 interface SchoolMatchProps {
