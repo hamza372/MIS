@@ -298,7 +298,9 @@ class SingleStudent extends Component {
 	}
 	onDelete = () => {
 		// console.log(this.state.profile.id)
-
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
 		this.props.delete(this.state.profile)
 
 		this.setState({
