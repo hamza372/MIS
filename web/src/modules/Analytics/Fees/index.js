@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
@@ -6,86 +6,100 @@ import moment from 'moment'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { addMultiplePayments } from 'actions'
 import { PrintHeader } from 'components/Layout'
+import Former from 'utils/former'
+
 
 import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
 
-const MonthlyFeesChart = (props) => {
+	const MonthlyFeesChart = (props) => {
 			
-	return <ResponsiveContainer width="100%" height={200}>
-				<ComposedChart data={
-						Object.entries(props.monthly_payments)
-							.sort(([m1,], [m2,]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
-							.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
-								month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED 
-							}))}>
-					<Legend />
-					<XAxis dataKey="month" />
-					<YAxis />
-					<Tooltip />
-
-					<Bar dataKey='OWED' name="Owed" fill="#74aced" />
-					<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Paid" />
-					<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
-					<Bar dataKey='net' name="Paid - Owed" fill="#ff6b68" />
-
-			  </ComposedChart>
-			</ResponsiveContainer> 
-}
-
-const MonthlyFeesTable = (props) => {
+		return <ResponsiveContainer width="100%" height={200}>
+					<ComposedChart data={
+							Object.entries(props.monthly_payments)
+								.sort(([m1,], [m2,]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
+								.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
+									month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED 
+								}))}>
+						<Legend />
+						<XAxis dataKey="month" />
+						<YAxis />
+						<Tooltip />
 	
-	const total = props.total_debts;
-	const monthly_payments = props.monthly_payments;
-
-return <div className="section table" style={{margin: "20px 0"}}>
-			<div className="table row heading">
-				<label><b>Date</b></label>
-				<label><b>Owed</b></label>
-				<label><b>Paid</b></label>
-				<label><b>Forgiven</b></label>
-				<label><b>Paid - Owed</b></label>
-			</div>
-			{
-				[...Object.entries(monthly_payments)
-					.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
-					.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
-													
-						const prof = SUBMITTED - OWED;
-						const red = "#FC6171"
-
-						return <div className="table row" key={month}>
-							<div>{month}</div>
-							<div>{OWED}</div>
-							<div>{SUBMITTED}</div>
-							<div>{FORGIVEN}</div>
-							<div style={{ color: prof < 0 ? red : "inherit" }}>{SUBMITTED - OWED}</div>
+						<Bar dataKey='OWED' name="Total" fill="#74aced" />
+						<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Paid" />
+						<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
+						<Bar dataKey='net' name="Pending" fill="#ff6b68" />
+	
+				  </ComposedChart>
+				</ResponsiveContainer> 
+	}
+	
+	const MonthlyFeesTable = (props) => {
+		
+		const total = props.total_debts;
+		const monthly_payments = props.monthly_payments;
+	
+		return <div className="section table" style={{margin: "20px 0"}}>
+				<div className="table row heading">
+					<label><b>Date</b></label>
+					<label><b>Total</b></label>
+					<label><b>Paid</b></label>
+					<label><b>Forgiven</b></label>
+					<label><b>Pending</b></label>
+				</div>
+				{
+					[...Object.entries(monthly_payments)
+						.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
+						.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
+														
+							const prof = SUBMITTED - OWED;
+							const red = "#FC6171"
+	
+							return <div className="table row" key={month}>
+								<div>{month}</div>
+								<div>{OWED}</div>
+								<div>{SUBMITTED}</div>
+								<div>{FORGIVEN}</div>
+								<div style={{ color: prof < 0 ? red : "inherit" }}>{SUBMITTED - OWED}</div>
+							</div>
+						}),
+						<div className="table row footing" key={Math.random()}>   
+							<label><b>Total</b></label>
+							<label><b>{total.OWED}</b></label>
+							<label><b>{total.PAID}</b></label>
+							<label><b>{total.FORGIVEN}</b></label>
+							<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{-total.OWED + total.PAID}</b></label>
 						</div>
-					}),
-					<div className="table row footing" key={Math.random()}>   
-						<label><b>Total</b></label>
-						<label><b>{total.OWED}</b></label>
-						<label><b>{total.PAID}</b></label>
-						<label><b>{total.FORGIVEN}</b></label>
-						<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{-total.OWED + total.PAID}</b></label>
-					</div>
-				]
-			}
-		</div> 
-			
-} 
+					]
+				}
+			</div> 
+				
+	}
+class FeeAnalytics extends Component {
 
-export default connect(state => ({
-	students: state.db.students,
-	settings: state.db.settings
-}), dispatch => ({
-	addPayments: payments => dispatch(addMultiplePayments(payments))
-}))(({ students, addPayments, settings }) => {
+	constructor(props) {
+	  super(props)
+	
+	  this.state = {
+		 filterText: ""
+	  }
+
+	  this.former = new Former(this, [])
+
+	}
+
+	calculateDebt = ({SUBMITTED, FORGIVEN, OWED}) => SUBMITTED + FORGIVEN - OWED;
+
+	
+  render() {
 
 	// first make sure all students payments have been calculated... (this is for dues)
 
 	// outstanding money
 	// who owes it, and how much
 	// graph of paid vs due per month.
+
+	const {students, settings, addPayments} = this.props
 
 	let total_paid = 0;
 	let total_owed = 0;
@@ -133,6 +147,9 @@ export default connect(state => ({
 		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven}
 	}
 
+	const items = Object.values(total_student_debts).filter(({student, debt})=> student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
+				
+	
 	return <div className="fees-analytics">
 		
 		<PrintHeader settings={settings} />
@@ -146,19 +163,26 @@ export default connect(state => ({
 
 		<div className="divider">Students with Payments Outstanding</div>
 		<div className="section">
+		
+		<input type="text" {...this.former.super_handle(["filterText"])} placeholder="search" style={{width: "100%"}}/>
 		{
-			Object.values(total_student_debts)
-				.sort((a, b) => calculateDebt(a.debt) - calculateDebt(b.debt))
-				.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]) )
-				.map(({ student, debt }) => <div className="table row" key={student.id}>
+			items
+			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
+			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))
+			.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
-					<div>{calculateDebt(debt)}</div>
+					<div>{this.calculateDebt(debt)}</div>
 				</div>)
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
 		</div>
 
 	</div>
-})
-
-const calculateDebt = ({SUBMITTED, FORGIVEN, OWED}) => SUBMITTED + FORGIVEN - OWED;
+  }
+}
+export default connect(state => ({
+	students: state.db.students,
+	settings: state.db.settings
+}), dispatch => ({
+	addPayments: payments => dispatch(addMultiplePayments(payments))
+}))(FeeAnalytics)
