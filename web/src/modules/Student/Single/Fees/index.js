@@ -8,7 +8,7 @@ import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
 
-import { addMultiplePayments, addPayment, logSms } from 'actions'
+import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
 import { sendSMS } from 'actions/core'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { smsIntentLink } from 'utils/intent'
@@ -31,6 +31,19 @@ class StudentFees extends Component {
 
 	constructor(props) {
 		super(props);
+		
+		const current_month = moment().format("MM/YYYY")
+		const edits = Object.entries(this.student().payments)
+		.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+		.reduce((agg,[id,payment]) => {
+			return {
+				...agg,
+				[id]: {
+					amount: payment.amount,
+					fee_id: payment.fee_id
+				}
+			}
+		}, {})
 
 		this.state = {
 			payment: {
@@ -40,11 +53,11 @@ class StudentFees extends Component {
 				sendSMS: false
 			},
 			month: "",
-			year: ""
+			year: "",
+			edits
 		}
 
 		this.Former = new former(this, []);
-
 	}
 
 	student = () => {
@@ -146,6 +159,9 @@ class StudentFees extends Component {
 
 
 	}
+	onSave =()=>{
+		this.props.editPayment(this.student(), this.state.edits)
+	}
 
 	render() {
 
@@ -165,8 +181,10 @@ class StudentFees extends Component {
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 				.filter(([id,payment]) => this.getFilterCondition(payment))
 		
-		console.log("FEES", this.student().fees)
 
+		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+		const curr_month = moment().format("MM/YYYY")
+		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
 
 		return <div className="student-fees">
 			<PrintHeader settings={this.props.settings}/>
@@ -210,10 +228,37 @@ class StudentFees extends Component {
 			</div>
 
 			<div className="student-name print-only" style={{ textAlign: "left", fontWeight: "normal" }}><b>Student Name:</b> {this.student().Name}</div>
-			<PaymentTable payments={filteredPayments} />
-
+			
+			<div className="payment-history section">
+				<div className="table row heading">
+					<label><b>Date</b></label>
+					<label><b>Label</b></label>
+					<label><b>Amount</b></label>
+				</div>
+					{filteredPayments
+						.map(([id, payment]) => {
+							return <div className="payment" key={id}>								
+								<div className="table row">
+									<div>{moment(payment.date).format("DD/MM")}</div>
+									<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
+									
+									{ this.state.edits[id] !== undefined ? 
+										<div className="row" style={{color:"rgb(94, 205, 185)"}}>
+											<input style={{textAlign:"right", border: "none"}} type="number" {...this.Former.super_handle(["edits", id, "amount"])} />
+											*
+										</div>
+									: <div> {payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>}
+								</div>
+							</div> })
+				}
+				<div className="table row last">
+					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
+					<div style={style}><b>{Math.abs(owed)}</b></div>
+				</div>
+			</div>
 			<div className="form">
-				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
+			<div className="button save" onClick={this.onSave}>Save</div>
+				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment} style={{marginTop:"10px"}}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
 				{ this.state.payment.active ? <div className="new-payment">
 					<div className="row">
@@ -243,37 +288,6 @@ class StudentFees extends Component {
 	}
 }
 
-const PaymentTable = ({ payments }) => {
-
-	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-
-	const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
-
-	return <div className="payment-history section">
-		<div className="table row heading">
-			<label><b>Date</b></label>
-			<label><b>Label</b></label>
-			<label><b>Amount</b></label>
-		</div>
-		{
-			payments
-				.map(([id, payment]) => {
-					return <div className="payment" key={id}>
-						<div className="table row">
-							<div>{moment(payment.date).format("DD/MM")}</div>
-							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-							<div>{payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>
-						</div>
-					</div> })
-		}
-		<div className="table row last">
-			<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-			<div style={style}><b>{Math.abs(owed)}</b></div>
-		</div>
-	</div>
-
-}
-
 export default connect(state => ({
 	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
@@ -285,4 +299,5 @@ export default connect(state => ({
 	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text, number) => dispatch(sendSMS(text, number)),
 	logSms: (history) => dispatch(logSms(history)),
+	editPayment: (student, payments) => dispatch(editPayment(student,payments))
 }))(withRouter(StudentFees))
