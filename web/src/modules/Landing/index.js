@@ -19,6 +19,7 @@ import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
+import diary from './icons/Diary/diary.svg'
 
 import './style.css'
 
@@ -160,6 +161,7 @@ class Landing extends Component {
 						</div>
 						<div className="row">
 							<Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link>
+							<Link to="/diary" className="button red-shadow" style={{backgroundImage: `url(${diary})` }}>Dairy</Link>
 						</div>
 					</div>
 

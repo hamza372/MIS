@@ -79,7 +79,7 @@ class SMS extends Component {
 			faculty: this.props.faculty_id,
 			date: new Date().getTime(),
 			type: type,
-			count: messages.length(),
+			count: messages.length,
 			text: text
 		}
 		//this.props.logSms(historyObj)

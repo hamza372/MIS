@@ -408,6 +408,24 @@ export const addTag = (students, tag) => dispatch => {
   	dispatch(createMerges(merges)) 
 }
 
+export const addDiary = (section_diary, section_id) => dispatch => {
+
+	//diary is an object { ..., subject: { homework: ""} }
+	if(section_id === undefined){
+		return
+	}
+	
+  dispatch(createMerges([{
+	    path: ["db", "diary", section_id],
+		  value : section_diary
+	  },
+	  {
+		  path:["db", "diary", "date"],
+		  value: new Date().getTime()
+	  }
+	])) 
+}
+
 export const editPayment = (student, payments) => dispatch => {
 
 	// payments is an object with id as key and value is { amount, fee_id } 

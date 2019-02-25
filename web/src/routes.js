@@ -23,6 +23,7 @@ import Settings from 'modules/Settings'
 import Analytics from 'modules/Analytics'
 import ReportsMenu from 'modules/ReportsMenu'
 import PromotionPage from 'modules/Settings/promote-students'
+import Diary from  'modules/Diary'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -85,6 +86,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/settings/promote" component={PromotionPage} />
 					<AuthedRoute path="/settings" component={Settings} />
 					<AuthedRoute path="/analytics" component={Analytics} />
+					<AuthedRoute path="/diary" component={Diary} />
 
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 
