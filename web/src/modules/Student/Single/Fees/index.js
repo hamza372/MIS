@@ -159,6 +159,27 @@ class StudentFees extends Component {
 
 
 	}
+	componentWillReceiveProps(newProps) {
+		//This will make we get the lates changes
+		const id = this.props.match.params.id;
+		const student =  newProps.students[id];
+
+		const current_month = moment().format("MM/YYYY")
+		const edits = Object.entries(student.payments)
+		.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+		.reduce((agg,[id,payment]) => {
+			return {
+				...agg,
+				[id]: {
+					amount: payment.amount,
+					fee_id: payment.fee_id
+				}
+			}
+		}, {})
+		this.setState({
+			edits
+		})
+	}
 	onSave =()=>{
 		this.props.editPayment(this.student(), this.state.edits)
 	}
