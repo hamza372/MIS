@@ -284,7 +284,7 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props) => {
 					}</div>
 					<div>{v.event}</div>
 					{
-						v.event === "CALL_END" ? console.log(v.meta) : false
+						v.event === "CALL_END" ? console.log("META:", v.meta) : false
 					}
 				</div>)
 		}

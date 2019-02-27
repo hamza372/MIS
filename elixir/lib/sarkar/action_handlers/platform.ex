@@ -72,7 +72,8 @@ defmodule Sarkar.ActionHandler.Platform do
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.puts "NOT YET READY"
-		{:reply, fail(), state}
+		{:ok, state}
+		# {:reply, fail(), state}
 	end
 
 	defp start_supplier(id) do

@@ -33,7 +33,8 @@ interface CallEndEvent extends PlatformInteractionEvent {
 	event: "CALL_END",
 	meta: {
 		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION",
-		duration: number
+		duration: number,
+		unique_id: string
 	}
 }
 

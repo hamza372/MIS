@@ -36,8 +36,12 @@ defmodule Sarkar.Server.Masking do
 					"call_start" -> 
 						Sarkar.Supplier.call_event("CALL_START", supplier_id, incoming, school_id, nil)
 					"call_end" -> 
-						meta = %{ "duration" => duration, "call_status" => call_status} = query_params
-						Sarkar.Supplier.call_event("CALL_END", supplier_id, incoming, school_id, meta)
+						%{ "duration" => duration, "call_status" => call_status} = query_params
+						Sarkar.Supplier.call_event("CALL_END", supplier_id, incoming, school_id, %{
+							"duration" => duration,
+							"call_status" => call_status,
+							"unique_id" => uid
+						})
 					"call_end" -> "CALL_END"
 					other -> 
 						IO.puts "unexpected event type: #{other}"
