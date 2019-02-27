@@ -14,7 +14,7 @@ export default connect(state => ({
 		const splits = props.location.pathname.split('/')
 		const loc = splits.slice(-1).pop();
 		const isPrintPage = splits.length === 6 && splits[3] === "reports"
-		const setupPage = props.permissions.setupPage ? props.permissions.setupPage.teacher : true
+		const setupPage = props.permissions && props.permissions.setupPage ? props.permissions.setupPage.teacher : true
 		
 return <Layout history={props.history}>
 		<div className="single-class-container">

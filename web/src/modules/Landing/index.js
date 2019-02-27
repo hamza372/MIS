@@ -69,8 +69,8 @@ class Landing extends Component {
 		let today_payment_students = 0;
 		let today_teacher_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 		
-		const setupPage = permissions.setupPage ? permissions.setupPage.teacher : true
-		const dailyStats = permissions.dailyStats ? permissions.dailyStats.teacher : true
+		const setupPage = permissions && permissions.setupPage ? permissions.setupPage.teacher : true
+		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
 
 
 		for(let student of Object.values(students)) {
@@ -130,6 +130,9 @@ class Landing extends Component {
 								<Link to="/student?forwardTo=prospective-student" className="button yellow-shadow" style={{backgroundImage: `url(${prospective})` }}>Prospective</Link>
 							</div>
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+						</div>
+						<div className="row">
+							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 					</div>
 
