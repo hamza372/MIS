@@ -16,7 +16,7 @@ defmodule Sarkar.Server.Masking do
 		# TODO: handle different events with different code blocks inside this case
 		# i.e. if we are passing call_end or call_start events
 		{school_name, forward} = case query_params do
-			%{"dialed" => dialed, "caller_id" => incoming} -> 
+			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
 				{:ok, resp} = Postgrex.query(Sarkar.School.DB, "
@@ -32,13 +32,23 @@ defmodule Sarkar.Server.Masking do
 				{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'pulled_schoolname', db->'phone_number' from platform_schools where id=$1", [school_id])
 				[[ school_name, outgoing_number ]] = resp2.rows
 
-				Sarkar.Supplier.call_start_event(supplier_id, incoming, school_id)
+				case event_type do
+					"call_start" -> 
+						Sarkar.Supplier.call_event("CALL_START", supplier_id, incoming, school_id, nil)
+					"call_end" -> 
+						meta = %{ "duration" => duration, "call_status" => call_status} = query_params
+						Sarkar.Supplier.call_event("CALL_END", supplier_id, incoming, school_id, meta)
+					"call_end" -> "CALL_END"
+					other -> 
+						IO.puts "unexpected event type: #{other}"
+						"UNKNOWN"
+				end
 
 				{school_name, outgoing_number}
 			other ->
 				IO.puts "unexpected query params"
 				IO.inspect other
-				[]
+				{"", ""}
 		end
 
 

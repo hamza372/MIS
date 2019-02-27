@@ -243,7 +243,7 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 		.filter(x => x.event === "CALL_START" || x.event === "CALL_END")
 		.sort((a, b) => a.time - b.time)
 
-	const unmatched_call_event = call_events.reduce((agg : SchoolMatchEvent[], curr) => {
+	const unmatched_call_event = call_events.reduce((agg : SupplierInteractionEvent[], curr) => {
 		if(curr.event === "CALL_START") {
 			return [...agg, curr]
 		}
@@ -263,7 +263,6 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 	}
 
 	return false;
-
 }
 
 interface SchoolMatchProps {
@@ -284,6 +283,9 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props) => {
 						v.user.name.name || v.user.name
 					}</div>
 					<div>{v.event}</div>
+					{
+						v.event === "CALL_END" ? console.log(v.meta) : false
+					}
 				</div>)
 		}
 	</div>

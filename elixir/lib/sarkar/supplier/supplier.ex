@@ -35,49 +35,32 @@ defmodule Sarkar.Supplier do
 		GenServer.call(via(id), {:reload})
 	end
 
-	def call_start_event(id, caller_id, school_id) do
-
+	def call_event(event_type, id, caller_id, school_id, meta) do
 		sync_state = Sarkar.Supplier.get_sync_state(id)
 
 		time = :os.system_time(:millisecond)
 		path = ["sync_state", "matches", school_id, "history", "#{time}"]
-		value = %{
-			"event" => "CALL_START",
-			"time" => time,
-			"user" => %{
-				"number" => caller_id,
-				"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
+
+		value = case meta do
+			nil -> %{
+				"event" => event_type,
+				"time" => time,
+				"user" => %{
+					"number" => caller_id,
+					"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
+				}
 			}
-		}
-
-		changes = %{
-			Enum.join(path, ",") => %{
-				"action" => %{
-					"path" => path,
-					"type" => "MERGE",
-					"value" => value
-				},
-				"date" => time
-			}
-		}
-
-		GenServer.call(via(id), {:sync_changes, "elixir", changes, time})
-	end
-
-	def call_end_event(id, caller_id, school_id) do
-
-		sync_state = Sarkar.Supplier.get_sync_state(id)
-
-		time = :os.system_time(:millisecond)
-		path = ["sync_state", "matches", school_id, "history", "#{time}"]
-		value = %{
-			"event" => "CALL_END",
-			"time" => time,
-			"user" => %{
-				"number" => caller_id,
-				"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
-			}
-		}
+			other -> 
+				%{
+					"event" => event_type,
+					"time" => time,
+					"user" => %{
+						"number" => caller_id,
+						"name" => Dynamic.get(sync_state, ["numbers", caller_id, "name"])
+					},
+					"meta" => meta
+				}
+		end
 
 		changes = %{
 			Enum.join(path, ",") => %{
