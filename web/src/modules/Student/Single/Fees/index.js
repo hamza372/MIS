@@ -208,7 +208,7 @@ class StudentFees extends Component {
 		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
 
 		return <div className="student-fees">
-			<PrintHeader settings={this.props.settings}/>
+			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo}/>
 			<div className="divider">Payment Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
@@ -314,7 +314,8 @@ export default connect(state => ({
 	students: state.db.students,
 	connected: state.connected,
 	settings: state.db.settings,
-	feeSMSTemplate: (state.db.sms_templates || {}).fee || ""
+	feeSMSTemplate: (state.db.sms_templates || {}).fee || "",
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
 }), dispatch => ({
 	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),

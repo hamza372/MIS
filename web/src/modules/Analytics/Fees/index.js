@@ -99,7 +99,7 @@ class FeeAnalytics extends Component {
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
-	const {students, settings, addPayments} = this.props
+	const {students, settings, addPayments, schoolLogo} = this.props
 
 	let total_paid = 0;
 	let total_owed = 0;
@@ -152,7 +152,7 @@ class FeeAnalytics extends Component {
 	
 	return <div className="fees-analytics">
 		
-		<PrintHeader settings={settings} />
+		<PrintHeader settings={settings} logo={schoolLogo} />
 		
 	
 		<div className="no-print">
@@ -182,7 +182,8 @@ class FeeAnalytics extends Component {
 }
 export default connect(state => ({
 	students: state.db.students,
-	settings: state.db.settings
+	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
 }), dispatch => ({
 	addPayments: payments => dispatch(addMultiplePayments(payments))
 }))(FeeAnalytics)
