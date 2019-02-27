@@ -207,13 +207,13 @@ class Diary extends Component {
 								</div>)
 						}
 
-						{ subjects.size() > 0 && <div className="button blue" onClick={this.onSave}>Save</div> }
+						{ subjects.size > 0 && <div className="button blue" onClick={this.onSave}>Save</div> }
 
 					</div>
 				}
 
 				{
-					subjects.size() > 0 ? false : smsOption === "SIM" ? 
+					subjects.size > 0 ? false : smsOption === "SIM" ? 
 						<a 
 							className="button blue"
 							href={smsIntentLink({
