@@ -41,7 +41,7 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo, history }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo }) => {
 
 	const sections = getSectionsFromClasses(classes)	
 	
@@ -79,7 +79,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 	}
 
 	return <div className="student-list">
-		<PrintHeader settings={settings} />
+		<PrintHeader settings={settings} logo={schoolLogo} />
 		<Title className="title">Students</Title>
 		<List 
 			items = {[ { Name: "", header: true }, ...items]}
@@ -96,5 +96,6 @@ export default connect((state, { location }) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
 }))(LayoutWrap(StudentList));

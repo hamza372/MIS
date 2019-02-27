@@ -122,7 +122,7 @@ class Attendance extends Component {
 
 				return [...agg, {
 					number: student.Phone,
-					text: this.props.attendance_message_template.replace(/\$NAME/g, student.Name).replace(/\$STATUS/g, att.status)
+					text: `Date: ${moment().format("DD/MM/YYYY")}\n${this.props.attendance_message_template.replace(/\$NAME/g, student.Name).replace(/\$STATUS/g, att.status)}`
 				}]
 
 			}, [])
@@ -131,7 +131,8 @@ class Attendance extends Component {
 			messages,
 			return_link: window.location.href
 		});
-		const setupPage = this.props.settings.permissions.setupPage ? this.props.settings.permissions.setupPage.teacher : true
+		const { settings } = this.props;
+		const setupPage = settings.permissions && settings.permissions.setupPage ? settings.permissions.setupPage.teacher : true
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
 		return <Layout history={this.props.history}>
 			<div className="attendance">

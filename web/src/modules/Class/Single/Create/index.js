@@ -183,7 +183,10 @@ class SingleClass extends Component {
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
 	removeClass = Class => {
-		
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+
 		Object.values(this.props.students)
 			.forEach(student => Object.keys(Class.sections)
 					.forEach(section => 

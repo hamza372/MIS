@@ -530,3 +530,14 @@ input::-webkit-inner-spin-button {
 		min-width: 100vw;
 		scroll-snap-align: start;
 	}
+
+.header-logo {
+	max-width: 130px;
+	max-height: 130px;
+	margin: 0px 480px -130px 80px;
+	left: 0;
+	display:inline;
+	border: none;
+	box-shadow: none;
+
+}

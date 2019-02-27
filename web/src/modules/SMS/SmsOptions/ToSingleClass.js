@@ -36,7 +36,7 @@ class ToSingleClass extends Component {
 
 	render() {
 
-	const { classes, students, sendBatchMessages } = this.props;
+	const { classes, students, sendBatchMessages, smsOption } = this.props;
 
 	const messages = Object.values(students)
 		.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
@@ -69,12 +69,12 @@ class ToSingleClass extends Component {
 					<label>Message</label>
 					<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
 				</div>
-					{ !this.props.connected ? 
-						<div className="button" onClick={() => sendBatchMessages(messages)}>Send</div> : 
+					{ smsOption === "SIM" ? 
 						<a href={smsIntentLink({
 							messages,
 							return_link: window.location.href 
-							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> }
+							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> 
+							: <div className="button" onClick={() => sendBatchMessages(messages)}>Send</div>}
 			</div>
 		)
 	}
