@@ -48,7 +48,7 @@ export default class Routes extends React.Component {
 			error: true,
 			err,
 			errInfo: errinfo
-		})googlemapsapi
+		})
 	}
 
 	render() {
