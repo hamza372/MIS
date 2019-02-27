@@ -34,16 +34,16 @@ class StudentFees extends Component {
 		
 		const current_month = moment().format("MM/YYYY")
 		const edits = Object.entries(this.student().payments)
-		.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
-		.reduce((agg,[id,payment]) => {
-			return {
-				...agg,
-				[id]: {
-					amount: payment.amount,
-					fee_id: payment.fee_id
+			.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+			.reduce((agg,[id,payment]) => {
+				return {
+					...agg,
+					[id]: {
+						amount: payment.amount,
+						fee_id: payment.fee_id
+					}
 				}
-			}
-		}, {})
+			}, {})
 
 		this.state = {
 			payment: {
@@ -105,6 +105,7 @@ class StudentFees extends Component {
 			if(this.props.settings.sendSMSOption !== "SIM") {
 				alert("can only send messages from local SIM");
 			}
+
 			else {
 				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
 				
@@ -128,8 +129,8 @@ class StudentFees extends Component {
 				active: false
 			}
 		})
-
 	}
+
 	getFilterCondition = (payment) =>
 	{
 		//when both are empty
@@ -151,14 +152,14 @@ class StudentFees extends Component {
 		{
 			return moment(payment.date).format("MMMM") === this.state.month && moment(payment.date).format("YYYY") === this.state.year;
 		}
-	} 
+	}
+
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		const owedPayments = checkStudentDuesReturning(this.student());
 		this.props.addMultiplePayments(owedPayments);
-
-
 	}
+
 	componentWillReceiveProps(newProps) {
 		//This will make we get the lates changes
 		const id = this.props.match.params.id;
@@ -166,22 +167,26 @@ class StudentFees extends Component {
 
 		const current_month = moment().format("MM/YYYY")
 		const edits = Object.entries(student.payments)
-		.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
-		.reduce((agg,[id,payment]) => {
-			return {
-				...agg,
-				[id]: {
-					amount: payment.amount,
-					fee_id: payment.fee_id
+			.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+			.reduce((agg,[id,payment]) => {
+				return {
+					...agg,
+					[id]: {
+						amount: payment.amount,
+						fee_id: payment.fee_id
+					}
 				}
-			}
-		}, {})
-		this.setState({
-			edits
-		})
+			}, {})
+
+			this.setState({
+				edits
+			})
 	}
-	onSave =()=>{
+
+	onSave = () => {
+
 		this.props.editPayment(this.student(), this.state.edits)
+
 	}
 
 	render() {
@@ -258,7 +263,7 @@ class StudentFees extends Component {
 				</div>
 					{filteredPayments
 						.map(([id, payment]) => {
-							return <div className="payment" key={id}>								
+							return <div className="payment" key={id}>
 								<div className="table row">
 									<div>{moment(payment.date).format("DD/MM")}</div>
 									<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
@@ -281,7 +286,7 @@ class StudentFees extends Component {
 			<div className="button save" onClick={this.onSave}>Save</div>
 				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment} style={{marginTop:"10px"}}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
-				{ this.state.payment.active ? <div className="new-payment">
+				{ this.state.payment.active && <div className="new-payment">
 					<div className="row">
 						<label>Amount</label>
 						<input type="number" {...this.Former.super_handle(["payment", "amount"])} placeholder="Enter Amount" />
@@ -301,7 +306,7 @@ class StudentFees extends Component {
 						</select>
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
-				</div> : false }
+				</div> }
 				<div className="print button" onClick={() => window.print()}>Print</div>
 			</div>
 
