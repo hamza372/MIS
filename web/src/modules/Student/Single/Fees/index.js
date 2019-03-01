@@ -215,8 +215,7 @@ class StudentFees extends Component {
 					}
 				}
 			}, {})
-		// convert "amount" into a parseFloat() 
-		// make sure only the new thing is getting sent in the merge
+
 		this.props.editPayment(this.student(), next_edits)
 
 	}
