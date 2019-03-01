@@ -269,7 +269,7 @@ a.block {
 
 
 .title {
-	margin: 20px 0;
+	margin: 20px 0 5px;
 	font-size: 2.0rem;
 	/*color: #777;*/
 }
@@ -526,9 +526,14 @@ input::-webkit-inner-spin-button {
 		scroll-snap-align: start;
 	}
 
+.logo-container{
+    display: flex;
+    justify-content: center;
+	align-items: center;
+}
 .header-logo {
-	max-width: 130px;
-	max-height: 130px;
+	max-width: 100px;
+	max-height: 100px;
 	margin: 0px 480px -130px 80px;
 	left: 0;
 	display:inline;

@@ -213,7 +213,7 @@ class Diary extends Component {
 				}
 
 				{
-					subjects.size > 0 ? false : smsOption === "SIM" ? 
+					subjects.size === 0 ? false : smsOption === "SIM" ? 
 						<a 
 							className="button blue"
 							href={smsIntentLink({
