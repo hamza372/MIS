@@ -204,8 +204,20 @@ class StudentFees extends Component {
 				}
 			})
 		}, 1000);
-		this.props.editPayment(this.student(), this.state.edits)
 
+		const next_edits = Object.entries(this.state.edits)
+			.reduce((agg, [payment_id, { fee_id, amount }]) => {
+				return {
+					...agg,
+					[payment_id]: {
+						fee_id,
+						amount: parseFloat(amount)
+					}
+				}
+			}, {})
+		// convert "amount" into a parseFloat() 
+		// make sure only the new thing is getting sent in the merge
+		this.props.editPayment(this.student(), next_edits)
 
 	}
 
