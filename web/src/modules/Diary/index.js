@@ -170,7 +170,6 @@ class Diary extends Component {
 					}
 				]
 			}, [])
-			console.log(messages)
 	
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
