@@ -130,7 +130,7 @@ class Diary extends Component {
 		const curr_date = `Date: ${moment().format("DD/MM")}\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
-				.map( ([subject, homework]) => {
+				.map( ([ subject, { homework }]) => {
 					return `${subject}: ${homework},`
 			})
 		return curr_date + diary_message.join("\n")
@@ -170,6 +170,7 @@ class Diary extends Component {
 					}
 				]
 			}, [])
+			console.log(messages)
 	
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
