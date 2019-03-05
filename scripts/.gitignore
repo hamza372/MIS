@@ -1,0 +1,6 @@
+*.csv
+*.png
+*.txt
+secrets.py
+__pycache__
+
