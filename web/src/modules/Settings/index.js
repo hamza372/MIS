@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { createTemplateMerges } from 'actions'
-import { mergeSettings } from 'actions'
+import { mergeSettings, addLogo } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
+import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
 
@@ -50,6 +51,7 @@ class Settings extends Component {
 				text: "Saved!"
 			},
 			client_id : localStorage.getItem("client_id"),
+			schoolLogo: props.schoolLogo
 		}
 
 		this.former = new Former(this, [])
@@ -123,6 +125,9 @@ class Settings extends Component {
 	onSave = () => {		
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
+		if(this.state.schoolLogo === "" || this.state.schoolLogo !== this.props.schoolLogo){
+			this.props.addLogo(this.state.schoolLogo)
+		}
 		this.setState({templateMenu: false});
 		
 		this.setState({
@@ -140,6 +145,40 @@ class Settings extends Component {
 				}
 			})
 		}, 2000);
+	}
+	onLogoRemove = () => {
+		this.setState({
+			schoolLogo: ""
+		})
+		this.props.addLogo("")
+		this.setState({
+			banner: {
+				active: true,
+				good: false,
+				text: "Logo Removed!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 1000);
+	}
+
+	logoHandler = (e) => {
+
+		var file = e.target.files[0];
+		var reader = new FileReader();
+		
+		reader.onloadend = () => {
+			this.setState({
+				schoolLogo: reader.result
+			})
+		}
+		reader.readAsDataURL(file);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -159,6 +198,24 @@ class Settings extends Component {
 				<div className="title">Settings</div>
 
 				<div className="form" style={{width: "90%"}}>
+
+					<div className="row">
+						<img className="school logo" src={this.state.schoolLogo} alt={"No Logo Found"}/> 
+					</div>
+
+					<div className="row">
+						<label>School Logo</label>
+						{this.state.schoolLogo === "" ?
+						<div className="badge-container">
+							<div className="fileContainer button green" style={{width:"90%"}}>
+								<div>Select A Logo</div>
+								<input type="file" onChange={this.logoHandler}/>
+							</div>
+							<img className="new-badge" src={newBadge}/>
+						</div>
+						: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
+
+					</div>
 					<div className="row">
 						<label>School Name</label>
 						<input type="text" {...this.former.super_handle(["settings", "schoolName"])} placeholder="School Name" />
@@ -242,9 +299,11 @@ export default connect(
 	state => ({ 
 		settings: state.db.settings, 
 		user: state.db.faculty[state.auth.faculty_id], 
-		sms_templates: state.db.sms_templates 
+		sms_templates: state.db.sms_templates,
+		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
 	}), 
 	dispatch => ({
 		saveTemplates: templates => dispatch(createTemplateMerges(templates)),
-		saveSettings: settings => dispatch(mergeSettings(settings))
+		saveSettings: settings => dispatch(mergeSettings(settings)),
+		addLogo: logo_string => dispatch(addLogo(logo_string))
 }))(Settings);

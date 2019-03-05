@@ -17,7 +17,7 @@ const StudentItem = (S) => {
 		return <div key="unique1245" className="table row heading">
 			<label> <b> Name </b></label>
 			<label> <b> Father Name </b></label>
-			<label> <b> Class Section </b></label>
+			{ S.forwardTo !== "prospective-student" && <label> <b> Class Section </b> </label> }
 		</div>
 	} 
 
@@ -29,7 +29,7 @@ const StudentItem = (S) => {
 					{S.Name} 
 				</Link>
 				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
-				<div> {cname /*+ "/" + sname */}</div>
+				{ S.forwardTo !== "prospective-student" && <div> {cname /*+ "/" + sname */}</div> }
 			</div>
 }
 
@@ -41,7 +41,7 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo, history }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo }) => {
 
 	const sections = getSectionsFromClasses(classes)	
 	
@@ -79,10 +79,10 @@ export const StudentList = ({ classes, students, settings, forwardTo, history })
 	}
 
 	return <div className="student-list">
-		<PrintHeader settings={settings} />
+		<PrintHeader settings={settings} logo={schoolLogo} />
 		<Title className="title">Students</Title>
 		<List 
-			items = {[ { Name: "", header: true }, ...items]}
+			items = {[ { Name: "", header: true, forwardTo }, ...items]}
 			Component = {StudentItem}
 			create = {create} 
 			createText = {createText} 
@@ -96,5 +96,6 @@ export default connect((state, { location }) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
 }))(LayoutWrap(StudentList));

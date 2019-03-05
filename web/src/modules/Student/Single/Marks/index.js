@@ -60,6 +60,7 @@ class StudentMarksContainer extends Component {
 
 		const url = smsIntentLink({ messages: [{ number: student.Phone, text: text }], return_link: window.location.href })
 
+		console.log("school logo thing", this.props.schoolLogo)
 		return <div className="student-marks-container">
 				<div className="no-print">
 					<div className="form">
@@ -92,11 +93,11 @@ class StudentMarksContainer extends Component {
 										return <option key={subject} value={subject}>{subject}</option>	
 									})
 								}
-							</select>						
+							</select>
 						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class}/>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class} logo={this.props.schoolLogo}/>
 
 
 				{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.logSms} className="button blue">Send SMS from Local SIM</a> : false }
@@ -141,7 +142,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_arr.join('\n');
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class }) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo }) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
@@ -158,7 +159,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		})
 
 	return <div className="student-marks">
-		<PrintHeader settings={settings} />
+		<PrintHeader settings={settings} logo={logo} />
 		
 		<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
 		<div className="student-info">
@@ -234,7 +235,8 @@ export default connect(state => ({
 	exams: state.db.exams,
 	classes: state.db.classes,
 	settings: state.db.settings,
-	sms_templates: state.db.sms_templates
+	sms_templates: state.db.sms_templates,
+	schoolLogo: state.db.assets ? (state.db.assets.schoolLogo || "") : "" 
 }), dispatch => ({
 	logSms: (history)=> dispatch(logSms(history)),
 }))(StudentMarksContainer)

@@ -131,6 +131,7 @@ class ClassReportMenu extends Component {
 							examFilter={this.state.report_filters.examFilterText} 
 							subjectFilter={this.state.report_filters.subjectFilterText} 
 							curr_class={this.props.curr_class}
+							logo={this.props.schoolLogo}
 						/>
 					</div>)
 			}
@@ -148,6 +149,7 @@ export default connect((state, { match: { params: { id } } }) => ({
 	 students: state.db.students,
 	 settings: state.db.settings,
 	 exams: state.db.exams,
+	 schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	 sms_templates: state.db.sms_templates
 }), dispatch => ({
 	logSms: (history) => dispatch(logSms(history))

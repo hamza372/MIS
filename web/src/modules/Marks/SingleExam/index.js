@@ -159,6 +159,11 @@ class SingleExam extends Component {
 	}
 
 	onDelete = (exam_id) =>{
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+			
 		const students = Object.values(this.props.students)
 							.filter(s => s.exams !== undefined && s.exams[exam_id] !== undefined)
 							.map(s => s.id)
@@ -205,6 +210,11 @@ class SingleExam extends Component {
 		})
 	}
 	removeStudent = (student) => {
+		const val = window.confirm("Are you sure you want to delete?")
+		
+		if(!val)
+			return
+		
 		const {[student.id]: removed, ...rest} = this.state.exam.student_marks;
 		this.setState({
 			exam: {

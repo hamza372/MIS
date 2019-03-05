@@ -22,7 +22,7 @@ class StudentAttendance extends Component {
 
 		return <div className="student-attendance" style={{margin: "0"}}>
 
-			<PrintHeader settings={this.props.settings} />
+			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo} />
 
 			<div className="print-only">
 				<div className="divider">{student.Name + "'s Attendance Record"}</div>
@@ -63,5 +63,6 @@ class StudentAttendance extends Component {
 
 export default connect(state => ({ 
 	students: state.db.students,
-	settings: state.db.settings
+	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
  }))(StudentAttendance)
