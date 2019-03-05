@@ -50,7 +50,6 @@ def google_geocode(name) -> (bool, object):
 
 
 def google_place(name) -> (bool, object):
-	api_key = "AIzaSyAt3L3I1mEjgPLLOOhr-Alv-exSTXDX6uo"
 	findplace_url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?"
 	args = {
 		'key': api_key,
