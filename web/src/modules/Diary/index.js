@@ -131,7 +131,7 @@ class Diary extends Component {
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
 				.map( ([ subject, { homework }]) => {
-					return `${subject}: ${homework},`
+					return `${subject}: ${homework}`
 			})
 		return curr_date + diary_message.join("\n")
 	}
