@@ -127,7 +127,7 @@ class Diary extends Component {
 			console.log("Not running diary")
 			return []
 		}
-		const curr_date = `Date: ${moment().format("DD/MM")}\n`
+		const curr_date = `Date: ${moment().format("DD MMMM YYYY")}\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
 				.map( ([ subject, { homework }]) => {
