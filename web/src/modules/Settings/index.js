@@ -7,6 +7,7 @@ import { mergeSettings, addLogo } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
+import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
 
@@ -145,6 +146,27 @@ class Settings extends Component {
 			})
 		}, 2000);
 	}
+	onLogoRemove = () => {
+		this.setState({
+			schoolLogo: ""
+		})
+		this.props.addLogo("")
+		this.setState({
+			banner: {
+				active: true,
+				good: false,
+				text: "Logo Removed!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 1000);
+	}
 
 	logoHandler = (e) => {
 
@@ -178,15 +200,21 @@ class Settings extends Component {
 				<div className="form" style={{width: "90%"}}>
 
 					<div className="row">
-						<img className="school logo" src={this.state.schoolLogo} alt={"No Logo Found"} accept="image/*"/>
+						<img className="school logo" src={this.state.schoolLogo} alt={"No Logo Found"}/> 
 					</div>
 
 					<div className="row">
 						<label>School Logo</label>
-						<div className="fileContainer button green">
-							<div>Select A Logo</div>
-							<input type="file" onChange={this.logoHandler}/>
+						{this.state.schoolLogo === "" ?
+						<div className="badge-container">
+							<div className="fileContainer button green" style={{width:"90%"}}>
+								<div>Select A Logo</div>
+								<input type="file" onChange={this.logoHandler}/>
+							</div>
+							<img className="new-badge" src={newBadge}/>
 						</div>
+						: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
+
 					</div>
 					<div className="row">
 						<label>School Name</label>

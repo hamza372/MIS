@@ -7,7 +7,7 @@ import {v4} from 'node-uuid'
 import former from 'utils/former'
 
 import { PrintHeader } from 'components/Layout'
-
+import Banner from 'components/Banner'
 import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
 import { sendSMS } from 'actions/core'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
@@ -46,6 +46,11 @@ class StudentFees extends Component {
 			}, {})
 
 		this.state = {
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			},
 			payment: {
 				active: false,
 				amount: "",
@@ -184,8 +189,34 @@ class StudentFees extends Component {
 	}
 
 	onSave = () => {
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved!"
+			}
+		})
 
-		this.props.editPayment(this.student(), this.state.edits)
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 1000);
+
+		const next_edits = Object.entries(this.state.edits)
+			.reduce((agg, [payment_id, { fee_id, amount }]) => {
+				return {
+					...agg,
+					[payment_id]: {
+						fee_id,
+						amount: parseFloat(amount)
+					}
+				}
+			}, {})
+
+		this.props.editPayment(this.student(), next_edits)
 
 	}
 
@@ -213,6 +244,7 @@ class StudentFees extends Component {
 		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
 
 		return <div className="student-fees">
+			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo}/>
 			<div className="divider">Payment Information</div>
 			<div className="table row">

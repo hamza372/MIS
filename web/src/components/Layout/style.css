@@ -531,13 +531,28 @@ input::-webkit-inner-spin-button {
 		scroll-snap-align: start;
 	}
 
+.logo-container{
+    display: flex;
+    justify-content: center;
+	align-items: center;
+}
 .header-logo {
-	max-width: 130px;
-	max-height: 130px;
-	margin: 0px 480px -130px 80px;
+	max-width: 100px;
+	max-height: 100px;
 	left: 0;
 	display:inline;
 	border: none;
 	box-shadow: none;
-
+}
+.header-body{
+	display: flex;
+	width: 100%;
+	margin-top: 10px;
+}
+.header-style{
+	width: 80%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-right: 20%;
 }

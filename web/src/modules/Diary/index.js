@@ -127,11 +127,11 @@ class Diary extends Component {
 			console.log("Not running diary")
 			return []
 		}
-		const curr_date = `Date: ${moment().format("DD/MM")}\n`
+		const curr_date = `Date: ${moment().format("DD MMMM YYYY")}\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
-				.map( ([subject, homework]) => {
-					return `${subject}: ${homework},`
+				.map( ([ subject, { homework }]) => {
+					return `${subject}: ${homework}`
 			})
 		return curr_date + diary_message.join("\n")
 	}
@@ -213,7 +213,7 @@ class Diary extends Component {
 				}
 
 				{
-					subjects.size > 0 ? false : smsOption === "SIM" ? 
+					subjects.size === 0 ? false : smsOption === "SIM" ? 
 						<a 
 							className="button blue"
 							href={smsIntentLink({

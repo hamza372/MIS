@@ -326,6 +326,11 @@ class SingleStudent extends Component {
 	}
 
 	removeFee = id => () => {
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+
 		const {[id]: removed, ...nextFee} = this.state.profile.fees;
 
 		this.setState({

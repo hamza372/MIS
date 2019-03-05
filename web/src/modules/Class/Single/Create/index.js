@@ -137,6 +137,11 @@ class SingleClass extends Component {
 	}
 
 	removeSubject = subj => () => {
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+
 		const {[subj]: removed, ...rest} = this.state.class.subjects;
 
 		this.setState({
@@ -148,6 +153,10 @@ class SingleClass extends Component {
 	}
 
 	removeSection = (id) => () => {
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
 
 		const {[id]: removed, ...rest} = this.state.class.sections;
 		this.setState({
@@ -177,6 +186,11 @@ class SingleClass extends Component {
 	}
 
 	removeStudent = student => {
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+
 		this.props.removeStudent(student)
 	}
 

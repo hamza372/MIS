@@ -81,7 +81,7 @@ class Landing extends Component {
 			}
 
 			const additional_payment = Object.values(student.payments || {})
-				.filter(x => moment(x.date).format("YYYY-MM-DD") === today_date)
+				.filter(x => moment(x.date).format("YYYY-MM-DD") === today_date && x.type === "SUBMITTED")
 				.reduce((agg, curr) => agg + curr.amount, 0);
 
 			if(additional_payment > 0) {
@@ -129,10 +129,11 @@ class Landing extends Component {
 								<img className="new-badge" src={newBadge}/>
 								<Link to="/student?forwardTo=prospective-student" className="button yellow-shadow" style={{backgroundImage: `url(${prospective})` }}>Prospective</Link>
 							</div>
-							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 						<div className="row">
-							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
+						<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+
 						</div>
 					</div>
 

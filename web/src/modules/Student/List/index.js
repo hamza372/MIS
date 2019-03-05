@@ -17,7 +17,7 @@ const StudentItem = (S) => {
 		return <div key="unique1245" className="table row heading">
 			<label> <b> Name </b></label>
 			<label> <b> Father Name </b></label>
-			<label> <b> Class Section </b></label>
+			{ S.forwardTo !== "prospective-student" && <label> <b> Class Section </b> </label> }
 		</div>
 	} 
 
@@ -29,7 +29,7 @@ const StudentItem = (S) => {
 					{S.Name} 
 				</Link>
 				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
-				<div> {cname /*+ "/" + sname */}</div>
+				{ S.forwardTo !== "prospective-student" && <div> {cname /*+ "/" + sname */}</div> }
 			</div>
 }
 
@@ -82,7 +82,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 		<PrintHeader settings={settings} logo={schoolLogo} />
 		<Title className="title">Students</Title>
 		<List 
-			items = {[ { Name: "", header: true }, ...items]}
+			items = {[ { Name: "", header: true, forwardTo }, ...items]}
 			Component = {StudentItem}
 			create = {create} 
 			createText = {createText} 

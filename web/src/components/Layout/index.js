@@ -18,11 +18,15 @@ const Header = ({user, history}) => <div className="header">
 </div>
 
 export const PrintHeader = ({settings, logo}) => <div className="print-only school-header">
-			<div>
-					<img className="header-logo" src={logo} alt="No Logo"/>				
+			<div className="header-body">
+				<div className="logo-container" style={{width: "20%"}}>
+					<img className="header-logo" src={logo} alt="No Logo"/>
+				</div>
+				<div className="header-style">
 					<div className="title">{settings.schoolName}</div>
-					<div className="address">{settings.schoolAddress}</div>
+					<div className="address" style={{marginBottom: "5px"}}>{settings.schoolAddress}</div>
 					<div className="phone-number">{settings.schoolPhoneNumber}</div>
+				</div>
 			</div>
 		</div>
 

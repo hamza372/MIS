@@ -210,6 +210,11 @@ class SingleExam extends Component {
 		})
 	}
 	removeStudent = (student) => {
+		const val = window.confirm("Are you sure you want to delete?")
+		
+		if(!val)
+			return
+		
 		const {[student.id]: removed, ...rest} = this.state.exam.student_marks;
 		this.setState({
 			exam: {
