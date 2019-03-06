@@ -7,7 +7,7 @@ from secrets import api_key
 
 import matplotlib.pyplot as plt
 
-max_processed = 100
+max_processed = 10
 
 def similar(a : str, b : str) -> float:
 	return SequenceMatcher(None, a, b).ratio()
@@ -45,6 +45,8 @@ def google_geocode(name) -> (bool, object):
 
 	if success:
 		return (success, parsed['results'][0])
+	else:
+		print("ERROR: " + parsed)
 
 	return (success, parsed)
 

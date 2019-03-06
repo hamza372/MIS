@@ -32,6 +32,7 @@ export const loadAuth = (): RootBankState['auth'] => {
 		id: undefined as string,
 		token: undefined as string,
 		username: undefined as string,
+		number: undefined as string,
 		attempt_failed: false,
 		loading: false,
 		client_type: "bank_portal"
@@ -40,7 +41,6 @@ export const loadAuth = (): RootBankState['auth'] => {
 	try {
 		const str = localStorage.getItem("auth")
 		if(str === null) {
-			console.log('no auth saved');
 			return init_auth;
 		}
 

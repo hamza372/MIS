@@ -59,7 +59,7 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 
 			<div className="bg-cover" />
 			<div className="cover" style={{ }}>
-				<div className="title" style={{ fontSize: "3rem" }}>Welcome to EdMarkaz</div>
+				<div className="title" style={{ fontSize: "3rem" }}>Welcome to IlmExchange</div>
 				<div className="divider"></div>
 				<div className="form">
 					<div className="row">

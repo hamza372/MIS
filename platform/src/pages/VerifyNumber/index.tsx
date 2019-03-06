@@ -55,7 +55,7 @@ class VerifyNumber extends React.Component<Props, State> {
 		return <div className="verify page">
 			<div className="title">Verify Your Number</div>
 
-			<div>Hello! You logged in with number {this.props.auth.number}. This number has not yet been registered with EdMarkaz. Please supply the following information to proceed</div>
+			<div>Hello! You logged in with number {this.props.auth.number}. This number has not yet been registered with IlmExchange. Please supply the following information to proceed</div>
 
 			<div className="form" style={{ width: "90%" }}>
 				<div className="row">

@@ -31,10 +31,9 @@ class Burger extends React.Component<RouteComponentProps> {
 
 		return <div className={`root-page ${selected_id ? 'double' : ''}`}>
 
-			<div className="header">EdMarkaz</div>
+			<div className="header">IlmExchange</div>
 
 			<div className="burger">
-				<div className="divider">Menu</div>
 				<Link to={{ pathname: "/", search }}  className={current === '/' ? "active" : ""}>Home</Link>
 				<Link to={{ pathname: "/new", search }} className={current === '/new' ? "active" : ""}>New</Link>
 				{ /* <Link to="/todo" className={current === '/todo' ? "active" : ""}>To-Do</Link> */ }
