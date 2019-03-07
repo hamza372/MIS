@@ -147,7 +147,7 @@ class FeeAnalytics extends Component {
 		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven}
 	}
 
-	const items = Object.values(total_student_debts).filter(({student, debt})=> student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
+	const items = Object.values(total_student_debts).filter(({student, debt}) => ( student.id && student.Name) && student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
 				
 	
 	return <div className="fees-analytics">
