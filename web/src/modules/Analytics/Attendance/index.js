@@ -78,6 +78,10 @@ export default connect(state => ({
 
 	for(let [sid, student] of Object.entries(students)) {
 
+		if(student.Name === undefined || student.attendance === undefined) {
+			continue;
+		}
+
 		let s_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 
 		for(let [date, record] of Object.entries(student.attendance)) {
