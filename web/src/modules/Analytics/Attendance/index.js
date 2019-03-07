@@ -78,6 +78,10 @@ export default connect(state => ({
 
 	for(let [sid, student] of Object.entries(students)) {
 
+		if(student.Name === undefined || student.attendance === undefined) {
+			continue;
+		}
+
 		let s_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 
 		for(let [date, record] of Object.entries(student.attendance)) {
@@ -87,7 +91,7 @@ export default connect(state => ({
 
 			const month_key = moment(date).format('MM/YYYY');
 			const m_status = monthly_attendance[month_key] || { PRESENT: 0, LEAVE: 0, ABSENT: 0}
-			m_status[record.status] += 1;
+			m_status[record.sta.tus] += 1;
 			monthly_attendance[month_key] = m_status;
 		}
 		student_attendance[sid] = {student, ...s_record}
