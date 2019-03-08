@@ -35,6 +35,20 @@ defmodule Sarkar.Supplier do
 		GenServer.call(via(id), {:reload})
 	end
 
+	def get_last_caller(id, school_id) do
+		sync_state = Sarkar.Supplier.get_sync_state(id)
+
+		history = Dynamic.get(sync_state, ["matches", school_id, "history"])
+		# get the latest call_start or call_end event 
+		%{"user" => %{"number" => number}} = history
+		|> Enum.filter(fn {_, %{"event" => event}} -> event == "CALL_START" end)
+		|> Enum.sort(fn({ t1 , _ }, {t2, _}) -> t1 > t2 end)
+		|> Enum.at(-1)
+
+		number
+
+	end
+
 	def call_event(event_type, id, caller_id, school_id, meta) do
 		sync_state = Sarkar.Supplier.get_sync_state(id)
 

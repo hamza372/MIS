@@ -16,7 +16,7 @@ interface SchoolMatch {
 	status: "NEW" | "IN_PROGRESS" | "REJECTED" | "DONE",
 	masked_number?: string,
 	history: {
-		[timestamp: number]: SupplierInteractionEvent
+		[timestamp: number]: SupplierInteractionEvent | CallEndEvent | CallEndSurvey
 	}
 }
 
@@ -38,14 +38,17 @@ interface CallEndEvent extends PlatformInteractionEvent {
 	}
 }
 
-type SupplierInteractionEvent  = {
-	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START",
-	time: number,
-	user: {
-		name: string,
-		number: string
+interface CallEndSurvey extends PlatformInteractionEvent {
+	event: "CALL_END_SURVEY",
+	meta: {
+		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
+		follow_up_meeting: "YES" | "NO" | ""
 	}
-} | CallEndEvent
+}
+
+type SupplierInteractionEvent = {
+	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START",
+} & PlatformInteractionEvent
 
 
 interface RootBankState {

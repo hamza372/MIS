@@ -1,5 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
 import moment from 'moment'
+import { ReactHTML } from 'react';
 
 export default class Former {
 
@@ -28,7 +29,7 @@ export default class Former {
 		const full_path = [...this.base_path, ...path];
 		
 		return {
-			onChange: (e : React.ChangeEvent<HTMLInputElement>) => {
+			onChange: (e : React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 				const value = this._getValue(e);
 				if(validate(value)) {
 					this._component.setState((state : any) => Dynamic.put(state, full_path, value), cb)
@@ -39,9 +40,9 @@ export default class Former {
 		}
 	}
 
-	_getValue(event : React.ChangeEvent<HTMLInputElement>) {
+	_getValue(event : React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
 
-		if(event.target.type === "checkbox") {
+		if(isChecked(event)) {
 			return event.target.checked;
 		}
 
@@ -51,4 +52,8 @@ export default class Former {
 
 		return event.target.value;
 	}
+}
+
+const isChecked = (event : React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): event is React.ChangeEvent<HTMLInputElement> => {
+	return (<React.ChangeEvent<HTMLInputElement>>event).target.type === "checkbox"
 }

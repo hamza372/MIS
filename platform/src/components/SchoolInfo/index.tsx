@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool } from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey} from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
 
@@ -18,11 +18,19 @@ interface StateProps {
 	schoolMatch?: SchoolMatch
 }
 
+// survey is basically going to be an event
+// from our perspective, we want to know from the first call what the customer purchase likelihood is 
+// we want to know if they will take a next_step
+	// if they will take a next step, it can appear on home page 
+// 
+
 interface StateType {
 	showSurvey: boolean
 
 	survey: {
-		random_question: string
+		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
+		follow_up_meeting: "YES" | "NO" | "" // boolean?
+		// scheduled_meeting: ""
 	}
 
 }
@@ -32,6 +40,7 @@ interface DispatchProps {
 	releaseNumber: () => void
 	reserveNumber: () => void
 	rejectSchool: () => void
+	saveSurvey: (survey: CallEndSurvey['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -49,7 +58,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		this.state = {
 			showSurvey: false,
 			survey: {
-				random_question: ""
+				customer_likelihood: "",
+				follow_up_meeting: ""
 			}
 		}
 
@@ -107,6 +117,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		console.log("saving survey", this.state)
 
+		this.props.saveSurvey(this.state.survey)
+
 		this.setState({
 			showSurvey: false
 		})
@@ -128,7 +140,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		let estimated_monthly_revenue = ""
 
 		if(isValid(school.lowest_fee) && isValid(school.highest_fee) && isValid(school.total_enrolment)) {
-			estimated_monthly_revenue = (parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment) + " Rs"
+			estimated_monthly_revenue = ((parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment)).toLocaleString() + " Rs"
 		}
 
 		return <div className="school-info page" style={{ padding: "5px" }}>
@@ -152,9 +164,24 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 							<div className="title">Call Finished</div>
 
 							<div className="form" style={{ width: "90%"}}>
+
 								<div className="row">
-									<label>How was your call?</label>
-									<input type="text" {...this.former.super_handle(["random_question"])} placeholder={"Tell Us Now"} />
+									<label>How strongly do you feel the client will make a purchase?</label>
+									<select {...this.former.super_handle(["customer_likelihood"])}>
+										<option value="">Select </option>
+										<option value="HIGH">I think they will buy from us</option>
+										<option value="MEDIUM">I am not sure</option>
+										<option value="LOW">They will not buy from us</option>
+									</select>
+								</div>
+
+								<div className="row">
+									<label>Will you have another meeting with the client?</label>
+									<select {...this.former.super_handle(["follow_up_meeting"])}>
+										<option value="">Please Select an Answer</option>
+										<option value="YES">Yes</option>
+										<option value="NO">No</option>
+									</select>
 								</div>
 
 								<div className="row">
@@ -177,6 +204,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</div>
 				}
 
+				<SurveyRow label="Respondant Name" val={school.respondent_name} />
+				<SurveyRow label="Respondent is Owner" val={school.respondent_owner} />
+				<SurveyRow label="Respondent Relation" val={school.respondent_relation} />
+				<SurveyRow label="Respondent Gender" val={school.respondent_gender} />
 				<SurveyRow label="Year Established" val={school.year_established} />
 				<SurveyRow label="Address" val={school.school_address} />
 				<SurveyRow label="Tehsil" val={school.school_tehsil} />
@@ -194,9 +225,9 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				<SurveyRow label="FEF School" val={school.school_fef} />
 				<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
 				<SurveyRow label="Highest Fee" val={school.highest_fee} />
+				<SurveyRow label="Enrollment" val={school.total_enrolment} />
 				<SurveyRow label="Reported Monthly Revenue" val={school.monthly_fee_collected} />
 				<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
-				<SurveyRow label="Enrollment" val={school.total_enrolment} />
 				<SurveyRow label="Highest Grade" val={school.highest_grade} />
 				<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
 
@@ -262,6 +293,7 @@ const call_in_progress = ( schoolMatch : SchoolMatch) : boolean => {
 interface SchoolMatchProps {
 	schoolMatch: SchoolMatch
 }
+
 const SchoolHistory : React.SFC<SchoolMatchProps> = (props) => {
 
 	return <div className="school history">
@@ -367,5 +399,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
-	rejectSchool: () => dispatch(rejectSchool(props.school_id))
+	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
+	saveSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey))
 }))(withRouter(SchoolInfo))

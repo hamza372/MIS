@@ -1,12 +1,13 @@
 import Syncr from '~/src/syncr'
 import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes } from './core'
+import { stat } from 'fs';
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
-type Dispatch = ( action : any) => any;
+type Dispatch = (action: any) => any;
 type GetState = () => RootBankState
 
-export const createLogin = (username : string, password : string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createLogin = (username: string, password: string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -20,17 +21,16 @@ export const createLogin = (username : string, password : string, number: string
 			password
 		}
 	})
-	.then((res : {token: string, sync_state: RootBankState['sync_state']}) => 
-	{
-		if(Object.keys(res.sync_state.matches).length === 0) {
-			dispatch(forceSaveFullStatePotentiallyCausingProblems())
-		}
+		.then((res: { token: string, sync_state: RootBankState['sync_state'] }) => {
+			if (Object.keys(res.sync_state.matches).length === 0) {
+				dispatch(forceSaveFullStatePotentiallyCausingProblems())
+			}
 
-		dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
-	})
+			dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
+		})
 }
 
-export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch : Dispatch, getState: GetState) => {
+export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dispatch, getState: GetState) => {
 	const state = getState();
 
 	dispatch(createMerges([
@@ -45,10 +45,10 @@ export const ADD_SCHOOLS = "ADD_SCHOOLS"
 
 export interface addNewSchoolAction {
 	readonly type: "ADD_SCHOOLS"
-	schools: { [id: string] : CERPSchool }
+	schools: { [id: string]: CERPSchool }
 }
 
-export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch, getState: GetState, syncr: Syncr) => {
+export const getSchoolProfiles = (school_ids: string[]) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -61,20 +61,20 @@ export const getSchoolProfiles = (school_ids : string[]) => (dispatch : Dispatch
 			school_ids
 		}
 	})
-	.then(res => {
-		console.log(res);
-		dispatch({
-			type: ADD_SCHOOLS,
-			schools: res,
+		.then(res => {
+			console.log(res);
+			dispatch({
+				type: ADD_SCHOOLS,
+				schools: res,
+			})
+
+			return res;
 		})
+		.catch(err => {
+			console.error(err);
 
-		return res;
-	})
-	.catch(err => {
-		console.error(err);
-
-		setTimeout(() => dispatch(getSchoolProfiles(school_ids)), 1000)
-	})
+			setTimeout(() => dispatch(getSchoolProfiles(school_ids)), 1000)
+		})
 }
 
 export const ADD_SCHOOL = "ADD_SCHOOL"
@@ -91,15 +91,15 @@ export const addToSchoolDB = (school: PMIUSchool) => {
 	}
 }
 
-export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: GetState) => {
+export const reserveMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
 	// from the pool in state.mask_pairs select an unused number
 	const state = getState();
 
 	const free = Object.entries(state.sync_state.mask_pairs)
 		.filter(([number, v]) => v.status == "FREE")
-		.map(([num, ]) => num)
-	
-	if(free.length === 0) {
+		.map(([num,]) => num)
+
+	if (free.length === 0) {
 		alert("The Maximum amount of schools are in progress. To continue, you must mark an existing school as done.")
 		return;
 	}
@@ -107,6 +107,14 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 	const masked_num = free[Math.floor(Math.random() * free.length)]
 
 	const time = new Date().getTime();
+	const event: SupplierInteractionEvent = {
+		event: "REVEAL_NUMBER",
+		time,
+		user: {
+			number: state.auth.number,
+			name: state.sync_state.numbers[state.auth.number].name
+		}
+	}
 
 	dispatch(createMerges([
 		{
@@ -126,24 +134,26 @@ export const reserveMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 		},
 		{
 			path: ["sync_state", "matches", school_id, "history", `${time}`],
-			value: {
-				event: "REVEAL_NUMBER",
-				time,
-				user: {
-					number: state.auth.number,
-					name: state.sync_state.numbers[state.auth.number].name
-				}
-			}
+			value: event
 		}
 	]))
 
 }
 
-export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, getState: GetState) => {
+export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
 
 	const masked_num = getState().sync_state.matches[school_id].masked_number
 	const time = new Date().getTime()
 	const state = getState();
+
+	const event: SupplierInteractionEvent = {
+		event: "MARK_DONE",
+		time,
+		user: {
+			number: state.auth.number,
+			name: state.sync_state.numbers[state.auth.number].name
+		}
+	}
 
 	dispatch(createMerges([
 		{
@@ -162,16 +172,36 @@ export const releaseMaskedNumber = (school_id : string) => (dispatch: Dispatch, 
 		},
 		{
 			path: ["sync_state", "matches", school_id, "history", `${time}`],
-			value: {
-				event: "MARK_DONE",
-				time,
-				user: {
-					number: state.auth.number,
-					name: state.sync_state.numbers[state.auth.number].name
-				}
-			}
+			value: event
 		}
 	]))
+}
+
+export const saveCallEndSurvey = (school_id: string, survey: CallEndSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
+
+	const time = new Date().getTime()
+
+	// if no follow up then auto-mark as done?
+
+	const state = getState();
+
+	const event: CallEndSurvey = {
+		event: "CALL_END_SURVEY",
+		meta: survey,
+		time,
+		user: {
+			name: state.sync_state.numbers[state.auth.number].name,
+			number: state.auth.number
+		}
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: event
+		}
+	]))
+
 }
 
 export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState: GetState) => {
@@ -183,6 +213,15 @@ export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState
 
 	const state = getState();
 
+	const event: SupplierInteractionEvent = {
+		event: "MARK_REJECTED",
+		time,
+		user: {
+			number: state.auth.number,
+			name: state.sync_state.numbers[state.auth.number].name
+		}
+	}
+
 	dispatch(createMerges([
 		{
 			path: ["sync_state", "matches", school_id, "status"],
@@ -190,19 +229,12 @@ export const rejectSchool = (school_id: string) => (dispatch: Dispatch, getState
 		},
 		{
 			path: ["sync_state", "matches", school_id, "history", `${time}`],
-			value: {
-				event: "MARK_REJECTED",
-				time,
-				user: {
-					number: state.auth.number,
-					name: state.sync_state.numbers[state.auth.number].name
-				}
-			}
+			value: event
 		}
 	]))
 }
 
-export const addSupplierNumber = (number : string, name: string) => (dispatch: Dispatch, getState: GetState) => {
+export const addSupplierNumber = (number: string, name: string) => (dispatch: Dispatch, getState: GetState) => {
 
 	dispatch(createMerges([
 		{
@@ -214,7 +246,7 @@ export const addSupplierNumber = (number : string, name: string) => (dispatch: D
 	]))
 }
 
-export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, getState: GetState) => {
+export const deleteSupplierNumber = (number: string) => (dispatch: Dispatch, getState: GetState) => {
 	dispatch(createDeletes([
 		{
 			path: ["sync_state", "numbers", number]
@@ -224,7 +256,7 @@ export const deleteSupplierNumber = (number : string) => (dispatch: Dispatch, ge
 
 export type EditLoginNumberAction = ReturnType<typeof editLoginNumber>
 export const EDIT_LOGIN_NUMBER = "EDIT_LOGIN_NUMBER"
-export const editLoginNumber = (number : string) => ({
+export const editLoginNumber = (number: string) => ({
 	type: EDIT_LOGIN_NUMBER as typeof EDIT_LOGIN_NUMBER,
 	number
 })
