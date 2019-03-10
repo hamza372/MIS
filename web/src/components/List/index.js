@@ -18,7 +18,9 @@ class List extends Component {
 
 	render() {
 		const {items, toLabel, Component } = this.props;
-		
+
+		const header = items.some(i => i.header)
+
 		const filteredList = items
 			.filter(item => {
 				return toLabel(item) !== undefined && toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
@@ -26,9 +28,10 @@ class List extends Component {
 			.sort((a,b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
 
 		return <div className="list-wrap">
-			
 			<div className="total">
-				<div className="label"> Total: <strong> {filteredList.length -1} </strong></div>
+				<div className="label"> 
+					Total: <strong> { header ? filteredList.length -1 : filteredList.length } </strong>
+				</div>
 				{ this.props.create ? <Create to={this.props.create} text={this.props.createText} /> : false }
 			</div>
 			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
