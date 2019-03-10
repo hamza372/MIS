@@ -145,6 +145,42 @@ class Landing extends Component {
 						</div>
 						
 						<div className="row">
+
+							<div className="badge-container">
+								<img className="new-badge" src={newBadge}/>
+								<Link
+									to="/diary"
+									className="button red-shadow"
+									style={{ backgroundImage: `url(${diary})` }}>
+									Dairy
+								</Link>
+							</div>
+							<Link
+								to="/reports"
+								className="button yellow-shadow"
+								style={{ backgroundImage: `url(${marksIcon})` }}>
+								Marks
+							</Link>
+
+						</div>
+
+						<div className="row">
+
+							<Link
+								to="/sms" className="button red-shadow"
+								style={{ backgroundImage: `url(${smsIcon})` }}>
+								SMS
+							</Link>
+
+							<Link
+								to="/reports-menu"
+								className="button green-shadow"
+								style={{ backgroundImage: `url(${resultIcon})` }}>
+								Result Card
+							</Link>
+
+						</div>
+						<div className="row">
 						{ 
 							user.Admin || permissions.fee.teacher ?
 							<Link 
@@ -153,29 +189,12 @@ class Landing extends Component {
 								style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> 
 								
 							: false 
-						} 
-							<Link 
-								to="/reports" 
-								className="button yellow-shadow" 
-								style={{backgroundImage: `url(${marksIcon})` }}> Marks</Link> 
-						
-						</div>
-
-						
-						<div className="row">
-							{
-								user.Admin || permissions.fee.teacher ? 
-									<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
-									: false
-							}
-							<Link to="/reports-menu" className="button green-shadow" style={{backgroundImage: `url(${resultIcon})` }}>Result Card</Link>
-						</div>
-						<div className="row">
-							<Link to="/sms" className="button red-shadow" style={{backgroundImage: `url(${smsIcon})` }}>SMS</Link>
-							<div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
-								<Link to="/diary" className="button red-shadow" style={{backgroundImage: `url(${diary})` }}>Dairy</Link>
-							</div>
+						}
+						{
+							user.Admin || permissions.fee.teacher ? 
+								<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
+								: false
+						}
 						</div>
 					</div>
 
