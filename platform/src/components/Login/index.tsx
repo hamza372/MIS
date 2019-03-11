@@ -44,6 +44,8 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 
 	componentWillReceiveProps(nextProps : propTypes) {
 
+		console.log(nextProps)
+		console.log("NEXT PROPS")
 		if(nextProps.auth.token && nextProps.auth.token !== this.props.auth.token) {
 			this.props.history.push('/');
 		}

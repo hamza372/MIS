@@ -47,6 +47,7 @@ html,body, #root, .layout{
 	margin-top: 15px;
 	border-radius: 4px;
 	color: #333;
+	flex-shrink: 0;
 }
 
 	.list>* {
@@ -222,7 +223,7 @@ a.block {
 			margin-left: auto;
 		}
 
-		.form .row>:not(input):last-child {
+		.form .row>:not(input):not(.button):last-child {
 			text-align: right;
 		}
 

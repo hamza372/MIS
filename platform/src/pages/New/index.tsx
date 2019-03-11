@@ -11,33 +11,53 @@ type propTypes = {
 	addSchools: (ids : string[]) => void
 } & RouteComponentProps
 
-class Home extends React.Component<propTypes> {
+interface stateType {
+	loading: boolean
+}
+
+class Home extends React.Component<propTypes, stateType> {
+
+	constructor(props : propTypes) {
+		super(props)
+
+		const blank = Object.keys(props.matches)
+			.filter(k => props.school_db[k] == undefined)
+		
+		console.log("BLANK SCHOOLS: ", blank)
+		if(blank.length > 0) {
+			props.addSchools(blank)
+		}
+
+		this.state = {
+			loading: blank.length > 0
+		}
+
+	}
 
 	onSchoolClick = (school : CERPSchool) => () => {
-		console.log(school)
-
 		this.props.history.push({
 			pathname: this.props.location.pathname,
 			search: `?school_id=${school.refcode}`
 		})
 	}
 
-	render() {
+	componentWillReceiveProps(nextProps : propTypes) {
 
-		const blank = Object.keys(this.props.matches)
-			.filter(k => this.props.school_db[k] == undefined)
-	
-		let loading = false;
-		if(this.props.connected && blank.length > 0) {
-			this.props.addSchools(blank)
-			loading = true;
-		}
+		const blank = Object.keys(nextProps.matches)
+			.filter(k => nextProps.school_db[k] == undefined)
+
+		console.log("NEW PROPS: ", blank)
+		this.setState({ loading: blank.length > 0 })
+	}
+
+
+	render() {
 
 		return <div className="new page">
 
 			<div className="title">New Schools</div>
 
-			{ loading && <div className="loading">Loading School Info....</div>}
+			{ this.state.loading && <div className="loading">Loading School Info....</div>}
 			<div className="list">
 			{
 				Object.entries(this.props.matches)

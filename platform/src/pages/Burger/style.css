@@ -59,6 +59,7 @@
 	padding: 10px;
 	display: flex;
 	flex-direction: column;
+	overflow-y: auto;
 }
 
 .info-panel {

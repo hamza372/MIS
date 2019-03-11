@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey} from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey} from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
 
@@ -25,13 +25,10 @@ interface StateProps {
 // 
 
 interface StateType {
-	showSurvey: boolean
+	showSurvey: false | "NOT_INTERESTED" | "CALL_END"
 
-	survey: {
-		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
-		follow_up_meeting: "YES" | "NO" | "" // boolean?
-		// scheduled_meeting: ""
-	}
+	call_end_survey: CallEndSurvey['meta']
+	not_interested_survey: NotInterestedSurvey['meta']
 
 }
 
@@ -40,7 +37,8 @@ interface DispatchProps {
 	releaseNumber: () => void
 	reserveNumber: () => void
 	rejectSchool: () => void
-	saveSurvey: (survey: CallEndSurvey['meta']) => void
+	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
+	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -57,13 +55,20 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		this.state = {
 			showSurvey: false,
-			survey: {
+			call_end_survey: {
+				customer_interest: "",
 				customer_likelihood: "",
-				follow_up_meeting: ""
+				follow_up_meeting: "",
+				follow_up_meeting_date: new Date().getTime(),
+				other_notes: ""
+			},
+			not_interested_survey: {
+				reason_rejected: "",
+				other_reason: ""
 			}
 		}
 
-		this.former = new Former(this, ["survey"])
+		this.former = new Former(this, [])
 
 	}
 
@@ -81,7 +86,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		if(current_call_in_progress && !next_call && this.props.school_id === nextProps.school_id) {
 			this.setState({
-				showSurvey: true
+				showSurvey: "CALL_END"
 			})
 		}
 	}
@@ -103,6 +108,11 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	onMarkRejected = () => {
 		console.log('mark as reject')
 
+		// can show a rejection survey here maybe
+
+		this.setState({
+			showSurvey: "NOT_INTERESTED"
+		})
 		this.props.rejectSchool()
 	}
 
@@ -113,11 +123,17 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = () => {
+	saveCallEndSurvey = () => {
 
 		console.log("saving survey", this.state)
 
-		this.props.saveSurvey(this.state.survey)
+		if(this.state.showSurvey === "CALL_END") {
+			this.props.saveCallEndSurvey(this.state.call_end_survey)
+		}
+
+		if(this.state.showSurvey === "NOT_INTERESTED") {
+			this.props.saveSchoolRejectedSurvey(this.state.not_interested_survey)
+		}
 
 		this.setState({
 			showSurvey: false
@@ -158,7 +174,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{
-					this.state.showSurvey && 
+					this.state.showSurvey === "CALL_END" && 
 					<Modal>
 						<div className="modal">
 							<div className="title">Call Finished</div>
@@ -166,18 +182,30 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 							<div className="form" style={{ width: "90%"}}>
 
 								<div className="row">
+									<label>Is the customer interested in using the Product?</label>
+									<select {...this.former.super_handle(["call_end_survey", "customer_interest"])}>
+										<option value="">Please Select an Answer</option>
+										<option value="YES">Yes</option>
+										<option value="UNSURE">Unsure</option>
+										<option value="NO">No</option>
+									</select>
+								</div>
+
+								<div className="row">
 									<label>How strongly do you feel the client will make a purchase?</label>
-									<select {...this.former.super_handle(["customer_likelihood"])}>
-										<option value="">Select </option>
-										<option value="HIGH">I think they will buy from us</option>
-										<option value="MEDIUM">I am not sure</option>
-										<option value="LOW">They will not buy from us</option>
+									<select {...this.former.super_handle(["call_end_survey", "customer_likelihood"])}>
+										<option value="">Please select an option</option>
+										<option value="HIGH">High - I think they will buy from us</option>
+										<option value="MEDIUM">Medium - I am not sure</option>
+										<option value="LOW">Low - They did not say no, but probably not</option>
+										<option value="ZERO">Zero - They will not buy from us</option>
+										<option value="NA">Question is not relevant</option>
 									</select>
 								</div>
 
 								<div className="row">
 									<label>Will you have another meeting with the client?</label>
-									<select {...this.former.super_handle(["follow_up_meeting"])}>
+									<select {...this.former.super_handle(["call_end_survey", "follow_up_meeting"])}>
 										<option value="">Please Select an Answer</option>
 										<option value="YES">Yes</option>
 										<option value="NO">No</option>
@@ -185,7 +213,50 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 								</div>
 
 								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
+									<label>When is the meeting scheduled for?</label>
+									<input type="date" {...this.former.super_handle(["call_end_survey", "follow_up_meeting_date"])} />
+								</div>
+
+								<div className="row">
+									<label>Other Notes</label>
+									<input type="text" {...this.former.super_handle(["call_end_survey", "other_notes"])} placeholder="Enter other notes here" />
+								</div>
+
+								<div className="row">
+									<div className="button blue" onClick={this.saveCallEndSurvey}>Save</div>
+								</div>
+							</div>
+						</div>
+					</Modal>
+				}
+
+				{
+					this.state.showSurvey === "NOT_INTERESTED" && 
+					<Modal>
+						<div className="modal">
+							<div className="title">Marked Not Interested</div>
+
+							<div className="form" style={{ width: "90%"}}>
+
+								<div className="row">
+									<label>Reason for marking Not Interested</label>
+									<select {...this.former.super_handle(["not_interested_survey", "reason_rejected"])}>
+										<option value="">Select </option>
+										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
+										<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
+										<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
+										<option value="OTHER">Other Reason</option>
+									</select>
+								</div>
+
+								{ this.state.not_interested_survey.reason_rejected === "OTHER" ? <div className="row">
+									<label>Why are they not interested?</label>
+									<input type="text" {...this.former.super_handle(["not_interested_survey", "other_reason"])} placeholder="" />
+								</div> : false 
+								}
+
+								<div className="row">
+									<div className="button blue" onClick={this.saveCallEndSurvey}>Save</div>
 								</div>
 							</div>
 						</div>
@@ -400,5 +471,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
-	saveSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey))
+	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
+	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey))
 }))(withRouter(SchoolInfo))

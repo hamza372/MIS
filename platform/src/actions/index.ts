@@ -21,13 +21,14 @@ export const createLogin = (username: string, password: string, number: string) 
 			password
 		}
 	})
-		.then((res: { token: string, sync_state: RootBankState['sync_state'] }) => {
-			if (Object.keys(res.sync_state.matches).length === 0) {
-				dispatch(forceSaveFullStatePotentiallyCausingProblems())
-			}
+	.then((res: { token: string, sync_state: RootBankState['sync_state'] }) => {
 
-			dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
-		})
+		if (res.sync_state.matches === undefined || Object.keys(res.sync_state.matches).length === 0) {
+			dispatch(forceSaveFullStatePotentiallyCausingProblems())
+		}
+
+		dispatch(createLoginSucceed(username, res.token, res.sync_state, number))
+	})
 }
 
 export const forceSaveFullStatePotentiallyCausingProblems = () => (dispatch: Dispatch, getState: GetState) => {
@@ -175,6 +176,31 @@ export const releaseMaskedNumber = (school_id: string) => (dispatch: Dispatch, g
 			value: event
 		}
 	]))
+}
+
+export const saveSchoolRejectedSurvey = (school_id: string, survey: NotInterestedSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
+
+	const time = new Date().getTime()
+
+	const state = getState()
+
+	const event : NotInterestedSurvey = {
+		event: "MARK_REJECTED_SURVEY",
+		meta: survey,
+		time,
+		user: {
+			name: state.sync_state.numbers[state.auth.number].name,
+			number: state.auth.number
+		}
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: event
+		}
+	]))
+
 }
 
 export const saveCallEndSurvey = (school_id: string, survey: CallEndSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {

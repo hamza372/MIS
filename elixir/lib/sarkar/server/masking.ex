@@ -87,25 +87,26 @@ defmodule Sarkar.Server.Masking do
 									other ->
 										IO.puts "didn't find a supplier who has the number that was dialed: #{school_id}: #{dialed}"
 										IO.inspect other
-										{"", ""}
+										{"not-found", "04238301513"}
 								end
 							other -> 
 								IO.puts "didn't find a school which has this number listed #{incoming}"
 								IO.inspect other
-								{"", ""}
+								{"not-found", "04238301513"}
 						end
 				end
 			other ->
 				IO.puts "unexpected query params"
 				IO.inspect other
-				{"", ""}
+				{"not-found-at-all", "04238301513"}
 		end
 
 		IO.puts "would have forwarded to #{school_name} #{forward}"
+
 		{:ok, :cowboy_req.reply(
 			200,
 			%{"content-type" => "text/plain"},
-			"03351419577",
+			forward,
 			req), state}
 	end
 

@@ -42,6 +42,9 @@ const rootReducer = (state : RootBankState, action: Actions) : RootBankState => 
 		{
 			//@ts-ignore
 			const succeed = <LoginSucceed>action
+
+			console.log("LOGIN SUCCEED")
+			console.log(succeed)
 			
 			return {
 				...state,

@@ -4,8 +4,8 @@ defmodule Mix.Tasks.Platform do
 	def run(["ingest_data"]) do
 		Application.ensure_all_started(:sarkar)
 
-		{:ok, body} = case File.exists?(Application.app_dir(:sarkar, "priv/sample.json")) do
-			true -> File.read(Application.app_dir(:sarkar, "priv/sample.json"))
+		{:ok, body} = case File.exists?(Application.app_dir(:sarkar, "priv/data.json")) do
+			true -> File.read(Application.app_dir(:sarkar, "priv/data.json"))
 			false -> File.read("priv/sample.json")
 		end
 		{:ok, json} = Poison.decode(body)
@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile -> 
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(Sarkar.School.DB, "INSERT INTO platform_schools(id, db) VALUES ($1, $2)", [id, school_profile]) do
+			case Postgrex.query(Sarkar.School.DB, "INSERT INTO platform_schools(id, db) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
 				{:ok, _} -> IO.puts "updated #{id}"
 				{:error, err} -> 
 					IO.puts "error on school #{id}"
@@ -29,8 +29,7 @@ defmodule Mix.Tasks.Platform do
 				res.rows
 				|> Enum.each(fn ([id, sync_state]) ->
 
-					{:ok, next_sync_state} = case args do
-						["fees"] -> {:ok, adjust_fees(id, sync_state)}
+					{:ok, _} = case args do
 						["add_matches"] -> {:ok, add_matches(id, sync_state)}
 						["gen_matches"] -> {:ok, gen_matches(id, sync_state)}
 						other -> 
@@ -39,14 +38,6 @@ defmodule Mix.Tasks.Platform do
 							{:error, "no task"}
 					end
 
-					case Postgrex.query(Sarkar.School.DB, "INSERT INTO suppliers(id, sync_state) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET sync_state=$2", [id, next_sync_state]) do
-						{:ok, _} -> IO.puts "updated school #{id}"
-						{:error, err} -> 
-							IO.puts "error on school: #{id}"
-							IO.inspect err
-					end
-
-					Sarkar.Supplier.reload(id)
 				end)
 
 			{:err, msg} -> 
@@ -71,29 +62,51 @@ defmodule Mix.Tasks.Platform do
 		Map.put(sync_state, "matches", next_matches)
 	end
 
-	defp add_matches(id, sync_state) do
-		# this needs to read from csv file and load into the school ids
+	defp add_matches("mischool2", sync_state) do
+
+		csv = case File.exists?(Application.app_dir(:sarkar, "priv/mischool.csv")) do
+			true -> File.stream!(Application.app_dir(:sarkar, "priv/mischool.csv")) |> CSV.decode!
+			false -> File.stream!("priv/mischool.csv") |> CSV.decode!
+		end
+
+		[_ | refcodes] = csv 
+		|> Enum.map(fn [refcode | _ ] -> refcode end)
+
+		# instead of directly manipulating the matches dir, should be creating writes
+		# and writing the writes to the supplier.
+
+		changes = refcodes 
+		|> Enum.reduce(%{}, fn(school_id, agg) -> 
+			path = ["sync_state", "matches", school_id]
+			write = %{
+				"action" => %{
+					"path" => path,
+					"value" => %{ "status" => "NEW" },
+					"type" => "MERGE"
+				},
+				"date" => :os.system_time(:millisecond)
+			}
+
+			Map.put(agg, Enum.join(path, ","), write)
+		end)
+
+		start_supplier("mischool2")
+		Sarkar.Supplier.sync_changes("mischool2", "backend-task", changes, :os.system_time(:millisecond))
+
 		sync_state
 	end
 
-	defp adjust_fees(_school_id, school_db) do
-		# has to return the new school_db
-			next_students = Map.get(school_db, "students", %{})
-				|> Enum.map(
-					fn({id, student}) -> 
-						current_fee = Map.get(student, "Fee")
-						fees = %{
-							UUID.uuid4() => %{
-								"name" => "Monthly Fee",
-								"amount" => current_fee,
-								"type" => "FEE",
-								"period" => "MONTHLY"
-							}
-						}
-						{id, Map.put(student, "fees", fees)}
-					end)
-				|> Enum.into(%{})
-			
-			Map.put(school_db, "students", next_students)
+	defp add_matches(id, sync_state) do
+		# this needs to read from csv file and load into the school ids
+
+		sync_state
 	end
+
+	defp start_supplier(id) do
+		case Registry.lookup(Sarkar.SupplierRegistry, id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
+		end
+	end
+
 end

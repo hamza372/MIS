@@ -41,9 +41,25 @@ interface CallEndEvent extends PlatformInteractionEvent {
 interface CallEndSurvey extends PlatformInteractionEvent {
 	event: "CALL_END_SURVEY",
 	meta: {
+		customer_interest: "YES" | "NO" | "UNSURE" | ""
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | ""
+		follow_up_meeting_date: number
+		other_notes: string
 	}
+}
+
+interface NotInterestedSurvey extends PlatformInteractionEvent {
+	event: "MARK_REJECTED_SURVEY"
+	meta: {
+		reason_rejected: 
+			"PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
+		other_reason: string
+	}
+}
+
+interface MarkCompleteSurvey extends PlatformInteractionEvent {
+	event: "MARK_COMPLETE_SURVEY"
 }
 
 type SupplierInteractionEvent = {
