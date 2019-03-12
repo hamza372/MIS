@@ -30,7 +30,7 @@ defmodule Sarkar.Server.Masking do
 						start_supplier(supplier_id)
 						school_id = Sarkar.Supplier.get_school_from_masked(supplier_id, dialed)
 
-						{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'pulled_schoolname', db->'phone_number' from platform_schools where id=$1", [school_id])
+						{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1", [school_id])
 						[[ school_name, outgoing_number ]] = resp2.rows
 
 						case event_type do
@@ -83,7 +83,7 @@ defmodule Sarkar.Server.Masking do
 										number = Sarkar.Supplier.get_last_caller(supplier_id, school_id)
 										Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
 
-										{supplier_id, number}
+										{supplier_id, "0#{number}"}
 									other ->
 										IO.puts "didn't find a supplier who has the number that was dialed: #{school_id}: #{dialed}"
 										IO.inspect other
