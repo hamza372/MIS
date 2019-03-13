@@ -15,7 +15,8 @@ defmodule Sarkar.Server.Masking do
 
 		# TODO: handle different events with different code blocks inside this case
 		# i.e. if we are passing call_end or call_start events
-		{school_name, forward} = case query_params do
+		IO.inspect query_params
+		{school_name, forward, caller} = case query_params do
 			%{"dialed" => dialed, "callerid" => incoming, "event" => event_type, "unique_id" => uid} -> 
 				# look up incoming against supplier db.
 				# then query that supplier for the mask pair.
@@ -30,42 +31,46 @@ defmodule Sarkar.Server.Masking do
 						start_supplier(supplier_id)
 						school_id = Sarkar.Supplier.get_school_from_masked(supplier_id, dialed)
 
-						{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1", [school_id])
+						{:ok, resp2} = Postgrex.query(
+							Sarkar.School.DB, 
+							"SELECT db->'school_name', db->'phone_number' from platform_schools where id=$1", 
+							[school_id])
+						IO.inspect resp2.rows
 						[[ school_name, outgoing_number ]] = resp2.rows
 
 						case event_type do
-							"call_start" -> 
+							"call_start" ->
 								Sarkar.Supplier.call_event("CALL_START", supplier_id, incoming, school_id, nil)
-							"call_end" -> 
+							"call_end" ->
 								%{ "duration" => duration, "call_status" => call_status} = query_params
 								Sarkar.Supplier.call_event("CALL_END", supplier_id, incoming, school_id, %{
 									"duration" => duration,
 									"call_status" => call_status,
 									"unique_id" => uid
 								})
-							other -> 
+							other ->
 								IO.puts "unexpected event type: #{other}"
 								"UNKNOWN"
 						end
 
-						{school_name, outgoing_number}
+						{school_name, "0#{outgoing_number}", "supplier: #{supplier_id}"}
 
 					other -> 
 						IO.puts "number is not from a supplier"
 						# we check if its one of the schools calling back.
 						# if it is, then do a lookup against all the mask_pairs->masked_num->school_id=$1
 						{:ok, resp} = Postgrex.query(Sarkar.School.DB, "
-							SELECT refcode FROM platform_schools WHERE 
-								phone_number=$1 OR
-								phone_number_1=$1 OR
-								phone_number_2=$1 OR
-								phone_number_3=$1 OR
-								owner_phonenumber=$1 OR
-								pulled_phonenumber=$1 OR
-								alt_phone_number=$1", [incoming])
+							SELECT db->'refcode', db->'school_name' FROM platform_schools WHERE 
+								concat('0',db->>'phone_number')=$1 OR
+								db->>'phone_number_1'=$1 OR
+								db->>'phone_number_2'=$1 OR
+								db->>'phone_number_3'=$1 OR
+								db->>'owner_phonenumber'=$1 OR
+								db->>'pulled_phonenumber'=$1 OR
+								db->>'alt_phone_number=$1'=$1", [incoming])
 						
 						case resp.rows do
-							[[ school_id ]] -> 
+							[[ school_id, school_name ]] -> 
 								# find the supplier
 								{:ok, resp2} = Postgrex.query(Sarkar.School.DB, "
 									SELECT id from suppliers where sync_state->'mask_pairs'->$1->'school_id' = $2
@@ -76,32 +81,33 @@ defmodule Sarkar.Server.Masking do
 										number = Sarkar.Supplier.get_last_caller(supplier_id, school_id)
 										Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
 
-										{supplier_id, number}
+										{supplier_id, number, "school: #{school_name}"}
 									[[ supplier_id ] | more] -> 
-										IO.puts "More than one supplier found. Should really use the one that called most recently"
+										IO.puts "More than one supplier found"
+										# Should really use the one that called most recently but we just use first result
 										IO.inspect more
 										number = Sarkar.Supplier.get_last_caller(supplier_id, school_id)
 										Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
 
-										{supplier_id, "0#{number}"}
+										{supplier_id, number, "school: #{school_name}"}
 									other ->
-										IO.puts "didn't find a supplier who has the number that was dialed: #{school_id}: #{dialed}"
+										IO.puts "didn't find a supplier who has the number that was dialed. #{school_id}: #{dialed}"
 										IO.inspect other
-										{"not-found", "04238301513"}
+										{"not-found", "04238301513", "school: #{school_name}"}
 								end
 							other -> 
 								IO.puts "didn't find a school which has this number listed #{incoming}"
 								IO.inspect other
-								{"not-found", "04238301513"}
+								{"not-found", "04238301513", "not-found"}
 						end
 				end
 			other ->
 				IO.puts "unexpected query params"
 				IO.inspect other
-				{"not-found-at-all", "04238301513"}
+				{"not-found-at-all", "04238301513", "bah"}
 		end
 
-		IO.puts "would have forwarded to #{school_name} #{forward}"
+		IO.puts "forwarding #{caller} to #{school_name}: #{forward}"
 
 		{:ok, :cowboy_req.reply(
 			200,

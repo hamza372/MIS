@@ -23,7 +23,6 @@
 	box-shadow: 20px 20px 100px #111;
 	border-radius: 8px;
 	padding: 20px;
-}
 
-	.modal .title {
-	}
+	overflow-y: auto;
+}

@@ -7,7 +7,7 @@ from secrets import api_key
 
 import matplotlib.pyplot as plt
 
-max_processed = 10
+max_processed = 100000000
 
 def similar(a : str, b : str) -> float:
 	return SequenceMatcher(None, a, b).ratio()
@@ -241,93 +241,99 @@ def map_locations():
 	count = 0
 	for school in lines:
 
-		if count > max_processed:
-			break
+		try:
+			if count > max_processed:
+				break
 
-		if 'GOOGLE_LAT' in school and 'GOOGLE_LNG' in school:
-			continue
+			if 'GOOGLE_LAT' in school and isValid(school['GOOGLE_LAT']):
+				print("skipping")
+				continue
 
-		count += 1
-		address = school['school_address'].upper()
-		union_council = address_normalize(school['school_uc'])
-		tehsil = school['school_tehsil'].upper()
-		school_district = school['school_district'].upper()
-		province = school['pulled_province'].upper().replace("KPK", "KHYBER PAKHTUNKHWA")
-		school_name = school['school_name'].upper()
+			count += 1
+			address = school['school_address'].upper()
+			union_council = address_normalize(school['school_uc'])
+			tehsil = school['school_tehsil'].upper()
+			school_district = school['school_district'].upper()
+			province = school['school_province'].upper().replace("KPK", "KHYBER PAKHTUNKHWA")
+			school_name = school['school_name'].upper()
 
-		full_addr = address_builder(address, union_council, tehsil, school_district, province)
-		fallback_addr = clean(address, union_council, tehsil, school_district, province, school_name)
+			full_addr = address_builder(address, union_council, tehsil, school_district, province)
+			fallback_addr = clean(address, union_council, tehsil, school_district, province, school_name)
 
-		success, first_result = google_geocode(full_addr)
-		print("first result for: " + full_addr)
-		if fallback_addr:
-			print("-------------------------------------------")
-			print("fallback would have been: " + fallback_addr)
-			print("-------------------------------------------")
+			success, first_result = google_geocode(full_addr)
+			print("first result for: " + full_addr)
+			if fallback_addr:
+				print("-------------------------------------------")
+				print("fallback would have been: " + fallback_addr)
+				print("-------------------------------------------")
 
-		if success:
-			resolutions += 1
-			candidate = first_result
-			school['GOOGLE_FORMATTED'] = candidate['formatted_address']
-			school['CERP_FORMATTED'] = full_addr
+			if success:
+				resolutions += 1
+				candidate = first_result
+				school['GOOGLE_FORMATTED'] = candidate['formatted_address']
+				school['CERP_FORMATTED'] = full_addr
 
-			geo = candidate['geometry']
-			school['GOOGLE_LAT'] = geo['location']['lat']
-			school['GOOGLE_LNG'] = geo['location']['lng']
+				geo = candidate['geometry']
+				school['GOOGLE_LAT'] = geo['location']['lat']
+				school['GOOGLE_LNG'] = geo['location']['lng']
 
-			northeast_corner = (geo['viewport']['northeast']['lat'], geo['viewport']['northeast']['lng'])
-			southwest_corner = (geo['viewport']['southwest']['lat'], geo['viewport']['southwest']['lng'])
+				northeast_corner = (geo['viewport']['northeast']['lat'], geo['viewport']['northeast']['lng'])
+				southwest_corner = (geo['viewport']['southwest']['lat'], geo['viewport']['southwest']['lng'])
 
-			# we want area of the bound
-			width = distance.distance(northeast_corner, (southwest_corner[0], northeast_corner[1])).kilometers
-			height = distance.distance(northeast_corner, (northeast_corner[0], southwest_corner[1])).kilometers
+				# we want area of the bound
+				width = distance.distance(northeast_corner, (southwest_corner[0], northeast_corner[1])).kilometers
+				height = distance.distance(northeast_corner, (northeast_corner[0], southwest_corner[1])).kilometers
 
-			area = width*height
+				area = width*height
 
-			school['GOOGLE_BOUNDED_AREA_KM'] = area
-			school['SEARCH_SIMILARITY'] = similar( remove_vowels(full_addr.upper()), remove_vowels(candidate['formatted_address'].upper()))
-			continue
-		else:
-			print("=====================")
-			print("FAILURE ^^^")
-			print("=====================")
+				school['GOOGLE_BOUNDED_AREA_KM'] = area
+				school['SEARCH_SIMILARITY'] = similar( remove_vowels(full_addr.upper()), remove_vowels(candidate['formatted_address'].upper()))
+				continue
+			else:
+				print("=====================")
+				print("FAILURE ^^^")
+				print("=====================")
 
-		if not fallback_addr:
-			failures += 1
-			continue
+			if not fallback_addr:
+				failures += 1
+				continue
 
-		success, second_result = google_geocode(fallback_addr)
-		print("second result for: " + fallback_addr)
-		print(second_result)
-		if success:
-			resolutions += 1
-			candidate = second_result
-			school['GOOGLE_FORMATTED'] = candidate['formatted_address']
-			school['CERP_FORMATTED'] = fallback_addr
+			success, second_result = google_geocode(fallback_addr)
+			print("second result for: " + fallback_addr)
+			print(second_result)
+			if success:
+				resolutions += 1
+				candidate = second_result
+				school['GOOGLE_FORMATTED'] = candidate['formatted_address']
+				school['CERP_FORMATTED'] = fallback_addr
 
-			geo = candidate['geometry']
-			school['GOOGLE_LAT'] = geo['location']['lat']
-			school['GOOGLE_LNG'] = geo['location']['lng']
+				geo = candidate['geometry']
+				school['GOOGLE_LAT'] = geo['location']['lat']
+				school['GOOGLE_LNG'] = geo['location']['lng']
 
-			northeast_corner = (geo['viewport']['northeast']['lat'], geo['viewport']['northeast']['lng'])
-			southwest_corner = (geo['viewport']['southwest']['lat'], geo['viewport']['southwest']['lng'])
+				northeast_corner = (geo['viewport']['northeast']['lat'], geo['viewport']['northeast']['lng'])
+				southwest_corner = (geo['viewport']['southwest']['lat'], geo['viewport']['southwest']['lng'])
 
-			# we want area of the bound
-			width = distance.distance(northeast_corner, (southwest_corner[0], northeast_corner[1])).kilometers
-			height = distance.distance(northeast_corner, (northeast_corner[0], southwest_corner[1])).kilometers
+				# we want area of the bound
+				width = distance.distance(northeast_corner, (southwest_corner[0], northeast_corner[1])).kilometers
+				height = distance.distance(northeast_corner, (northeast_corner[0], southwest_corner[1])).kilometers
 
-			area = width*height
+				area = width*height
 
-			school['GOOGLE_BOUNDED_AREA_KM'] = area
-			school['SEARCH_SIMILARITY'] = similar(remove_vowels(full_addr.upper()), remove_vowels(candidate['formatted_address'].upper()))
-		else:
-			failures += 1
+				school['GOOGLE_BOUNDED_AREA_KM'] = area
+				school['SEARCH_SIMILARITY'] = similar(remove_vowels(full_addr.upper()), remove_vowels(candidate['formatted_address'].upper()))
+			else:
+				failures += 1
+
+		except: 
+			print("::::ERROR:::")
+			failed_mappings.append(school)
 
 	print("resolutions: " + str(resolutions))
 	print("failures: " + str(failures))
 
 #with open("geocoded.csv") as f:
-with open("edmarkaz_survey_sampledata.csv") as f:
+with open("geocoded4.csv") as f:
 	reader = csv.DictReader(f)
 	lines = [l for l in reader]
 	fieldnames = reader.fieldnames
@@ -336,6 +342,11 @@ with open("uc.csv") as f:
 	reader = csv.DictReader(f)
 	uc_lines = [l for l in reader]
 	uc_fieldnames = reader.fieldnames
+
+with open("punjab_uc.csv") as f:
+	reader = csv.DictReader(f)
+	punjab_uc_lines = [l for l in reader]
+	punjab_uc_fieldnames = reader.fieldnames
 
 master_uc = { remove_vowels(address_normalize(l['UC'])): address_normalize(l['UC']) for l in uc_lines }
 master_district = { remove_vowels(address_normalize(l['DISTRICT'])): l['PROVINCE'].upper() for l in uc_lines }
@@ -362,9 +373,10 @@ for l in uc_lines:
 
 del master['']
 
+failed_mappings = []
 map_locations()
 
-with open("geocoded3.csv", "w") as f:
+with open("geocoded4.csv", "w") as f:
 	writer = csv.DictWriter(f, fieldnames=['CERP_FORMATTED', 'GOOGLE_FORMATTED', 'GOOGLE_LAT', 'GOOGLE_LNG', 'GOOGLE_BOUNDED_AREA_KM', 'SEARCH_SIMILARITY', *fieldnames])
 	# writer = csv.DictWriter(f, fieldnames=fieldnames)
 	writer.writeheader()
@@ -373,3 +385,6 @@ with open("geocoded3.csv", "w") as f:
 # plt.hist(confidences, 20, facecolor='blue', alpha=0.5)
 # plt.savefig("plot.png", format="png")
 
+
+with open("failed.json", "w") as f:
+	json.dump(failed_mappings, f)

@@ -85,6 +85,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		const next_call = call_in_progress(nextProps.schoolMatch)
 
 		if(current_call_in_progress && !next_call && this.props.school_id === nextProps.school_id) {
+
 			this.setState({
 				showSurvey: "CALL_END"
 			})
