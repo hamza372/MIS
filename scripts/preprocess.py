@@ -223,6 +223,7 @@ def compute_fee_meta():
 		"Rs. 1051 - 1500": 1500,
 		"Rs. 1501+": 1501
 	}
+
 	for school in lines:
 		lowest_fee = school['lowest_fee']
 		highest_fee = school['highest_fee']
