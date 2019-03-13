@@ -253,13 +253,18 @@ class Settings extends Component {
 					</div>
 
 					<div className="row">
-					<label>MISchool Version</label>
-					<label>{window.version || "no version set"}</label>
+						<label>MISchool Version</label>
+						<label>{window.version || "no version set"}</label>
 					</div>
 
 					<div className="row">
-					<label>Client Id</label>
-					<label>{ this.state.client_id }</label>
+						<label>Client Id</label>
+						<label>{ this.state.client_id }</label>
+					</div>
+
+					<div className="row">
+						<label>Student Limit</label>
+						<label>{ this.props.max_limit >= 0 ? this.props.max_limit : "Unlimited"}</label>
 					</div>
 
 
@@ -300,7 +305,8 @@ export default connect(
 		settings: state.db.settings, 
 		user: state.db.faculty[state.auth.faculty_id], 
 		sms_templates: state.db.sms_templates,
-		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
+		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
+		max_limit: state.db.max_limit || -1
 	}), 
 	dispatch => ({
 		saveTemplates: templates => dispatch(createTemplateMerges(templates)),

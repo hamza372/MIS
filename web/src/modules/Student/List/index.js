@@ -41,7 +41,7 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo, max_limit }) => {
 
 	const sections = getSectionsFromClasses(classes)	
 	
@@ -73,9 +73,14 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 	else{
 		items = items.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]))
 	}
+
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"
+	}
+
+	if(max_limit >= 0 && Object.values(students).filter(x => x.Name).length >= max_limit) {
+		create = ''
 	}
 
 	return <div className="student-list">
@@ -97,5 +102,6 @@ export default connect((state, { location }) => ({
 	classes: state.db.classes,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
-	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
+	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
+	max_limit: state.db.max_limit || -1
 }))(LayoutWrap(StudentList));
