@@ -1,6 +1,42 @@
 defmodule Mix.Tasks.Migrate do
 	use Mix.Task
 
+
+	def run(["assign_max_students"]) do
+
+		Application.ensure_all_started(:sarkar)
+		case Postgrex.query(Sarkar.School.DB, "SELECT school_id, db from backup", []) do
+			{:ok, res} -> 
+				res.rows 
+				|> Enum.each(fn ([school_id, school_db]) ->
+					assign_max_students(school_id, -1)
+				end) 
+		end
+	end
+
+	def assign_max_students(school_id, limit) do
+
+		path = ["db", "max_limit"]
+		pkey = Enum.join(path, ",")
+
+		write = %{
+			"action" => %{
+				"path" => path,
+				"value" => limit,
+				"type" => "MERGE"
+			},
+			"date" => :os.system_time(:millisecond)
+		}
+
+		changes = %{
+			pkey => write
+		}
+
+		start_school(school_id)
+		Sarkar.School.sync_changes(school_id, "backend-task", changes, :os.system_time(:millisecond))
+
+	end
+
 	def run(args) do
 		Application.ensure_all_started(:sarkar)
 		case Postgrex.query(Sarkar.School.DB, "SELECT school_id, db from backup", []) do
@@ -263,5 +299,12 @@ defmodule Mix.Tasks.Migrate do
 			|> Enum.into(%{})
 		Map.put(school_db, "students", next_students)
 
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(Sarkar.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
 	end
 end
