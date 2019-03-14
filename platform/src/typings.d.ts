@@ -30,7 +30,7 @@ interface PlatformInteractionEvent {
 }
 
 interface CallEndEvent extends PlatformInteractionEvent {
-	event: "CALL_END",
+	event: "CALL_END" | "CALL_BACK_END",
 	meta: {
 		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION",
 		duration: number,
@@ -63,7 +63,7 @@ interface MarkCompleteSurvey extends PlatformInteractionEvent {
 }
 
 type SupplierInteractionEvent = {
-	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START",
+	event: "MARK_REJECTED" | "REVEAL_NUMBER" | "MARK_DONE" | "CALL_START" | "CALL_BACK",
 } & PlatformInteractionEvent
 
 

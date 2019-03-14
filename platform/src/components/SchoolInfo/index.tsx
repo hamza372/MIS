@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
+import moment from 'moment'
 import Former from '~/src/utils/former'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey} from '~/src/actions'
 import Modal from '~/src/components/Modal'
@@ -366,16 +367,35 @@ interface SchoolMatchProps {
 	schoolMatch: SchoolMatch
 }
 
-const SchoolHistory : React.SFC<SchoolMatchProps> = (props) => {
+const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) => {
+
+	const combined_events = Object.values(props.schoolMatch.history)
+		.sort((a, b) => a.time - b.time)
+		.reduce((agg, curr) => {
+			if(curr.event == "CALL_START" || curr.event == "CALL_BACK") {
+				return agg;
+			}
+
+			return [
+				...agg,
+				curr
+			]
+		}, [])
 
 	return <div className="school history">
 		<div className="divider">History</div>
 
+		<div className="row">
+			<div><b>Date</b></div>
+			<div><b>Time</b></div>
+			<div><b>User</b></div>
+			<div><b>Event</b></div>
+		</div>
 		{
-			Object.values(props.schoolMatch.history)
+			combined_events
 				.map(v => <div className="row" key={v.time}>
-					<div>{new Date(v.time).toLocaleTimeString()}</div>
-					<div>{new Date(v.time).toLocaleDateString()}</div>
+					<div>{moment(v.time).format("DD/MM")}</div>
+					<div>{moment(v.time).format("HH:mm")}</div>
 					<div>{
 						// @ts-ignore
 						v.user.name.name || v.user.name

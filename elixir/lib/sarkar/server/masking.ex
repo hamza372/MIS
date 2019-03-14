@@ -79,7 +79,21 @@ defmodule Sarkar.Server.Masking do
 								case resp2.rows do 
 									[[ supplier_id ]] -> 
 										number = Sarkar.Supplier.get_last_caller(supplier_id, school_id)
-										Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
+
+										case event_type do
+											"call_start" ->
+												Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
+											"call_end" ->
+												%{ "duration" => duration, "call_status" => call_status } = query_params
+												Sarkar.Supplier.call_event("CALL_BACK_END", supplier_id, number, school_id, %{
+													"duration" => duration,
+													"call_status" => call_status,
+													"unique_id" => uid
+												})
+											other ->
+												IO.puts "unexpected event type: #{other}"
+												"UNKNOWN"
+										end
 
 										{supplier_id, number, "school: #{school_name}"}
 									[[ supplier_id ] | more] -> 
@@ -87,18 +101,32 @@ defmodule Sarkar.Server.Masking do
 										# Should really use the one that called most recently but we just use first result
 										IO.inspect more
 										number = Sarkar.Supplier.get_last_caller(supplier_id, school_id)
-										Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
+
+										case event_type do
+											"call_start" ->
+												Sarkar.Supplier.call_event("CALL_BACK", supplier_id, number, school_id, nil)
+											"call_end" ->
+												%{ "duration" => duration, "call_status" => call_status } = query_params
+												Sarkar.Supplier.call_event("CALL_BACK_END", supplier_id, number, school_id, %{
+													"duration" => duration,
+													"call_status" => call_status,
+													"unique_id" => uid
+												})
+											other ->
+												IO.puts "unexpected event type: #{other}"
+												"UNKNOWN"
+										end
 
 										{supplier_id, number, "school: #{school_name}"}
 									other ->
 										IO.puts "didn't find a supplier who has the number that was dialed. #{school_id}: #{dialed}"
 										IO.inspect other
-										{"not-found", "04238301513", "school: #{school_name}"}
+										{"supplier-not-found: #{incoming} -> #{dialed}", "04238301513", "school: #{school_name}"}
 								end
 							other -> 
 								IO.puts "didn't find a school which has this number listed #{incoming}"
 								IO.inspect other
-								{"not-found", "04238301513", "not-found"}
+								{"not-found: #{incoming} -> #{dialed}", "04238301513", "not-found"}
 						end
 				end
 			other ->

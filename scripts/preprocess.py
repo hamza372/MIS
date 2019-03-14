@@ -7,7 +7,7 @@ from secrets import api_key
 
 import matplotlib.pyplot as plt
 
-max_processed = 100000000
+max_processed = 1000
 
 def similar(a : str, b : str) -> float:
 	return SequenceMatcher(None, a, b).ratio()
@@ -87,15 +87,15 @@ def address_builder(address: str, union_council: str, tehsil: str, school_distri
 	if isValid(cleaned_uc) and cleaned_uc not in runner:
 		splits.append(address_normalize(cleaned_uc))
 		runner += address_normalize(cleaned_uc) + " "
-	
+
 	if isValid(tehsil) and tehsil not in runner:
 		splits.append(tehsil)
 		runner += tehsil + " "
-	
+
 	if isValid(school_district) and school_district not in runner:
 		splits.append(school_district)
 		runner += school_district + " "
-	
+
 	if isValid(province) and province not in runner:
 		splits.append(province)
 		runner += province
@@ -105,7 +105,7 @@ def address_builder(address: str, union_council: str, tehsil: str, school_distri
 	return final
 
 def address_normalize(address: str) -> str:
-	parsed : str 
+	parsed : str
 	parsed = address.upper().replace(".", "")
 	parsed = re.sub(r"\b(NO|NEAR|VPO|PO|VS|P/O|VILLAGE|VILL|VIL|TEHSIL|THESIL|THILL|THE|DISTT|DISTRICT|V/P|TEH|MOH|,|BESIDE|OPPOSITE|UC)\b", "", parsed)
 	parsed = parsed.replace("TT SINGH", "TOBA TEK SINGH").replace("&", "")
@@ -126,7 +126,7 @@ confidences = []
 # where each of the repsondents now has a google lat/long/other data with some confidence
 # we first go through a data cleaning cycle where we map the addresses to a known union council if possible
 # this data cleaning is only providing us fallbacks. so for each school, we have an array of fallback addresses
-# we keep track of which addresses we tried 
+# we keep track of which addresses we tried
 
 def clean(address : str, union_council : str, tehsil : str, school_district : str, province : str, school_name : str) -> str:
 
@@ -146,7 +146,7 @@ def clean(address : str, union_council : str, tehsil : str, school_district : st
 	elif parsed_uc in master_district:
 		return address_builder("", "", "", union_council, province)
 	else:
-		# now we figure out the closest we can get 
+		# now we figure out the closest we can get
 		p_dict = master.get(province, False)
 		if not p_dict:
 			return ""
@@ -169,7 +169,7 @@ def clean(address : str, union_council : str, tehsil : str, school_district : st
 			return address_builder(address, proposed, tehsil, school_district, province)
 		else:
 			proposed_fallback = max(t_dict.keys(), key=lambda str: similar(address, str))
-			is_contained = proposed_fallback in address 
+			is_contained = proposed_fallback in address
 			proposed_fallback_confidence = similar(proposed_fallback, address)
 
 			if is_contained:
@@ -209,7 +209,7 @@ def compute_enrollment_meta():
 			chunk = math.floor(parsed / enrollment_bucket)
 			enrollment_meta[chunk] = enrollment_meta.get(chunk, 0) + 1
 			enrollment_count += 1
-	
+
 	return enrollment_meta
 
 def compute_fee_meta():
@@ -232,7 +232,7 @@ def compute_fee_meta():
 		high_fee_range = school['high_fee_range']
 
 		# first lets ignore fee ranges..
-	
+
 	return fee_meta
 
 def map_locations():
@@ -326,7 +326,7 @@ def map_locations():
 			else:
 				failures += 1
 
-		except: 
+		except:
 			print("::::ERROR:::")
 			failed_mappings.append(school)
 
