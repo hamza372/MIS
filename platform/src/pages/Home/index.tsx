@@ -1,18 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-
+import { Link, RouteComponentProps } from 'react-router-dom'
 import moment from 'moment'
 
 import { forceSaveFullStatePotentiallyCausingProblems, getSchoolProfiles } from '~/src/actions'
 
-interface propTypes {
+import './style.css'
+
+type propTypes = {
 
 	sync_state: RootBankState['sync_state']
 	school_db: RootBankState['new_school_db']
 	saveFullState: () => void
 	addSchools: (ids: string[]) => void
-}
+} & RouteComponentProps
 
 interface stateType {
 	loading: boolean
@@ -43,6 +44,13 @@ class Home extends React.Component<propTypes, stateType> {
 		this.setState({ loading: blank.length > 0 })
 	}
 
+	onSchoolClick = (school_id : string) => () => {
+		this.props.history.push({
+			pathname: this.props.location.pathname,
+			search: `?school_id=${school_id}`
+		})
+	}
+
 	render() {
 		// if no number is set in auth, should ask them here
 
@@ -70,15 +78,25 @@ class Home extends React.Component<propTypes, stateType> {
 
 			}, [])
 
-		const last_unanswered_per_school = call_end_events
-			.filter(x => x.meta && x.meta.call_status !== "ANSWER")
+		const last_unanswered_per_school = Object.values(call_end_events
+			.filter(x => x.meta && this.props.sync_state.matches[x.school_id].status === "IN_PROGRESS")
 			.sort((a, b) => a.time - b.time)
 			.reduce((agg, curr) => {
 				return {
 					...agg,
 					[curr.school_id]: curr
 				}
-			}, {} as {[sid: string]: MergedEndEvent})
+			}, {} as {[sid: string]: MergedEndEvent}))
+			.filter(x => !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60)
+			
+		const total_minutes_on_phone = call_end_events.reduce((agg, curr) => {
+			//@ts-ignore
+			if(curr.meta && !isNaN(parseInt(curr.meta.duration))) {
+				//@ts-ignore
+				return agg + parseInt(curr.meta.duration)
+			}
+			return agg;
+		}, 0)/60.0
 
 		return <div className='home page school-info'>
 			<div className="title">Home Page</div>
@@ -92,13 +110,23 @@ class Home extends React.Component<propTypes, stateType> {
 				<div className="divider">Analytics</div>
 
 				<div className="row">
+					<label>Total Clients</label>
+					<div>{Object.keys(this.props.sync_state.matches).length}</div>
+				</div>
+
+				<div className="row">
+					<label>Clients Reached</label>
+					<div>{Object.keys(this.props.sync_state.matches).length - last_unanswered_per_school.length}</div>
+				</div>
+
+				<div className="row">
 					<label>Calls Made</label>
 					<div>{call_end_events.length}</div>
 				</div>
 
 				<div className="row">
-					<label>Failed Calls</label>
-					<div>{call_end_events.filter(x => x.meta && x.meta.call_status !== "ANSWER").length}</div>
+					<label>Un-Answered Calls</label>
+					<div>{call_end_events.filter(x => x.meta && !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60 ).length}</div>
 				</div>
 
 				<div className="row">
@@ -108,26 +136,19 @@ class Home extends React.Component<propTypes, stateType> {
 
 				<div className="row">
 					<label>Minutes on Phone</label>
-					<div>{(call_end_events.reduce((agg, curr) => curr.meta ? agg + curr.meta.duration : agg, 0)/60.0).toFixed(1)}</div>
+					<div>{total_minutes_on_phone.toFixed(1)}</div>
 				</div>
 
 				<div className="divider">Unanswered Calls</div>
 				{
 					Object.values(last_unanswered_per_school)
-						.map(x => <div className="row">
-							<label>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</label>
-							<div>{moment(x.time).format("DD/MM HH:MM:SS")}</div>
+						.sort((a, b) => a.time - b.time)
+						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSchoolClick(x.school_id)}>
+							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
+							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM:SS")}</div>
 						</div>)
 				}
 			</div>
-
-
-
-			{
-				// I want to see who i called who didnt pick up the phone, when i called them, and should i call them back now
-					// for this i need name and id
-			}
-
 		</div>
 	}
 }

@@ -390,6 +390,7 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) =
 			<div><b>Time</b></div>
 			<div><b>User</b></div>
 			<div><b>Event</b></div>
+			<div><b>Status</b></div>
 		</div>
 		{
 			combined_events
@@ -401,9 +402,11 @@ const SchoolHistory : React.SFC<SchoolMatchProps> = (props : SchoolMatchProps) =
 						v.user.name.name || v.user.name
 					}</div>
 					<div>{v.event}</div>
+					<div>{v.meta ? v.meta.call_status : ""}</div>
 					{
 						v.event === "CALL_END" ? console.log("META:", v.meta) : false
 					}
+					
 				</div>)
 		}
 	</div>
