@@ -211,7 +211,6 @@ class Settings extends Component {
 								<div>Select A Logo</div>
 								<input type="file" onChange={this.logoHandler}/>
 							</div>
-							<img className="new-badge" src={newBadge}/>
 						</div>
 						: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
 

@@ -24,6 +24,11 @@ import newBadge from "./icons/New/new.svg";
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'
 
+/**
+ * line for adding new badge just copy / paste it
+ * 
+ *	<img className="new-badge" src={newBadge}/>
+ */
 
 import './style.css'
 
@@ -126,7 +131,6 @@ class Landing extends Component {
 						</div> : false}
 						<div className="row">
 							<div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
 								<Link to="/student?forwardTo=prospective-student" className="button yellow-shadow" style={{backgroundImage: `url(${prospective})` }}>Prospective</Link>
 							</div>
 							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
@@ -147,7 +151,6 @@ class Landing extends Component {
 						<div className="row">
 
 							<div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
 								<Link
 									to="/diary"
 									className="button red-shadow"
