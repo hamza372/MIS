@@ -62,7 +62,7 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{OWED}</div>
 								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{SUBMITTED}</div>
 								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN}</div>
-								<div style={{ backgroundColor: red, textAlign:"center"  }}>{SUBMITTED - OWED}</div>
+								<div style={{ backgroundColor: red, textAlign:"center" }}>{ Math.abs(SUBMITTED - OWED)}</div>
 							</div>
 						}),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>
@@ -71,7 +71,7 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{total.OWED}</b></label>
 							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{total.PAID}</b></label>
 							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN}</b></label>
-							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{-total.OWED + total.PAID}</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.abs(total.OWED + total.PAID)}</b></label>
 						</div>
 					]
 				}

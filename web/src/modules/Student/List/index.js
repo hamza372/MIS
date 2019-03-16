@@ -79,7 +79,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 		createText = "Manage Fees"
 	}
 
-	if(max_limit >= 0 && Object.values(students).filter(x => x.Name).length >= max_limit) {
+	if(max_limit >= 0 && forwardTo !== 'payment' && Object.values(students).filter(x => x.Name).length >= max_limit) {
 		create = ''
 	}
 
