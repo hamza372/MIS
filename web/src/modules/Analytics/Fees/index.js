@@ -246,7 +246,7 @@ class FeeAnalytics extends Component {
 			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
-					<div>{this.calculateDebt(debt)}</div>
+					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } }  >{-1 * this.calculateDebt(debt)}</div>
 				</div>)
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
