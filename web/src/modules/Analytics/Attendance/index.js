@@ -23,7 +23,7 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {
 						
 						{ filter.present && <Line dataKey="PRESENT" stackId="a" stroke="#93d0c5" strokeWidth={3} name="Present"/> }
 						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#74aced" strokeWidth={3} name="Absent" />}
-						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#fc6171" strokeWidth={3} name="Leave" />}
+						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#e0e0e0" strokeWidth={3} name="Leave" />}
 						{ filter.percentage && <Line dataKey="percent" stroke="#ff6b68" strokeWidth={3} name="Percentage" />}
 					</LineChart>
 			</ResponsiveContainer>
