@@ -8,6 +8,7 @@ import Dynamic from '@ironbay/dynamic'
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import getStudentLimit from 'utils/getStudentLimit'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import Hyphenator from 'utils/Hyphenator'
 
@@ -364,6 +365,7 @@ class SingleStudent extends Component {
 			return <Redirect to={this.state.redirect} />
 		}
 		const admin = this.props.user.Admin;
+		const {students, max_limit} = this.props;
 		const prospective = this.isProspective()
 
 		return <div className="single-student">
@@ -519,7 +521,7 @@ class SingleStudent extends Component {
 					</div>
 					}
 					<div className="row">
-					{prospective && !this.isNew() ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
+					{prospective && !this.isNew() && !getStudentLimit(students, max_limit) ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
 					</div>
 				</div>
 			</div>
@@ -530,6 +532,7 @@ export default connect(state => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	permissions: state.db.settings.permissions,
+	max_limit: state.db.max_limit || -1 ,
 	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
 	save: (student) => dispatch(createStudentMerge(student)),
 	delete: (student) => dispatch(deleteStudent(student)),

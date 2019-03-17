@@ -78,7 +78,9 @@ const rootReducer = (state, action) => {
 
 		case CONFIRM_SYNC_DIFF:
 		{
-			console.log("confirm sync diff: ", Object.keys(action.new_writes).length, " changes synced")
+			console.log("confirm sync diff: ", 
+			Object.keys(action.new_writes).length, 
+			" changes synced")
 
 			const newQ = Object.keys(state.queued)
 				.filter(t => {
@@ -86,7 +88,7 @@ const rootReducer = (state, action) => {
 					return state.queued[t].date > action.date
 				})
 				.reduce((agg, curr) => {
-					return Dynamic.put(agg, ["queued", curr.action.path], curr.action)
+					return Dynamic.put(agg, ["queued", state.queued[curr].action.path], state.queud[curr].action)
 				}, {})
 
 			if(Object.keys(action.new_writes).length > 0) {
@@ -100,7 +102,7 @@ const rootReducer = (state, action) => {
 						return Dynamic.put(agg, curr.path, curr.value)
 					}, JSON.parse(JSON.stringify(state)))
 
-				return  {
+				return {
 					...nextState, 
 					queued: newQ,
 					acceptSnapshot: true,

@@ -178,7 +178,7 @@ class Diary extends Component {
 
 			<div className="title">Diary</div>
 				<div className="form">
-					<div className="divider">Send Diary for {moment().format("DD/MM/YYYY")}</div>
+					<div className="divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
 
 					<div className="section">
 						<div className="row">

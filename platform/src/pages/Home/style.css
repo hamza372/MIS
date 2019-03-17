@@ -1,0 +1,7 @@
+.home.page .clickable {
+	cursor: pointer;
+}
+
+.home.page .clickable:hover {
+	background-color: #ddd;
+}

@@ -1,10 +1,45 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import moment from 'moment'
+import former from 'utils/former'
 
 import './style.css'
 
 class FacultyAttendance extends Component {
+
+	constructor(props) {
+
+		super(props)
+
+		this.state = {
+			monthFilter: "",
+			yearFilter: ""
+		}
+
+		this.former = new former(this, []);
+	}
+	
+	getFilterCondition = (date) =>{
+		//when both are empty
+		if(this.state.monthFilter === "" && this.state.yearFilter === "") {
+			return true
+		}
+		//when month is empty	
+		if(this.state.monthFilter === "" && this.state.yearFilter !== ""){
+			return  moment(date).format("YYYY") === this.state.yearFilter;
+
+		}
+		//when year is empty
+		if(this.state.monthFilter !== "" && this.state.yearFilter === ""){
+			return moment(date).format("MMMM") === this.state.monthFilter
+
+		}
+		//when both are not empty
+		if(this.state.monthFilter !== "" && this.state.yearFilter !== "")
+		{
+			return moment(date).format("MMMM") === this.state.monthFilter && moment(date).format("YYYY") === this.state.yearFilter;
+		}
+	}
 
 	render() {
 
@@ -12,6 +47,15 @@ class FacultyAttendance extends Component {
 		const faculty = this.props.faculty[id];
 
 		const attendance = faculty.attendance;
+
+		const Months = new Set()
+		const Year = new Set()
+
+		Object.keys(attendance).forEach(date => {
+			const formatted = moment(date, "YYYY-MM-DD")
+			Months.add(formatted.format("MMMM"))
+			Year.add(formatted.format("YYYY"))
+		})
 
 		/*
 		const { PRESENT: num_present, ABSENT: num_absent, LEAVE: num_leave } = Object.values(attendance)
@@ -39,14 +83,33 @@ class FacultyAttendance extends Component {
 			</div>
 		*/
 
-		console.log(attendance)
 		return <div className="faculty-attendance">
 			<div className="divider">Record</div>
-			{ Object.entries(attendance)
+
+			<select {...this.former.super_handle(["monthFilter"])} style={{margin: "4px 2px"}}>
+				<option value=""> Select</option>
+				{
+					[...Months]
+					.map(month => <option key={month} value={month}>{month}</option>)
+				}
+			</select>
+
+			<select {...this.former.super_handle(["yearFilter"])} style={{margin:"4px 2px"}}>
+				<option value=""> Select</option>
+				{
+					[...Year]
+					.map(year => <option key={year} value={year}>{year}</option>)
+				}
+			</select>
+
+			<div className="section">
+			{
+				Object.entries(attendance)
+				.filter(([date,]) => this.getFilterCondition(date))
 				.map(
 					([date, rec]) => {
 						return <div className="row" key={date}>
-							<label>{moment(date).format("MM-DD")}</label>
+							<label>{moment(date).format("DD-MM")}</label>
 							{ rec.check_in && rec.check_out ? <div>In: {moment(rec.check_in).format("HH:mm")} Out: {moment(rec.check_out).format("HH:mm")}</div> : false}
 							{ rec.check_in && !rec.check_out ? <div>In: {moment(rec.check_in).format("HH:mm")}</div> : false}
 							{ rec.absent ? <div>Absent</div> : false }
@@ -54,6 +117,7 @@ class FacultyAttendance extends Component {
 						</div>
 					}
 			)}
+			</div>
 
 		</div>
 	}

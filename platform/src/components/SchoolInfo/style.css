@@ -1,0 +1,22 @@
+.school-info .form .row {
+	padding: .5rem 0;
+	border-bottom: 1px solid #aaa;
+	flex-direction: row;
+	align-items: center;
+}
+
+.school-info .form .row>label {
+	flex-shrink: 2;
+}
+
+	.school-info .form .row:last-child {
+		border-bottom: none;
+	}
+
+.school-info .form .row label {
+	color: #333;
+}
+
+.form .row>:not(input):not(.button):last-child {
+	text-align: right;
+}

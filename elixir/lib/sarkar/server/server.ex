@@ -18,7 +18,8 @@ defmodule Sarkar.Server do
 			{:_, [
 				{"/ws", Sarkar.Websocket, []},
 				{"/", Sarkar.Server.OK, []},
-				{"/analytics/:type", Sarkar.Server.Analytics, []}
+				{"/analytics/:type", Sarkar.Server.Analytics, []},
+				{"/masking", Sarkar.Server.Masking, []}
 			]}
 		])
 	end

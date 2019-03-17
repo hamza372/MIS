@@ -10,6 +10,7 @@ import Title from 'components/Title';
 import {PrintHeader} from 'components/Layout';
 
 import './style.css'
+import getStudentLimt from 'utils/getStudentLimit';
 
 const StudentItem = (S) => {
 
@@ -41,7 +42,7 @@ const toLabel = (S) => {
 
 }
 
-export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo }) => {
+export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo, max_limit }) => {
 
 	const sections = getSectionsFromClasses(classes)	
 	
@@ -65,6 +66,10 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 		create = '';
 	}
 
+	if(getStudentLimt(students, max_limit)) {
+		create = ''
+	}
+
 	if(forwardTo === "prospective-student"){
 		create = "/student/prospective-student/new"
 		createText = "New Prospective Student"
@@ -73,6 +78,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 	else{
 		items = items.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]))
 	}
+
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"
@@ -97,5 +103,6 @@ export default connect((state, { location }) => ({
 	classes: state.db.classes,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
-	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile"
+	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
+	max_limit: state.db.max_limit || -1
 }))(LayoutWrap(StudentList));

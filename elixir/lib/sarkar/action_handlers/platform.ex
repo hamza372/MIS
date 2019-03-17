@@ -14,17 +14,17 @@ defmodule Sarkar.ActionHandler.Platform do
 	# keep in memory for fast reply when call comes
 
 	def handle_action(%{"type" => "SET_FILTER"} = action, state) do
-
 		IO.inspect action
-
 		{:reply, succeed(%{"type" => "nonsense"}), state}
 	end
 
 	def handle_action(%{"type" => "LOGIN", "client_id" => client_id, "payload" => %{"id" => id, "password" => password}}, state) do
 		case Sarkar.Auth.login({id, client_id, password}) do
 			{:ok, token} ->
+				start_supplier(id)
 				register_connection(id, client_id)
-				{:reply, succeed(%{token: token}), %{id: id, client_id: client_id}}
+				sync_state = Sarkar.Supplier.get_sync_state(id)
+				{:reply, succeed(%{token: token, sync_state: sync_state}), %{id: id, client_id: client_id}}
 			{:error, message} -> {:reply, fail(message), %{}}
 		end
 	end
@@ -32,6 +32,7 @@ defmodule Sarkar.ActionHandler.Platform do
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"id" => id, "token" => token, "client_id" => client_id}}, state) do
 		case Sarkar.Auth.verify({id, client_id, token}) do
 			{:ok, _} ->
+				start_supplier(id)
 				register_connection(id, client_id)
 				{:reply, succeed(), %{id: id, client_id: client_id}}
 			{:error, msg} ->
@@ -40,10 +41,47 @@ defmodule Sarkar.ActionHandler.Platform do
 		end
 	end
 
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
+		res = Sarkar.Supplier.sync_changes(id, client_id, payload, last_sync_date)
+		{:reply, succeed(res), state}
+	end
+
+	def handle_action(%{"type" => "GET_SCHOOL_PROFILES", "payload" => payload}, %{id: id, client_id: client_id} = state) do
+		
+		ids = Map.get(payload, "school_ids", [])
+
+		or_str = Stream.with_index(ids, 1)
+			|> Enum.map(fn {_, i}-> 
+				"id=$#{i}"
+			end)
+			|> Enum.join(" OR ")
+
+		case Postgrex.query(Sarkar.School.DB, "SELECT id, db FROM platform_schools WHERE #{or_str}", ids) do
+			{:ok, resp} ->
+				dbs = resp.rows
+				|> Enum.map(fn [id, db] -> {id, db} end)
+				|> Enum.into(%{})
+
+				{:reply, succeed(dbs), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail("db error"), state}
+		end
+	end
+
 	def handle_action(action, state) do
 		IO.inspect action
+		IO.inspect state
 		IO.puts "NOT YET READY"
-		{:reply, fail(), state}
+		{:ok, state}
+		# {:reply, fail(), state}
+	end
+
+	defp start_supplier(id) do
+		case Registry.lookup(Sarkar.SupplierRegistry, id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SupplierSupervisor, {Sarkar.Supplier, {id}})
+		end
 	end
 
 	defp register_connection(id, client_id) do

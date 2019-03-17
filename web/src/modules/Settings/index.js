@@ -191,6 +191,11 @@ class Settings extends Component {
 
 
 	render() {
+
+		const studentLength = Object.values(this.props.students)
+        .filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
+		).length
+		
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -211,7 +216,6 @@ class Settings extends Component {
 								<div>Select A Logo</div>
 								<input type="file" onChange={this.logoHandler}/>
 							</div>
-							<img className="new-badge" src={newBadge}/>
 						</div>
 						: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
 
@@ -253,13 +257,18 @@ class Settings extends Component {
 					</div>
 
 					<div className="row">
-					<label>MISchool Version</label>
-					<label>{window.version || "no version set"}</label>
+						<label>MISchool Version</label>
+						<label>{window.version || "no version set"}</label>
 					</div>
 
 					<div className="row">
-					<label>Client Id</label>
-					<label>{ this.state.client_id }</label>
+						<label>Client Id</label>
+						<label>{ this.state.client_id }</label>
+					</div>
+
+					<div className="row">
+						<label>Student Limit</label>
+						<label>{ this.props.max_limit >= 0 ? `${studentLength} out of ${this.props.max_limit}` : "Unlimited"}</label>
 					</div>
 
 
@@ -297,10 +306,12 @@ class Settings extends Component {
 
 export default connect(
 	state => ({ 
-		settings: state.db.settings, 
+		settings: state.db.settings,
+		students: state.db.students, 
 		user: state.db.faculty[state.auth.faculty_id], 
 		sms_templates: state.db.sms_templates,
-		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
+		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
+		max_limit: state.db.max_limit || -1
 	}), 
 	dispatch => ({
 		saveTemplates: templates => dispatch(createTemplateMerges(templates)),

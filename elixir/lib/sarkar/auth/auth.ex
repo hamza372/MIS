@@ -12,6 +12,24 @@ defmodule Sarkar.Auth do
 		end
 	end
 
+	def create({id, password, "mischool", student_limit}) do
+		{:ok, confirm_text} = Sarkar.Auth.create({id, password})
+		IO.inspect confirm_text
+
+		Sarkar.Store.School.save(id, %{
+			"max_limit" => student_limit
+		}, %{
+			"max_students" => %{
+				"date" => :os.system_time(:millisecond),
+				"value" => student_limit,
+				"path" => ["db", "max_limit"],
+				"type" => "MERGE",
+				"client_id" => "backend"
+			}
+		})
+
+	end
+
 	def login({id, client_id, password}) do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db

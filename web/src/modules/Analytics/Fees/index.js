@@ -8,29 +8,31 @@ import { addMultiplePayments } from 'actions'
 import { PrintHeader } from 'components/Layout'
 import Former from 'utils/former'
 
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
-import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip } from 'recharts'
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts'
 
 	const MonthlyFeesChart = (props) => {
-			
+		const filter = props.filter
 		return <ResponsiveContainer width="100%" height={200}>
-					<ComposedChart data={
+					<LineChart 
+						data={
 							Object.entries(props.monthly_payments)
 								.sort(([m1,], [m2,]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
 								.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
-									month, OWED, SUBMITTED, FORGIVEN, net: SUBMITTED - OWED 
+									month, OWED, SUBMITTED, FORGIVEN, net: Math.abs(SUBMITTED - OWED) 
 								}))}>
-						<Legend />
+						
 						<XAxis dataKey="month" />
 						<YAxis />
 						<Tooltip />
-	
-						<Bar dataKey='OWED' name="Total" fill="#74aced" />
-						<Bar dataKey="SUBMITTED" stackId="a" fill="#5ecdb9" name="Paid" />
-						<Bar dataKey="FORGIVEN" stackId="a" fill="#e0e0e0" name="Forgiven" />
-						<Bar dataKey='net' name="Pending" fill="#ff6b68" />
-	
-				  </ComposedChart>
+						
+						{ filter.total && <Line dataKey='OWED' name="Total" stroke="#74aced" strokeWidth={3} /> }
+						{ filter.paid && <Line dataKey="SUBMITTED" stackId="a" stroke="#93d0c5" name="Paid" strokeWidth={3}/> }
+						{ filter.forgiven && <Line dataKey="FORGIVEN" stackId="a" stroke="#939292" name="Forgiven" strokeWidth={3}/>}
+						{ filter.pending  && <Line dataKey='net' name="Pending" strokeWidth={3} stroke="#ff6b68" />}
+
+					</LineChart>
 				</ResponsiveContainer> 
 	}
 	
@@ -39,13 +41,13 @@ import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip 
 		const total = props.total_debts;
 		const monthly_payments = props.monthly_payments;
 	
-		return <div className="section table" style={{margin: "20px 0"}}>
+		return <div className="section table" style={{margin: "20px 0", backgroundColor:"#c2bbbb21", overflowX: "scroll" }}>
 				<div className="table row heading">
-					<label><b>Date</b></label>
-					<label><b>Total</b></label>
-					<label><b>Paid</b></label>
-					<label><b>Forgiven</b></label>
-					<label><b>Pending</b></label>
+					<label style={{ backgroundColor: "#efecec", textAlign:"center" }}> <b> Date     </b></label>
+					<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}> <b> Total    </b> </label>
+					<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}> <b> Paid     </b> </label>
+					<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}> <b> Forgiven </b> </label>
+					<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}> <b> Pending  </b> </label>
 				</div>
 				{
 					[...Object.entries(monthly_payments)
@@ -53,39 +55,47 @@ import { ResponsiveContainer, Bar, Legend, XAxis, YAxis, ComposedChart, Tooltip 
 						.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
 														
 							const prof = SUBMITTED - OWED;
-							const red = "#FC6171"
+							const red = "#fc6171"
 	
 							return <div className="table row" key={month}>
-								<div>{month}</div>
-								<div>{OWED}</div>
-								<div>{SUBMITTED}</div>
-								<div>{FORGIVEN}</div>
-								<div style={{ color: prof < 0 ? red : "inherit" }}>{SUBMITTED - OWED}</div>
+								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month}</div>
+								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{OWED}</div>
+								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{SUBMITTED}</div>
+								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN}</div>
+								<div style={{ backgroundColor: red, textAlign:"center" }}>{ Math.abs(SUBMITTED - OWED)}</div>
 							</div>
 						}),
-						<div className="table row footing" key={Math.random()}>   
-							<label><b>Total</b></label>
-							<label><b>{total.OWED}</b></label>
-							<label><b>{total.PAID}</b></label>
-							<label><b>{total.FORGIVEN}</b></label>
-							<label style={{color: (total.PAID - total.OWED < 0 ? "#FC6171" : "inherit") }}><b>{-total.OWED + total.PAID}</b></label>
+						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>
+						<br/> 
+							<label style={{ backgroundColor: "#efecec", textAlign:"center" }}><b>Total</b></label>
+							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{total.OWED}</b></label>
+							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{total.PAID}</b></label>
+							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN}</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.abs(total.OWED + total.PAID)}</b></label>
 						</div>
 					]
 				}
 			</div> 
 				
 	}
+
 class FeeAnalytics extends Component {
 
 	constructor(props) {
 	  super(props)
 	
 	  this.state = {
-		 filterText: ""
+		 filterText: "",
+		 chartFilter: {
+			 paid: true,
+			 forgiven: true,
+			 pending: true,
+			 total: true
+		 },
+		 classFilter: ""
 	  }
 
 	  this.former = new Former(this, [])
-
 	}
 
 	calculateDebt = ({SUBMITTED, FORGIVEN, OWED}) => SUBMITTED + FORGIVEN - OWED;
@@ -147,31 +157,96 @@ class FeeAnalytics extends Component {
 		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven}
 	}
 
-	const items = Object.values(total_student_debts).filter(({student, debt}) => ( student.id && student.Name) && student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
-				
+	const items = Object.values(total_student_debts)
+		.filter(({student, debt}) => (
+			student.id && student.Name) &&
+			(this.state.classFilter === "" || 
+			student.section_id === this.state.classFilter ) &&
+			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase())
+		)
+
+	const sections = Object.values(getSectionsFromClasses(this.props.classes))
 	
 	return <div className="fees-analytics">
+
+		<PrintHeader 
+			settings={settings} 
+			logo={schoolLogo}
+		/>
 		
-		<PrintHeader settings={settings} logo={schoolLogo} />
-		
-	
-		<div className="no-print">
+		<div className="no-print" style={{ marginRight:"10px" }}>
 			<div className="divider">Payments over Time</div>
-			<MonthlyFeesChart monthly_payments={monthly_payments}/>
+			<MonthlyFeesChart 
+				monthly_payments={monthly_payments} 
+				filter={this.state.chartFilter}
+			/>
 		</div>
+		
+		<div className="no-print checkbox-container">
+			
+			<div className="chart-checkbox" style={{ color:"#93d0c5" }}>
+				<input
+					type="checkbox" 
+					{...this.former.super_handle([ "chartFilter", "paid" ])}
+				/>
+				Paid 
+			</div>
+
+			<div className="chart-checkbox" style={{ color:"#939292" }}>
+				<input
+					type="checkbox"
+					{...this.former.super_handle([ "chartFilter", "forgiven" ])}
+				/>
+				Forgiven
+			</div>
+
+			<div className="chart-checkbox" style={{ color:"#ff6b68" }}>
+				<input
+					type="checkbox"
+					{...this.former.super_handle([ "chartFilter", "pending" ])}
+				/> 
+				Pending
+			</div>
+
+			<div className="chart-checkbox" style={{ color:"#74aced" }}>
+				<input
+					type="checkbox"
+					{...this.former.super_handle([ "chartFilter", "total" ])}
+				/> 
+				Total
+			</div>
+		
+		</div>
+
 		<MonthlyFeesTable monthly_payments={monthly_payments} total_debts={total_debts}/>
 
 		<div className="divider">Students with Payments Outstanding</div>
 		<div className="section">
 		
-		<input type="text" {...this.former.super_handle(["filterText"])} placeholder="search" style={{width: "100%"}}/>
+		<div className="no-print row">
+			<input
+				className="search-bar"
+				type="text"
+				{...this.former.super_handle(["filterText"])}
+				placeholder = "search"
+			/>
+			<select {...this.former.super_handle(["classFilter"])}>
+				<option value=""> Select Class </option>
+				{
+					sections
+						.map(s => {
+							return <option value={s.id} key={s.id}> {s.namespaced_name}</option>
+						})
+				}
+			</select>
+		</div>
 		{
 			items
-			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))
+			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
-					<div>{this.calculateDebt(debt)}</div>
+					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } }  >{-1 * this.calculateDebt(debt)}</div>
 				</div>)
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
@@ -183,6 +258,7 @@ class FeeAnalytics extends Component {
 export default connect(state => ({
 	students: state.db.students,
 	settings: state.db.settings,
+	classes: state.db.classes,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
 }), dispatch => ({
 	addPayments: payments => dispatch(addMultiplePayments(payments))
