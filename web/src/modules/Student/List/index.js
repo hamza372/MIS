@@ -10,6 +10,7 @@ import Title from 'components/Title';
 import {PrintHeader} from 'components/Layout';
 
 import './style.css'
+import getStudentLimt from 'utils/getStudentLimit';
 
 const StudentItem = (S) => {
 
@@ -65,7 +66,7 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 		create = '';
 	}
 
-	if(max_limit >= 0 && Object.values(students).filter(x => x.Name).length >= max_limit) {
+	if(getStudentLimt(students, max_limit)) {
 		create = ''
 	}
 
