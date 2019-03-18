@@ -57,8 +57,8 @@ class StudentFees extends Component {
 				type: "SUBMITTED", // submitted or owed
 				sendSMS: false
 			},
-			month: "",
-			year: "",
+			month: moment().format("MMMM"),
+			year: moment().format("YYYY"),
 			edits
 		}
 
