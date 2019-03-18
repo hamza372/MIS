@@ -184,7 +184,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 							<div className="form" style={{ width: "90%"}}>
 
 								<div className="row">
-									<label>Is the customer interested in using the Product?</label>
+									<label>Is the customer interested in using your product?</label>
 									<select {...this.former.super_handle(["call_end_survey", "customer_interest"])}>
 										<option value="">Please Select an Answer</option>
 										<option value="YES">Yes</option>
@@ -194,7 +194,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 								</div>
 
 								{ this.state.call_end_survey.customer_interest === "NO" && <div className="row">
-									<label>Reason for marking Not Interested</label>
+									<label>Why is the customer not interested in your product?</label>
 									<select {...this.former.super_handle(["call_end_survey", "reason_rejected"])}>
 										<option value="">Select </option>
 										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
@@ -206,7 +206,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 								}
 
 								{ this.state.call_end_survey.reason_rejected == "OTHER" && <div className="row">
-									<label>Why are they not interested?</label>
+									<label>Please write why they are not interested</label>
 									<input type="text" {...this.former.super_handle(["call_end_survey", "other_reason_rejected"])} placeholder="" />
 								</div> 
 								}
@@ -219,7 +219,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 										<option value="MEDIUM">Medium - I am not sure</option>
 										<option value="LOW">Low - They did not say no, but probably not</option>
 										<option value="ZERO">Zero - They will not buy from us</option>
-										<option value="NA">Question is not relevant</option>
 									</select>
 								</div>
 
