@@ -55,17 +55,17 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 
 		this.state = {
-			showSurvey: false,
+			showSurvey: "CALL_END",
 			call_end_survey: {
 				customer_interest: "",
+				reason_rejected: "",
+				other_reason_rejected: "",
 				customer_likelihood: "",
 				follow_up_meeting: "",
-				follow_up_meeting_date: new Date().getTime(),
 				other_notes: ""
 			},
 			not_interested_survey: {
 				reason_rejected: "",
-				other_reason: ""
 			}
 		}
 
@@ -120,12 +120,12 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 	onClose = () => {
 		this.props.history.push({
-			pathname: this.props.location.pathname,
+			pathname: window.location.pathname,
 			search: ''
 		})
 	}
 
-	saveCallEndSurvey = () => {
+	saveSurvey = () => {
 
 		console.log("saving survey", this.state)
 
@@ -179,7 +179,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					this.state.showSurvey === "CALL_END" && 
 					<Modal>
 						<div className="modal">
-							<div className="title">Call Finished</div>
+							<div className="title" style={{ marginTop: 0 }}>Call Finished Survey</div>
 
 							<div className="form" style={{ width: "90%"}}>
 
@@ -192,6 +192,24 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 										<option value="NO">No</option>
 									</select>
 								</div>
+
+								{ this.state.call_end_survey.customer_interest === "NO" && <div className="row">
+									<label>Reason for marking Not Interested</label>
+									<select {...this.former.super_handle(["call_end_survey", "reason_rejected"])}>
+										<option value="">Select </option>
+										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
+										<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
+										<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
+										<option value="OTHER">Other Reason</option>
+									</select>
+								</div>
+								}
+
+								{ this.state.call_end_survey.reason_rejected == "OTHER" && <div className="row">
+									<label>Why are they not interested?</label>
+									<input type="text" {...this.former.super_handle(["call_end_survey", "other_reason_rejected"])} placeholder="" />
+								</div> 
+								}
 
 								<div className="row">
 									<label>How strongly do you feel the client will make a purchase?</label>
@@ -215,17 +233,12 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 								</div>
 
 								<div className="row">
-									<label>When is the meeting scheduled for?</label>
-									<input type="date" {...this.former.super_handle(["call_end_survey", "follow_up_meeting_date"])} />
-								</div>
-
-								<div className="row">
 									<label>Other Notes</label>
 									<input type="text" {...this.former.super_handle(["call_end_survey", "other_notes"])} placeholder="Enter other notes here" />
 								</div>
 
 								<div className="row">
-									<div className="button blue" onClick={this.saveCallEndSurvey}>Save</div>
+									<div className="button blue" onClick={this.saveSurvey}>Save</div>
 								</div>
 							</div>
 						</div>
@@ -241,29 +254,27 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 							<div className="form" style={{ width: "90%"}}>
 
 								<div className="row">
-									<label>Reason for marking Not Interested</label>
-									<select {...this.former.super_handle(["not_interested_survey", "reason_rejected"])}>
-										<option value="">Select </option>
-										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
-										<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
-										<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
-										<option value="OTHER">Other Reason</option>
-									</select>
+									<label>Why are you not interested in this school?</label>
+									<input type="text" {...this.former.super_handle(["call_end_survey", "reason_rejected"])} placeholder="Enter reason here" />
 								</div>
 
-								{ this.state.not_interested_survey.reason_rejected === "OTHER" ? <div className="row">
-									<label>Why are they not interested?</label>
-									<input type="text" {...this.former.super_handle(["not_interested_survey", "other_reason"])} placeholder="" />
-								</div> : false 
-								}
-
 								<div className="row">
-									<div className="button blue" onClick={this.saveCallEndSurvey}>Save</div>
+									<div className="button blue" onClick={this.saveSurvey}>Save</div>
 								</div>
 							</div>
 						</div>
 					</Modal>
 				}
+
+				<div className="save-delete">
+					{ !reserved &&
+						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
+					}
+					{ reserved ? 
+						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
+						<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
+					}
+				</div>
 
 				<div className="row">
 					<label>Status</label>
@@ -317,15 +328,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
 				<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
 
-				<div className="save-delete">
-					{ !reserved &&
-						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
-					}
-					{ reserved ? 
-						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
-						<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
-					}
-				</div>
 			</div>
 		</div>
 	}

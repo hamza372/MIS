@@ -22,6 +22,37 @@ defmodule Mix.Tasks.Platform do
 		end)
 	end
 
+	def run(["add_matches", id]) do
+		csv = case File.exists?(Application.app_dir(:sarkar, "priv/#{id}.csv")) do
+			true -> File.stream!(Application.app_dir(:sarkar, "priv/#{id}.csv")) |> CSV.decode!
+			false -> File.stream!("priv/#{id}.csv") |> CSV.decode!
+		end
+
+		[_ | refcodes] = csv 
+		|> Enum.map(fn [refcode | _ ] -> refcode end)
+
+		# instead of directly manipulating the matches dir, should be creating writes
+		# and writing the writes to the supplier.
+
+		changes = refcodes
+		|> Enum.reduce(%{}, fn(school_id, agg) -> 
+			path = ["sync_state", "matches", school_id]
+			write = %{
+				"action" => %{
+					"path" => path,
+					"value" => %{ "status" => "NEW" },
+					"type" => "MERGE"
+				},
+				"date" => :os.system_time(:millisecond)
+			}
+
+			Map.put(agg, Enum.join(path, ","), write)
+		end)
+
+		start_supplier(id)
+		Sarkar.Supplier.sync_changes(id, "backend-task", changes, :os.system_time(:millisecond))
+	end
+
 	def run(args) do
 		Application.ensure_all_started(:sarkar)
 		case Postgrex.query(Sarkar.School.DB, "SELECT id, sync_state from suppliers", []) do
