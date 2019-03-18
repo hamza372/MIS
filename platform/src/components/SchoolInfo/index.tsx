@@ -55,7 +55,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 
 		this.state = {
-			showSurvey: "CALL_END",
+			showSurvey: false,
 			call_end_survey: {
 				customer_interest: "",
 				reason_rejected: "",
