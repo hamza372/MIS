@@ -27,10 +27,10 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 						<YAxis />
 						<Tooltip />
 						
-						{ filter.total && <Line dataKey='OWED' name="Total" stroke="#74aced" /> }
-						{ filter.paid && <Line dataKey="SUBMITTED" stackId="a" stroke="#93d0c5" name="Paid" /> }
-						{ filter.forgiven && <Line dataKey="FORGIVEN" stackId="a" stroke="#939292" name="Forgiven" />}
-						{ filter.pending  && <Line dataKey='net' name="Pending" stroke="#ff6b68" />}
+						{ filter.total && <Line dataKey='OWED' name="Total" stroke="#74aced" strokeWidth={3} /> }
+						{ filter.paid && <Line dataKey="SUBMITTED" stackId="a" stroke="#93d0c5" name="Paid" strokeWidth={3}/> }
+						{ filter.forgiven && <Line dataKey="FORGIVEN" stackId="a" stroke="#939292" name="Forgiven" strokeWidth={3}/>}
+						{ filter.pending  && <Line dataKey='net' name="Pending" strokeWidth={3} stroke="#ff6b68" />}
 
 					</LineChart>
 				</ResponsiveContainer> 
@@ -47,7 +47,7 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 					<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}> <b> Total    </b> </label>
 					<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}> <b> Paid     </b> </label>
 					<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}> <b> Forgiven </b> </label>
-					<label style={{ backgroundColor: "#e3b3b9", textAlign:"center" }}> <b> Pending  </b> </label>
+					<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}> <b> Pending  </b> </label>
 				</div>
 				{
 					[...Object.entries(monthly_payments)
@@ -55,14 +55,14 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 						.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
 														
 							const prof = SUBMITTED - OWED;
-							const red = "#e3b3b9"
+							const red = "#fc6171"
 	
 							return <div className="table row" key={month}>
 								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month}</div>
 								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{OWED}</div>
 								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{SUBMITTED}</div>
 								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN}</div>
-								<div style={{ backgroundColor: red, textAlign:"center"  }}>{SUBMITTED - OWED}</div>
+								<div style={{ backgroundColor: red, textAlign:"center" }}>{ Math.abs(SUBMITTED - OWED)}</div>
 							</div>
 						}),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>
@@ -71,7 +71,7 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{total.OWED}</b></label>
 							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{total.PAID}</b></label>
 							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN}</b></label>
-							<label style={{ backgroundColor: "#e3b3b9", textAlign:"center" }}><b>{-total.OWED + total.PAID}</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.abs(total.OWED + total.PAID)}</b></label>
 						</div>
 					]
 				}
@@ -160,8 +160,8 @@ class FeeAnalytics extends Component {
 	const items = Object.values(total_student_debts)
 		.filter(({student, debt}) => (
 			student.id && student.Name) &&
-			this.state.classFilter === "" || 
-			student.section_id === this.state.classFilter &&
+			(this.state.classFilter === "" || 
+			student.section_id === this.state.classFilter ) &&
 			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase())
 		)
 
@@ -246,7 +246,7 @@ class FeeAnalytics extends Component {
 			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
-					<div>{this.calculateDebt(debt)}</div>
+					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } }  >{-1 * this.calculateDebt(debt)}</div>
 				</div>)
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>

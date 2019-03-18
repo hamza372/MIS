@@ -10,6 +10,7 @@ import Title from 'components/Title';
 import {PrintHeader} from 'components/Layout';
 
 import './style.css'
+import getStudentLimt from 'utils/getStudentLimit';
 
 const StudentItem = (S) => {
 
@@ -65,6 +66,10 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 		create = '';
 	}
 
+	if(getStudentLimt(students, max_limit)) {
+		create = ''
+	}
+
 	if(forwardTo === "prospective-student"){
 		create = "/student/prospective-student/new"
 		createText = "New Prospective Student"
@@ -77,10 +82,6 @@ export const StudentList = ({ classes, students, settings, forwardTo, schoolLogo
 	if(forwardTo === 'payment'){
 		create = '/fees/manage'
 		createText = "Manage Fees"
-	}
-
-	if(max_limit >= 0 && Object.values(students).filter(x => x.Name).length >= max_limit) {
-		create = ''
 	}
 
 	return <div className="student-list">

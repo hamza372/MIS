@@ -19,13 +19,14 @@ class List extends Component {
 	render() {
 		const {items, toLabel, Component } = this.props;
 
-		const header = items.some(i => i.header)
-
+		
 		const filteredList = items
 			.filter(item => {
 				return toLabel(item) !== undefined && toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase());
 			})
 			.sort((a,b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
+
+		const header = filteredList.some(i => i.header)
 
 		return <div className="list-wrap">
 			<div className="total">

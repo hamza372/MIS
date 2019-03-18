@@ -21,10 +21,10 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {
 
 						<Tooltip />
 						
-						{ filter.present && <Line dataKey="PRESENT" stackId="a" stroke="#93d0c5" name="Present" /> }
-						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#74aced" name="Absent" />}
-						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#939292" name="Leave" />}
-						{ filter.percentage && <Line dataKey="percent" stroke="#ff6b68" name="Percentage" />}
+						{ filter.present && <Line dataKey="PRESENT" stackId="a" stroke="#93d0c5" strokeWidth={3} name="Present"/> }
+						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#74aced" strokeWidth={3} name="Absent" />}
+						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#e0e0e0" strokeWidth={3} name="Leave" />}
+						{ filter.percentage && <Line dataKey="percent" stroke="#ff6b68" strokeWidth={3} name="Percentage" />}
 					</LineChart>
 			</ResponsiveContainer>
 }
@@ -35,7 +35,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 					<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>Present</b></label>
 					<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>Absent</b></label>
 					<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>Leave</b></label>
-					<label style={{ backgroundColor: "#e3b3b9", textAlign:"center" }}><b>Absentee(%)</b></label>
+					<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>Absentee(%)</b></label>
 				</div>
 				{
 					[...Object.entries(monthly_attendance)
@@ -47,7 +47,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{PRESENT}</div>
 								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{ABSENT}</div>
 								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{LEAVE}</div>
-								<div style={{ backgroundColor: "#e3b3b9", textAlign:"center" }}>{ Math.round((1 - ABSENT / (PRESENT + LEAVE)) * 100)}%</div>
+								<div style={{ backgroundColor: "#fc6171", textAlign:"center" }}>{ Math.round((1 - ABSENT / (PRESENT + LEAVE)) * 100)}%</div>
 							</div>
 						),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>   
@@ -55,7 +55,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{totals.PRESENT}</b></label>
 							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{totals.ABSENT}</b></label>
 							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{totals.LEAVE}</b></label>
-							<label style={{ backgroundColor: "#e3b3b9", textAlign:"center" }}><b>{Math.round((1 - totals.ABSENT / (totals.PRESENT + totals.LEAVE)) * 100)}%</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.round((1 - totals.ABSENT / (totals.PRESENT + totals.LEAVE)) * 100)}%</b></label>
 						</div>
 					]
 				}
