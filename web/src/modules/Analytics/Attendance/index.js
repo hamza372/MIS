@@ -7,6 +7,8 @@ import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
 import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'recharts'
 
+import './style.css'
+
 const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {		
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
@@ -22,20 +24,20 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {
 						<Tooltip />
 						
 						{ filter.present && <Line dataKey="PRESENT" stackId="a" stroke="#93d0c5" strokeWidth={3} name="Present"/> }
-						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#74aced" strokeWidth={3} name="Absent" />}
+						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#ff6b68" strokeWidth={3} name="Absent" />}
 						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#e0e0e0" strokeWidth={3} name="Leave" />}
-						{ filter.percentage && <Line dataKey="percent" stroke="#ff6b68" strokeWidth={3} name="Percentage" />}
+						{ filter.percentage && <Line dataKey="percent" stroke="#74aced" strokeWidth={3} name="Percentage" />}
 					</LineChart>
 			</ResponsiveContainer>
 }
 const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 	return <div className="section table" style={{margin: "20px 0", backgroundColor:"#c2bbbb21" }}>
 				<div className="table row heading">
-					<label style={{ backgroundColor: "#efecec", textAlign:"center" }}><b>Date</b></label>
-					<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>Present</b></label>
-					<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>Absent</b></label>
-					<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>Leave</b></label>
-					<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>Absentee(%)</b></label>
+					<label style={{ backgroundColor: "#efecec"}}><b>Date</b></label>
+					<label style={{ backgroundColor: "#93d0c5"}}><b>Present</b></label>
+					<label style={{ backgroundColor: "#fc6171"}}><b>Absent</b></label>
+					<label style={{ backgroundColor: "#e0e0e0"}}><b>Leave</b></label>
+					<label style={{ backgroundColor: "#bedcff"}}><b>Absentee(%)</b></label>
 				</div>
 				{
 					[...Object.entries(monthly_attendance)
@@ -43,19 +45,19 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 						.map(([month, {student ,PRESENT, LEAVE, ABSENT} ]) =>
 						
 							<div className="table row">
-								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month }</div>
-								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{PRESENT}</div>
-								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{ABSENT}</div>
-								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{LEAVE}</div>
-								<div style={{ backgroundColor: "#fc6171", textAlign:"center" }}>{ Math.round((1 - ABSENT / (PRESENT + LEAVE)) * 100)}%</div>
+								<div style={{ backgroundColor: "#efecec"}}>{month }</div>
+								<div style={{ backgroundColor: "#93d0c5"}}>{PRESENT}</div>
+								<div style={{ backgroundColor: "#fc6171"}}>{ABSENT}</div>
+								<div style={{ backgroundColor: "#e0e0e0"}}>{LEAVE}</div>
+								<div style={{ backgroundColor: "#bedcff"}}>{ Math.round((ABSENT / (PRESENT + LEAVE)) * 100)}%</div>
 							</div>
 						),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>   
-							<label style={{ backgroundColor: "#efecec", textAlign:"center" }}><b>Total</b></label>
-							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{totals.PRESENT}</b></label>
-							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{totals.ABSENT}</b></label>
-							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{totals.LEAVE}</b></label>
-							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.round((1 - totals.ABSENT / (totals.PRESENT + totals.LEAVE)) * 100)}%</b></label>
+							<label style={{ backgroundColor: "#efecec"}}><b>Total</b></label>
+							<label style={{ backgroundColor: "#93d0c5"}}><b>{totals.PRESENT}</b></label>
+							<label style={{ backgroundColor: "#fc6171"}}><b>{totals.ABSENT}</b></label>
+							<label style={{ backgroundColor: "#e0e0e0"}}><b>{totals.LEAVE}</b></label>
+							<label style={{ backgroundColor: "#bedcff"}}><b>{Math.round((1 - totals.ABSENT / (totals.PRESENT + totals.LEAVE)) * 100)}%</b></label>
 						</div>
 					]
 				}
@@ -153,7 +155,7 @@ class AttendanceAnalytics extends Component {
 				Present
 			</div>
 
-			<div className="chart-checkbox" style={{ color:"#74aced" }}>
+			<div className="chart-checkbox" style={{ color:"#fc6171" }}>
 				<input
 					type="checkbox"
 					{...this.former.super_handle(["chartFilter", "absent"])}
@@ -169,7 +171,7 @@ class AttendanceAnalytics extends Component {
 				Leave
 			</div>
 			
-			<div className="chart-checkbox" style={{ color:"#ff6b68" }}>
+			<div className="chart-checkbox" style={{ color:"#74aced" }}>
 				<input
 					type="checkbox"
 					{...this.former.super_handle(["chartFilter", "percentage"])}

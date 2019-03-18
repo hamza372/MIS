@@ -52,17 +52,16 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 				{
 					[...Object.entries(monthly_payments)
 						.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
-						.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => {
+						.map(([month, { OWED, SUBMITTED, FORGIVEN, SCHOLARSHIP }]) => {
 														
 							const prof = SUBMITTED - OWED;
 							const red = "#fc6171"
-	
 							return <div className="table row" key={month}>
 								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month}</div>
 								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{OWED}</div>
 								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{SUBMITTED}</div>
-								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN}</div>
-								<div style={{ backgroundColor: red, textAlign:"center" }}>{ Math.abs(SUBMITTED - OWED)}</div>
+								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN + SCHOLARSHIP}</div>
+								<div style={{ backgroundColor: red, textAlign:"center" }}>{ OWED - (SUBMITTED + FORGIVEN + SCHOLARSHIP)}</div>
 							</div>
 						}),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>
@@ -70,8 +69,8 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 							<label style={{ backgroundColor: "#efecec", textAlign:"center" }}><b>Total</b></label>
 							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{total.OWED}</b></label>
 							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{total.PAID}</b></label>
-							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN}</b></label>
-							<label style={{ backgroundColor: "#fc6171", textAlign:"center" }}><b>{Math.abs(total.OWED + total.PAID)}</b></label>
+							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN + total.SCHOLARSHIP}</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center"}}><b>{Math.abs(total.OWED - (total.PAID + total.FORGIVEN))}</b></label>
 						</div>
 					]
 				}
@@ -114,6 +113,7 @@ class FeeAnalytics extends Component {
 	let total_paid = 0;
 	let total_owed = 0;
 	let total_forgiven = 0;
+	let total_scholarship = 0;
 	let monthly_payments = {}; // [MM-DD-YYYY]: { due, paid, forgiven }
 	let total_student_debts = {}; // [id]: { due, paid, forgiven }
 	let total_debts = {};
@@ -131,19 +131,21 @@ class FeeAnalytics extends Component {
 	for(let sid in students) {
 		const student = students[sid];
 
-		let debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0}
+		let debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
+		
 		for(let pid in student.payments || {}) {
 			const payment = student.payments[pid];
 
 			const amount = parseFloat(payment.amount)
 
 			// totals
-			debt[payment.type] += amount;
+			amount < 0 ? debt["SCHOLARSHIP"] += Math.abs(amount) : debt[payment.type] += amount;
 
 			// monthly
 			const month_key = moment(payment.date).format("MM/YYYY");
-			const month_debt = monthly_payments[month_key] || { OWED: 0, SUBMITTED: 0, FORGIVEN: 0}
-			month_debt[payment.type] += amount;
+			const month_debt = monthly_payments[month_key] || { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
+			
+			amount < 0 ? month_debt["SCHOLARSHIP"] += Math.abs(amount) : month_debt[payment.type] += amount;
 			monthly_payments[month_key] = month_debt;
 
 		}
@@ -151,10 +153,12 @@ class FeeAnalytics extends Component {
 		total_paid += debt.SUBMITTED;
 		total_owed += debt.OWED;
 		total_forgiven += debt.FORGIVEN;
+		total_scholarship += debt.SCHOLARSHIP;
+		
 
 		total_student_debts[sid] = { student, debt };
 
-		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven}
+		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }
 	}
 
 	const items = Object.values(total_student_debts)
