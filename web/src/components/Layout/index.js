@@ -6,13 +6,18 @@ import './style.css'
 
 const Layout = ({ user, children, history }) => {
 	return <div className="layout">
-		<Header user={user} history={history}/>
+	{ history.location.pathname === "/front" ? <FrontHeader user={user} history={history} /> : <Header user={user} history={history}/> }
 		{ children }
 	</div>
 }
 
+const FrontHeader = ({user, history}) => <div className="header bg-red"> 
+	<div className="left"><Link to="/front">MISchool</Link></div>
+	<div className="profile" style={{marginRight:"10px"}}> Login </div>
+</div>
+
 const Header = ({user, history}) => <div className="header"> 
-	{ history.location.pathname !== "/" ? <div className="back" onClick={() => history.goBack()} style={{ backgroundImage: `url(${backIcon})`}} />: false}
+	{ (history.location.pathname !== "/" && history.location.pathname !== "/front") && <div className="back" onClick={() => history.goBack()} style={{ backgroundImage: `url(${backIcon})`}} />}
 	<div className="left"><Link to="/">MISchool</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
@@ -35,7 +40,7 @@ export default connect(state => ({
 }))(Layout)
 
 const SpecialLayoutWrap = WrappedComponent => ({ user, ...props}) => <div className="layout">
-	<Header user={user} history={props.history}/>
+	{ props.history.location.pathname === "/front" ? <FrontHeader user={user} history={props.history} /> : <Header user={user} history={props.history}/> }
 	<WrappedComponent {...props} />
 </div>
 
