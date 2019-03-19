@@ -287,45 +287,56 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</div>
 				}
 
-				<SurveyRow label="Respondant Name" val={school.respondent_name} />
-				<SurveyRow label="Respondent is Owner" val={school.respondent_owner} />
-				<SurveyRow label="Respondent Relation" val={school.respondent_relation} />
-				<SurveyRow label="Respondent Gender" val={school.respondent_gender} />
-				<SurveyRow label="Year Established" val={school.year_established} />
-				<SurveyRow label="Address" val={school.school_address} />
-				<SurveyRow label="Tehsil" val={school.school_tehsil} />
-				<SurveyRow label="District" val={school.school_district} />
-				<SurveyRow label="Building Rented" val={school.school_building_rent} />
-				<SurveyRow label="Number of Branches" val={school.school_branches} />
-				<SurveyRow label="Number of Rooms" val={school.no_of_rooms} />
-				<SurveyRow label="Medium of Instruction" val={school.instruction_medium} />
-				<SurveyRow label="Teachers Employed" val={school.teachers_employed} />
-				<SurveyRow label="Facilities" val={map_facilities(school.school_facilities)} />
-				<SurveyRow label="Has Smartphone" val={school.smart_phone} />
-				<SurveyRow label="Registered" val={school.school_registration} />
-				<SurveyRow label="PEF School" val={school.school_pef} />
-				<SurveyRow label="SEF School" val={school.school_sef} />
-				<SurveyRow label="FEF School" val={school.school_fef} />
-				<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
-				<SurveyRow label="Highest Fee" val={school.highest_fee} />
-				<SurveyRow label="Enrollment" val={school.total_enrolment} />
-				<SurveyRow label="Reported Monthly Revenue" val={school.monthly_fee_collected} />
-				<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
-				<SurveyRow label="Highest Grade" val={school.highest_grade} />
-				<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
+				<div className="divider">School Profile</div>
+				<div className="section">
+					<SurveyRow label="Address" val={school.school_address} />
+					<SurveyRow label="Tehsil" val={school.school_tehsil} />
+					<SurveyRow label="District" val={school.school_district} />
+					<SurveyRow label="Respondant Name" val={school.respondent_name} />
+					<SurveyRow label="Respondent is Owner" val={school.respondent_owner} />
+					<SurveyRow label="Respondent Relation" val={school.respondent_relation} />
+					<SurveyRow label="Respondent Gender" val={school.respondent_gender} />
+					<SurveyRow label="Year Established" val={school.year_established} />
+					<SurveyRow label="Registered" val={school.school_registration} />
+					<SurveyRow label="PEF School" val={school.school_pef} />
+					<SurveyRow label="SEF School" val={school.school_sef} />
+					<SurveyRow label="FEF School" val={school.school_fef} />
+					<SurveyRow label="Number of Branches" val={school.school_branches} />
+					<SurveyRow label="Number of Rooms" val={school.no_of_rooms} />
+					<SurveyRow label="Building Rented" val={school.school_building_rent} />
+					<SurveyRow label="Medium of Instruction" val={school.instruction_medium} />
+					<SurveyRow label="Teachers Employed" val={school.teachers_employed} />
+					<SurveyRow label="Facilities" val={map_facilities(school.school_facilities)} />
+					<SurveyRow label="Has Smartphone" val={school.smart_phone} />
+
+				</div>
+
+				<div className="divider">Fees & Enrollment</div>
+				<div className="section">
+					<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
+					<SurveyRow label="Highest Fee" val={school.highest_fee} />
+					<SurveyRow label="Enrollment" val={school.total_enrolment} />
+					<SurveyRow label="Reported Monthly Revenue" val={school.monthly_fee_collected} />
+					<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
+					<SurveyRow label="Highest Grade" val={school.highest_grade} />
+					<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
+				</div>
 
 				<div className="divider">Financing</div>
-
-				<SurveyRow label="Financing Interest" val={school.financing_interest} />
-				<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
-				<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
-				<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
+				<div className="section">
+					<SurveyRow label="Financing Interest" val={school.financing_interest} />
+					<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
+					<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
+					<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
+				</div>
 
 				<div className="divider">Education Services</div>
-				<SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} />
-				<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
-				<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
-				<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
+				<div className="section">
+					<SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} />
+					<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
+					<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
+					<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
+				</div>
 
 			</div>
 		</div>
