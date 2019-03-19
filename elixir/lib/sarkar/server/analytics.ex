@@ -176,6 +176,59 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "platform-writes.csv"}} = req, state) do
+
+		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
+		"SELECT id, to_timestamp(time/1000)::date as date, count(*) 
+		FROM platform_writes
+		GROUP BY id, date 
+		ORDER BY date desc",
+		[]) do
+				{:ok, resp} -> {:ok, resp.rows}
+				{:error, err} -> {:error, err}
+		end
+
+		csv = [ ["supplier_id", "date", "writes"] | data ]
+		|> CSV.encode
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
+	def init(%{bindings: %{type: "platform-events.csv"}} = req, state) do
+
+		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
+		"SELECT id, to_timestamp((value->>'time')::bigint/1000) as date, value->>'event' as event, value->'meta'->>'call_status' as call_status, value->'meta'->>'duration' as duration_seconds
+		FROM platform_writes
+		WHERE path[4] = 'history'
+		ORDER BY date desc
+		",
+		[]) do
+				{:ok, resp} -> {:ok, resp.rows}
+				{:error, err} -> {:error, err}
+		end
+
+		csv = [ ["supplier_id", "date", "event", "call_status", "duration_seconds"] | data ]
+		|> CSV.encode
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(req, state) do 
 		req = :cowboy_req.reply(200, req)
 		IO.inspect req

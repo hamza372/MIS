@@ -1,6 +1,5 @@
 import Syncr from '~/src/syncr'
 import { MergeAction, DeletesAction, QueueAction, sendServerAction, createLoginSucceed, createMerges, createDeletes } from './core'
-import { stat } from 'fs';
 
 export const SELECT_LOCATION = "SELECT_LOCATION"
 
