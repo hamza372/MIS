@@ -202,6 +202,30 @@ export const saveSchoolRejectedSurvey = (school_id: string, survey: NotIntereste
 
 }
 
+export const saveSchoolCompletedSurvey = (school_id: string, survey: MarkCompleteSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
+
+	const time = new Date().getTime()
+
+	const state = getState()
+
+	const event : MarkCompleteSurvey = {
+		event: "MARK_COMPLETE_SURVEY",
+		meta: survey,
+		time,
+		user: {
+			name: state.sync_state.numbers[state.auth.number].name,
+			number: state.auth.number
+		}
+	}
+
+	dispatch(createMerges([
+		{
+			path: ["sync_state", "matches", school_id, "history", `${time}`],
+			value: event
+		}
+	]))
+}
+
 export const saveCallEndSurvey = (school_id: string, survey: CallEndSurvey['meta']) => (dispatch: Dispatch, getState: GetState) => {
 
 	const time = new Date().getTime()

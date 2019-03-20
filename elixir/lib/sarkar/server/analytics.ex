@@ -162,7 +162,7 @@ defmodule Sarkar.Server.Analytics do
 			GROUP BY d, school_id
 			ORDER BY d desc", [])
 		
-		csv = [ ["date", "school_id", "ALL_STUDENTS","ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE","EXAM","PROSPECTIVE", "TOTAL"] | resp.rows] 
+		csv = [ ["date", "school_id", "ALL_STUDENTS", "ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE", "EXAM", "PROSPECTIVE", "TOTAL"] | resp.rows] 
 			|> CSV.encode
 			|> Enum.join()
 		
@@ -215,7 +215,7 @@ defmodule Sarkar.Server.Analytics do
 				{:error, err} -> {:error, err}
 		end
 
-		csv = [ ["supplier_id", "date", "event", "call_status", "duration_seconds"] | data ]
+		csv = [ ["supplier_id", "date", "event", "call_status", ""] | data ]
 		|> CSV.encode
 		|> Enum.join()
 

@@ -4,7 +4,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import moment from 'moment'
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey} from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
 
@@ -26,10 +26,11 @@ interface StateProps {
 // 
 
 interface StateType {
-	showSurvey: false | "NOT_INTERESTED" | "CALL_END"
+	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE"
 
 	call_end_survey: CallEndSurvey['meta']
 	not_interested_survey: NotInterestedSurvey['meta']
+	mark_complete_survey: MarkCompleteSurvey['meta']
 
 }
 
@@ -40,6 +41,7 @@ interface DispatchProps {
 	rejectSchool: () => void
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -66,6 +68,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			},
 			not_interested_survey: {
 				reason_rejected: "",
+			},
+			mark_complete_survey: {
+				reason_completed: "",
+				other_reason: ""
 			}
 		}
 
@@ -100,10 +106,13 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	onMarkComplete = () => {
 		console.log('mark as complete')
 
-		const res = confirm('Are you sure you want to Mark as Complete? Tell us why')
+		const res = confirm('Are you sure you want to Mark as Complete?')
 
 		if(res) {
 			this.props.releaseNumber()
+			this.setState({
+				showSurvey: "MARK_COMPLETE"
+			})
 		}
 	}
 
@@ -135,6 +144,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		if(this.state.showSurvey === "NOT_INTERESTED") {
 			this.props.saveSchoolRejectedSurvey(this.state.not_interested_survey)
+		}
+
+		if(this.state.showSurvey === "MARK_COMPLETE") {
+			this.props.saveSchoolCompletedSurvey(this.state.mark_complete_survey)
 		}
 
 		this.setState({
@@ -265,15 +278,45 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</Modal>
 				}
 
-				<div className="save-delete">
-					{ !reserved &&
-						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
-					}
-					{ reserved ? 
-						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
-						<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
-					}
+				{
+					this.state.showSurvey === "MARK_COMPLETE" &&
+					<Modal>
+						<div className="modal">
+							<div className="title">Marked as Complete</div>
+
+							<div className="form" style={{ width: "90%"}}>
+								<div className="row">
+									<label>Reason for marking as complete</label>
+									<select {...this.former.super_handle(["mark_complete_survey", "reason_completed"])}>
+										<option value="">Select Reason</option>
+										<option value="CLIENT_BOUGHT_PRODUCT">Client has purchased our product</option>
+										<option value="CLIENT_NOT_INTERESTED">Client not interested in our product</option>
+										<option value="CLIENT_NOT_REACHABLE">Unable to contact the Client</option>
+										<option value="HANDLING_OUTSIDE_PLATFORM">No longer need to track in the website</option>
+										<option value="RELEASE_MASKED_NUMBER">Need to clear this client so we can call a new one</option>
+									</select>
+								</div>
+								{ this.state.mark_complete_survey.reason_completed == "OTHER" && <div className="row">
+									<label>Other Reason</label>
+									<input type="text" {...this.former.super_handle(["mark_complete_survey", "other_reason"])} placeholder="Other Reason" />
+								</div>
+								}
+
+								<div className="row">
+									<div className="button blue" onClick={this.saveSurvey}>Save</div>
+								</div>
+
+							</div>
+						</div>
+					</Modal>
+				}
+
+				{ !reserved && <div className="save-delete">
+					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div> 
+					<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 				</div>
+				}
+				{ reserved && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
 
 				<div className="row">
 					<label>Status</label>
@@ -316,7 +359,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
 					<SurveyRow label="Highest Fee" val={school.highest_fee} />
 					<SurveyRow label="Enrollment" val={school.total_enrolment} />
-					<SurveyRow label="Reported Monthly Revenue" val={school.monthly_fee_collected} />
 					<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
 					<SurveyRow label="Highest Grade" val={school.highest_grade} />
 					<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
@@ -508,5 +550,6 @@ export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankSta
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
-	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey))
+	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey)),
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey))
 }))(withRouter(SchoolInfo))

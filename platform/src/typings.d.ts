@@ -59,7 +59,11 @@ interface NotInterestedSurvey extends PlatformInteractionEvent {
 }
 
 interface MarkCompleteSurvey extends PlatformInteractionEvent {
-	event: "MARK_COMPLETE_SURVEY"
+	event: "MARK_COMPLETE_SURVEY",
+	meta: {
+		reason_completed: "CLIENT_BOUGHT_PRODUCT" | "RELEASE_MASKED_NUMBER" | "HANDLING_OUTSIDE_PLATFORM" | "CLIENT_NOT_INTERESTED" | "CLIENT_NOT_REACHABLE" | "OTHER" | ""
+		other_reason: String
+	}
 }
 
 type SupplierInteractionEvent = {
