@@ -7,6 +7,10 @@ import Former from '~/src/utils/former'
 import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
 import Modal from '~/src/components/Modal'
 
+import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
+import MarkCompleteSurveyComponent from '~/src/components/Surveys/MarkCompleteSurvey'
+import NotInterestedSurveyComponent from '~/src/components/Surveys/NotInterested'
+
 
 import './style.css'
 
@@ -27,11 +31,6 @@ interface StateProps {
 
 interface StateType {
 	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE"
-
-	call_end_survey: CallEndSurvey['meta']
-	not_interested_survey: NotInterestedSurvey['meta']
-	mark_complete_survey: MarkCompleteSurvey['meta']
-
 }
 
 interface DispatchProps {
@@ -58,21 +57,6 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 		this.state = {
 			showSurvey: false,
-			call_end_survey: {
-				customer_interest: "",
-				reason_rejected: "",
-				other_reason_rejected: "",
-				customer_likelihood: "",
-				follow_up_meeting: "",
-				other_notes: ""
-			},
-			not_interested_survey: {
-				reason_rejected: "",
-			},
-			mark_complete_survey: {
-				reason_completed: "",
-				other_reason: ""
-			}
 		}
 
 		this.former = new Former(this, [])
@@ -134,20 +118,20 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = () => {
+	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta']) => {
 
 		console.log("saving survey", this.state)
 
 		if(this.state.showSurvey === "CALL_END") {
-			this.props.saveCallEndSurvey(this.state.call_end_survey)
+			this.props.saveCallEndSurvey(survey as CallEndSurvey['meta'])
 		}
 
 		if(this.state.showSurvey === "NOT_INTERESTED") {
-			this.props.saveSchoolRejectedSurvey(this.state.not_interested_survey)
+			this.props.saveSchoolRejectedSurvey(survey as NotInterestedSurvey['meta'])
 		}
 
 		if(this.state.showSurvey === "MARK_COMPLETE") {
-			this.props.saveSchoolCompletedSurvey(this.state.mark_complete_survey)
+			this.props.saveSchoolCompletedSurvey(survey as MarkCompleteSurvey['meta'])
 		}
 
 		this.setState({
@@ -189,125 +173,22 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{
-					this.state.showSurvey === "CALL_END" && 
-					<Modal>
-						<div className="modal">
-							<div className="title" style={{ marginTop: 0 }}>Call Finished Survey</div>
-
-							<div className="form" style={{ width: "90%"}}>
-
-								<div className="row">
-									<label>Is the customer interested in using your product?</label>
-									<select {...this.former.super_handle(["call_end_survey", "customer_interest"])}>
-										<option value="">Please Select an Answer</option>
-										<option value="YES">Yes</option>
-										<option value="UNSURE">Unsure</option>
-										<option value="NO">No</option>
-									</select>
-								</div>
-
-								{ this.state.call_end_survey.customer_interest === "NO" && <div className="row">
-									<label>Why is the customer not interested in your product?</label>
-									<select {...this.former.super_handle(["call_end_survey", "reason_rejected"])}>
-										<option value="">Select </option>
-										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
-										<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
-										<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
-										<option value="OTHER">Other Reason</option>
-									</select>
-								</div>
-								}
-
-								{ this.state.call_end_survey.reason_rejected == "OTHER" && <div className="row">
-									<label>Please write why they are not interested</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "other_reason_rejected"])} placeholder="" />
-								</div> 
-								}
-
-								<div className="row">
-									<label>How strongly do you feel the client will make a purchase?</label>
-									<select {...this.former.super_handle(["call_end_survey", "customer_likelihood"])}>
-										<option value="">Please select an option</option>
-										<option value="HIGH">High - I think they will buy from us</option>
-										<option value="MEDIUM">Medium - I am not sure</option>
-										<option value="LOW">Low - They did not say no, but probably not</option>
-										<option value="ZERO">Zero - They will not buy from us</option>
-									</select>
-								</div>
-
-								<div className="row">
-									<label>Will you have another meeting with the client?</label>
-									<select {...this.former.super_handle(["call_end_survey", "follow_up_meeting"])}>
-										<option value="">Please Select an Answer</option>
-										<option value="YES">Yes</option>
-										<option value="NO">No</option>
-									</select>
-								</div>
-
-								<div className="row">
-									<label>Other Notes</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "other_notes"])} placeholder="Enter other notes here" />
-								</div>
-
-								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
-								</div>
-							</div>
-						</div>
+					this.state.showSurvey === "CALL_END" && <Modal>
+						<CallEndSurveyComponent saveSurvey={this.saveSurvey} />
 					</Modal>
 				}
 
 				{
 					this.state.showSurvey === "NOT_INTERESTED" && 
 					<Modal>
-						<div className="modal">
-							<div className="title">Marked Not Interested</div>
-
-							<div className="form" style={{ width: "90%"}}>
-
-								<div className="row">
-									<label>Why are you not interested in this school?</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "reason_rejected"])} placeholder="Enter reason here" />
-								</div>
-
-								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
-								</div>
-							</div>
-						</div>
+						<NotInterestedSurveyComponent saveSurvey={this.saveSurvey} />
 					</Modal>
 				}
 
 				{
 					this.state.showSurvey === "MARK_COMPLETE" &&
 					<Modal>
-						<div className="modal">
-							<div className="title">Marked as Complete</div>
-
-							<div className="form" style={{ width: "90%"}}>
-								<div className="row">
-									<label>Reason for marking as complete</label>
-									<select {...this.former.super_handle(["mark_complete_survey", "reason_completed"])}>
-										<option value="">Select Reason</option>
-										<option value="CLIENT_BOUGHT_PRODUCT">Client has purchased our product</option>
-										<option value="CLIENT_NOT_INTERESTED">Client not interested in our product</option>
-										<option value="CLIENT_NOT_REACHABLE">Unable to contact the Client</option>
-										<option value="HANDLING_OUTSIDE_PLATFORM">No longer need to track in the website</option>
-										<option value="RELEASE_MASKED_NUMBER">Need to clear this client so we can call a new one</option>
-									</select>
-								</div>
-								{ this.state.mark_complete_survey.reason_completed == "OTHER" && <div className="row">
-									<label>Other Reason</label>
-									<input type="text" {...this.former.super_handle(["mark_complete_survey", "other_reason"])} placeholder="Other Reason" />
-								</div>
-								}
-
-								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
-								</div>
-
-							</div>
-						</div>
+						<MarkCompleteSurveyComponent saveSurvey={this.saveSurvey} />
 					</Modal>
 				}
 

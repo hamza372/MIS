@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Former from '~/src/utils/former'
 
+import { clearDB } from '~/src/utils/localStorage'
+
 import { addSupplierNumber, deleteSupplierNumber } from '~/src/actions'
 
 interface propTypes {
@@ -47,6 +49,11 @@ class Settings extends React.Component<propTypes, stateType> {
 	componentWillReceiveProps(nextProps: propTypes) {
 	}
 
+	onLogout = () => {
+		clearDB();
+		window.location.reload();
+	}
+
 	render() {
 
 		console.log(this.props)
@@ -80,6 +87,8 @@ class Settings extends React.Component<propTypes, stateType> {
 							</div>
 						})
 				}
+
+				<div className="button red" onClick={this.onLogout}>Logout</div>
 			</div>
 		</div>
 

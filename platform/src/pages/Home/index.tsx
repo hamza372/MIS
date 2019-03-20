@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import moment from 'moment'
 
-import { forceSaveFullStatePotentiallyCausingProblems, getSchoolProfiles } from '~/src/actions'
+import { forceSaveFullStatePotentiallyCausingProblems, getSchoolProfiles, saveCallEndSurvey } from '~/src/actions'
+import Modal from '~/src/components/Modal'
+
+import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
 
 import './style.css'
 
@@ -13,10 +16,13 @@ type propTypes = {
 	school_db: RootBankState['new_school_db']
 	saveFullState: () => void
 	addSchools: (ids: string[]) => void
+	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => void
 } & RouteComponentProps
 
 interface stateType {
 	loading: boolean
+	showSurvey: boolean
+	current_school: string
 }
 
 class Home extends React.Component<propTypes, stateType> {
@@ -32,7 +38,9 @@ class Home extends React.Component<propTypes, stateType> {
 		}
 
 		this.state = {
-			loading: blank.length > 0
+			loading: blank.length > 0,
+			showSurvey: false,
+			current_school: ""
 		}
 	}
 
@@ -51,12 +59,28 @@ class Home extends React.Component<propTypes, stateType> {
 		})
 	}
 
+	onSurveyClick = (school_id : string) => () => {
+		this.setState({
+			showSurvey: true,
+			current_school: school_id
+		})
+	}
+
+	saveSurvey = (survey : CallEndSurvey['meta']) => {
+		this.props.saveCallEndSurvey(this.state.current_school, survey)
+		this.setState({
+			current_school: "",
+			showSurvey: false
+		})
+	}
+
 	render() {
 		// if no number is set in auth, should ask them here
 
 		const numbers = this.props.sync_state.numbers;
+		const matches = this.props.sync_state.matches;
 
-		const call_end_events : MergedEndEvent[]  = Object.entries(this.props.sync_state.matches)
+		const call_end_events : MergedEndEvent[]  = Object.entries(matches)
 			.filter(([, x]) => x.history)
 			.reduce((agg, [sid, curr]) => {
 				// interaction between user and school - need to just keep id and name here of school
@@ -79,7 +103,7 @@ class Home extends React.Component<propTypes, stateType> {
 			}, [])
 
 		const last_unanswered_per_school = Object.values(call_end_events
-			.filter(x => x.meta && this.props.sync_state.matches[x.school_id].status === "IN_PROGRESS")
+			.filter(x => x.meta && matches[x.school_id].status === "IN_PROGRESS")
 			.sort((a, b) => a.time - b.time)
 			.reduce((agg, curr) => {
 				return {
@@ -96,11 +120,42 @@ class Home extends React.Component<propTypes, stateType> {
 			return agg;
 		}, 0)/60.0
 
+		// TODO: I want to render all schools that has a call_end event but no corresponding survey in a list with a button that will open up the survey. 
+		// this means the survey should be its own component which will clean up the schoolinfo component 
+
+		const missing_surveys : MergedEndEvent[] = Object.entries(matches)
+			.reduce((agg, [id, curr]) => {
+
+				if(curr.history === undefined) {
+					return agg;
+				}
+
+				const last_event_key = Math.max(...Object.keys(curr.history).map(x => parseInt(x)))
+				const last_event = curr.history[last_event_key]
+				if(last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") {
+					return [
+						...agg,
+						{
+							...last_event,
+							school_id: id
+						}
+					]
+				}
+
+				return agg;
+			}, [])
+
 		return <div className='home page school-info'>
 			<div className="title">Home Page</div>
 
 			{
 				Object.keys(numbers).length >= 0 && <div>Please add your organizations phone numbers in <Link to="/settings">Settings</Link></div>
+			}
+
+			{
+				this.state.showSurvey && <Modal>
+					<CallEndSurveyComponent saveSurvey={this.saveSurvey} />
+				</Modal>
 			}
 
 			<div className="form" style={{ width: "75%"}}>
@@ -137,13 +192,22 @@ class Home extends React.Component<propTypes, stateType> {
 					<div>{total_minutes_on_phone.toFixed(1)}</div>
 				</div>
 
+				<div className="divider">Missed Surveys</div>
+				{
+					missing_surveys
+						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSurveyClick(x.school_id)}>
+							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
+							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM")}</div>
+						</div>)
+				}
+
 				<div className="divider">Unanswered Calls</div>
 				{
 					Object.values(last_unanswered_per_school)
 						.sort((a, b) => a.time - b.time)
 						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSchoolClick(x.school_id)}>
 							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
-							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM:SS")}</div>
+							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM")}</div>
 						</div>)
 				}
 			</div>
@@ -158,5 +222,6 @@ export default connect((state : RootBankState) => ({
 	school_db: state.new_school_db
 }), (dispatch : Function) => ({
 	saveFullState: () => dispatch(forceSaveFullStatePotentiallyCausingProblems()),
-	addSchools: (ids : string[]) => dispatch(getSchoolProfiles(ids))
+	addSchools: (ids : string[]) => dispatch(getSchoolProfiles(ids)),
+	saveCallEndSurvey: (school_id: string, survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(school_id, survey))
 }))(Home)
