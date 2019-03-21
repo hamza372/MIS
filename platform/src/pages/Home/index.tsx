@@ -195,6 +195,7 @@ class Home extends React.Component<propTypes, stateType> {
 				<div className="divider">Missed Surveys</div>
 				{
 					missing_surveys
+						.sort((a, b) => a.time - b.time)
 						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSurveyClick(x.school_id)}>
 							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
 							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM")}</div>
