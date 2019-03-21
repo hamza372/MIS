@@ -77,6 +77,7 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 						<option value="">Please Select an Answer</option>
 						<option value="YES">Yes</option>
 						<option value="NO">No</option>
+						<option value="N/A">Not Relevant</option>
 					</select>
 				</div>
 
