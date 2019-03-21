@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
+import { PrintHeader } from 'components/Layout'
 import Former from "utils/former"
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
@@ -31,7 +32,7 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {
 			</ResponsiveContainer>
 }
 const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
-	return <div className="section table" style={{margin: "20px 0", backgroundColor:"#c2bbbb21" }}>
+	return <div className="section table line" style={{margin: "20px 0", backgroundColor:"#c2bbbb21" }}>
 				<div className="table row heading">
 					<label style={{ backgroundColor: "#efecec"}}><b>Date</b></label>
 					<label style={{ backgroundColor: "#93d0c5"}}><b>Present</b></label>
@@ -84,7 +85,7 @@ class AttendanceAnalytics extends Component {
 	
 	render()
 	{
-		const { students, classes } = this.props
+		const { students, classes, settings, schoolLogo } = this.props
 
 		let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0 };
 		let monthly_attendance = { } // [mm/yyyy]: { present / absent / leave }
@@ -121,6 +122,11 @@ class AttendanceAnalytics extends Component {
 			.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
 
 		return <div className="attendance-analytics">
+
+		<PrintHeader 
+			settings={settings} 
+			logo={schoolLogo}
+		/>
 		
 		<div className="table row">
 			<label>Total Present</label>
@@ -141,10 +147,12 @@ class AttendanceAnalytics extends Component {
 
 		<div className="divider">Monthly Attendance</div>
 		
-		<MonthlyAttendanceChart
-			monthly_attendance = { monthly_attendance }
-			filter = { this.state.chartFilter }
-		/>
+		<div className="no-print">
+			<MonthlyAttendanceChart
+				monthly_attendance = { monthly_attendance }
+				filter = { this.state.chartFilter }
+			/>
+		</div>
 
 		<div className="no-print checkbox-container">
 			<div className="chart-checkbox" style={{ color:"#93d0c5" }}>
@@ -187,7 +195,7 @@ class AttendanceAnalytics extends Component {
 
 		<div className="divider">Student Attendance</div>
 		<div className="section">
-			<div className="row">
+			<div className="row no-print">
 				<input 
 					className="search-bar"
 					type="text"
@@ -216,11 +224,15 @@ class AttendanceAnalytics extends Component {
 						<div>{ABSENT}</div>
 					</div>)
 			}
+			<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
+
 		</div>
 	</div>
 	}
 }
 export default connect(state =>({
 	students: state.db.students,
-	classes: state.db.classes
+	classes: state.db.classes,
+	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }))(AttendanceAnalytics)

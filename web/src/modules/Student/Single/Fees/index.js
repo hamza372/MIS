@@ -27,6 +27,8 @@ import './style.css'
 
 */
 
+const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
 class StudentFees extends Component {
 
 	constructor(props) {
@@ -303,9 +305,9 @@ class StudentFees extends Component {
 									{ this.state.edits[id] !== undefined ? 
 										<div className="row" style={{color:"rgb(94, 205, 185)"}}>
 											<input style={{textAlign:"right", border: "none"}} type="number" {...this.Former.super_handle(["edits", id, "amount"])} />
-											*
+											<span className="no-print" style={{ width:"min-content" }}>*</span>
 										</div>
-									: <div> {payment.type === "OWED" ? `${payment.amount}` : `-${payment.amount}`}</div>}
+									: <div> {payment.type === "OWED" ? `${numberWithCommas(payment.amount)}` : `${numberWithCommas(payment.amount)}`}</div>}
 								</div>
 							</div> })
 				}

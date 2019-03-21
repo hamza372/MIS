@@ -13,7 +13,7 @@ class FacultyAttendance extends Component {
 
 		this.state = {
 			monthFilter: "",
-			yearFilter: ""
+			yearFilter: moment().format("YYYY")
 		}
 
 		this.former = new former(this, []);
@@ -106,6 +106,7 @@ class FacultyAttendance extends Component {
 			{
 				Object.entries(attendance)
 				.filter(([date,]) => this.getFilterCondition(date))
+				.sort(([dateA,], [dateB,])=> moment(dateB).diff(moment(dateA)) )
 				.map(
 					([date, rec]) => {
 						return <div className="row" key={date}>
