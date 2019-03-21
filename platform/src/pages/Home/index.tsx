@@ -132,7 +132,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 				const last_event_key = Math.max(...Object.keys(curr.history).map(x => parseInt(x)))
 				const last_event = curr.history[last_event_key]
-				if(last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") {
+				if((last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") && last_event.meta && last_event.meta.call_status.toLowerCase().includes("answer") && parseInt(last_event.meta.duration) > 45) {
 					return [
 						...agg,
 						{
@@ -198,7 +198,7 @@ class Home extends React.Component<propTypes, stateType> {
 						.sort((a, b) => a.time - b.time)
 						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSurveyClick(x.school_id)}>
 							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
-							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM")}</div>
+							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:mm")}</div>
 						</div>)
 				}
 
@@ -208,7 +208,7 @@ class Home extends React.Component<propTypes, stateType> {
 						.sort((a, b) => a.time - b.time)
 						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSchoolClick(x.school_id)}>
 							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
-							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:MM")}</div>
+							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:mm")}</div>
 						</div>)
 				}
 			</div>
