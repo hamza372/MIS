@@ -248,7 +248,7 @@ class FeeAnalytics extends Component {
 		</div>
 		<div className="table row">
 				<label><b>Name</b></label>
-				<label><b>Payments</b></label>
+				<label><b>Amount</b></label>
 		</div>
 		{
 			items

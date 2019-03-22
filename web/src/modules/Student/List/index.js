@@ -194,7 +194,9 @@ class StudentList extends Component {
 						<option value="">Select Tag</option>
 						{
 							[...this.uniqueTags(students).keys()]
-							.filter(tag => tag !== "PROSPECTIVE" && (this.state.showActiveStudent ? tag !== "FINISHED_SCHOOL": true ))
+							.filter(tag => tag !== "PROSPECTIVE" && 
+								( this.state.showActiveStudent && !this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true )
+							)
 							.map(tag => <option key={tag} value={tag}> {tag} </option>)
 						}
 					</select>
