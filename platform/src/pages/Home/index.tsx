@@ -80,6 +80,8 @@ class Home extends React.Component<propTypes, stateType> {
 		const numbers = this.props.sync_state.numbers;
 		const matches = this.props.sync_state.matches;
 
+		const min_convo_length = 30;
+
 		const call_end_events : MergedEndEvent[]  = Object.entries(matches)
 			.filter(([, x]) => x.history)
 			.reduce((agg, [sid, curr]) => {
@@ -111,7 +113,7 @@ class Home extends React.Component<propTypes, stateType> {
 					[curr.school_id]: curr
 				}
 			}, {} as {[sid: string]: MergedEndEvent}))
-			.filter(x => !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60)
+			.filter(x => !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < min_convo_length)
 			
 		const total_minutes_on_phone = call_end_events.reduce((agg, curr) => {
 			if(curr.meta && !isNaN(parseInt(curr.meta.duration))) {
@@ -120,19 +122,16 @@ class Home extends React.Component<propTypes, stateType> {
 			return agg;
 		}, 0)/60.0
 
-		// TODO: I want to render all schools that has a call_end event but no corresponding survey in a list with a button that will open up the survey. 
-		// this means the survey should be its own component which will clean up the schoolinfo component 
-
 		const missing_surveys : MergedEndEvent[] = Object.entries(matches)
 			.reduce((agg, [id, curr]) => {
 
 				if(curr.history === undefined) {
-					return agg;
+					return agg
 				}
 
 				const last_event_key = Math.max(...Object.keys(curr.history).map(x => parseInt(x)))
 				const last_event = curr.history[last_event_key]
-				if((last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") && last_event.meta && last_event.meta.call_status.toLowerCase().includes("answer") && parseInt(last_event.meta.duration) > 45) {
+				if((last_event.event === "CALL_END" || last_event.event === "CALL_BACK_END") && last_event.meta && last_event.meta.call_status.toLowerCase().includes("answer") && parseInt(last_event.meta.duration) > min_convo_length) {
 					return [
 						...agg,
 						{
@@ -144,6 +143,17 @@ class Home extends React.Component<propTypes, stateType> {
 
 				return agg;
 			}, [])
+
+		const clients_reached_map = call_end_events
+			.filter(x => x.meta && x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) > min_convo_length)
+			.reduce((agg, curr) => {
+				return {
+					...agg,
+					[curr.school_id]: curr
+				}
+			}, {})
+		
+		const clients_reached = Object.keys(clients_reached_map).length;
 
 		return <div className='home page school-info'>
 			<div className="title">Home Page</div>
@@ -169,7 +179,7 @@ class Home extends React.Component<propTypes, stateType> {
 
 				<div className="row">
 					<label>Clients Reached</label>
-					<div>{Object.keys(this.props.sync_state.matches).length - last_unanswered_per_school.length}</div>
+					<div>{clients_reached}</div>
 				</div>
 
 				<div className="row">
@@ -198,6 +208,7 @@ class Home extends React.Component<propTypes, stateType> {
 						.sort((a, b) => a.time - b.time)
 						.map(x => <div key={x.school_id} className="row clickable" onClick={this.onSurveyClick(x.school_id)}>
 							<div>{this.props.school_db[x.school_id] ? this.props.school_db[x.school_id].school_name : "Loading..."}</div>
+							<div style={{ flexShrink: 1, textAlign: "center" }}>{x.user.name}</div>
 							<div style={{ flexShrink: 1 }}>{moment(x.time).format("DD/MM HH:mm")}</div>
 						</div>)
 				}
