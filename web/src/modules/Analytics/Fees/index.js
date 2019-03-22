@@ -246,6 +246,10 @@ class FeeAnalytics extends Component {
 				}
 			</select>
 		</div>
+		<div className="table row">
+				<label><b>Name</b></label>
+				<label><b>Payments</b></label>
+		</div>
 		{
 			items
 			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))

@@ -62,6 +62,7 @@ class StudentList extends Component {
 		const tags = new Set();
 
 		Object.values(students)
+			.filter(s => s.id && s.Name)
 			.forEach(s => {
 				Object.keys(s.tags || {})
 					.forEach(tag => tags.add(tag))
@@ -129,7 +130,7 @@ class StudentList extends Component {
 		const sections = getSectionsFromClasses(classes)	
 	
 		let items = Object.entries(students)
-		.filter(([, s]) => s.id && s.Name && this.getListFilterCondition(s)) // hiding the error for now.... need to build reporting mechanism
+		.filter(([, s]) => s.id && s.Name && (forwardTo === "prospective-student" || this.getListFilterCondition(s)) ) // hiding the error for now.... need to build reporting mechanism
 		.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 		.map( ([id, student]) => {
 			const relevant_section = sections.find(section => student.section_id === section.id);
@@ -177,7 +178,7 @@ class StudentList extends Component {
 				createText = {createText} 
 				toLabel = {toLabel}>
 
-				<div className="row filter-container">
+				{forwardTo !== "prospective-student" && <div className="row filter-container">
 					<div className="row checkbox-container">
 						<div className="checkbox">
 							<input type="checkbox" {...this.former.super_handle(["showActiveStudent"])} style={{height:"20px"}}/>
@@ -190,14 +191,14 @@ class StudentList extends Component {
 					</div>
 
 					<select className="list-select" {...this.former.super_handle(["tag"])}>
-						<option value="">Tag</option>
+						<option value="">Select Tag</option>
 						{
 							[...this.uniqueTags(students).keys()]
-							.filter(tag => tag !== "PROSPECTIVE")
+							.filter(tag => tag !== "PROSPECTIVE" && (this.state.showActiveStudent ? tag !== "FINISHED_SCHOOL": true ))
 							.map(tag => <option key={tag} value={tag}> {tag} </option>)
 						}
 					</select>
-				</div>
+				</div>}
 
 			</List>
 

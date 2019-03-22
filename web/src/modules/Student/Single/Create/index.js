@@ -372,6 +372,7 @@ class SingleStudent extends Component {
 		const tags = new Set();
 
 		Object.values(this.props.students)
+			.filter(s => s.id && s.Name)
 			.forEach(s => {
 				Object.keys(s.tags || {})
 					.forEach(tag => tags.add(tag))
