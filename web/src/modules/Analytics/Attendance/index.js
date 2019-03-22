@@ -221,7 +221,7 @@ class AttendanceAnalytics extends Component {
 				items
 					.map(([ sid, { student, PRESENT, ABSENT, LEAVE } ]) => <div className="table row">
 						<Link to={`/student/${sid}/attendance`}>{student.Name}</Link>
-						<div style={{color:"#fc6171"}}>{ABSENT}</div>
+						<div style={ ABSENT === 0 ? { color:"#5ecdb9" } : { color:"#fc6171" }}>{ABSENT}</div>
 					</div>)
 			}
 			<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
