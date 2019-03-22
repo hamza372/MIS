@@ -152,8 +152,16 @@ class Home extends React.Component<propTypes, stateType> {
 					[curr.school_id]: curr
 				}
 			}, {})
-		
+
 		const clients_reached = Object.keys(clients_reached_map).length;
+
+		const clients_attempted = Object.keys(call_end_events.reduce((agg, curr) => {
+			return {
+				...agg,
+				[curr.school_id]: curr
+			}
+		}, {})).length
+		
 
 		return <div className='home page school-info'>
 			<div className="title">Home Page</div>
@@ -177,6 +185,10 @@ class Home extends React.Component<propTypes, stateType> {
 					<div>{Object.keys(this.props.sync_state.matches).length}</div>
 				</div>
 
+				<div className="row">
+					<label>Clients Attempted</label>
+					<div>{clients_attempted}</div>
+				</div>
 				<div className="row">
 					<label>Clients Reached</label>
 					<div>{clients_reached}</div>
