@@ -69,14 +69,22 @@ class SingleStudent extends Component {
 
 		const id = props.match.params.id;
 
+		const student = props.students[id] ? props.students[id].tags ?
+			props.students[id]
+			: {
+				...props.students[id],
+				tags:{}
+			} : blankStudent()
+
 		this.state = {
-			profile: props.students[id] || blankStudent(),
+			profile: student,
 			redirect: false,
 			banner: {
 				active: false,
 				good: true,
 				text: "Saved!"
-			}
+			},
+			new_tag: ""
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -359,6 +367,51 @@ class SingleStudent extends Component {
 		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))
 	}
 
+	uniqueTags = () => {
+
+		const tags = new Set();
+
+		Object.values(this.props.students)
+			.filter(s => s.id && s.Name)
+			.forEach(s => {
+				Object.keys(s.tags || {})
+					.forEach(tag => tags.add(tag))
+			})
+
+		return tags;
+	}
+
+	addTag = () => {
+
+		const new_tag = this.state.new_tag;
+
+		if(new_tag.trim() === "") {
+			return;
+		}
+
+		this.setState({
+			profile: {
+				...this.state.profile,
+				tags: {
+					...this.state.profile.tags,
+					[new_tag]: true
+				}
+			}
+		})
+	}
+
+	removeTag = tag => () => {
+
+		const {[tag]: removed, ...rest} = this.state.profile.tags;
+
+		this.setState({
+			profile: {
+				...this.state.profile,
+				tags: rest
+			}
+		})
+	}
+
 	render() {
 
 		if(this.state.redirect) {
@@ -482,6 +535,30 @@ class SingleStudent extends Component {
 						<label>Notes</label>
 						<textarea {...this.former.super_handle(["Notes"])} placeholder="Notes" disabled={!admin}/>
 					</div>
+
+					{!prospective && <div className="divider"> Tags </div>}
+					{!prospective && <div className="tag-container">
+						{
+							Object.keys(this.state.profile.tags)
+							.map(tag =>
+								<div className="tag-row" key={tag}>
+									<div className="tag bg-grey" onClick={this.removeTag(tag)}>{tag} <span className="cross">x</span></div>
+								</div>
+							)
+						}
+					</div>}
+
+					{!prospective && <div className="row" style={{flexDirection:"row"}}>
+						<input list="tags" onChange={(e) => this.setState({ new_tag: e.target.value })} placeholder="Type or Select Tag" style={{width: "initial"}}/>
+						<datalist id="tags">
+						{
+							[...this.uniqueTags().keys()]
+							.filter(tag => tag !== "FINISHED_SCHOOL" && tag !== "PROSPECTIVE")
+							.map(tag => <option key={tag} value={tag} />)
+						}
+						</datalist>
+						<div className="button green" style={{ width: "initial", marginLeft:"auto" }} onClick={this.addTag}>+</div>
+					</div>}
 
 					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
 					{(admin || this.props.permissions.fee.teacher) && !prospective ?

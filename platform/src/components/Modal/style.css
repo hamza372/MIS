@@ -18,11 +18,22 @@
 .modal {
 	background-color: whitesmoke;
 
-	height: 50%;
-	width: 50%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	height: 80%;
+	width: 80%;
 	box-shadow: 20px 20px 100px #111;
 	border-radius: 8px;
 	padding: 20px;
 
 	overflow-y: auto;
+}
+
+@media only screen and (min-width: 768px) {
+	.modal {
+		height: 70%;
+		width: 70%;
+	}
 }

@@ -58,25 +58,27 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 							const red = "#fc6171"
 							return <div className="table row" key={month}>
 								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month}</div>
-								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{OWED}</div>
-								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{SUBMITTED}</div>
-								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{FORGIVEN + SCHOLARSHIP}</div>
-								<div style={{ backgroundColor: red, textAlign:"center" }}>{ OWED - (SUBMITTED + FORGIVEN + SCHOLARSHIP)}</div>
+								<div style={{ backgroundColor: "#bedcff", textAlign:"center" }}>{numberWithCommas(OWED)}</div>
+								<div style={{ backgroundColor: "#93d0c5", textAlign:"center" }}>{numberWithCommas(SUBMITTED)}</div>
+								<div style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}>{numberWithCommas(FORGIVEN + SCHOLARSHIP)}</div>
+								<div style={{ backgroundColor: red, textAlign:"center" }}>{numberWithCommas(OWED - (SUBMITTED + FORGIVEN + SCHOLARSHIP))}</div>
 							</div>
 						}),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>
 						<br/> 
 							<label style={{ backgroundColor: "#efecec", textAlign:"center" }}><b>Total</b></label>
-							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{total.OWED}</b></label>
-							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{total.PAID}</b></label>
-							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{total.FORGIVEN + total.SCHOLARSHIP}</b></label>
-							<label style={{ backgroundColor: "#fc6171", textAlign:"center"}}><b>{Math.abs(total.OWED - (total.PAID + total.FORGIVEN))}</b></label>
+							<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{numberWithCommas(total.OWED)}</b></label>
+							<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{numberWithCommas(total.PAID)}</b></label>
+							<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{numberWithCommas(total.FORGIVEN + total.SCHOLARSHIP)}</b></label>
+							<label style={{ backgroundColor: "#fc6171", textAlign:"center"}}><b>{numberWithCommas(Math.abs(total.OWED - (total.PAID + total.FORGIVEN)))}</b></label>
 						</div>
 					]
 				}
 			</div> 
 				
 	}
+
+	const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class FeeAnalytics extends Component {
 
@@ -97,7 +99,7 @@ class FeeAnalytics extends Component {
 	  this.former = new Former(this, [])
 	}
 
-	calculateDebt = ({SUBMITTED, FORGIVEN, OWED}) => SUBMITTED + FORGIVEN - OWED;
+	calculateDebt = ({SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP}) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
 
 	
   render() {
@@ -244,13 +246,17 @@ class FeeAnalytics extends Component {
 				}
 			</select>
 		</div>
+		<div className="table row">
+				<label><b>Name</b></label>
+				<label><b>Amount</b></label>
+		</div>
 		{
 			items
 			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))
 			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.map(({ student, debt }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
-					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } }  >{-1 * this.calculateDebt(debt)}</div>
+					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
 				</div>)
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>

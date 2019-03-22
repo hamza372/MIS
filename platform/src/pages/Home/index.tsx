@@ -90,9 +90,7 @@ class Home extends React.Component<propTypes, stateType> {
 			.filter(x => !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < 60)
 			
 		const total_minutes_on_phone = call_end_events.reduce((agg, curr) => {
-			//@ts-ignore
 			if(curr.meta && !isNaN(parseInt(curr.meta.duration))) {
-				//@ts-ignore
 				return agg + parseInt(curr.meta.duration)
 			}
 			return agg;

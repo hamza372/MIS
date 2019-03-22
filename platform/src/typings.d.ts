@@ -33,7 +33,7 @@ interface CallEndEvent extends PlatformInteractionEvent {
 	event: "CALL_END" | "CALL_BACK_END",
 	meta: {
 		call_status: "ANSWER" | "NO ANSWER" | "BUSY" | "CANCEL" | "FAILED" | "CONGESTION",
-		duration: number,
+		duration: string,
 		unique_id: string
 	}
 }
@@ -42,9 +42,11 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 	event: "CALL_END_SURVEY",
 	meta: {
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
+		reason_rejected: 
+			"PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
+		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | ""
-		follow_up_meeting_date: number
 		other_notes: string
 	}
 }
@@ -52,9 +54,7 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 interface NotInterestedSurvey extends PlatformInteractionEvent {
 	event: "MARK_REJECTED_SURVEY"
 	meta: {
-		reason_rejected: 
-			"PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
-		other_reason: string
+		reason_rejected: String
 	}
 }
 
