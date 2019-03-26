@@ -46,7 +46,8 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
 		follow_up_meeting: "YES" | "NO" | "N/A" | ""
-		other_notes: string
+		other_notes: string,
+		call_number: number
 	}
 }
 

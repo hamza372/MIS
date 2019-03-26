@@ -158,6 +158,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			estimated_monthly_revenue = ((parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment)).toLocaleString() + " Rs"
 		}
 
+		const call_number = Object.values(schoolMatch.history || {}).filter(x => x.event === "CALL_END_SURVEY").length
+
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
@@ -174,7 +176,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				{
 					this.state.showSurvey === "CALL_END" && <Modal>
-						<CallEndSurveyComponent saveSurvey={this.saveSurvey} />
+						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} />
 					</Modal>
 				}
 

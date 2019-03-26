@@ -22,7 +22,8 @@ type propTypes = {
 interface stateType {
 	loading: boolean
 	showSurvey: boolean
-	current_school: string
+	current_school: string,
+	current_school_survey_num: number
 }
 
 class Home extends React.Component<propTypes, stateType> {
@@ -40,7 +41,8 @@ class Home extends React.Component<propTypes, stateType> {
 		this.state = {
 			loading: blank.length > 0,
 			showSurvey: false,
-			current_school: ""
+			current_school: "",
+			current_school_survey_num: 0
 		}
 	}
 
@@ -60,9 +62,15 @@ class Home extends React.Component<propTypes, stateType> {
 	}
 
 	onSurveyClick = (school_id : string) => () => {
+		
+		const num = Object.values(this.props.sync_state.matches[school_id].history || {})
+			.filter(x => x.event === "CALL_END_SURVEY")
+			.length
+
 		this.setState({
 			showSurvey: true,
-			current_school: school_id
+			current_school: school_id,
+			current_school_survey_num: num
 		})
 	}
 
@@ -80,7 +88,7 @@ class Home extends React.Component<propTypes, stateType> {
 		const numbers = this.props.sync_state.numbers;
 		const matches = this.props.sync_state.matches;
 
-		const min_convo_length = 30;
+		const min_convo_length = 0;
 
 		const call_end_events : MergedEndEvent[]  = Object.entries(matches)
 			.filter(([, x]) => x.history)
@@ -113,8 +121,8 @@ class Home extends React.Component<propTypes, stateType> {
 					[curr.school_id]: curr
 				}
 			}, {} as {[sid: string]: MergedEndEvent}))
-			.filter(x => !x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < min_convo_length)
-			
+			.filter(x => x.meta.call_status === "CANCEL" || (!x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) < min_convo_length))
+
 		const total_minutes_on_phone = call_end_events.reduce((agg, curr) => {
 			if(curr.meta && !isNaN(parseInt(curr.meta.duration))) {
 				return agg + parseInt(curr.meta.duration)
@@ -145,7 +153,7 @@ class Home extends React.Component<propTypes, stateType> {
 			}, [])
 
 		const clients_reached_map = call_end_events
-			.filter(x => x.meta && x.meta.call_status.toLowerCase().includes("answer") && parseInt(x.meta.duration) > min_convo_length)
+			.filter(x => x.meta && x.meta.call_status.toLowerCase().includes("answer") || parseInt(x.meta.duration) > 60)
 			.reduce((agg, curr) => {
 				return {
 					...agg,
@@ -172,11 +180,11 @@ class Home extends React.Component<propTypes, stateType> {
 
 			{
 				this.state.showSurvey && <Modal>
-					<CallEndSurveyComponent saveSurvey={this.saveSurvey} />
+					<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={}/>
 				</Modal>
 			}
 
-			<div className="form" style={{ width: "75%"}}>
+			<div className="form" style={{ width: "75%" }}>
 
 				<div className="divider">Analytics</div>
 

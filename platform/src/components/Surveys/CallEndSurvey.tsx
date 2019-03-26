@@ -3,6 +3,7 @@ import Former from '~/src/utils/former'
 
 interface P {
 	saveSurvey: (survey: CallEndSurvey['meta']) => void
+	call_number: number
 }
 
 export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
@@ -18,7 +19,8 @@ export default class Survey extends React.Component<P, CallEndSurvey['meta']> {
 			other_reason_rejected: "",
 			customer_likelihood: "",
 			follow_up_meeting: "",
-			other_notes: ""
+			other_notes: "",
+			call_number: props.call_number
 		}
 
 		this.former = new Former(this, [])
