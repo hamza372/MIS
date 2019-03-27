@@ -153,7 +153,7 @@ class Home extends React.Component<propTypes, stateType> {
 			}, [])
 
 		const clients_reached_map = call_end_events
-			.filter(x => x.meta && x.meta.call_status.toLowerCase().includes("answer") || parseInt(x.meta.duration) > 60)
+			.filter(x => x.meta && (x.meta.call_status.toLowerCase().includes("answer") || parseInt(x.meta.duration) > 60))
 			.reduce((agg, curr) => {
 				return {
 					...agg,

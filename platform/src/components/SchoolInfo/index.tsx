@@ -19,6 +19,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+	connected: boolean
 	school?: CERPSchool
 	schoolMatch?: SchoolMatch
 }
@@ -426,7 +427,8 @@ const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => 
 
 export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
-	schoolMatch: state.sync_state.matches[props.school_id]
+	schoolMatch: state.sync_state.matches[props.school_id],
+	connected: state.connected
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
