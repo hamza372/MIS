@@ -208,6 +208,7 @@ defmodule Sarkar.Server.Analytics do
 		"SELECT 
 			id, 
 			to_timestamp((value->>'time')::bigint/1000)::date::text as date,
+			path[3] as school_id,
 			value->>'event' as event,
 			value->'meta'->>'call_status' as call_status,
 			value->'meta'->>'duration' as duration_seconds
@@ -222,7 +223,7 @@ defmodule Sarkar.Server.Analytics do
 					{:error, err}
 		end
 
-		csv = [ ["supplier_id", "date", "event", "call_status", "duration"] | data ]
+		csv = [ ["supplier_id", "date", "school_id", "event", "call_status", "duration"] | data ]
 		|> CSV.encode
 		|> Enum.join()
 
