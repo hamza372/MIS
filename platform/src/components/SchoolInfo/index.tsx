@@ -195,12 +195,14 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</Modal>
 				}
 
-				{ !reserved && <div className="save-delete">
+				{ !this.props.connected && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Connecting....</div> }
+
+				{ this.props.connected && !reserved && <div className="save-delete">
 					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div> 
 					<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 				</div>
 				}
-				{ reserved && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
+				{ this.props.connected && reserved && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
 
 				<div className="row">
 					<label>Status</label>
