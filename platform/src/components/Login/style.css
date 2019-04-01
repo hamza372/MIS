@@ -11,6 +11,7 @@
 	align-items: flex-end;
 	justify-content: center;
 	padding: 75px;
+	background-color: var(--darkgrey);
 }
 
 .login .bg-cover {

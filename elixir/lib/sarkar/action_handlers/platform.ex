@@ -39,7 +39,7 @@ defmodule Sarkar.ActionHandler.Platform do
 		ids = Map.get(payload, "school_ids", [])
 
 		or_str = Stream.with_index(ids, 1)
-			|> Enum.map(fn {_, i}-> 
+			|> Enum.map(fn {_, i} -> 
 				"id=$#{i}"
 			end)
 			|> Enum.join(" OR ")

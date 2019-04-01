@@ -12,6 +12,7 @@ export const saveDB = (db : RootBankState) => {
 		saveSyncState(db.sync_state);
 		saveSnapshot(db.last_snapshot);
 		saveSchoolDb(db.new_school_db)
+		saveQueue(db.queued)
 	}
 
 	catch(err) {
@@ -101,6 +102,16 @@ const saveSyncState = (sync_state : RootBankState['sync_state']) => {
 	localStorage.setItem("sync_state", JSON.stringify(sync_state));
 }
 
+const saveQueue = (queue : RootBankState['queued']) => {
+
+	localStorage.setItem("queued", JSON.stringify(queue))
+
+}
+
+const loadQueue = () => {
+	return JSON.parse(localStorage.getItem("queued") || "{}") as RootBankState['queued']
+}
+
 const saveSchoolDb = (db : RootBankState['new_school_db']) => {
 
 	localStorage.setItem("school_db", JSON.stringify(db))
@@ -128,7 +139,7 @@ export const loadDB = () : RootBankState => {
 		new_school_db: loadSchoolDb(),
 		client_id: loadClientId(),
 		auth: loadAuth(),
-		queued: {},
+		queued: loadQueue(),
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
