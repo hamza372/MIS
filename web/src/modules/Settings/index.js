@@ -40,6 +40,7 @@ class Settings extends Component {
 			},
 			devices: (props.settings ? (props.settings.devices || {}) : {})
 		}
+
 		this.state = {
 			templates: this.props.sms_templates,
 			settings,
@@ -184,8 +185,17 @@ class Settings extends Component {
 	componentWillReceiveProps(nextProps) {
 		console.log(nextProps)
 
+		const settings = {
+			...(nextProps.settings || defaultSettings),
+			permissions: {
+				...defaultPermissions,
+				...(nextProps.settings || defaultSettings).permissions
+			},
+			devices: (nextProps.settings ? (nextProps.settings.devices || {}) : {})
+		}
+
 		this.setState({
-			settings: nextProps.settings
+			settings
 		})
 	}
 
