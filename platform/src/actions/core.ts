@@ -1,4 +1,4 @@
-import { Dispatch, AnyAction, Action } from 'redux'
+import { Dispatch, AnyAction } from 'redux'
 import Syncr from 'src/syncr';
 
 const SYNC = "SYNC"

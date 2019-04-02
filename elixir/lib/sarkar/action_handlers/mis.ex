@@ -30,7 +30,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 	def handle_action(%{"type" => "SMS", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
 
-		IO.puts "HANDLING SMS"
+		IO.puts "HANDLING SMS FROM #{school_id}"
 		IO.inspect payload
 		{:reply, succeed(), state}
 	end 
