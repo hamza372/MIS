@@ -190,7 +190,7 @@ export const connected = () => (dispatch, getState, syncr) => {
 			})
 			.catch(err => {
 				console.error(err);
-				alert("Authorization Failed. Log out and Log in again.")
+				alert("Authorization Failed. Log out and Log in again. Error text: " + JSON.stringify(err))
 			})
 	}
 }
