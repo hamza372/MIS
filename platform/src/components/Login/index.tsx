@@ -6,7 +6,7 @@ import { createLogin } from '~/src/actions'
 import locations from '~/src/utils/narrowed.json'
 
 import former from '~/src/utils/former'
-import DeckMap from '~/src/components/DeckMap'
+//import DeckMap from '~/src/components/DeckMap'
 
 import './style.css'
 
@@ -59,11 +59,6 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 
 		return <div className="login page">
 
-			<div className="mappy-boi">
-				<DeckMap onSelect={console.log} school_locations={locations}/>
-			</div>
-
-			<div className="bg-cover" />
 			<div className="cover" style={{ }}>
 				<div className="title" style={{ fontSize: "3rem" }}>Welcome to IlmExchange</div>
 				<div className="divider"></div>

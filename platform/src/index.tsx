@@ -10,7 +10,7 @@ import { loadDB, saveDB } from './utils/localStorage'
 import Syncr from './syncr'
 import reducer from './reducers'
 
-const debug_url = "wss://c857fff5.ngrok.io/ws"
+const debug_url = "wss://36feace3.ngrok.io/ws"
 //const debug_url = "wss://platform.mischool.pk/ws"
 
 // @ts-ignore

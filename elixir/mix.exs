@@ -25,7 +25,7 @@ defmodule Sarkar.MixProject do
 			# {:dep_from_hexpm, "~> 0.3.0"},
 			# {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
 			{:poison, "~> 3.0"},
-			{:csv, "~> 2.0.0"},
+			{:csv, "~> 2.3"},
 			{:distillery, "~> 2.0"},
 			{:cowboy, "~> 2.2", override: true, manager: :rebar3},
 			{:uuid, "~> 1.1"},

@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Platform do
 			false -> File.stream!("priv/#{id}.csv") |> CSV.decode!
 		end
 
-		[_ | refcodes] = csv 
+		[_ | refcodes] = csv
 		|> Enum.map(fn [refcode | _ ] -> refcode end)
 
 		# instead of directly manipulating the matches dir, should be creating writes

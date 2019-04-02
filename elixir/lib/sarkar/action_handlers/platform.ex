@@ -1,18 +1,5 @@
 defmodule Sarkar.ActionHandler.Platform do
 	
-	# todo:
-	# there will be a table of schools, who will have their data continuously updated (jsonb)
-	# there will be a table of users with there data to be syncd
-		# they will have history with school id's 
-		# tinder for giving loans - yes, no
-			# is there a guy who first will say whether we should make the loan to the school 
-			# then theres a separate group that actually does it
-			# if so, we want to let users mark yes/no on the list of schools
-			# if school info changes since they last marked it, that info can come back up...
-		# then there is a group that consumes the "yes" list / "ToDo" list and makes the calls.
-	# make call means press the button (verify your phone number), save to db ( userid, incoming #, intended #), show # in ui
-	# keep in memory for fast reply when call comes
-
 	def handle_action(%{"type" => "SET_FILTER"} = action, state) do
 		IO.inspect action
 		{:reply, succeed(%{"type" => "nonsense"}), state}
@@ -43,6 +30,7 @@ defmodule Sarkar.ActionHandler.Platform do
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "last_snapshot" => last_sync_date}, %{id: id, client_id: client_id} = state) do
 		res = Sarkar.Supplier.sync_changes(id, client_id, payload, last_sync_date)
+
 		{:reply, succeed(res), state}
 	end
 
@@ -51,7 +39,7 @@ defmodule Sarkar.ActionHandler.Platform do
 		ids = Map.get(payload, "school_ids", [])
 
 		or_str = Stream.with_index(ids, 1)
-			|> Enum.map(fn {_, i}-> 
+			|> Enum.map(fn {_, i} -> 
 				"id=$#{i}"
 			end)
 			|> Enum.join(" OR ")

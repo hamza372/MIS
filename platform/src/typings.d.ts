@@ -42,12 +42,12 @@ interface CallEndSurvey extends PlatformInteractionEvent {
 	event: "CALL_END_SURVEY",
 	meta: {
 		customer_interest: "YES" | "NO" | "UNSURE" | ""
-		reason_rejected: 
-			"PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
+		reason_rejected: "PRODUCT_TOO_EXPENSIVE" | "PRODUCT_NOT_RELEVANT" | "PRODUCT_NOT_GOOD_ENOUGH" | "OTHER" | "",
 		other_reason_rejected: string
 		customer_likelihood: "HIGH" | "MEDIUM" | "LOW" | ""
-		follow_up_meeting: "YES" | "NO" | ""
-		other_notes: string
+		follow_up_meeting: "YES" | "NO" | "N/A" | ""
+		other_notes: string,
+		call_number: number
 	}
 }
 
@@ -59,7 +59,11 @@ interface NotInterestedSurvey extends PlatformInteractionEvent {
 }
 
 interface MarkCompleteSurvey extends PlatformInteractionEvent {
-	event: "MARK_COMPLETE_SURVEY"
+	event: "MARK_COMPLETE_SURVEY",
+	meta: {
+		reason_completed: "CLIENT_BOUGHT_PRODUCT" | "RELEASE_MASKED_NUMBER" | "HANDLING_OUTSIDE_PLATFORM" | "CLIENT_NOT_INTERESTED" | "CLIENT_NOT_REACHABLE" | "OTHER" | ""
+		other_reason: String
+	}
 }
 
 type SupplierInteractionEvent = {

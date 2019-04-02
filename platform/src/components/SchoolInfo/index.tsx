@@ -4,8 +4,12 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import moment from 'moment'
 import Former from '~/src/utils/former'
-import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey} from '~/src/actions'
+import { getSchoolProfiles, reserveMaskedNumber, releaseMaskedNumber, rejectSchool, saveCallEndSurvey, saveSchoolRejectedSurvey, saveSchoolCompletedSurvey } from '~/src/actions'
 import Modal from '~/src/components/Modal'
+
+import CallEndSurveyComponent from '~/src/components/Surveys/CallEndSurvey'
+import MarkCompleteSurveyComponent from '~/src/components/Surveys/MarkCompleteSurvey'
+import NotInterestedSurveyComponent from '~/src/components/Surveys/NotInterested'
 
 
 import './style.css'
@@ -15,6 +19,7 @@ interface OwnProps {
 }
 
 interface StateProps {
+	connected: boolean
 	school?: CERPSchool
 	schoolMatch?: SchoolMatch
 }
@@ -26,11 +31,7 @@ interface StateProps {
 // 
 
 interface StateType {
-	showSurvey: false | "NOT_INTERESTED" | "CALL_END"
-
-	call_end_survey: CallEndSurvey['meta']
-	not_interested_survey: NotInterestedSurvey['meta']
-
+	showSurvey: false | "NOT_INTERESTED" | "CALL_END" | "MARK_COMPLETE"
 }
 
 interface DispatchProps {
@@ -40,6 +41,7 @@ interface DispatchProps {
 	rejectSchool: () => void
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => void
 	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => void
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => void
 }
 
 type propTypes = OwnProps & StateProps & DispatchProps & RouteComponentProps
@@ -55,18 +57,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		}
 
 		this.state = {
-			showSurvey: "CALL_END",
-			call_end_survey: {
-				customer_interest: "",
-				reason_rejected: "",
-				other_reason_rejected: "",
-				customer_likelihood: "",
-				follow_up_meeting: "",
-				other_notes: ""
-			},
-			not_interested_survey: {
-				reason_rejected: "",
-			}
+			showSurvey: false,
 		}
 
 		this.former = new Former(this, [])
@@ -100,10 +91,13 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 	onMarkComplete = () => {
 		console.log('mark as complete')
 
-		const res = confirm('Are you sure you want to Mark as Complete? Tell us why')
+		const res = confirm('Are you sure you want to Mark as Complete?')
 
 		if(res) {
 			this.props.releaseNumber()
+			this.setState({
+				showSurvey: "MARK_COMPLETE"
+			})
 		}
 	}
 
@@ -125,16 +119,20 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 		})
 	}
 
-	saveSurvey = () => {
+	saveSurvey = (survey : CallEndSurvey['meta'] | NotInterestedSurvey['meta'] | MarkCompleteSurvey['meta']) => {
 
 		console.log("saving survey", this.state)
 
 		if(this.state.showSurvey === "CALL_END") {
-			this.props.saveCallEndSurvey(this.state.call_end_survey)
+			this.props.saveCallEndSurvey(survey as CallEndSurvey['meta'])
 		}
 
 		if(this.state.showSurvey === "NOT_INTERESTED") {
-			this.props.saveSchoolRejectedSurvey(this.state.not_interested_survey)
+			this.props.saveSchoolRejectedSurvey(survey as NotInterestedSurvey['meta'])
+		}
+
+		if(this.state.showSurvey === "MARK_COMPLETE") {
+			this.props.saveSchoolCompletedSurvey(survey as MarkCompleteSurvey['meta'])
 		}
 
 		this.setState({
@@ -161,6 +159,8 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 			estimated_monthly_revenue = ((parseInt(school.lowest_fee) + parseInt(school.highest_fee))/2 * parseInt(school.total_enrolment)).toLocaleString() + " Rs"
 		}
 
+		const call_number = Object.values(schoolMatch.history || {}).filter(x => x.event === "CALL_END_SURVEY").length
+
 		return <div className="school-info page" style={{ padding: "5px" }}>
 			<div className="close" onClick={this.onClose}>Close</div>
 			<div className="title" style={{ marginTop: 0, textAlign: "center" }}>{school.school_name}</div>
@@ -176,104 +176,33 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 				}
 
 				{
-					this.state.showSurvey === "CALL_END" && 
-					<Modal>
-						<div className="modal">
-							<div className="title" style={{ marginTop: 0 }}>Call Finished Survey</div>
-
-							<div className="form" style={{ width: "90%"}}>
-
-								<div className="row">
-									<label>Is the customer interested in using your product?</label>
-									<select {...this.former.super_handle(["call_end_survey", "customer_interest"])}>
-										<option value="">Please Select an Answer</option>
-										<option value="YES">Yes</option>
-										<option value="UNSURE">Unsure</option>
-										<option value="NO">No</option>
-									</select>
-								</div>
-
-								{ this.state.call_end_survey.customer_interest === "NO" && <div className="row">
-									<label>Why is the customer not interested in your product?</label>
-									<select {...this.former.super_handle(["call_end_survey", "reason_rejected"])}>
-										<option value="">Select </option>
-										<option value="PRODUCT_TOO_EXPENSIVE">The Product is too expensive</option>
-										<option value="PRODUCT_NOT_RELEVANT">The product is not relevant for them</option>
-										<option value="PRODUCT_NOT_GOOD_ENOUGH">The product does not fulfill or address their needs</option>
-										<option value="OTHER">Other Reason</option>
-									</select>
-								</div>
-								}
-
-								{ this.state.call_end_survey.reason_rejected == "OTHER" && <div className="row">
-									<label>Please write why they are not interested</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "other_reason_rejected"])} placeholder="" />
-								</div> 
-								}
-
-								<div className="row">
-									<label>How strongly do you feel the client will make a purchase?</label>
-									<select {...this.former.super_handle(["call_end_survey", "customer_likelihood"])}>
-										<option value="">Please select an option</option>
-										<option value="HIGH">High - I think they will buy from us</option>
-										<option value="MEDIUM">Medium - I am not sure</option>
-										<option value="LOW">Low - They did not say no, but probably not</option>
-										<option value="ZERO">Zero - They will not buy from us</option>
-									</select>
-								</div>
-
-								<div className="row">
-									<label>Will you have another meeting with the client?</label>
-									<select {...this.former.super_handle(["call_end_survey", "follow_up_meeting"])}>
-										<option value="">Please Select an Answer</option>
-										<option value="YES">Yes</option>
-										<option value="NO">No</option>
-									</select>
-								</div>
-
-								<div className="row">
-									<label>Other Notes</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "other_notes"])} placeholder="Enter other notes here" />
-								</div>
-
-								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
-								</div>
-							</div>
-						</div>
+					this.state.showSurvey === "CALL_END" && <Modal>
+						<CallEndSurveyComponent saveSurvey={this.saveSurvey} call_number={call_number} />
 					</Modal>
 				}
 
 				{
 					this.state.showSurvey === "NOT_INTERESTED" && 
 					<Modal>
-						<div className="modal">
-							<div className="title">Marked Not Interested</div>
-
-							<div className="form" style={{ width: "90%"}}>
-
-								<div className="row">
-									<label>Why are you not interested in this school?</label>
-									<input type="text" {...this.former.super_handle(["call_end_survey", "reason_rejected"])} placeholder="Enter reason here" />
-								</div>
-
-								<div className="row">
-									<div className="button blue" onClick={this.saveSurvey}>Save</div>
-								</div>
-							</div>
-						</div>
+						<NotInterestedSurveyComponent saveSurvey={this.saveSurvey} />
 					</Modal>
 				}
 
-				<div className="save-delete">
-					{ !reserved &&
-						<div className="red button" onClick={this.onMarkRejected}>Not Interested</div>
-					}
-					{ reserved ? 
-						<div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> :
-						<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
-					}
+				{
+					this.state.showSurvey === "MARK_COMPLETE" &&
+					<Modal>
+						<MarkCompleteSurveyComponent saveSurvey={this.saveSurvey} />
+					</Modal>
+				}
+
+				{ !this.props.connected && <div style={{textAlign: "center", fontSize: "1.2rem" }}>Connecting....</div> }
+
+				{ this.props.connected && !reserved && <div className="save-delete">
+					<div className="red button" onClick={this.onMarkRejected}>Not Interested</div> 
+					<div className="button blue" onClick={this.onShowNumber}>Show Number</div>
 				</div>
+				}
+				{ this.props.connected && reserved && <div className="button purple" onClick={this.onMarkComplete}>Mark as Complete</div> }
 
 				<div className="row">
 					<label>Status</label>
@@ -287,45 +216,55 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 					</div>
 				}
 
-				<SurveyRow label="Respondant Name" val={school.respondent_name} />
-				<SurveyRow label="Respondent is Owner" val={school.respondent_owner} />
-				<SurveyRow label="Respondent Relation" val={school.respondent_relation} />
-				<SurveyRow label="Respondent Gender" val={school.respondent_gender} />
-				<SurveyRow label="Year Established" val={school.year_established} />
-				<SurveyRow label="Address" val={school.school_address} />
-				<SurveyRow label="Tehsil" val={school.school_tehsil} />
-				<SurveyRow label="District" val={school.school_district} />
-				<SurveyRow label="Building Rented" val={school.school_building_rent} />
-				<SurveyRow label="Number of Branches" val={school.school_branches} />
-				<SurveyRow label="Number of Rooms" val={school.no_of_rooms} />
-				<SurveyRow label="Medium of Instruction" val={school.instruction_medium} />
-				<SurveyRow label="Teachers Employed" val={school.teachers_employed} />
-				<SurveyRow label="Facilities" val={map_facilities(school.school_facilities)} />
-				<SurveyRow label="Has Smartphone" val={school.smart_phone} />
-				<SurveyRow label="Registered" val={school.school_registration} />
-				<SurveyRow label="PEF School" val={school.school_pef} />
-				<SurveyRow label="SEF School" val={school.school_sef} />
-				<SurveyRow label="FEF School" val={school.school_fef} />
-				<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
-				<SurveyRow label="Highest Fee" val={school.highest_fee} />
-				<SurveyRow label="Enrollment" val={school.total_enrolment} />
-				<SurveyRow label="Reported Monthly Revenue" val={school.monthly_fee_collected} />
-				<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
-				<SurveyRow label="Highest Grade" val={school.highest_grade} />
-				<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
+				<div className="divider">School Profile</div>
+				<div className="section">
+					<SurveyRow label="Address" val={school.school_address} />
+					<SurveyRow label="Tehsil" val={school.school_tehsil} />
+					<SurveyRow label="District" val={school.school_district} />
+					<SurveyRow label="Respondant Name" val={school.respondent_name} />
+					<SurveyRow label="Respondent is Owner" val={school.respondent_owner} />
+					<SurveyRow label="Respondent Relation" val={school.respondent_relation} />
+					<SurveyRow label="Respondent Gender" val={school.respondent_gender} />
+					<SurveyRow label="Year Established" val={school.year_established} />
+					<SurveyRow label="Registered" val={school.school_registration} />
+					<SurveyRow label="PEF School" val={school.school_pef} />
+					<SurveyRow label="SEF School" val={school.school_sef} />
+					<SurveyRow label="FEF School" val={school.school_fef} />
+					<SurveyRow label="Number of Branches" val={school.school_branches} />
+					<SurveyRow label="Number of Rooms" val={school.no_of_rooms} />
+					<SurveyRow label="Building Rented" val={school.school_building_rent} />
+					<SurveyRow label="Medium of Instruction" val={school.instruction_medium} />
+					<SurveyRow label="Teachers Employed" val={school.teachers_employed} />
+					<SurveyRow label="Facilities" val={map_facilities(school.school_facilities)} />
+					<SurveyRow label="Has Smartphone" val={school.smart_phone} />
+
+				</div>
+
+				<div className="divider">Fees & Enrollment</div>
+				<div className="section">
+					<SurveyRow label="Lowest Fee" val={school.lowest_fee} />
+					<SurveyRow label="Highest Fee" val={school.highest_fee} />
+					<SurveyRow label="Enrollment" val={school.total_enrolment} />
+					<SurveyRow label="CERP Estimated Monthly Revenue" val={estimated_monthly_revenue} />
+					<SurveyRow label="Highest Grade" val={school.highest_grade} />
+					<SurveyRow label="Lowest Grade" val={school.lowest_grade} />
+				</div>
 
 				<div className="divider">Financing</div>
-
-				<SurveyRow label="Financing Interest" val={school.financing_interest} />
-				<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
-				<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
-				<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
+				<div className="section">
+					<SurveyRow label="Financing Interest" val={school.financing_interest} />
+					<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
+					<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
+					<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
+				</div>
 
 				<div className="divider">Education Services</div>
-				<SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} />
-				<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
-				<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
-				<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
+				<div className="section">
+					<SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} />
+					<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
+					<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
+					<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
+				</div>
 
 			</div>
 		</div>
@@ -490,12 +429,14 @@ const SurveyRow : React.StatelessComponent<SurveyRowProp> = ({ label, val }) => 
 
 export default connect<StateProps, DispatchProps, OwnProps>((state : RootBankState, props: OwnProps) => ({
 	school: state.new_school_db[props.school_id],
-	schoolMatch: state.sync_state.matches[props.school_id]
+	schoolMatch: state.sync_state.matches[props.school_id],
+	connected: state.connected
 }), (dispatch : Function, props: OwnProps ) => ({
 	addSchool: () => dispatch(getSchoolProfiles([props.school_id])),
 	reserveNumber: () => dispatch(reserveMaskedNumber(props.school_id)),
 	releaseNumber: () => dispatch(releaseMaskedNumber(props.school_id)),
 	rejectSchool: () => dispatch(rejectSchool(props.school_id)),
 	saveCallEndSurvey: (survey: CallEndSurvey['meta']) => dispatch(saveCallEndSurvey(props.school_id, survey)),
-	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey))
+	saveSchoolRejectedSurvey: (survey: NotInterestedSurvey['meta']) => dispatch(saveSchoolRejectedSurvey(props.school_id, survey)),
+	saveSchoolCompletedSurvey: (survey: MarkCompleteSurvey['meta']) => dispatch(saveSchoolCompletedSurvey(props.school_id, survey))
 }))(withRouter(SchoolInfo))

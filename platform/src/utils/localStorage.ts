@@ -12,6 +12,7 @@ export const saveDB = (db : RootBankState) => {
 		saveSyncState(db.sync_state);
 		saveSnapshot(db.last_snapshot);
 		saveSchoolDb(db.new_school_db)
+		saveQueue(db.queued)
 	}
 
 	catch(err) {
@@ -64,6 +65,13 @@ const loadSyncState = () : RootBankState['sync_state'] => {
 
 	const str = localStorage.getItem("sync_state");
 
+	const masked_numbers = 	mask_number_bank.reduce((agg, curr) => ({
+		...agg,
+		[curr]: {
+			status: "FREE"
+		}
+	}), {})
+
 	if(str == undefined || str == "" || str == "null") {
 		return {
 			matches: {
@@ -72,21 +80,36 @@ const loadSyncState = () : RootBankState['sync_state'] => {
 			numbers: {
 
 			},
-			mask_pairs: mask_number_bank.reduce((agg, curr) => ({
-				...agg,
-				[curr]: {
-					status: "FREE"
-				}
-			}), {})
+			mask_pairs: masked_numbers
 		}
 	}
 
-	return JSON.parse(str) as RootBankState['sync_state'];
+	// merge mask_pairs with the mask_number_bank
+
+	const curr = JSON.parse(str) as RootBankState['sync_state']
+
+	return {
+		...curr,
+		mask_pairs: {
+			...masked_numbers,
+			...curr.mask_pairs
+		}
+	}
 }
 
 const saveSyncState = (sync_state : RootBankState['sync_state']) => {
 
 	localStorage.setItem("sync_state", JSON.stringify(sync_state));
+}
+
+const saveQueue = (queue : RootBankState['queued']) => {
+
+	localStorage.setItem("queued", JSON.stringify(queue))
+
+}
+
+const loadQueue = () => {
+	return JSON.parse(localStorage.getItem("queued") || "{}") as RootBankState['queued']
 }
 
 const saveSchoolDb = (db : RootBankState['new_school_db']) => {
@@ -116,7 +139,7 @@ export const loadDB = () : RootBankState => {
 		new_school_db: loadSchoolDb(),
 		client_id: loadClientId(),
 		auth: loadAuth(),
-		queued: {},
+		queued: loadQueue(),
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
