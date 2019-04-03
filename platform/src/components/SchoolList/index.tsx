@@ -48,7 +48,6 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 		this.setState({ loading: blank.length > 0 })
 	}
 
-
 	render() {
 
 		const { school_db } = this.props;

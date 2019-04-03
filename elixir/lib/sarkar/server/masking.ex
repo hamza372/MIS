@@ -135,7 +135,11 @@ defmodule Sarkar.Server.Masking do
 				{"not-found-at-all", "04238301513", "bah"}
 		end
 
-		IO.puts "forwarding #{caller} to #{school_name}: #{forward}"
+		current_time =  DateTime.utc_now
+			|> DateTime.add(5*60*60, :second)
+			|> DateTime.truncate(:second)
+
+		IO.puts "#{current_time}: forwarding #{caller} to #{school_name}: #{forward}"
 
 		{:ok, :cowboy_req.reply(
 			200,

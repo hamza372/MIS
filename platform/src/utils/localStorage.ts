@@ -1,4 +1,3 @@
-import locations from './narrowed.json'
 import { v4 } from 'node-uuid';
 
 const mask_number_bank = Array(100).fill(1).map((x, i) => `0${4232500600 + i}`);
@@ -134,7 +133,7 @@ const loadSnapshot = () => {
 export const loadDB = () : RootBankState => {
 
 	return {
-		school_locations: locations,
+		school_locations: {},
 		school_db: {},
 		new_school_db: loadSchoolDb(),
 		client_id: loadClientId(),
