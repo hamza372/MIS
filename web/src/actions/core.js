@@ -166,33 +166,50 @@ export const connected = () => (dispatch, getState, syncr) => {
 	const state = getState();
 
 	if(state.auth.school_id && state.auth.token) {
-		syncr
-			.send({
-				type: "VERIFY",
-				client_type,
-				payload: {
-					school_id: state.auth.school_id,
-					token: state.auth.token,
-					client_id: state.client_id
-				}
-			})
-			.then(res => {
-				return syncr.send({
-					type: SYNC,
-					client_type,
-					school_id: state.auth.school_id,
-					payload: state.queued,
-					lastSnapshot: state.lastSnapshot
-				})
-			})
-			.then(resp => {
-				dispatch(resp)
-			})
-			.catch(err => {
-				console.error(err);
-				alert("Authorization Failed. Log out and Log in again.")
-			})
+		verify_user(dispatch, getState, syncr)
 	}
+}
+
+const verify_user = (dispatch, getState, syncr) => {
+
+	const state = getState();
+
+	syncr
+		.send({
+			type: "VERIFY",
+			client_type,
+			payload: {
+				school_id: state.auth.school_id,
+				token: state.auth.token,
+				client_id: state.client_id
+			}
+		})
+		.then(res => {
+			return syncr.send({
+				type: SYNC,
+				client_type,
+				school_id: state.auth.school_id,
+				payload: state.queued,
+				lastSnapshot: state.lastSnapshot
+			})
+		})
+		.then(resp => {
+			dispatch(resp)
+		})
+		.catch(err => {
+			console.error(err);
+			if(err === "timeout"){
+				console.log("verify timed out... trying again in 2 seconds")	
+				setTimeout(() => {
+					console.log("trying verify again")
+					verify_user(dispatch, getState, syncr);
+				}, 2000)
+			}
+			else {
+				alert("Authorization Failed. Log out and Log in again. Error text: " + JSON.stringify(err))
+			}
+		})
+
 }
 
 export const disconnected = () => ({ type: ON_DISCONNECT })
