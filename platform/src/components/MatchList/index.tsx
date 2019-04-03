@@ -40,6 +40,7 @@ export default class MatchList extends React.Component<propTypes> {
 			<div className="list">
 			{
 				Object.values(this.props.schools)
+					.sort((a, b) => (a.school_name || "").localeCompare(b.school_name))
 					.map(s => <div key={s.refcode} onClick={this.onSchoolClick(s)}>{s.school_name}</div>)
 			}
 			</div>
