@@ -51,6 +51,7 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 
 	render() {
 
+		const { school_db } = this.props;
 		return <div className="page">
 
 			<div className="title">{this.props.title}</div>
@@ -60,8 +61,9 @@ export default class SchooList extends React.Component<propTypes, stateType> {
 			{
 				Object.entries(this.props.matches)
 					.filter(([id, v]) => v.status === this.props.status && this.props.school_db[id] !== undefined)
+					.sort(([a,] , [b,]) => (school_db[a].school_name || "").localeCompare(school_db[b].school_name))
 					.map(([sid, v]) => {
-						const school = this.props.school_db[sid];
+						const school = school_db[sid];
 
 						return <div key={sid} onClick={this.onSchoolClick(school)}>
 							<div>{school.school_name}</div>
