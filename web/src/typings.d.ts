@@ -1,3 +1,32 @@
+interface RootDBState {
+	faculty: {
+		[id: string]: MISTeacher
+	}
+	users: { 
+		[id: string]: MISUser
+	}
+	students: {
+		[id: string]: MISStudent
+	}
+	classes: { 
+		[id: string]: MISClass
+	}
+	sms_templates: { 
+		attendance: string
+		fee: string
+		result: string
+	}
+	exams: { 
+		[id: string]: MISExam
+	}
+	settings: MISSettings
+	analytics: {
+		sms_history: {
+			[id: string]: MISSMSHistory
+		}
+	}
+	max_limit: number
+}
 
 interface RootReducerState {
 	client_id: string
@@ -13,34 +42,7 @@ interface RootReducerState {
 	}
 	acceptSnapshot: boolean
 	lastSnapshot: number
-	db: {
-		faculty: {
-			[id: string]: MISTeacher
-		}
-		users: { 
-			[id: string]: MISUser
-		}
-		students: {
-			[id: string]: MISStudent
-		}
-		classes: { 
-			[id: string]: MISClass
-		}
-		sms_templates: { 
-			attendance: string
-			fee: string
-			result: string
-		}
-		exams: { 
-			[id: string]: MISExam
-		}
-		settings: MISSettings
-		analytics: {
-			sms_history: {
-				[id: string]: MISSMSHistory
-			}
-		}
-	}
+	db: RootDBState
 	auth: {
 		school_id: string
 		faculty_id: string
@@ -49,7 +51,7 @@ interface RootReducerState {
 		name: string
 		attempt_failed: boolean
 		loading: boolean
-	},
+	}
 	connected: boolean
 }
 
@@ -111,11 +113,11 @@ interface MISStudent {
 	Birthdate: string
 	Address: string
 	Notes: string
-	StartDate: number
+	StartDate: string 
 	AdmissionNumber: string
 
 	section_id: string
-	prospective_section_id: string
+	prospective_section_id?: string
 
 	fees: {
 		[id: string]: MISStudentFee
