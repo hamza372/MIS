@@ -305,7 +305,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 	onEnrolled = () => {
 		
-    const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
+	const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
 		const student = {
 			...rest_profile,
 			Active: true,
