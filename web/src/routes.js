@@ -61,7 +61,7 @@ export default class Routes extends React.Component {
 		return <Provider store={this.props.store}>
 			<BrowserRouter>
 				<Switch>
-					<AuthedRoute exact path="/" component={Landing} />
+					<AuthedRoute exact path="/landing" component={Landing} />
 
 					<Route path="/faculty/first" component={TeacherSingle} />
 					<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
@@ -93,7 +93,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 					<AuthedRoute path="/help" component={Help} />
 
-					<Route path="/front" component={Front} />
+					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />
 					<Route path="/login" component={Login} />
 

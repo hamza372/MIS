@@ -3,6 +3,11 @@ create table auth (
 	password text not null
 );
 
+create table mischool_sign_ups(
+	id text unique not null,
+	form jsonb
+);
+
 create table backup (
 	school_id text unique not null,
 	db jsonb

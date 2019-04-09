@@ -36,13 +36,13 @@ class Login extends Component {
 		// this needs to be looked into...
 		// we should keep client_id....
 		localStorage.removeItem("db");
-		this.props.history.push("/")
+		this.props.history.push("/landing")
 		window.location.reload()
 	}
 
 	componentWillReceiveProps(newProps) {
 		if(newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
-			this.props.history.push('/')
+			this.props.history.push('/landing')
 		}
 	}
 

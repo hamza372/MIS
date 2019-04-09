@@ -36,6 +36,11 @@ const initState = {
 		loading: false
 	},
 	connected: false,
+	sign_up_form: {
+		loading: false,
+		succeed: false,
+		reason: ""
+	}
 }
 
 export const loadDB = () => {
@@ -57,7 +62,12 @@ export const loadDB = () => {
 				...initState.db,
 				...prev.db
 			},
-			connected: false
+			connected: false,
+			sign_up_form: {
+				loading: false,
+				succeed: false,
+				reason: ""
+			}
 		}
 
 		// console.log(merged);
