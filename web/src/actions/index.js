@@ -152,6 +152,47 @@ export const createLogin = (name, password) => (dispatch) => {
 		})
 }
 
+export const SIGN_UP_LOADING = "SIGN_UP_LOADING"
+export const SIGN_UP_SUCCEED = "SIGN_UP_SUCCEED"
+export const SIGN_UP_FAILED = "SIGN_UP_FAILED"
+export const createSignUp = (profile) => (dispatch, getState, syncr) => {
+
+	// dispatch action to say you are loading/sending the sign up
+	dispatch({
+		type: SIGN_UP_LOADING
+	})
+
+ 	syncr.send({
+		type: "SIGN_UP",
+		client_type,
+		sign_up_id: v4(),
+		payload:{
+			...profile,
+		}
+	})
+	.then(res => {
+		console.log(res)
+		dispatch({
+			type: SIGN_UP_SUCCEED
+		})
+		// dispatch action to say sign up succeeded
+	})
+	.catch(err => {
+		console.error(err)
+		if(err === "timeout")
+		{
+			console.log('your internet sucks')
+		}
+		
+		dispatch({
+			type: SIGN_UP_FAILED,
+			reason: err
+		})
+		// dispatch action to say sign up failed
+	})
+
+ }
+
 export const SCHOOL_LOGIN = "SCHOOL_LOGIN"
 export const createSchoolLogin = (school_id, password) => (dispatch, getState, syncr) => {
 

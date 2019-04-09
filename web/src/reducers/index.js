@@ -1,11 +1,48 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGES, DELETE, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
-import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
+import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from '../actions'
 
 const rootReducer = (state, action) => {
 
 	console.log(action)
 	switch(action.type) {
+
+		case SIGN_UP_LOADING: 
+		{
+			return {
+				...state,
+				sign_up_form: {
+					loading: true,
+					succeed: false,
+					reason: ""
+				}
+			}
+		}
+
+		case SIGN_UP_FAILED:
+		{
+			return {
+				...state,
+				sign_up_form: {
+					loading: false,
+					succeed: false,
+					reason: action.reason
+				}
+			}
+		}
+
+		case SIGN_UP_SUCCEED:
+		{
+			return {
+				...state,
+				sign_up_form: {
+					loading: false,
+					succeed: true,
+					reason: ""
+				}
+			}
+		}
+
 		case MERGES:
 		{
 			const nextState = action.merges.reduce((agg, curr) => {
