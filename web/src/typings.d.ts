@@ -1,3 +1,4 @@
+
 interface RootDBState {
 	faculty: {
 		[id: string]: MISTeacher
@@ -172,6 +173,7 @@ interface MISStudentAttendanceEntry {
 }
 
 interface MISTeacher {
+	id: string
 	Name: string 
 	CNIC: string
 	Gender: string
@@ -189,7 +191,7 @@ interface MISTeacher {
 	StructuredQualification: string
 	Qualification: string
 	Experience: string
-	HireDate: number
+	HireDate: string
 	Admin: boolean
 
 	attendance:  MISTeacherAttendance
@@ -201,4 +203,14 @@ interface MISTeacherAttendance {
 	[date: string]: {
 		[status in MISTeacherAttendanceStatus]: number
 	}
+}
+
+interface MISSms {
+	text: string
+	number: string
+}
+
+interface MISSmsPayload {
+	messages: MISSms[]
+	return_link: string
 }

@@ -19,7 +19,7 @@ import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
-import newBadge from "./icons/New/new.svg";
+//import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'

@@ -1,5 +1,5 @@
 import { v4 } from 'node-uuid'
-import requestFS from 'utils/requestFS'
+import requestFS from './requestFS'
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -7,7 +7,7 @@ const defaultTemplates = () => ({
 	result: "Report is ready for $NAME:\n $REPORT"
 })
 
-const initState = {
+const initState : RootReducerState = {
 	client_id: v4(),
 	queued: { },
 	acceptSnapshot: false,
@@ -19,10 +19,11 @@ const initState = {
 		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
 		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
-		settings: { },
+		settings: { } as MISSettings,
 		analytics: {
 			sms_history: {}
-		}
+		},
+		max_limit: -1
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later
@@ -84,7 +85,7 @@ export const loadDB = () => {
 	}
 }
 
-export const saveDB = (db) => {
+export const saveDB = (db: RootReducerState) => {
 	try {
 		const json = JSON.stringify(db);
 		localStorage.setItem('db', json)
@@ -103,13 +104,13 @@ export const saveDB = (db) => {
 
 }
 
-const saveDbToFilesystem = (db) => {
+const saveDbToFilesystem = (db: RootReducerState) => {
 
 	requestFS(20)
-		.then(fs => {
+		.then((fs: any) => {
 			//console.log('got fs');
 		})
-		.catch(err => {
+		.catch((err: any) => {
 			//console.error(err)
 		})
 
@@ -146,7 +147,7 @@ const checkPersistent = () => {
 checkPersistent();
 
 // add faculty_id to the auth field if it doesn't exist.
-const addFacultyID = state => {
+const addFacultyID = (state : RootReducerState) => {
 
 	if(state.auth.faculty_id !== undefined) {
 		console.log("not running addFacultyID script")
@@ -161,7 +162,7 @@ const addFacultyID = state => {
 	return state;
 }
 
-const checkPermissions = state => {
+const checkPermissions = (state: RootReducerState) => {
 	if(state.db.settings.permissions !== undefined){
 		console.log("NOT Running Permission Scripts")
 		return state
@@ -171,7 +172,10 @@ const checkPermissions = state => {
 	state.db.settings = {
 		...state.db.settings,
 		permissions:{
-			fee:{ teacher: true }
+			fee: { teacher: true },
+			dailyStats: {teacher: true },
+			setupPage: {teacher: true},
+			...state.db.settings.permissions
 		}
 	}
 	return state;

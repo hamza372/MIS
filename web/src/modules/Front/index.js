@@ -39,7 +39,7 @@ export default class Front extends Component {
       <div className="mischool-resume">
         {/*Header*/}
         <div className="headers bg-red">
-            <img src={logo} className="logo"/> 
+            <img alt="" src={logo} className="logo"/> 
         </div>
 
         {/**BODY */}
@@ -49,7 +49,7 @@ export default class Front extends Component {
                 
               {!this.state.iframe ?
                 <div className="cv-img-container" style={{ backgroundImage: `url(${play})`}}>
-                    <img className="cv-image" src={home}/>
+                    <img alt="" className="cv-image" src={home}/>
                 </div>
                 :
                 <iframe src='https://youtube.com/embed/cm73XDWTiNQ'
@@ -67,7 +67,7 @@ export default class Front extends Component {
           <div className="card">
             
             <div className="img-container">
-                <img className="image" src={action} />
+                <img alt="" className="image" src={action} />
             </div>
             <div className="info" >
               <h2 className="card-title">What is MISchool?</h2>
@@ -105,7 +105,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={attendanceIcon}/>
+                    <img alt="" className="icard-image" src={attendanceIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -117,7 +117,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teacherAttendanceIcon}/>
+                    <img alt="" className="icard-image" src={teacherAttendanceIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -132,7 +132,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={feesIcon}/>
+                    <img alt="" className="icard-image" src={feesIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -149,7 +149,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={marksIcon}/>
+                    <img alt="" className="icard-image" src={marksIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -165,7 +165,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={analyticsIcon}/>
+                    <img alt="" className="icard-image" src={analyticsIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -177,7 +177,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={resultIcon}/>
+                    <img alt="" className="icard-image" src={resultIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -193,7 +193,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={smsIcon}/>
+                    <img alt="" className="icard-image" src={smsIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -205,7 +205,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={diary}/>
+                    <img alt="" className="icard-image" src={diary}/>
                   </div>
       
                   <p className="icard-para">
@@ -219,7 +219,7 @@ export default class Front extends Component {
 
             </div>
             <div className="img-container">
-              <img className="image" src={action} />
+              <img alt="" className="image" src={action} />
             </div>
           </div>
 
@@ -229,7 +229,7 @@ export default class Front extends Component {
           {/** ==========================> CARD-2 <======================================== */}
           <div className="card">
             <div className="img-container">
-              <img className="image" src={setup} />
+              <img alt="" className="image" src={setup} />
             </div>
             <div className="info" >
 
@@ -244,7 +244,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teachersIcon}/>
+                    <img alt="" className="icard-image" src={teachersIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -256,35 +256,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={studentsIcon}/>
-                  </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={classesIcon}/>
-                  </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={settingsIcon}/>
+                    <img alt="" className="icard-image" src={studentsIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -300,7 +272,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={prospective}/>
+                    <img alt="" className="icard-image" src={classesIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -312,7 +284,7 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={Help}/>
+                    <img alt="" className="icard-image" src={settingsIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -328,7 +300,35 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={switchUserIcon}/>
+                    <img alt="" className="icard-image" src={prospective}/>
+                  </div>
+      
+                  <p className="icard-para">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                  </p>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={Help}/>
+                  </div>
+      
+                  <p className="icard-para">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                  </p>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={switchUserIcon}/>
                   </div>
       
                   <p className="icard-para">
@@ -362,7 +362,7 @@ export default class Front extends Component {
               
             </div>
             <div className="img-container">
-              <img className="image" src={dail_stats} style={{ width:"200px"}}/>
+              <img alt="" className="image" src={dail_stats} style={{ width:"200px"}}/>
             </div>
           </div>
 

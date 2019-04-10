@@ -2,26 +2,27 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
-import { createFacultyMerge, deleteFaculty } from 'actions'
-import { hash } from 'utils'
-import Hyphenator from 'utils/Hyphenator'
+import { createFacultyMerge, deleteFaculty } from '../../../../actions'
+import { hash } from '../../../../utils'
+import Hyphenator from '../../../../utils/Hyphenator'
 
 
 
-import Banner from 'components/Banner'
-import Former from 'utils/former'
-import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import Banner from '../../../../components/Banner'
+import checkCompulsoryFields from '../../../../utils/checkCompulsoryFields'
 
 import './style.css'
+import Former from '../../../../utils/former';
 
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
 
-const blankTeacher = (isFirst = false) => ({
+const blankTeacher = (isFirst = false) : MISTeacher => ({
+	id: v4(),
 	Name: "",
 	CNIC: "",
 	Gender: "",
@@ -39,7 +40,7 @@ const blankTeacher = (isFirst = false) => ({
 	StructuredQualification: "",
 	Qualification: "",
 	Experience: "",
-	HireDate: moment(),
+	HireDate: `${moment()}`,
 	Admin: isFirst,
 
 	attendance: { } 
@@ -47,9 +48,34 @@ const blankTeacher = (isFirst = false) => ({
 
 // should be a dropdown of choices. not just teacher or admin.
 
-class CreateTeacher extends Component {
+interface P {
+	faculty: RootDBState['faculty'],
+	user: MISTeacher
+	save: (teacher: MISTeacher) => any
+	delete: (faculty_id : string) => any
+}
 
-	constructor(props) {
+interface S {
+	profile: MISTeacher
+	redirect: false | string
+	banner : {
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+}
+
+interface RouteInfo {
+	id: string
+}
+
+type propTypes = P & RouteComponentProps<RouteInfo>
+
+class CreateTeacher extends Component<propTypes, S> {
+
+	former: Former
+
+	constructor(props: propTypes) {
 		super(props);
 		console.log(props)
 
@@ -73,9 +99,6 @@ class CreateTeacher extends Component {
 
 	onSave = () => {
 		// dispatch merge action, which should come from props.
-
-		const id = v4();
-
 		// check if they set a username and password. 
 
 		const compulsoryFileds = checkCompulsoryFields(this.state.profile, [
@@ -99,7 +122,6 @@ class CreateTeacher extends Component {
 		if (this.state.profile.Password.length !== 128) { // hack...
 			hash(this.state.profile.Password).then(hashed => {
 				this.props.save({
-					id,
 					...this.state.profile,
 					Password: hashed
 				})
@@ -123,10 +145,7 @@ class CreateTeacher extends Component {
 			})
 		}
 		else {
-			this.props.save({
-				id,
-				...this.state.profile,
-			}, this.isFirst())
+			this.props.save(this.state.profile)
 
 			this.setState({
 				banner: {
@@ -169,7 +188,7 @@ class CreateTeacher extends Component {
 		}, 1000);
 	}
 
-	componentWillReceiveProps(newProps) {
+	componentWillReceiveProps( newProps : propTypes ) {
 		// this means every time teacher upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
@@ -179,25 +198,18 @@ class CreateTeacher extends Component {
 		})
 	}
 
-	addHyphens = (path) => () => {
-		
-		const str = Dynamic.get(this.state, path);
-		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))	
+	addHyphens = (path: string[]) => () => {
+
+		const str = Dynamic.get(this.state, path) as string;
+		this.setState(Dynamic.put(this.state, path, Hyphenator(str)) as S)
 	}
 
 
 	render() {
 
 		if(this.state.redirect) {
-			return <Redirect to={this.state.redirect} />
-			//return <Redirect to="/login" />
+			return <Redirect to={ this.state.redirect} />
 		}
-		/*
-				<div className="row">
-					<label>Username</label>
-					<input type="text" {...this.former.super_handle(["Username"])} placeholder="Username" autoCorrect="off" autoCapitalize="off" />
-				</div>
-				*/
 
 		const admin = this.isFirst() || this.props.user.Admin;
 		const canEdit = admin || this.props.user.id === this.state.profile.id;
@@ -209,7 +221,7 @@ class CreateTeacher extends Component {
 				<div className="divider">Personal Information</div>
 				<div className="row">
 					<label>Full Name</label>
-					<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!canEdit} />
+					<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!canEdit} />
 				</div>
 				<div className="row">
 					<label>CNIC</label>
@@ -227,8 +239,8 @@ class CreateTeacher extends Component {
 					<label>Married</label>
 					<select {...this.former.super_handle(["Married"])} disabled={!canEdit}>
 						<option value='' disabled>Please Select Marriage Status</option>
-						<option value={false}>Not Married</option>
-						<option value={true}>Married</option>
+						<option value="false">Not Married</option>
+						<option value="true">Married</option>
 					</select>
 				</div>
 
@@ -248,13 +260,13 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Husband/Father CNIC</label>
-					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile","ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
+					<input type="tel" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile","ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
 				</div>
 				
 				<div className="divider">Account Information</div>
 				<div className="row">
 					<label>Password</label>
-					<input type="password" {...this.former.super_handle_flex(["Password"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Password" disabled={!canEdit}/>
+					<input type="password" {...this.former.super_handle_flex(["Password"], { styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Password" disabled={!canEdit}/>
 				</div>
 
 				<div className="divider">Contact Information</div>
@@ -304,8 +316,8 @@ class CreateTeacher extends Component {
 				<div className="row">
 					<label>Admin Status</label>
 					<select {...this.former.super_handle(["Admin"])} disabled={!admin}>
-						<option value={false}>Not an Admin</option>
-						<option value={true}>Admin</option>
+						<option value="false">Not an Admin</option>
+						<option value="true">Admin</option>
 					</select>
 				</div>
 
@@ -313,8 +325,8 @@ class CreateTeacher extends Component {
 					<label>Active Status</label>
 					<select {...this.former.super_handle(["Active"])} disabled={!admin}>
 						<option value='' disabled>Please Select Active Status</option>
-						<option value={true}>Currently Working in School</option>
-						<option value={false}>No Longer Working in School</option>
+						<option value="true">Currently Working in School</option>
+						<option value="false">No Longer Working in School</option>
 					</select>
 				</div>
 
@@ -328,7 +340,10 @@ class CreateTeacher extends Component {
 	}
 }
 
-export default connect(state => ({ faculty: state.db.faculty, user: state.db.faculty[state.auth.faculty_id] }) , dispatch => ({
-	save: (teacher) => dispatch(createFacultyMerge(teacher)),
-	delete: (faculty_id) => dispatch(deleteFaculty(faculty_id)) 
+export default connect((state : RootReducerState ) => ({
+	faculty: state.db.faculty,
+	user: state.db.faculty[state.auth.faculty_id]
+}) , (dispatch : Function) => ({
+	save: (teacher: MISTeacher) => dispatch(createFacultyMerge(teacher)),
+	delete: (faculty_id : string) => dispatch(deleteFaculty(faculty_id))
  }))(CreateTeacher);
