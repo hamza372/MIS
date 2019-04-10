@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Layout from 'components/Layout'
-import { StudentList } from 'modules/Student/List'
+import StudentList from 'modules/Student/List'
 import { ClassListModule } from 'modules/Class/List'
 
 import former from 'utils/former'

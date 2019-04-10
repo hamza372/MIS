@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import moment from 'moment'
 import former from 'utils/former'
 
+import { PrintHeader } from 'components/Layout'
+
 import './style.css'
 
 class FacultyAttendance extends Component {
@@ -13,7 +15,7 @@ class FacultyAttendance extends Component {
 
 		this.state = {
 			monthFilter: "",
-			yearFilter: ""
+			yearFilter: moment().format("YYYY")
 		}
 
 		this.former = new former(this, []);
@@ -84,28 +86,41 @@ class FacultyAttendance extends Component {
 		*/
 
 		return <div className="faculty-attendance">
+			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo} />
+
 			<div className="divider">Record</div>
 
-			<select {...this.former.super_handle(["monthFilter"])} style={{margin: "4px 2px"}}>
-				<option value=""> Select</option>
-				{
-					[...Months]
-					.map(month => <option key={month} value={month}>{month}</option>)
-				}
-			</select>
+			<div className="row no-print">
+				<select {...this.former.super_handle(["monthFilter"])} style={{margin: "4px 2px"}}>
+					<option value=""> Select</option>
+					{
+						[...Months]
+						.map(month => <option key={month} value={month}>{month}</option>)
+					}
+				</select>
 
-			<select {...this.former.super_handle(["yearFilter"])} style={{margin:"4px 2px"}}>
-				<option value=""> Select</option>
-				{
-					[...Year]
-					.map(year => <option key={year} value={year}>{year}</option>)
-				}
-			</select>
+				<select {...this.former.super_handle(["yearFilter"])} style={{margin:"4px 2px"}}>
+					<option value=""> Select</option>
+					{
+						[...Year]
+						.map(year => <option key={year} value={year}>{year}</option>)
+					}
+				</select>
+				<div className="row" style={{justifyContent:"flex-end", margin:"4px 2px"}}>
+					<div className="button blue" onClick={() => window.print()}>Print</div>
+				</div>
+
+			</div>
 
 			<div className="section">
+			<div className="row">
+				<div style={{marginBottom:"2px"}}> <b>Date</b></div>
+				<label style={{marginBottom:"2px"}}><b>Status</b></label>
+			</div>
 			{
 				Object.entries(attendance)
 				.filter(([date,]) => this.getFilterCondition(date))
+				.sort(([dateA,], [dateB,])=> moment(dateB).diff(moment(dateA)) )
 				.map(
 					([date, rec]) => {
 						return <div className="row" key={date}>
@@ -118,11 +133,17 @@ class FacultyAttendance extends Component {
 					}
 			)}
 			</div>
+			<div className="row">
+			</div>
 
 		</div>
 	}
 }
 
 export default connect(
-	state => ({ faculty: state.db.faculty }),
+	state => ({ 
+		faculty: state.db.faculty,
+		settings: state.db.settings,
+		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
+	}),
 	dispatch => ({ }) )(FacultyAttendance)

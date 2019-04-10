@@ -556,3 +556,28 @@ input::-webkit-inner-spin-button {
 	align-items: center;
 	margin-right: 20%;
 }
+
+.tag-container{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap
+}
+.tag-row{
+	flex-direction: row;
+	margin: 2px 2px;
+}
+.tag {
+    font-family: inherit;
+    border: 3px solid rgba(0,0,0,0.2);
+    font-weight: bold;
+    padding: 3px 20px 15px;
+	border-radius: 20px;
+	height: 5px;
+	cursor: pointer;
+}
+.cross {
+	font-size: inherit;
+}
+:hover.cross{
+	color: #ff6b68;
+}

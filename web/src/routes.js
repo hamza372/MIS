@@ -25,6 +25,7 @@ import ReportsMenu from 'modules/ReportsMenu'
 import PromotionPage from 'modules/Settings/promote-students'
 import Help from "modules/Help"
 import Diary from  'modules/Diary'
+import Front from 'modules/Front'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -60,7 +61,7 @@ export default class Routes extends React.Component {
 		return <Provider store={this.props.store}>
 			<BrowserRouter>
 				<Switch>
-					<AuthedRoute exact path="/" component={Landing} />
+					<AuthedRoute exact path="/landing" component={Landing} />
 
 					<Route path="/faculty/first" component={TeacherSingle} />
 					<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
@@ -92,8 +93,10 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 					<AuthedRoute path="/help" component={Help} />
 
+					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />
 					<Route path="/login" component={Login} />
+
 				</Switch>
 			</BrowserRouter>
 		</Provider>

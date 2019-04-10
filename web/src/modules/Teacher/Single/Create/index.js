@@ -248,7 +248,7 @@ class CreateTeacher extends Component {
 
 				<div className="row">
 					<label>Husband/Father CNIC</label>
-					<input type="number" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile","ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
+					<input type="tel" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile","ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit}/>
 				</div>
 				
 				<div className="divider">Account Information</div>
