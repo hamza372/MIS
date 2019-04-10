@@ -66,7 +66,7 @@ class Front extends Component {
         <div className="body">
 
           <div className="logo-container-cerp" style={{ backgroundColor:"#fafafa"}}>
-            <img src={cerpLogo} className="logo-cerp"/>
+            <img alt="" src={cerpLogo} className="logo-cerp"/>
           </div>
           <div className="card video">
             <iframe src='https://youtube.com/embed/cm73XDWTiNQ'
@@ -198,7 +198,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={smsIcon}/>
+                    <img alt="" className="icard-image" src={smsIcon}/>
                     <div className="image-title">SMS</div>
                   </div>
       
@@ -374,7 +374,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={syncIcon}/>
+                    <img alt="" className="icard-image" src={syncIcon}/>
                     <div className="image-title"> Auto-Synchronization </div>
                   </div>
                   <div className="icard-para">
@@ -387,7 +387,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={mdsupportIcon}/>
+                    <img alt="" className="icard-image" src={mdsupportIcon}/>
                     <div className="image-title"> Multiple Device Support </div>
                   </div>
                   <div className="icard-para">
@@ -399,7 +399,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={cloudIcon}/>
+                    <img alt="" className="icard-image" src={cloudIcon}/>
                     <div className="image-title"> Cloud-Backup </div>
                   </div>
                   <div className="icard-para">
@@ -410,7 +410,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={supportIcon}/>
+                    <img alt="" className="icard-image" src={supportIcon}/>
                     <div className="image-title"> Excellent Customer Service </div>
                   </div>
                   <div className="icard-para">
@@ -422,7 +422,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={coinsIcon}/>
+                    <img alt="" className="icard-image" src={coinsIcon}/>
                     <div className="image-title"> Best Price </div>
                   </div>
                   <div className="icard-para">
@@ -497,7 +497,7 @@ class Front extends Component {
             </div>
 
             <div className="img-container">
-              <img className="image-cerp" src={cerpLogo}/>
+              <img alt="" className="image-cerp" src={cerpLogo}/>
             </div>
           </div>
 
