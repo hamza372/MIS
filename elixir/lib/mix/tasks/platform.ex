@@ -13,7 +13,10 @@ defmodule Mix.Tasks.Platform do
 		Enum.each(json, fn school_profile -> 
 			id = Map.get(school_profile, "refcode")
 
-			case Postgrex.query(Sarkar.School.DB, "INSERT INTO platform_schools(id, db) VALUES ($1, $2) ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
+			case Postgrex.query(Sarkar.School.DB, "
+				INSERT INTO platform_schools(id, db) 
+				VALUES ($1, $2) 
+				ON CONFLICT(id) DO UPDATE SET db=$2 ", [id, school_profile]) do
 				{:ok, _} -> IO.puts "updated #{id}"
 				{:error, err} -> 
 					IO.puts "error on school #{id}"
@@ -23,6 +26,7 @@ defmodule Mix.Tasks.Platform do
 	end
 
 	def run(["add_matches", id, offset, limit]) do
+		Application.ensure_all_started(:sarkar)
 		csv = case File.exists?(Application.app_dir(:sarkar, "priv/#{id}.csv")) do
 			true -> File.stream!(Application.app_dir(:sarkar, "priv/#{id}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{id}.csv") |> CSV.decode!
@@ -30,7 +34,7 @@ defmodule Mix.Tasks.Platform do
 
 		[_ | refcodes] = csv
 		|> Enum.map(fn [refcode | _ ] -> refcode end)
-		|> Enum.slice(offset, limit)
+		|> Enum.slice(String.to_integer(offset), String.to_integer(limit))
 
 		changes = refcodes
 		|> Enum.reduce(%{}, fn(school_id, agg) -> 
