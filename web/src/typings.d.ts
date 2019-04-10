@@ -54,6 +54,11 @@ interface RootReducerState {
 		loading: boolean
 	}
 	connected: boolean
+	sign_up_form: {
+		loading: boolean
+		succeed: boolean
+		reason: string
+	}
 }
 
 interface MISSMSHistory {
