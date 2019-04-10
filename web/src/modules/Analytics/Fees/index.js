@@ -53,8 +53,7 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 					[...Object.entries(monthly_payments)
 						.sort(([m1, ], [m2, ]) => moment(m1, "MM/YYYY").diff(moment(m2, "MM/YYYY")))
 						.map(([month, { OWED, SUBMITTED, FORGIVEN, SCHOLARSHIP }]) => {
-														
-							const prof = SUBMITTED - OWED;
+
 							const red = "#fc6171"
 							return <div className="table row" key={month}>
 								<div style={{ backgroundColor: "#efecec", textAlign:"center" }}>{month}</div>

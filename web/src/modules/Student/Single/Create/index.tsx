@@ -2,21 +2,22 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
-import getSectionsFromClasses from 'utils/getSectionsFromClasses'
-import checkCompulsoryFields from 'utils/checkCompulsoryFields'
-import getStudentLimit from 'utils/getStudentLimit'
-import { checkStudentDuesReturning } from 'utils/checkStudentDues'
-import Hyphenator from 'utils/Hyphenator'
+import getSectionsFromClasses from '../../../../utils/getSectionsFromClasses'
+import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
 
+import checkCompulsoryFields from '../../../../utils/checkCompulsoryFields'
+import getStudentLimit from '../../../../utils/getStudentLimit'
 
-import { createStudentMerge, deleteStudent } from 'actions'
+import Hyphenator from '../../../../utils/Hyphenator'
 
-import Banner from 'components/Banner'
-import Former from 'utils/former'
+import { createStudentMerge, deleteStudent } from '../../../../actions'
+
+import Banner from '../../../../components/Banner'
+import Former from '../../../../utils/former'
 
 import './style.css'
 
@@ -27,7 +28,7 @@ import './style.css'
 // I have an object with a bunch of fields
 // text and date input, dropdowns....
 
-const blankStudent = () => ({
+const blankStudent = () : MISStudent => ({
 	id: v4(),
 	Name: "",
 	RollNumber: "",
@@ -42,6 +43,7 @@ const blankStudent = () => ({
 	Birthdate: "",
 	Address: "",
 	Notes: "",
+	// @ts-ignore
 	StartDate: moment(),
 	AdmissionNumber: "",
 
@@ -62,9 +64,37 @@ const blankStudent = () => ({
 })
 // should be a dropdown of choices. not just teacher or admin.
 
-class SingleStudent extends Component {
+interface P {
+	students: RootDBState['students']
+	classes: RootDBState['classes'],
+	permissions: RootDBState['settings']['permissions'],
+	max_limit: RootDBState['max_limit']
+	user: MISTeacher
+	save: (student : MISStudent) => any
+	delete: (student : MISStudent) => any
+}
 
-	constructor(props) {
+interface S {
+	profile: MISStudent
+	redirect: false | string
+	banner: {
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	new_tag: string
+}
+
+interface RouteInfo {
+	id: string
+}
+
+type propTypes = P & RouteComponentProps<RouteInfo>
+
+class SingleStudent extends Component<propTypes, S> {
+
+	former: Former
+	constructor(props : propTypes) {
 		super(props);
 
 		const id = props.match.params.id;
@@ -88,8 +118,6 @@ class SingleStudent extends Component {
 		}
 
 		this.former = new Former(this, ["profile"])
-
-		// console.log(this.state.profile)
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
@@ -197,7 +225,7 @@ class SingleStudent extends Component {
 
 				const curr_payment_date = moment(current_payment.date).format("MM/YYYY")
 				const curr_month = moment().format("MM/YYYY")
-				const fee_amount =  corresponding_fees !== undefined ? parseFloat(corresponding_fees.amount,10) : ""
+				const fee_amount =  corresponding_fees !== undefined ? parseFloat(corresponding_fees.amount) : 0
 				
 				if( curr_payment_date === curr_month &&
 					current_payment.type === "OWED" &&
@@ -251,7 +279,7 @@ class SingleStudent extends Component {
 
 	}
 
-	addSibling = (sibling) => {
+	addSibling = (sibling : any) => {
 		console.log("ADD SIBLING", sibling)
 
 		// we create another table called "families" with a unique id, and loop and check that map
@@ -277,7 +305,7 @@ class SingleStudent extends Component {
 
 	onEnrolled = () => {
 		
-    const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
+	const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
 		const student = {
 			...rest_profile,
 			Active: true,
@@ -335,7 +363,7 @@ class SingleStudent extends Component {
 		})
 	}
 
-	removeFee = id => () => {
+	removeFee = (id : string) => () => {
 
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
@@ -351,7 +379,7 @@ class SingleStudent extends Component {
 		})
 	}
 
-	componentWillReceiveProps(newProps) {
+	componentWillReceiveProps(newProps : propTypes) {
 		// this means every time students upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
@@ -361,10 +389,10 @@ class SingleStudent extends Component {
 		})
 	}
 
-	addHyphens = (path) => () => {
+	addHyphens = (path : string[]) => () => {
 		
-		const str = Dynamic.get(this.state, path);
-		this.setState(Dynamic.put(this.state, path, Hyphenator(str)))
+		const str = Dynamic.get(this.state, path) as string;
+		this.setState(Dynamic.put(this.state, path, Hyphenator(str)) as S)
 	}
 
 	uniqueTags = () => {
@@ -400,7 +428,7 @@ class SingleStudent extends Component {
 		})
 	}
 
-	removeTag = tag => () => {
+	removeTag = (tag : string) => () => {
 
 		const {[tag]: removed, ...rest} = this.state.profile.tags;
 
@@ -433,17 +461,35 @@ class SingleStudent extends Component {
 					
 					<div className="row">
 						<label>Full Name</label>
-						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Full Name" disabled={!admin} />
+						<input type="text" 
+							{ ...this.former.super_handle_flex(["Name"], { 
+									styles: (val : any) => { return val === "" ? { borderColor : "#fc6171" } : {} } 
+								})
+							} 
+							placeholder="Full Name" 
+							disabled={!admin} 
+						/>
 					</div>
 					
 					{!prospective ? <div className="row">
 						<label>B-Form Number</label>
-						<input type="tel" {...this.former.super_handle(["BForm"], (val) => val.length <= 15, this.addHyphens(["profile", "BForm"]) )} placeholder="BForm" disabled={!admin}/>
+						<input 
+							type="tel" {...this.former.super_handle(
+								["BForm"],
+								(val) => val.length <= 15,
+								this.addHyphens(["profile", "BForm"]) )} 
+							placeholder="BForm" 
+							disabled={!admin} />
 					</div> : false}
 
 					{!prospective ? <div className="row">
 						<label>Date of Birth</label>
-						<input type="date" onChange={this.former.handle(["Birthdate"])} value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")} placeholder="Date of Birth" disabled={!admin}/>
+						<input 
+							type="date"
+							onChange={this.former.handle(["Birthdate"])}
+							value={moment(this.state.profile.Birthdate).format("YYYY-MM-DD")}
+							placeholder="Date of Birth"
+							disabled={!admin} />
 					</div> : false}
 
 					<div className="row">
@@ -462,7 +508,15 @@ class SingleStudent extends Component {
 
 					{!prospective ? <div className="row">
 						<label>Father CNIC</label>
-						<input type="tel" {...this.former.super_handle(["ManCNIC"], (num) => num.length <= 15,this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father CNIC"  disabled={!admin}/>
+						<input 
+							type="tel" 
+							{...this.former.super_handle(
+								["ManCNIC"],
+								(num) => num.length <= 15,
+								this.addHyphens(["profile", "ManCNIC"]))
+							} 
+							placeholder="Father CNIC" 
+							disabled={!admin} />
 					</div>: false}
 
 					<div className="divider">Contact Information</div>
@@ -491,48 +545,65 @@ class SingleStudent extends Component {
 					{!prospective ? <div className="row">
 						<label>Active Status</label>
 						<select {...this.former.super_handle(["Active"])} disabled={!admin}>
-							<option value={true}>Student Currently goes to this School</option>
-							<option value={false}>Student No Longer goes to this School</option>
+							<option value="true">Student Currently goes to this School</option>
+							<option value="false">Student No Longer goes to this School</option>
 						</select>
 					</div> : false}
 
 					{ prospective || !this.state.profile.Active ? false : <div className="row">
 						<label>Class Section</label>
-						<select {...this.former.super_handle_flex(["section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
+						<select 
+							{...this.former.super_handle_flex(
+								["section_id"], 
+								{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} })
+							} 
+							disabled={!admin}>
+
+							<option value="">Please Select a Section</option>
 							{
-								 [
-									<option key="" value="">Please Select a Section</option>,
-									 ...getSectionsFromClasses(this.props.classes)
-									 	.sort((a,b) => a.classYear - b.classYear )
-										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
-								]
+								getSectionsFromClasses(this.props.classes)
+									.sort((a,b) => a.classYear - b.classYear )
+									.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
 							}
 						</select>
 					</div>
 					}
 					{ !prospective ? false : <div className="row">
 						<label>Class Section</label>
-						<select {...this.former.super_handle_flex(["prospective_section_id"], { styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} disabled={!admin}>
-							{
-								 [
-									<option key="" value="">Please Select a Section</option>,
-									 ...getSectionsFromClasses(this.props.classes)
-									 	.sort((a,b) => a.classYear - b.classYear )
+						<select 
+							{...this.former.super_handle_flex(
+								["prospective_section_id"], 
+								{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} }
+							)} 
+							disabled={!admin}>
+
+								<option value="">Please Select a Section</option>
+								{
+									getSectionsFromClasses(this.props.classes)
+										.sort((a,b) => a.classYear - b.classYear )
 										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
-								]
-							}
+								}
 						</select>
 					</div>
 					}
 
 					{!prospective ? <div className="row">
 						<label>Roll No</label>
-						<input type="text" {...this.former.super_handle(["RollNumber"])} placeholder="Roll Number" disabled={!admin} />
+						<input 
+							type="text" 
+							{...this.former.super_handle(["RollNumber"])}
+							placeholder="Roll Number" disabled={!admin} 
+						/>
 					</div>: false}
 
 					{!prospective ? <div className="row">
 						<label>Admission Date</label>
-						<input type="date" onChange={this.former.handle(["StartDate"])} value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} placeholder="Admission Date" disabled={!admin}/>
+						<input type="date" 
+							onChange={this.former.handle(["StartDate"])} 
+							value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} 
+							placeholder="Admission Date" 
+							disabled={!admin}
+						/>
 					</div> : false}
 
 					{!prospective ? <div className="row">
@@ -584,11 +655,17 @@ class SingleStudent extends Component {
 								</div>
 								<div className="row">
 									<label>Name</label>
-									<input type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={!admin}/>
+									<input 
+										type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={!admin}/>
 								</div>
 								<div className="row">
 									<label>Amount</label>
-									<input type="number" {...this.former.super_handle_flex(["fees", id, "amount"],{ styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Amount" disabled={!admin}/>
+									<input type="number" {...this.former.super_handle_flex(
+											["fees", id, "amount"],
+											{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} })
+										} 
+										placeholder="Amount" 
+										disabled={!admin}/>
 								</div>
 								<div className="row">
 									<label>Fee Period</label>
@@ -615,12 +692,12 @@ class SingleStudent extends Component {
 	}
 }
 
-export default connect(state => ({
+export default connect((state : RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	permissions: state.db.settings.permissions,
 	max_limit: state.db.max_limit || -1 ,
-	user: state.db.faculty[state.auth.faculty_id] }), dispatch => ({ 
-	save: (student) => dispatch(createStudentMerge(student)),
-	delete: (student) => dispatch(deleteStudent(student)),
+	user: state.db.faculty[state.auth.faculty_id] }), (dispatch : Function) => ({ 
+	save: (student : MISStudent) => dispatch(createStudentMerge(student)),
+	delete: (student : MISStudent) => dispatch(deleteStudent(student)),
  }))(SingleStudent);

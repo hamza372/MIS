@@ -7,7 +7,7 @@ import { mergeSettings, addLogo } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
-import newBadge from "../Landing/icons/New/new.svg";
+//import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
 

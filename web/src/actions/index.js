@@ -290,17 +290,11 @@ export const markFaculty = (faculty, date, status, time = moment.now()) => dispa
 }
 
 export const undoFacultyAttendance = (faculty, date) => dispatch => {
-	console.log("BEFORE UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
-
 	dispatch(createDeletes([
 		{
 			path:["db", "faculty", faculty.id, "attendance", date]
 		}
 	]))
-
-	console.log("AFTER UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
-
-
 } 
 
 

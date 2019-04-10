@@ -1,6 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETE, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
-import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from '../actions'
+import { MERGES, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
+import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT } from '../actions'
 
 const rootReducer = (state, action) => {
 
@@ -68,12 +68,6 @@ const rootReducer = (state, action) => {
 				...state_copy,
 				acceptSnapshot: false
 			}
-		}
-		
-		// don't need this anymore i think
-		case DELETE:
-		{
-			return {...Dynamic.delete(state, action.path)}
 		}
 
 		case QUEUE:

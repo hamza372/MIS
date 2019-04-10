@@ -1,7 +1,7 @@
 
-const encoder = new TextEncoder("utf-8");
+const encoder = new TextEncoder();
 
-export async function hash(str) {
+export async function hash(str : string) : Promise <string> {
 	try {
 		const msgBuffer = encoder.encode(str);
 		const hashBuffer = await crypto.subtle.digest("SHA-512", msgBuffer)

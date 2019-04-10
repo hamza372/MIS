@@ -1,7 +1,17 @@
 
-export const getSectionsFromClasses = (classes) => {
+interface AugmentedSection {
+	id: string
+	class_id: string
+	namespaced_name: string
+	className: string
+	classYear: number
+	name: string
+	faculty_id?: string
+}
 
-	const sections = Object.values(classes)
+export const getSectionsFromClasses = (classes : RootDBState['classes']) => {
+
+	const sections : AugmentedSection[] = Object.values(classes)
 		.reduce((agg, c) => {
 			// each section
 			return [...agg, ...Object.entries(c.sections)

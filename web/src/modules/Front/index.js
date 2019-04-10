@@ -56,7 +56,7 @@ class Front extends Component {
         {/*Header*/}
         <div className="headers bg-red">
             <div className="logo-container" to="/">
-              <img src={logo} className="logo"/>
+              <img alt="" src={logo} className="logo"/> 
             </div>
         </div>
 
@@ -102,7 +102,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={attendanceIcon}/>
+                    <img alt="" className="icard-image" src={attendanceIcon}/>
                     <div className="image-title">Attendance</div>
                   </div>
       
@@ -115,7 +115,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teacherAttendanceIcon}/>
+                    <img alt="" className="icard-image" src={teacherAttendanceIcon}/>
                     <div className="image-title">Teacher Attendance</div>
 
                   </div>
@@ -132,7 +132,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={feesIcon}/>
+                    <img alt="" className="icard-image" src={feesIcon}/>
                     <div className="image-title">Fees</div>
 
                   </div>
@@ -148,7 +148,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={marksIcon}/>
+                    <img alt="" className="icard-image" src={marksIcon}/>
                     <div className="image-title">Marks</div>
 
                   </div>
@@ -167,7 +167,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={analyticsIcon}/>
+                    <img alt="" className="icard-image" src={analyticsIcon}/>
                     <div className="image-title">Analytics</div>
 
                   </div>
@@ -182,7 +182,7 @@ class Front extends Component {
                 <div className="icon-card">
 
                   <div className="icard-image-container">
-                    <img className="icard-image" src={resultIcon}/>
+                    <img alt="" className="icard-image" src={resultIcon}/>
                     <div>Result</div>
                   </div>
 
@@ -211,7 +211,7 @@ class Front extends Component {
                 <div className="icon-card">
 
                   <div className="icard-image-container">
-                    <img className="icard-image" src={diary}/>
+                    <img alt="" className="icard-image" src={diary}/>
                     <div className="image-title">Diary</div>
                   </div>
 
@@ -224,13 +224,13 @@ class Front extends Component {
 
             </div>
             <div className="img-container">
-              <img className="image" src={action}/>
+              <img alt="" className="image" src={action}/>
             </div>
           </div>
 
           <div className="card setup">
             <div className="img-container">
-              <img className="image" src={setup}/>
+              <img alt="" className="image" src={setup}/>
             </div>
             <div className="info" >
 
@@ -245,7 +245,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teachersIcon}/>
+                    <img alt="" className="icard-image" src={teachersIcon}/>
                     <div className="image-title">Teacher Setup</div>
                   </div>
       
@@ -258,7 +258,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={studentsIcon}/>
+                    <img alt="" className="icard-image" src={studentsIcon}/>
                     <div className="image-title">Student Setup</div>
                   </div>
       
@@ -275,7 +275,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={classesIcon}/>
+                    <img alt="" className="icard-image" src={classesIcon}/>
                     <div className="image-title">Classes</div>
                   </div>
       
@@ -288,7 +288,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={settingsIcon}/>
+                    <img alt="" className="icard-image" src={settingsIcon}/>
                     <div className="image-title">Settings</div>
                   </div>
       
@@ -306,7 +306,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={prospective}/>
+                    <img alt="" className="icard-image" src={prospective}/>
                     <div className="image-title">Prospective Student</div>
                   </div>
       
@@ -320,7 +320,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={Help}/>
+                    <img alt="" className="icard-image" src={Help}/>
                     <div className="image-title">Help</div>
                   </div>
       
@@ -337,7 +337,7 @@ class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={switchUserIcon}/>
+                    <img alt="" className="icard-image" src={switchUserIcon}/>
                     <div className="image-title">Logout</div>
                   </div>
       
@@ -362,7 +362,7 @@ class Front extends Component {
               
             </div>
             <div className="img-container">
-              <img className="image" src={dail_stats}/>
+              <img alt="" className="image" src={dail_stats}/>
             </div>
           </div>
 

@@ -8,7 +8,6 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import former from 'utils/former'
 import moment from 'moment'
-import v4 from 'node-uuid'
 
 /** Structure of Diary
  * diary:{
