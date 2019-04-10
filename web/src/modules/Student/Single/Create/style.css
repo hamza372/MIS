@@ -21,6 +21,11 @@
 		color: #fc6171;
 	}
 
+.call-link {
+	width: 10% !important;
+	margin: 5px !important;
+}
+
 @media only screen and (min-width: 768px) {
 	.save-delete .button {
 		margin-left: 0;
