@@ -56,6 +56,7 @@ class SMS extends Component {
 			return;
 		}
 		
+		/*
 		const type = this.getType(this.state.smsFilter)	
 		const historyObj = {
 			faculty: this.props.faculty_id,
@@ -64,6 +65,7 @@ class SMS extends Component {
 			count: 1,
 			text: text
 		}
+		*/
 		//this.props.logSms(historyObj)
 		this.props.sendMessage(text, number);
 
@@ -73,6 +75,8 @@ class SMS extends Component {
 		if(messages.length === 0 || messages === undefined){
 			return;
 		}
+
+		/*
 		const type = this.getType(this.state.smsFilter)
 
 		const historyObj = {
@@ -83,7 +87,8 @@ class SMS extends Component {
 			text: text
 		}
 		//this.props.logSms(historyObj)
-		this.props.sendBatchMessages(messages); 
+		*/
+		this.props.sendBatchMessages(messages);
 	}
 
 	sendMessageFilter=(e)=>{

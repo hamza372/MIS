@@ -1,7 +1,8 @@
 import { Dispatch, AnyAction } from 'redux'
-import Syncr from 'src/syncr';
+import Syncr from '../syncr';
 
 const SYNC = "SYNC"
+const client_type = "mis";
 
 // TODO: separate out connect, auth merges and deletes into separate folder
 export const MERGES = "MERGES"
@@ -16,7 +17,7 @@ export interface MergeAction {
 	merges: Merge[]
 }
 
-export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -43,9 +44,9 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 
 	const payload = {
 		type: SYNC,
-		id: state.auth.id,
-		client_type: state.auth.client_type,
-		last_snapshot: state.last_snapshot,
+		school_id: state.auth.school_id,
+		client_type: client_type,
+		lastSnapshot: state.lastSnapshot,
 		payload: rationalized_merges
 	}
 
@@ -55,15 +56,15 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 }
 
 export const SMS = "SMS"
-export const sendSMS = (text : string, number : string) => (dispatch : (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const sendSMS = (text : string, number : string) => (dispatch : (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
 	// should i keep a log of all messages sent in the db?
 
 	const state = getState();
 	syncr.send({
 		type: SMS,
-		client_type: state.auth.client_type,
-		id: state.auth.id,
+		client_type: client_type,
+		school_id: state.auth.school_id,
 		payload: {
 			text,
 			number,
@@ -80,13 +81,13 @@ interface SMS {
 	number: string
 }
 
-export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, getState: () => RootBankState, syncr: Syncr) => {
+export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const state = getState();
 	syncr.send({
 		type: BATCH_SMS,
-		client_type: state.auth.client_type,
-		id: state.auth.id,
+		client_type: client_type,
+		school_id: state.auth.school_id,
 		payload: {
 			messages
 		}
@@ -101,15 +102,15 @@ interface ServerAction {
 	payload: any
 }
 
-export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootBankState, syncr: Syncr) => {
+export const sendServerAction = ( action: ServerAction ) => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
 	const state = getState();
 
 	console.log('send server action...', action)
 	return syncr.send({
 		type: action.type,
-		client_type: state.auth.client_type,
+		client_type: client_type,
 		client_id: state.client_id,
-		id: state.auth.id,
+		school_id: state.auth.school_id,
 		payload: action.payload
 	})
 	.then(dispatch)
@@ -130,7 +131,7 @@ export interface DeletesAction {
 	paths: Delete[]
 }
 
-export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyAction>, getState : () => RootBankState, syncr : Syncr) => {
+export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyAction>, getState : () => RootReducerState, syncr : Syncr) => {
 
 	const action = {
 		type: DELETES,
@@ -156,9 +157,9 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 
 	syncr.send({
 		type: SYNC,
-		client_type: state.auth.client_type,
-		school_id: state.auth.id,
-		last_snapshot: state.last_snapshot,
+		client_type: client_type,
+		school_id: state.auth.school_id,
+		lastSnapshot: state.lastSnapshot,
 		payload: rationalized_deletes
 	})
 	.then(dispatch)
@@ -224,20 +225,20 @@ export const QueueUp = (action : Queuable) => {
 
 export const ON_CONNECT = "ON_CONNECT"
 export const ON_DISCONNECT = "ON_DISCONNECT"
-export const connected = () => (dispatch: (a : any) => any, getState: () => RootBankState, syncr: Syncr) => { 
+export const connected = () => (dispatch: (a : any) => any, getState: () => RootReducerState, syncr: Syncr) => { 
 	const action = {type: ON_CONNECT}
 
 	dispatch(action)
 
 	const state = getState();
 
-	if(state.auth.id && state.auth.token) {
+	if(state.auth.school_id && state.auth.token) {
 		syncr
 			.send({
 				type: "VERIFY",
-				client_type: state.auth.client_type,
+				client_type: client_type,
 				payload: {
-					id: state.auth.id,
+					school_id: state.auth.school_id,
 					token: state.auth.token,
 					client_id: state.client_id,
 				}
@@ -245,10 +246,10 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 			.then(res => {
 				return syncr.send({
 					type: SYNC,
-					client_type: state.auth.client_type,
-					id: state.auth.id,
+					client_type: client_type,
+					school_id: state.auth.school_id,
 					payload: state.queued,
-					last_snapshot: state.last_snapshot
+					lastSnapshot: state.lastSnapshot
 				})
 			})
 			.then(resp => {
@@ -269,15 +270,13 @@ export const createLoginFail = () => ({ type: LOGIN_FAIL })
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
 export interface LoginSucceed {
 	type: "LOGIN_SUCCEED",
-	id: string,
+	school_id: string,
 	token: string,
-	sync_state: RootBankState['sync_state'],
-	number: string
+	db: RootReducerState['db']
 }
-export const createLoginSucceed = (id : string, token : string, sync_state: RootBankState['sync_state'], number : string) : LoginSucceed => ({ 
+export const createLoginSucceed = (school_id : string, db: RootReducerState['db'], token : string) : LoginSucceed => ({ 
 	type: LOGIN_SUCCEED,
-	id,
+	school_id,
 	token,
-	sync_state,
-	number
+	db
 })

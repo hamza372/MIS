@@ -131,7 +131,8 @@ class Attendance extends Component {
 			messages,
 			return_link: window.location.href
 		});
-		const { settings } = this.props;
+		const { settings, current_faculty, students } = this.props;
+		const isAdmin = current_faculty.Admin
 		const setupPage = settings.permissions && settings.permissions.setupPage ? settings.permissions.setupPage.teacher : true
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
 		return <Layout history={this.props.history}>
@@ -152,15 +153,17 @@ class Attendance extends Component {
 				<div className="list">
 				{
 					Object.keys(this.state.selected_students)
+						.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && students[id_a].RollNumber.localeCompare( students[id_b].RollNumber))
 						.map(sid => {
-							const x = this.props.students[sid]
+							const x = students[sid]
 
 							const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
 							const status = current_attendance ? current_attendance.status : "n/a"
 
 							return <div className="list-row" key={x.id}>
 								<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
-								{setupPage ?<Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link> : <div> {x.Name} </div>}
+								<div> {`${x.RollNumber === "" || x.RollNumber === undefined ? "" : x.RollNumber }`} </div>
+								{isAdmin || setupPage ? <Link className="student" to={`/student/${x.id}/attendance`}>{x.Name}</Link> : <div> {x.Name} </div>}
 								<div className="status">
 									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 									<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>

@@ -242,7 +242,7 @@ class StudentFees extends Component {
 		
 
 		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-		const curr_month = moment().format("MM/YYYY")
+		//const curr_month = moment().format("MM/YYYY")
 		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
 
 		return <div className="student-fees">
