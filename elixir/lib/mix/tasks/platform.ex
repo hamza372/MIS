@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Platform do
 		end)
 	end
 
-	def run(["add_matches", id]) do
+	def run(["add_matches", id, offset, limit]) do
 		csv = case File.exists?(Application.app_dir(:sarkar, "priv/#{id}.csv")) do
 			true -> File.stream!(Application.app_dir(:sarkar, "priv/#{id}.csv")) |> CSV.decode!
 			false -> File.stream!("priv/#{id}.csv") |> CSV.decode!
@@ -30,9 +30,7 @@ defmodule Mix.Tasks.Platform do
 
 		[_ | refcodes] = csv
 		|> Enum.map(fn [refcode | _ ] -> refcode end)
-
-		# instead of directly manipulating the matches dir, should be creating writes
-		# and writing the writes to the supplier.
+		|> Enum.slice(offset, limit)
 
 		changes = refcodes
 		|> Enum.reduce(%{}, fn(school_id, agg) -> 
@@ -51,6 +49,10 @@ defmodule Mix.Tasks.Platform do
 
 		start_supplier(id)
 		Sarkar.Supplier.sync_changes(id, "backend-task", changes, :os.system_time(:millisecond))
+	end
+
+	def run(["add_matches", id]) do
+		run(["add_matches", id, 0, 1000]) # 1000 is the max!
 	end
 
 	def run(args) do
