@@ -26,7 +26,7 @@ const Header = ({user, history}) => <div className="header">
 export const PrintHeader = ({settings, logo}) => <div className="print-only school-header">
 			<div className="header-body">
 				<div className="logo-container" style={{width: "20%"}}>
-					<img className="header-logo" src={logo} alt="No Logo"/>
+					{logo !== "" && <img className="header-logo" src={logo} alt="No Logo"/>}
 				</div>
 				<div className="header-style">
 					<div className="title">{settings.schoolName}</div>
