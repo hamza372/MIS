@@ -1,19 +1,14 @@
 import moment from 'moment'
 
-interface payment {
-    student: MISStudent
-    payment_id: string
-    amount: number
-    date: number
-    type: string
-    fee_id: string
-    fee_name: string
-}
+type payment = {
+	student: MISStudent
+	payment_id: string
+} & MISStudentPayment
 
 export function checkStudentDuesReturning(student: MISStudent) : payment[] {
 	const curr = moment().format("MM/YYYY")
 
-	let payments = []
+	let payments : payment[] = []
 
 	for(let [id, fee] of Object.entries(student.fees || {})) {
 		if(fee.period === "MONTHLY") {
