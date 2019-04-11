@@ -252,7 +252,7 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				<div className="divider">Financing</div>
 				<div className="section">
-					<SurveyRow label="Financing Interest" val={school.financing_interest} />
+					{ /* <SurveyRow label="Financing Interest" val={school.financing_interest} /> */ }
 					<SurveyRow label="Unmet Need" val={school.unmet_financing_needs} />
 					<SurveyRow label="Current Loan Outstanding" val={school.previous_loan} />
 					<SurveyRow label="Outstanding Loan Amount" val={school.previous_loan_amount} />
@@ -260,10 +260,10 @@ class SchoolInfo extends React.Component<propTypes, StateType> {
 
 				<div className="divider">Education Services</div>
 				<div className="section">
-					<SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} />
+					{ /* <SurveyRow label="Textbook Provider Interest" val={school.textbook_provider_interest} /> */ }
 					<SurveyRow label="Current Textbook Provider" val={map_textbook_providers(school.textbook_publisher)} />
 					<SurveyRow label="Previously Purchased Products" val={map_ess_products(school.ess_current)} />
-					<SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} />
+					{ /* <SurveyRow label="Current Product Interests" val={map_ess_products(school.ess_interest)} /> */ }
 				</div>
 
 			</div>
