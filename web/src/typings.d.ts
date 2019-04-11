@@ -26,6 +26,9 @@ interface RootDBState {
 			[id: string]: MISSMSHistory
 		}
 	}
+	assets : {
+		schoolLogo : string
+	}
 	max_limit: number
 }
 

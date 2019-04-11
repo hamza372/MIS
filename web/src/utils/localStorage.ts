@@ -23,6 +23,9 @@ const initState : RootReducerState = {
 		analytics: {
 			sms_history: {}
 		},
+		assets:{
+			schoolLogo:""
+		},
 		max_limit: -1
 	},
 	// this part of the tree i want to obscure.

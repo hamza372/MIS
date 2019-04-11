@@ -1,27 +1,53 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 
-import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import getSectionsFromClasses from '../../utils/getSectionsFromClasses'
 
-import { smsIntentLink } from 'utils/intent'
-import Layout from 'components/Layout'
-import { markStudent, logSms } from 'actions'
+import { smsIntentLink } from '../../utils/intent'
+import Layout from '../../components/Layout'
+import { markStudent, logSms } from '../../actions'
 
 import moment from 'moment'
-import Former from 'utils/former'
+import Former from '../../utils/former'
 
 import './style.css'
+import { string } from 'prop-types';
 
-const deriveSelectedStudents = (selected_section, students) =>  getStudentsForSection(selected_section, students)
+interface P {
+	current_faculty: MISTeacher
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	connected: RootReducerState["connected"]
+	attendance_message_template: RootDBState["sms_templates"]["attendance"]
+	markStudent: (student: MISStudent, date: string, status: string) => any
+	logSms: (history: any) => any
+}
+
+interface S {
+	date: number
+	sending: boolean
+	selected_section: string
+	selected_students: { [id: string]: boolean }
+}
+
+interface RouteInfo {
+	id: string
+}
+
+type propTypes = P & RouteComponentProps<RouteInfo>
+
+const deriveSelectedStudents = (selected_section: string, students: RootDBState["students"]) =>  getStudentsForSection(selected_section, students)
 	.reduce((agg, curr) => ({...agg, [curr.id]: true}), {})
 
-const getStudentsForSection = (section_id, students) => Object.values(students)
+const getStudentsForSection = (section_id: string, students: RootDBState["students"]) => Object.values(students)
 	.filter(s => s.section_id === section_id)
 
-class Attendance extends Component {
+class Attendance extends Component <propTypes, S> {
 
-	constructor(props) {
+	Former: Former
+	constructor(props : propTypes) {
 		super(props);
 
 		// by default, the class selected should be one owned by the user.
@@ -42,11 +68,11 @@ class Attendance extends Component {
 		this.Former = new Former(this, [])
 	}
 
-	mark = (student, status) => () => {
+	mark = (student: MISStudent, status: string) => () => {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
-	sendBatchSMS = (messages) => {
+	sendBatchSMS = (messages : MISSms[]) => {
 		if(messages.length === 0){
 			console.log("No Messages to Log")
 			return
@@ -90,7 +116,7 @@ class Attendance extends Component {
 		}
 	}
 
-	onSectionChange = e => {
+	onSectionChange = (e : any) => {
 		const newSectionId = e.target.value;
 
 		this.setState({
@@ -139,7 +165,10 @@ class Attendance extends Component {
 			<div className="attendance">
 				<div className="title">Attendance</div>
 
-				<input type="date" onChange={this.Former.handle(["date"], d => moment(d) < moment.now())} value={moment(this.state.date).format("YYYY-MM-DD")} placeholder="Current Date" />
+				<input type="date" 
+					onChange={this.Former.handle(["date"], d => moment(d).unix() < moment.now())} 
+					value={moment(this.state.date).format("YYYY-MM-DD")} 
+					placeholder="Current Date" />
 
 				<div className="row" style={{width: "90%"}}>
 					<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
@@ -179,18 +208,14 @@ class Attendance extends Component {
 	}
 }
 
-export default connect(state => {
-
-	return {
-		current_faculty: state.db.faculty[state.auth.faculty_id],
-		students: state.db.students,
-		classes: state.db.classes,
-		settings: state.db.settings,
-		connected: state.connected,
-		attendance_message_template: (state.db.sms_templates || {}).attendance || "",
-	}
-
-}, dispatch => ({
-	markStudent: (student, date, status) => dispatch(markStudent(student, date, status)),
-	logSms: (history) => dispatch(logSms(history))
+export default connect((state: RootReducerState) => ({
+	current_faculty: state.db.faculty[state.auth.faculty_id],
+	students: state.db.students,
+	classes: state.db.classes,
+	settings: state.db.settings,
+	connected: state.connected,
+		attendance_message_template: (state.db.sms_templates || {} as RootDBState["sms_templates"]).attendance || "",
+}), (dispatch : Function) => ({
+	markStudent: (student: MISStudent, date: string, status: string) => dispatch(markStudent(student, date, status)),
+	logSms: (history: any) => dispatch(logSms(history))
 }))(Attendance)
