@@ -1,15 +1,35 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import former from 'utils/former'
+import former from '../../../../utils/former'
 
-import { PrintHeader } from 'components/Layout'
+import { PrintHeader } from '../../../../components/Layout'
 
 import './style.css'
+import { RouteComponentProps } from 'react-router';
+import { Settings } from 'http2';
 
-class FacultyAttendance extends Component {
+interface P {
+	faculty: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+}
 
-	constructor(props) {
+interface S {
+	monthFilter: string
+	yearFilter: string
+}
+
+interface Routeinfo {
+	id: string
+}
+
+type propTypes = P & RouteComponentProps<Routeinfo>
+
+class FacultyAttendance extends Component< propTypes, S> {
+
+	former: former
+	constructor( props: propTypes) {
 
 		super(props)
 
@@ -21,7 +41,7 @@ class FacultyAttendance extends Component {
 		this.former = new former(this, []);
 	}
 	
-	getFilterCondition = (date) =>{
+	getFilterCondition = (date: string) =>{
 		//when both are empty
 		if(this.state.monthFilter === "" && this.state.yearFilter === "") {
 			return true
@@ -141,7 +161,7 @@ class FacultyAttendance extends Component {
 }
 
 export default connect(
-	state => ({ 
+	(state : RootReducerState) => ({ 
 		faculty: state.db.faculty,
 		settings: state.db.settings,
 		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
