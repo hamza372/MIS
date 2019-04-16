@@ -4,6 +4,7 @@ import Layout from 'components/Layout'
 
 import Create from './Create'
 import ReportMenu from './ReportsMenu'
+import FeeMenu from './ClassFeeMenu'
 
 import './style.css'
 import connect from 'react-redux/lib/connect/connect';
@@ -28,6 +29,7 @@ return <Layout history={props.history}>
 			<Route path="/class/new" component={Create} />
 			<Route path="/class/:id/profile" component={Create} />
 			<Route path="/class/:id/report-menu" component={ReportMenu} />
+			<Route path="/class/:id/fee-menu" component={FeeMenu} />
 
 		</div>
 	</Layout>

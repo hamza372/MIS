@@ -21,6 +21,9 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 	
 		let create = '/class/new'
 
+		if(forwardTo === 'fee-menu'){
+			create = ''
+		}
 		if(forwardTo === 'report-menu'){
 			create = '';
 		}

@@ -5,7 +5,6 @@ import qs from 'query-string'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Former from 'utils/former'
 
-import { LayoutWrap } from 'components/Layout';
 import List from 'components/List';
 import Title from 'components/Title';
 import {PrintHeader} from 'components/Layout';
@@ -209,11 +208,11 @@ class StudentList extends Component {
 	}
 }
 
-export default connect((state, { location }) => ({ 
+export default connect((state, { location, forwardTo = undefined }) => ({ 
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
-	forwardTo: qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
+	forwardTo: forwardTo || qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
 	max_limit: state.db.max_limit || -1
-}))(LayoutWrap(StudentList));
+}))( StudentList);
