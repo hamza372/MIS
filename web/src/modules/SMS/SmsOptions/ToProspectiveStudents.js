@@ -34,7 +34,7 @@ class ToProspectiveStudents extends Component {
 	console.log(smsOption)
 
 	const messages = Object.values(students)
-						.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
+						.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]) && s.Phone)
 						.reduce((agg,student)=> {
 							const index  = agg.findIndex(s => s.number === student.Phone)		
 							if(index >= 0 ){
