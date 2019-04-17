@@ -39,7 +39,7 @@ class ToSingleClass extends Component {
 	const { classes, students, sendBatchMessages, smsOption } = this.props;
 
 	const messages = Object.values(students)
-		.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
+		.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone)
 		.reduce((agg,student)=> {
 			const index  = agg.findIndex(s => s.number === student.Phone)		
 			if(index >= 0 ){

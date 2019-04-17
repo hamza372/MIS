@@ -42,7 +42,7 @@ class ToSingleTeacher extends Component {
 				{
 					[<option key="abcd" value="" disabled>Select a Teacher</option>,
 					...Object.entries(teachers)
-					.filter(([id, teacher]) => teacher.Phone !== undefined && teacher.Phone !== "")
+					.filter(([id, teacher]) => teacher.Phone)
 					.map(([id, teacher]) => <option key={id} value={teacher.Phone}>{teacher.Name}</option>)
 					]
 				}
