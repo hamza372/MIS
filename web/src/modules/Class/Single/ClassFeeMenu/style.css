@@ -33,4 +33,12 @@
 		display: flex !important;
 		flex-direction: row;
 	}
+	.student-fees-ledger .divider {
+		font-size: 1rem;
+		font-weight: bold;
+		text-decoration: underline
+	}
+	.student-fees-ledger .info label {
+		text-decoration: underline
+	}
 }

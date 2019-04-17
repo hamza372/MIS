@@ -194,26 +194,27 @@ const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students
 			return <div className="payment-history section print-page">
 			<PrintHeader settings={settings} logo={""}/>
 			<div className="divider">Student Information</div>
-				<div className="table row">
+				<div className="row info">
 					<label> Name:</label>
 					<div>{curr_student.Name}</div>
 				</div>
-				<div className="table row">
+				<div className="row info">
 					<label> Father Name:</label>
 					<div>{curr_student.ManName}</div>
 				</div>
-				<div className="table row">
+				<div className="row info">
 					<label> Class Name:</label>
 					<div>{curr_class.name}</div>
 				</div>
-				<div className="table row">
+				<div className="row info">
 					<label> Roll #:</label>
 					<div>{curr_student.RollNumber}</div>
 				</div>
-				<div className="table row">
+				<div className="row info">
 					<label> Adm # :</label>
 					<div>{curr_student.RollNumber}</div>
 				</div>
+				
 			<div className="divider">Payment Information</div>
 
 			<div className="table row heading">
