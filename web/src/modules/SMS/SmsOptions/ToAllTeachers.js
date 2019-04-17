@@ -31,7 +31,7 @@ class ToAllTeachers extends Component {
 
 	const { teachers, sendBatchMessages, smsOption } = this.props;
 	
-	const messages = Object.values(teachers).filter( teacher => teacher.Phone !== undefined && teacher.Phone !== "" )
+	const messages = Object.values(teachers).filter( teacher => teacher.Phone)
 						.map (T => { 
 							return { number: T.Phone, text : this.state.text }
 						});
