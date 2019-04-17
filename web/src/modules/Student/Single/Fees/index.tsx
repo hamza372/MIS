@@ -334,9 +334,7 @@ class StudentFees extends Component <propTypes, S> {
 
 			<div className="student-name print-only" style={{ textAlign: "left", fontWeight: "normal" }}><b>Student Name:</b> {this.student().Name}</div>
 			
-			<LedgerPage filteredPayments={filteredPayments} owed={owed} />
-
-			{/* <div className="payment-history section">
+			<div className="payment-history section">
 				<div className="table row heading">
 					<label><b>Date</b></label>
 					<label><b>Label</b></label>
@@ -362,7 +360,7 @@ class StudentFees extends Component <propTypes, S> {
 					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
 					<div style={style}><b>{numberWithCommas(Math.abs(owed))}</b></div>
 				</div>
-			</div> */}
+			</div>
 			<div className="form">
 			<div className="button save" onClick={this.onSave}>Save</div>
 				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} onClick={this.newPayment} style={{marginTop:"10px"}}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
@@ -409,36 +407,3 @@ export default connect((state: RootReducerState) => ({
 	logSms: (history: any) => dispatch(logSms(history)),
 	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => dispatch(editPayment(student,payments))
 }))(withRouter(StudentFees))
-
-
-interface LedgerPageProp {
-	filteredPayments: [string, MISStudentPayment][]
-	owed: number
-}
-
-const LedgerPage : React.SFC <LedgerPageProp> = ({filteredPayments, owed}) => {
-
-	const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
-
-	return <div className="payment-history section">
-	<div className="table row heading">
-		<label><b>Date</b></label>
-		<label><b>Label</b></label>
-		<label><b>Amount</b></label>
-	</div>
-		{filteredPayments
-			.map(([id, payment]) => {
-				return <div className="payment" key={id}>
-					<div className="table row">
-						<div>{moment(payment.date).format("DD/MM")}</div>
-						<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-						<div>{payment.type === "OWED" ? `${numberWithCommas(payment.amount)}` : `${numberWithCommas(payment.amount)}`}</div>
-					</div>
-				</div> })
-	}
-	<div className="table row last">
-		<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-		<div style={style}><b>{numberWithCommas( Math.abs(owed))}</b></div>
-	</div>
-</div>
-} 
