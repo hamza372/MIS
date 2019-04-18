@@ -77,6 +77,8 @@ class Landing extends Component {
 		const setupPage = permissions && permissions.setupPage ? permissions.setupPage.teacher : true
 		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
 		const teacher_fee_permission = permissions && permissions.fee ? permissions.fee.teacher : true;
+		const teacher_expenses_permission = permissions && permissions.expenses ? permissions.expenses.teacher : true;
+
 
 		for(let student of Object.values(students)) {
 
@@ -197,6 +199,12 @@ class Landing extends Component {
 							user.Admin || teacher_fee_permission ? 
 								<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
 								: false
+						}
+						</div>
+						<div>
+						{
+							(user.Admin || teacher_expenses_permission) && 
+								<Link className="button yellow" to="/expenses"> Expenses </Link>	
 						}
 						</div>
 					</div>

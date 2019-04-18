@@ -30,6 +30,7 @@ import Front from 'modules/Front'
 import ManageFees from 'modules/Student/ManageFees'
 
 import AuthedRoute from 'components/AuthedRoute'
+import Expenses from './modules/Expenses';
 
 export default class Routes extends React.Component {
 
@@ -92,6 +93,7 @@ export default class Routes extends React.Component {
 
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 					<AuthedRoute path="/help" component={Help} />
+					<AuthedRoute path="/expenses" component={Expenses} />
 
 					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />
