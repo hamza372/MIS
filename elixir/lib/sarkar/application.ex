@@ -10,11 +10,8 @@ defmodule Sarkar.Application do
 		children = [
 			{ Registry, keys: :duplicate, name: Sarkar.ConnectionRegistry },
 			{ Registry, keys: :unique, name: Sarkar.SchoolRegistry },
-			{ Registry, keys: :unique, name: Sarkar.SupplierRegistry },
 			{ DynamicSupervisor, name: Sarkar.SchoolSupervisor, strategy: :one_for_one },
-			{ DynamicSupervisor, name: Sarkar.SupplierSupervisor, strategy: :one_for_one },
 			Sarkar.Store.School,
-			Sarkar.Store.Supplier,
 			{
 				Postgrex,
 					name: Sarkar.School.DB,
