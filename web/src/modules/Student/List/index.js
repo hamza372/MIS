@@ -6,7 +6,7 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Former from 'utils/former'
 
 import { LayoutWrap } from 'components/Layout';
-import List from 'components/List';
+import Card from 'components/Card'
 import Title from 'components/Title';
 import {PrintHeader} from 'components/Layout';
 
@@ -14,32 +14,40 @@ import './style.css'
 import getStudentLimt from 'utils/getStudentLimit';
 
 const StudentItem = (S) => {
-
-	if(S.header) {
-		return <div key="unique1245" className="table row heading">
-			<label> <b> Name </b></label>
-			<label> <b> Father Name </b></label>
-			{ S.forwardTo !== "prospective-student" && <label> <b> Class Section </b> </label> }
-		</div>
-	} 
-
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
-//const sname = S.relevant_section.includes("namespaced_name") ? S.relevant_section.namespaced_name : "No Section"; 
-	
-	return <div className="table row" key={S.id}>
-				<Link to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
-					{S.Name} 
-				</Link>
-				<div>{S.ManName !== "" || null ? S.ManName : "" }</div>
-				{ S.forwardTo !== "prospective-student" && <div> {cname /*+ "/" + sname */}</div> }
+	const tags = S.tags !== undefined && Object.keys(S.tags).length > 0 ? Object.keys(S.tags) : false
+	return <div className="icon-card">
+				<div className="icard-title">
+					<Link style={{textDecoration:"none"}} to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
+						{S.Name} 
+					</Link>
+				</div>
+				<div className="icard-para">
+					{S.ManName ? <div className="para-row"> {S.ManName} </div> : ""}
+					{ S.forwardTo !== "prospective-student" && <div className="para-row"><b></b> {cname /*+ "/" + sname */}</div> }
+					{ S.forwardTo !== "prospective-student" && S.AdmissionNumber && 
+						<div className="para-row">
+							<b>{`Adm #: `}</b>{S.AdmissionNumber}
+						</div>}
+					{ tags && 
+						<div className="row" style={{flexWrap:"wrap"}}>
+						{
+							 tags
+							 .filter(t => t !== "FINISHED_SCHOOL") 
+							 .map(t => <div className="tag bg-green"> {t}</div>) 
+						}
+						</div>
+					}
+				</div>
 			</div>
 }
 
 const toLabel = (S) => {
 	
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
+	const admissionNumber = S.AdmissionNumber ? `a${S.AdmissionNumber}` : ""
 
-	return S.Name + S.ManName + cname ;
+	return S.Name + S.ManName + cname + admissionNumber;
 
 }
 
@@ -171,11 +179,11 @@ class StudentList extends Component {
 			<PrintHeader settings={settings} logo={schoolLogo} />
 			<Title className="title">Students</Title>
 
-			<List 
-				items = {[ { Name: "", header: true, forwardTo }, ...items]}
+			<Card
+				items = {items}
 				Component = {StudentItem}
-				create = {create} 
-				createText = {createText} 
+				create = {create}
+				createText = {createText}
 				toLabel = {toLabel}>
 
 				{forwardTo !== "prospective-student" && <div className="row filter-container">
@@ -202,7 +210,7 @@ class StudentList extends Component {
 					</select>
 				</div>}
 
-			</List>
+			</Card>
 
 			<div className="print button" onClick={() => window.print()}>Print</div>
 		</div>
