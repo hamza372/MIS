@@ -6,7 +6,7 @@ import Layout from 'components/Layout'
 
 import Create from './Create'
 import Attendance from './Attendance'
-import Fees from './Fees'
+import StudentFees from './Fees'
 import Marks from './Marks'
 
 import './style.css'
@@ -38,7 +38,7 @@ class StudentPage extends Component {
 
 				<Route path="/student/new" component={Create} />
 				<Route path="/student/:id/profile" component={Create} />
-				<Route path="/student/:id/payment" component={Fees} />
+				<Route path="/student/:id/payment" component={StudentFees} />
 				<Route path="/student/:id/attendance" component={Attendance} />
 				<Route path="/student/:id/marks" component={Marks} />
 

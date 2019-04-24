@@ -187,7 +187,7 @@ class Landing extends Component {
 						{ 
 							user.Admin ||  teacher_fee_permission ?
 							<Link 
-								to="/student?forwardTo=payment" 
+								to= "/fee-menu" 
 								className="button blue-shadow" 
 								style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> 
 								

@@ -1,0 +1,44 @@
+.student-fees-ledger{
+	width: 90%;
+}
+
+.student-fees-ledger select{
+	width: 200px
+}
+
+.student-fees-ledger .row {
+	justify-content: space-between
+}
+
+.student-fees-ledger .fee-voucher{
+	margin-right: 2px;
+	page-break-before: always;
+	page-break-after: always;
+}
+
+.print-voucher {
+	display: none;
+}
+
+@media print {
+
+	.fee-voucher{
+		width: none
+	}
+	.voucher-row {
+		display: flex;
+		flex-direction: row;
+	}
+	.print-voucher {
+		display: flex !important;
+		flex-direction: row;
+	}
+	.student-fees-ledger .divider {
+		font-size: 1rem;
+		font-weight: bold;
+		text-decoration: underline
+	}
+	.student-fees-ledger .info label {
+		text-decoration: underline
+	}
+}

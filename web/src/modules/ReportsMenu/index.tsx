@@ -1,18 +1,36 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import Layout from 'components/Layout'
-import StudentList from 'modules/Student/List'
-import { ClassListModule } from 'modules/Class/List'
+import Layout from '../../components/Layout'
+import StudentList from '../../modules/Student/List'
+import { ClassListModule } from '../../modules/Class/List'
 
-import former from 'utils/former'
+import former from '../../utils/former'
+import { RouteComponentProps } from 'react-router';
 
 // give option to select student list or class list, with forwardTo ---> reports.
 // need to give this a route 
 
-class ReportsMenu extends Component {
+interface P {
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+}
 
-	constructor(props) {
+interface S {
+	report_for: string
+}
+
+interface RouteInfo {
+	id: string
+}
+
+type propTypes = RouteComponentProps <RouteInfo> & P
+
+class ReportsMenu extends Component <propTypes, S> {
+
+	Former: former
+	constructor(props : propTypes) {
 		super(props);
 
 		this.state = {
@@ -50,8 +68,10 @@ class ReportsMenu extends Component {
 
 }
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
 }))(ReportsMenu)
+
+

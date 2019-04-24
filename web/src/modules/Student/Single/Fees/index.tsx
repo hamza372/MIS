@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
 
-import former from 'utils/former'
+import former from '../../../.../../../utils/former';
 
-import { PrintHeader } from 'components/Layout'
-import Banner from 'components/Banner'
-import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
-import { sendSMS } from 'actions/core'
-import { checkStudentDuesReturning } from 'utils/checkStudentDues'
-import { smsIntentLink } from 'utils/intent'
+import { PrintHeader } from '../../../../components/Layout'
+import Banner from '../../../../components/Banner'
+import { addMultiplePayments, addPayment, logSms, editPayment } from '../../../../actions'
+import { sendSMS } from '../../../../actions/core'
+import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
+import { smsIntentLink } from '../../../../utils/intent'
 
 import './style.css'
 
@@ -27,11 +27,55 @@ import './style.css'
 
 */
 
-const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+type payment = {
+	student: MISStudent
+	payment_id: string
+} & MISStudentPayment
 
-class StudentFees extends Component {
+interface P {
+	faculty_id: RootReducerState["auth"]["faculty_id"]
+	students: RootDBState["students"]
+	connected: RootReducerState["connected"]
+	settings: RootDBState["settings"]
+	feeSMSTemplate: RootDBState["sms_templates"]["fee"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: string, fee_id?: string, fee_name?: string) => any
+	addMultiplePayments: (payments: payment[] ) => any
+	sendSMS: (text: string, number: string) => any
+	logSms: (history: any) => any
+	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => any
+}
 
-	constructor(props) {
+interface S {
+	banner: {
+		active: boolean
+		good: boolean
+		text: string
+	}
+	payment: {
+		active: boolean
+		amount: string
+		type: "SUBMITTED" | "FORGIVEN"
+		sendSMS?: boolean
+	}
+	month: string
+	year: string
+	edits: MISStudent["payments"]
+
+}
+
+interface RouteInfo {
+	id: string
+}
+
+type propTypes = RouteComponentProps<RouteInfo> & P
+
+const numberWithCommas = ( x : number) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+class StudentFees extends Component <propTypes, S> {
+
+	Former: former
+	constructor(props: propTypes) {
 		super(props);
 		
 		const current_month = moment().format("MM/YYYY")
@@ -90,11 +134,10 @@ class StudentFees extends Component {
 		}
 
 		const id = v4();
-		const payment = {
+		const payment : MISStudentPayment = {
 			amount: parseFloat(this.state.payment.amount),
 			type: this.state.payment.type,
-			date: moment.now(),
-			fee_id: undefined
+			date: new Date().getTime()
 		}
 
 		const balance = [...Object.values(this.student().payments), payment]
@@ -104,8 +147,8 @@ class StudentFees extends Component {
 			// send SMS with replace text for regex etc.
 			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
 			const message = this.props.feeSMSTemplate
-					.replace(/\$BALANCE/g, balance)
-					.replace(/\$AMOUNT/g, payment.amount)
+					.replace(/\$BALANCE/g, `${balance}`)
+					.replace(/\$AMOUNT/g, `${payment.amount}`)
 					.replace(/\$NAME/g, this.student().Name)
 
 			
@@ -133,12 +176,13 @@ class StudentFees extends Component {
 
 		this.setState({
 			payment: {
+				...this.state.payment,
 				active: false
 			}
 		})
 	}
 
-	getFilterCondition = (payment) =>
+	getFilterCondition = (payment: MISStudentPayment) =>
 	{
 		//when both are empty
 		if(this.state.month === "" && this.state.year === "") {
@@ -167,7 +211,7 @@ class StudentFees extends Component {
 		this.props.addMultiplePayments(owedPayments);
 	}
 
-	componentWillReceiveProps(newProps) {
+	componentWillReceiveProps(newProps: propTypes) {
 		//This will make we get the lates changes
 		const id = this.props.match.params.id;
 		const student =  newProps.students[id];
@@ -202,6 +246,7 @@ class StudentFees extends Component {
 		setTimeout(() => {
 			this.setState({
 				banner: {
+					...this.state.banner,
 					active: false
 				}
 			})
@@ -213,7 +258,7 @@ class StudentFees extends Component {
 					...agg,
 					[payment_id]: {
 						fee_id,
-						amount: parseFloat(amount)
+						amount
 					}
 				}
 			}, {})
@@ -313,7 +358,7 @@ class StudentFees extends Component {
 				}
 				<div className="table row last">
 					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-					<div style={style}><b>{Math.abs(owed)}</b></div>
+					<div style={style}><b>{numberWithCommas(Math.abs(owed))}</b></div>
 				</div>
 			</div>
 			<div className="form">
@@ -335,8 +380,8 @@ class StudentFees extends Component {
 					<div className="table row">
 						<label>Send SMS</label>
 						<select {...this.Former.super_handle(["payment", "sendSMS"])}>
-							<option value={false}>No SMS Notification</option>
-							<option value={true}>Send SMS Notification</option>
+							<option value={"false"}>No SMS Notification</option>
+							<option value={"true"}>Send SMS Notification</option>
 						</select>
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
@@ -348,17 +393,17 @@ class StudentFees extends Component {
 	}
 }
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	connected: state.connected,
 	settings: state.db.settings,
-	feeSMSTemplate: (state.db.sms_templates || {}).fee || "",
+	feeSMSTemplate: (state.db.sms_templates || {} as RootDBState["sms_templates"]).fee || "",
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
-}), dispatch => ({
-	addPayment: (student, id, amount, date, type, fee_id, fee_name) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
-	addMultiplePayments: (payments) => dispatch(addMultiplePayments(payments)),
-	sendSMS: (text, number) => dispatch(sendSMS(text, number)),
-	logSms: (history) => dispatch(logSms(history)),
-	editPayment: (student, payments) => dispatch(editPayment(student,payments))
+}), (dispatch : Function) => ({
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: string, fee_id: string, fee_name: string) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
+	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments)),
+	sendSMS: (text: string, number: string) => dispatch(sendSMS(text, number)),
+	logSms: (history: any) => dispatch(logSms(history)),
+	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => dispatch(editPayment(student,payments))
 }))(withRouter(StudentFees))
