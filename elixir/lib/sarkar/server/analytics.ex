@@ -10,7 +10,7 @@ defmodule Sarkar.Server.Analytics do
 	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
-		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(*) 
+		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
 		FROM writes
 		GROUP BY school_id, date 
 		ORDER BY date desc",
