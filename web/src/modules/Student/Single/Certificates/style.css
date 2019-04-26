@@ -1,0 +1,90 @@
+.certificate {
+    width: 90%
+}
+
+.cert-Info .row {
+    width: 100%;
+    justify-content: space-between
+}
+
+.cert-Info select {
+    width: 40%
+}
+
+.certificate .button {
+    margin-top: 5px
+}
+
+.certificate-page{
+    width: 80%;
+    margin: 50px auto;
+    border-top: 1px solid #bebebe;
+}
+
+.certificate .head .divider {
+	font-family: 'Bungee Inline', sans-serif;
+}
+
+.certificate .head .sub-divider {
+    display: flex;
+    justify-content: center;
+    text-decoration: underline;
+    margin: 20px auto;
+}
+
+.certificate .body {
+    line-height: 30px;
+    word-spacing: 5px;
+ 	font-size: 1rem;
+
+}
+
+.certificate .body .para {
+/* 	text-indent: 5%;
+ */	margin: 50px 0px;
+	text-align: left;
+}
+
+.certificate .body .cert-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+	
+}
+	.cert-row label {
+		width: 30%;
+		justify-content: center;
+	}
+	.cert-row div {
+		width: 70%;
+		border-bottom: 1px solid #bbb;
+		font-weight: bold;
+		text-align: center
+	}
+
+.certificate .footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 100px; 
+}
+    .certificate .footer .right {
+        border-top: 1px solid #bebebe;
+        padding: 10px 0px;
+    }
+    .certificate .footer .left {
+        border-top: 1px solid #bebebe;
+        padding: 10px 0px;
+    }
+
+    @media print {
+        .certificate {
+            margin-top: 50px;
+            border: 10px double rgba(0,0,0,0.3);
+        }
+        .certificate-page{
+            border-top: none;
+        }
+	}

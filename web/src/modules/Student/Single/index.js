@@ -8,6 +8,7 @@ import Create from './Create'
 import Attendance from './Attendance'
 import StudentFees from './Fees'
 import Marks from './Marks'
+import StudentCertificates from './Certificates'
 
 import './style.css'
 
@@ -33,6 +34,7 @@ class StudentPage extends Component {
 						</Link> : false }
 					<Link className={`button ${loc === "attendance" ? "purple" : false}`} to="attendance" replace={true}>Attendance</Link>
 					<Link className={`button ${loc === "marks" ? "blue" : false}`} to="marks" replace={true}>Marks</Link>
+					<Link className={`button ${loc === "certificates" ? "yellow" : false}`} to="certificates" replace={true}>Certificates</Link>
 				</div>
 				}
 
@@ -44,6 +46,7 @@ class StudentPage extends Component {
 
 				<Route path="/student/:id/prospective-student" component={Create} />
 				<Route path="/student/prospective-student/new" component={Create} />
+				<Route path="/student/:id/certificates" component={StudentCertificates} />
 			</div>
 		</Layout>
 	}
