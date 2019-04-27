@@ -52,6 +52,13 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
 	
 	const state = getState()
 
+	const faculty = state.db.faculty[faculty_id]
+
+	if(faculty === undefined || state.auth.name == faculty.Name) {
+		alert("Cannot delete this teacher they are currently logged in on this device")
+		return;
+	}
+
 	const deletes = []
 
 	for(let c of Object.values(state.db.classes)){
@@ -67,6 +74,9 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
  	dispatch(createDeletes([
 		{
 			path: ["db", "faculty", faculty_id]
+		},
+		{
+			path: ["db", "users", faculty_id]
 		},
 		...deletes
 	])) 
