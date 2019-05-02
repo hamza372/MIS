@@ -27,6 +27,8 @@ import Help from "modules/Help"
 import Diary from  'modules/Diary'
 import Front from 'modules/Front'
 import FeeMenu from 'modules/FeeMenu'
+import PlannerList from 'modules/Planner/ClassList'
+import Planner from 'modules/Planner'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -92,6 +94,10 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/diary" component={Diary} />
 
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
+					
+					<AuthedRoute path="/ClassList" component={PlannerList} />
+					<AuthedRoute path="/planner/:class_id/:section_id" component={Planner} />
+
 					<AuthedRoute path="/help" component={Help} />
 
 					<AuthedRoute path="/fee-menu" component={FeeMenu} />

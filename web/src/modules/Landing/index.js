@@ -19,6 +19,8 @@ import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
+import planner from './icons/Planner/planner.svg'
+
 //import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
@@ -198,6 +200,13 @@ class Landing extends Component {
 								<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
 								: false
 						}
+						</div>
+						<div className="row">
+							<Link
+								to="/ClassList" className="button grey-shadow"
+								style={{ backgroundImage: `url(${planner})` }}>
+								Date-Sheet
+							</Link>
 						</div>
 					</div>
 
