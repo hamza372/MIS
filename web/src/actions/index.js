@@ -54,7 +54,7 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
 
 	const faculty = state.db.faculty[faculty_id]
 
-	if(faculty === undefined || state.auth.name == faculty.Name) {
+	if(faculty === undefined || state.auth.name === faculty.Name) {
 		alert("Cannot delete this teacher they are currently logged in on this device")
 		return;
 	}

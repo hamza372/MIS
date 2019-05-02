@@ -119,20 +119,20 @@ class Planner extends Component <propTypes, S> {
 		const text = this.dateSheetString()
 
 		const messages = Object.values(students)
-		.filter(s => s.section_id === section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone)
-		.reduce((agg,student)=> {
-			return [...agg,{
-				number: student.Phone,
-				text
-			}]
-		}, [])
+			.filter(s => s.section_id === section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone)
+			.reduce((agg,student)=> {
+				return [...agg,{
+					number: student.Phone,
+					text
+				}]
+			}, [])
 
 		console.log(messages)
 
 		return <Layout history={history}> 
-			
+
 			<PrintHeader settings={settings} logo={schoolLogo} />
-			
+
 			<div className="planner">
 				<div className="divider no-print">Planner</div>
 
@@ -147,8 +147,6 @@ class Planner extends Component <propTypes, S> {
 				<div> <b> Class/Section: </b> {`${curr_class.name +"/"+ curr_section.name}`}</div>
 
 				<div className="section table">
-
-
 					<div className ="row">
 						<div className="item"><b> Date </b></div>
 						<div className="item"><b> Subject </b></div>
@@ -161,19 +159,21 @@ class Planner extends Component <propTypes, S> {
 											value={moment(this.state.dateSheet[subject]).format("YYYY-MM-DD")}
 											onChange={this.former.handle(["dateSheet", subject])}
 											/>
-										<div> {subject}</div>
+										<div className="item"> {subject}</div>
 									</div>
 							})
 						}
 				</div>
-				{ settings.sendSMSOption === "SIM" ? 
-					<a href={smsIntentLink({
-						messages,
-						return_link: window.location.href 
-						})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> 
-						: <div className="button" onClick={() => this.sendBatchMessages(messages)}>Send</div> }
-					
-				<div className="button blue" style={{margin: "5px 0px auto", width:"90%"}} onClick={() => window.print()}> Print</div>
+				<div className="row">
+					{ settings.sendSMSOption === "SIM" ? 
+						<a href={smsIntentLink({
+							messages,
+							return_link: window.location.href 
+							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> 
+							: <div className="button" onClick={() => this.sendBatchMessages(messages)}>Send</div> }
+						
+					<div className="button blue" onClick={() => window.print()}> Print</div>
+				</div>
 			</div>
 	  
 		</Layout>

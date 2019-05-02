@@ -205,7 +205,7 @@ class Landing extends Component {
 							<Link
 								to="/ClassList" className="button grey-shadow"
 								style={{ backgroundImage: `url(${planner})` }}>
-								Planner
+								Date-Sheet
 							</Link>
 						</div>
 					</div>
