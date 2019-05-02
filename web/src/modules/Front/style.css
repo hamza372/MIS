@@ -323,6 +323,9 @@
     .mischool-resume .card .info .icon-card {
         height: 260px;
     }
+    .icon-card .icard-para {
+        overflow-y: scroll;
+    }
     .mischool-resume .card.setup{
         flex-direction: column-reverse;
     }

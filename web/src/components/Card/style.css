@@ -38,6 +38,10 @@
 			color: #555;
 
 		}
+			.card-list .icon-card .icard-para .row {
+				width: 100%;
+				overflow: scroll;
+			}
 
 			.card-list .icon-card .icard-para .para-row{
 				margin: 2px 0;
