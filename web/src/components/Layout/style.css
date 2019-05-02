@@ -568,12 +568,14 @@ input::-webkit-inner-spin-button {
 }
 .tag {
     font-family: inherit;
-    border: 3px solid rgba(0,0,0,0.2);
     font-weight: bold;
     padding: 3px 20px 15px;
-	border-radius: 20px;
 	height: 5px;
 	cursor: pointer;
+
+	border: 1px solid rgba(0,0,0,0.2);
+	border-radius:2px; 
+	margin: 2px;
 }
 .cross {
 	font-size: inherit;
