@@ -3,16 +3,23 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import moment from 'moment'
 import former from '../../../../utils/former';
+import { addMultiplePayments } from '../../../../actions'
+import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
 import { PrintHeader } from '../../../../components/Layout'
 
 import './style.css'
 
+type payment = {
+	student: MISStudent
+	payment_id: string
+} & MISStudentPayment
 
 interface P {
 	curr_class: MISClass
 	faculty_id: RootReducerState["auth"]["faculty_id"]
 	students: RootDBState["students"]
 	settings: RootDBState["settings"]
+	addMultiplePayments: (payments: payment[] ) => any
 }
 
 interface S {
@@ -65,6 +72,19 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		}
 	}
 
+	componentDidMount(){
+		//loop through fees to check if we have added
+		const relevant_students = Object.values(this.props.students)
+		.filter(s => this.props.curr_class.sections[s.section_id] !== undefined)
+
+		for (let s of relevant_students){
+
+			const owedPayments = checkStudentDuesReturning(s);
+			this.props.addMultiplePayments(owedPayments);
+	
+		}
+	}
+
 	render() {
 
 		const { students, curr_class, settings} = this.props
@@ -99,12 +119,16 @@ class ClassFeeMenu extends Component <propTypes, S> {
 			const owed = filteredPayments
 				.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
+			const totalOwed = Object.entries(s.payments || {} as MISStudent["payments"])
+			.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
+			.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 			
 			return {
 				...agg,
 				[s.id] : {
 					filteredPayments,
-					owed
+					owed,
+					totalOwed
 				}
 			}
 
@@ -173,11 +197,13 @@ export default connect((state: RootReducerState, { match: { params: { id } } } :
 	faculty_id: state.auth.faculty_id,
 	students: state.db.students,
 	settings: state.db.settings,
+}), (dispatch: Function)=> ({
+	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments))
 }))(withRouter(ClassFeeMenu))
 
 
 interface LedgerPageProp {
-	relevant_payments: { [id: string]: { filteredPayments : [string, MISStudentPayment][], owed: number }}
+	relevant_payments: { [id: string]: { filteredPayments : [string, MISStudentPayment][], owed: number, totalOwed: number }}
 	settings: RootDBState["settings"]
 	students: RootDBState["students"]
 	curr_class: MISClass
@@ -188,7 +214,7 @@ const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students
 	return <div className="payment-history">
 	{
 		Object.entries(relevant_payments)
-			.map(([s_id, {filteredPayments, owed}]) => {
+			.map(([s_id, {filteredPayments, owed, totalOwed}]) => {
 			
 			const curr_student = students[s_id]
 			return <div className="payment-history section print-page">
@@ -214,6 +240,10 @@ const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students
 					<label> Adm # :</label>
 					<div>{curr_student.RollNumber}</div>
 				</div>
+				<div className="row info">
+					<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}> {owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
+					<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}>{`${numberWithCommas(Math.abs(totalOwed))} Rs`}</div>
+				</div>
 				
 			<div className="divider">Payment Information</div>
 
@@ -226,7 +256,7 @@ const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students
 			{filteredPayments
 				.map(([id, payment]) => {
 
-					return <div className="payment" key={s_id} >
+					return <div className="payment" key={id} >
 						<div className="table row">
 							<div>{moment(payment.date).format("DD/MM")}</div>
 							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>

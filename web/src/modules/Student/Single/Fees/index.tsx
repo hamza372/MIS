@@ -103,7 +103,7 @@ class StudentFees extends Component <propTypes, S> {
 				type: "SUBMITTED", // submitted or owed
 				sendSMS: false
 			},
-			month: moment().format("MMMM"),
+			month: "",
 			year: moment().format("YYYY"),
 			edits
 		}
