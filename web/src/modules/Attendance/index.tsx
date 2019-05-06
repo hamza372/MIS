@@ -182,7 +182,7 @@ class Attendance extends Component <propTypes, S> {
 				<div className="list">
 				{
 					Object.keys(this.state.selected_students)
-						.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && students[id_a].RollNumber.localeCompare( students[id_b].RollNumber))
+						.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && (parseFloat(students[id_a].RollNumber) - parseFloat(students[id_b].RollNumber)))
 						.map(sid => {
 							const x = students[sid]
 

@@ -18,6 +18,7 @@ import marksIcon from '../Landing/icons/Marks/exam.svg'
 import analyticsIcon from '../Landing/icons/Analytics/increasing-stocks-graphic-of-bars.svg'
 import resultIcon from '../Landing/icons/result_card/exam-a-plus.svg'
 import smsIcon from '../Landing/icons/SMS/sms_1.svg'
+import planner from '../Landing/icons/Planner/planner.svg'
 import Help from '../Landing/icons/Help/help.svg'
 import diary from '../Landing/icons/Diary/diary.svg'
 import teachersIcon from '../Landing/icons/Teacher/teacher_1.svg'
@@ -91,6 +92,131 @@ class Front extends Component {
           </div>
 
           <div className="card">
+            <div className="info" >
+              <div className="card-title"> Setup </div>
+              <div className="para">
+              It is the section through which school would setup the system according to their school,
+              add/make/maintain record of the profiles of their teachers and students.
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={teachersIcon}/>
+                    <div className="image-title">Teacher Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Teacher’s profile module facilitates schools to keep a detailed record of all teachers. 
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={studentsIcon}/>
+                    <div className="image-title">Student Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Student’s profile module saves all required information of students. 
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={classesIcon}/>
+                    <div className="image-title">Classes</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Schools can add classes or sections according to their system.
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={settingsIcon}/>
+                    <div className="image-title">Settings</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Settings let the user setup basic things in MISchool such as teacher’s permission,
+                  logo, school information for header in printing etc.
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={prospective}/>
+                    <div className="image-title">Prospective Student</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Prospective students is especially made for schools marketing so through this
+                  schools can send a message to
+                  the parents that inquired about fees/school but didn’t come back for admission.                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={Help}/>
+                    <div className="image-title">Help</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Help button connects the user instantly to our customer service.
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={switchUserIcon}/>
+                    <div className="image-title">Logout</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Switch users with just a click
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+            <div className="img-container">
+              <img alt="" className="image" src={setup}/>
+            </div>
+          </div>
+
+          <div className="card reverse">
+            <div className="img-container">
+              <img alt="" className="image" src={action}/>
+            </div>
             <div className="info" >
               <div className="card-title"> Actions </div>
               <div className="para">
@@ -222,132 +348,21 @@ class Front extends Component {
                 </div>
               </div>
 
-            </div>
-            <div className="img-container">
-              <img alt="" className="image" src={action}/>
-            </div>
-          </div>
-
-          <div className="card setup">
-            <div className="img-container">
-              <img alt="" className="image" src={setup}/>
-            </div>
-            <div className="info" >
-
-              <div className="card-title"> Setup </div>
-              <div className="para">
-              It is the section through which school would setup the system according to their school,
-              add/make/maintain record of the profiles of their teachers and students.
-              </div>
-
               <div className="icard-row">
-                
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={teachersIcon}/>
-                    <div className="image-title">Teacher Setup</div>
+                    <img alt="" className="icard-image" src={planner}/>
+                    <div className="image-title">Date-Sheet</div>
                   </div>
       
                   <div className="icard-para">
-                  Teacher’s profile module facilitates schools to keep a detailed record of all teachers. 
+                  Allows you to send datesheet to parents and print it
                   </div>
 
                 </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={studentsIcon}/>
-                    <div className="image-title">Student Setup</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Student’s profile module saves all required information of students. 
-                  </div>
-
-                </div>
-                
               </div>
 
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={classesIcon}/>
-                    <div className="image-title">Classes</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Schools can add classes or sections according to their system.
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={settingsIcon}/>
-                    <div className="image-title">Settings</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Settings let the user setup basic things in MISchool such as teacher’s permission,
-                  logo, school information for header in printing etc.
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={prospective}/>
-                    <div className="image-title">Prospective Student</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Prospective students is especially made for schools marketing so through this
-                  schools can send a message to
-                  the parents that inquired about fees/school but didn’t come back for admission.                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={Help}/>
-                    <div className="image-title">Help</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Help button connects the user instantly to our customer service.
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={switchUserIcon}/>
-                    <div className="image-title">Logout</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Switch users with just a click
-                  </div>
-
-                </div>
-                
-              </div>
             </div>
           </div>
 
