@@ -124,10 +124,6 @@ const CharacterCertificate: React.FC <CertificateProps> = ({ curr_student }) => 
         <label>Class: </label>
         <div/>
       </div>
-      <div className="cert-row">
-        <label>Batch: </label>
-        <div/>
-      </div>
     </div>
 
     <div className="footer">

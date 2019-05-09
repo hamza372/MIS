@@ -622,7 +622,10 @@ class SingleStudent extends Component<propTypes, S> {
 							Object.keys(this.state.profile.tags)
 							.map(tag =>
 								<div className="tag-row" key={tag}>
-									<div className="tag bg-grey" onClick={this.removeTag(tag)}>{tag} <span className="cross">x</span></div>
+									<div className="deletable-tag-wrapper" onClick={this.removeTag(tag)}>
+										<div className="tag">{tag} </div> 
+										<div className="cross">×</div>
+									</div>
 								</div>
 							)
 						}

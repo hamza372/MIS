@@ -11,6 +11,7 @@ import {PrintHeader} from 'components/Layout';
 
 import './style.css'
 import getStudentLimt from 'utils/getStudentLimit';
+import { LayoutWrap } from '../../../components/Layout';
 
 const StudentItem = (S) => {
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
@@ -29,11 +30,11 @@ const StudentItem = (S) => {
 							<b>{`Adm #: `}</b>{S.AdmissionNumber}
 						</div>}
 					{ tags && 
-						<div className="row" style={{flexWrap:"wrap"}}>
+						<div className="tags row">
 						{
 							 tags
 							 .filter(t => t !== "FINISHED_SCHOOL") 
-							 .map(t => <div className="tag bg-green"> {t}</div>) 
+							 .map(t => <div className="tag bg-red"> {t}</div>) 
 						}
 						</div>
 					}
@@ -50,7 +51,7 @@ const toLabel = (S) => {
 
 }
 
-class StudentList extends Component {
+export class StudentList extends Component {
 
 
 	constructor(props) {
@@ -152,7 +153,7 @@ class StudentList extends Component {
 		let create = '/student/new' 
 		let createText = "Add new Student"
 		
-		if(forwardTo === 'marks'){
+		if(forwardTo === 'marks' || forwardTo === 'certificates'){
 			create = '';
 		}
 	
@@ -223,4 +224,4 @@ export default connect((state, { location, forwardTo = undefined }) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	forwardTo: forwardTo || qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
 	max_limit: state.db.max_limit || -1
-}))( StudentList);
+}))(LayoutWrap( StudentList));

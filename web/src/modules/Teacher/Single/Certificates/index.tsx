@@ -119,7 +119,7 @@ const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =>
 			</div>
 
 			<div className="para">
-			We found {`${getGenderSpecificText("him/her", gender)}`} responsible, enthusiastic and hardworking during {`${getGenderSpecificText("his/her", gender)}`} working tenure. {`${capitalize(getGenderSpecificText("he/she", gender))}`} can prove to be an asset for any organization. We wish {`${getGenderSpecificText("him/her", gender)}`} success in {`${getGenderSpecificText("his/her", gender)} `} 
+			We found {`${getGenderSpecificText("him/her", gender)}`} responsible, enthusiastic and hardworking during {`${getGenderSpecificText("his/her", gender)}`} tenure. {`${capitalize(getGenderSpecificText("he/she", gender))}`} can prove to be an asset for any organization. We wish {`${getGenderSpecificText("him/her", gender)}`} success in {`${getGenderSpecificText("his/her", gender)} `} 
 			future endeavours.
 			</div>
 		</div>

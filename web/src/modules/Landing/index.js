@@ -20,8 +20,9 @@ import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
 import planner from './icons/Planner/planner.svg'
+import cerificate from './icons/Certificate/certificate1.svg'
 
-//import newBadge from "./icons/New/new.svg";
+import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'
@@ -138,7 +139,20 @@ class Landing extends Component {
 							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 						<div className="row">
-						<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+							<div className="badge-container">
+								<img className="new-badge" src={newBadge}/>
+								{
+									user.Admin &&
+										<Link 
+											to="/certificate-menu"
+											className="button purple-shadow"
+											style={{backgroundImage: `url(${cerificate})`}}
+										>
+											Cerificates
+										</Link> 
+								}
+							</div>
+							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 
 						</div>
 					</div>
@@ -202,11 +216,14 @@ class Landing extends Component {
 						}
 						</div>
 						<div className="row">
-							<Link
-								to="/ClassList" className="button grey-shadow"
-								style={{ backgroundImage: `url(${planner})` }}>
-								Date-Sheet
-							</Link>
+							<div className="badge-container">
+								<img className="new-badge" src={newBadge}/>
+								<Link
+									to="/ClassList" className="button grey-shadow"
+									style={{ backgroundImage: `url(${planner})` }}>
+									Date-Sheet
+								</Link>
+							</div>
 						</div>
 					</div>
 
