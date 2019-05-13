@@ -9,10 +9,10 @@ import { getGenderSpecificText } from '../../../../utils/getGenderSpecificText'
 import moment from 'moment';
 
 interface P {
-		students: RootDBState['students']
-		teachers: RootDBState["faculty"]
-		settings: RootDBState["settings"]
-		schoolLogo: RootDBState["assets"]["schoolLogo"]
+	students: RootDBState['students']
+	teachers: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
@@ -20,10 +20,10 @@ interface S {
 }
 
 interface RouteInfo {
-		id: string
+	id: string
 }
 
-type propTypes = RouteComponentProps < RouteInfo > & P 
+type propTypes = RouteComponentProps < RouteInfo > & P
 
 class TeacherCertificates extends Component < propTypes, S > {
 
@@ -32,7 +32,7 @@ class TeacherCertificates extends Component < propTypes, S > {
 		super(props)
 
 		this.state = {
-				selectedCertificate: "EXPERIENCE"
+			selectedCertificate: "EXPERIENCE"
 		}
 		this.former = new Former( this, [] )
 	}
@@ -48,7 +48,6 @@ class TeacherCertificates extends Component < propTypes, S > {
 				return <ExperienceCertificate curr_teacher={this.teacher()} />
 		}
 	}
-		
 
 	render() {
 		const {settings, schoolLogo} = this.props
@@ -58,13 +57,13 @@ class TeacherCertificates extends Component < propTypes, S > {
 				<PrintHeader settings={settings} logo={schoolLogo} />
 
 					<div className="divider no-print">Certificates</div>
-					
+
 					<div className="cert-Info no-print">
 						<div className="row">
-								<label>Type</label>
-								<select {...this.former.super_handle(["selectedCertificate"])}>
-										<option value="EXPERIENCE">Experience</option>
-								</select>
+							<label>Type</label>
+							<select {...this.former.super_handle(["selectedCertificate"])}>
+								<option value="EXPERIENCE">Experience</option>
+							</select>
 						</div>
 						<div className="button blue" onClick={()=> window.print()}>Print</div>
 					</div>
@@ -72,12 +71,13 @@ class TeacherCertificates extends Component < propTypes, S > {
 			</div>
 		)
 	}
-	}
+}
+
 export default connect ((state : RootReducerState) => ({
-		students: state.db.students,
-		teachers: state.db.faculty,
-		settings: state.db.settings,
-		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
+	students: state.db.students,
+	teachers: state.db.faculty,
+	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }))(TeacherCertificates)
 
 interface CertificateProps {
@@ -103,25 +103,28 @@ const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =>
 				{` ${getGenderSpecificText("son/daughter", gender)}`} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_teacher.ManName ? curr_teacher.ManName : "________________"}</span>, has
 				worked as a teacher of the following subjects in our school from <b style={{textDecoration:"underline"}}>{`${moment(curr_teacher.HireDate).format("DD-MM-YYYY")} `}</b>
 				to <b style={{textDecoration:"underline"}}>{moment(curr_date).format("DD-MM-YYYY")} </b>
-				</div>
+			</div>
 
 			<div className="cert-row">
 				<label>Subjects: </label>
 				<div/>
 			</div>
+
 			<div className="cert-row">
 				<label>Class: </label>
 				<div/>
 			</div>
+
 			<div className="cert-row">
 				<label>Remarks: </label>
 				<div/>
 			</div>
 
 			<div className="para">
-			We found {`${getGenderSpecificText("him/her", gender)}`} responsible, enthusiastic and hardworking during {`${getGenderSpecificText("his/her", gender)}`} tenure. {`${capitalize(getGenderSpecificText("he/she", gender))}`} can prove to be an asset for any organization. We wish {`${getGenderSpecificText("him/her", gender)}`} success in {`${getGenderSpecificText("his/her", gender)} `} 
+			We found {getGenderSpecificText("him/her", gender)} responsible, enthusiastic and hardworking during {getGenderSpecificText("his/her", gender)} tenure. {capitalize(getGenderSpecificText("he/she", gender))} can prove to be an asset for any organization. We wish {getGenderSpecificText("him/her", gender)} success in {`${getGenderSpecificText("his/her", gender)} `} 
 			future endeavours.
 			</div>
+
 		</div>
 
 		<div className="footer">

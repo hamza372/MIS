@@ -139,21 +139,19 @@ class Landing extends Component {
 							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 						<div className="row">
-							<div className="badge-container">
+						{
+							user.Admin && <div className="badge-container">
 								<img className="new-badge" src={newBadge}/>
-								{
-									user.Admin &&
-										<Link 
-											to="/certificate-menu"
-											className="button purple-shadow"
-											style={{backgroundImage: `url(${cerificate})`}}
-										>
-											Cerificates
-										</Link> 
-								}
+								<Link 
+									to="/certificate-menu"
+									className="button purple-shadow"
+									style={{backgroundImage: `url(${cerificate})`}}
+								>
+									Certificates
+								</Link> 
 							</div>
+						}
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
-
 						</div>
 					</div>
 
@@ -221,7 +219,7 @@ class Landing extends Component {
 								<Link
 									to="/ClassList" className="button grey-shadow"
 									style={{ backgroundImage: `url(${planner})` }}>
-									Date-Sheet
+									DateSheet
 								</Link>
 							</div>
 						</div>

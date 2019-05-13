@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Layout from '../../components/Layout'
-import {StudentList} from '../../modules/Student/List'
+import { StudentList } from '../../modules/Student/List'
 import { TeacherList } from '../../modules/Teacher/List'
 
 import former from '../../utils/former'
@@ -18,7 +18,7 @@ interface P {
 }
 
 interface S {
-	fee_for: string
+	fee_for: "STUDENT" | "TEACHER"
 }
 
 interface RouteInfo {
@@ -34,7 +34,7 @@ class CerificateMenu extends Component <propTypes, S> {
 		super(props);
 
 		this.state = {
-			fee_for: "STUDENT" // enum CLASS | STUDENT
+			fee_for: "STUDENT"
 		}
 
 		this.Former = new former(this, [])

@@ -34,7 +34,7 @@ const StudentItem = (S) => {
 						{
 							 tags
 							 .filter(t => t !== "FINISHED_SCHOOL") 
-							 .map(t => <div className="tag bg-red"> {t}</div>) 
+							 .map(t => <div className="tag"> {t}</div>) 
 						}
 						</div>
 					}
@@ -224,4 +224,4 @@ export default connect((state, { location, forwardTo = undefined }) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	forwardTo: forwardTo || qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
 	max_limit: state.db.max_limit || -1
-}))(LayoutWrap( StudentList));
+}))(LayoutWrap(StudentList));
