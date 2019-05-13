@@ -24,8 +24,9 @@ interface P {
 
 interface S {
 	selected_task : string
-	dateSheet : {[subject : string]: number }
+	dateSheet : {[subject : string]: { date: number, time: string} }
 	selected_student_number: string
+	newSubject: string
 }
 
 interface RouteInfo {
@@ -40,21 +41,29 @@ class Planner extends Component <propTypes, S> {
 
 	former: Former
 	constructor(props:  propTypes) {
-	  super(props)
+		super(props)
 		
 		const { class_id, section_id } = this.props.match.params
 		const curr_class = this.props.classes[class_id]
-		const curr_date = moment(moment.now()).format("YYYY-MM-DD")
+		
+		const date = moment.now()
+		const time = moment().format("hh:mm")
+
 		const dateSheet = Object.keys(curr_class.subjects)
 		.reduce((agg, curr) => ({
 			...agg,
-			[curr]: curr_date
+			[curr]: {
+				date,
+				time
+			}
+			
 		}), {})
 
-	  this.state = {
+		this.state = {
 			selected_task: "DATE_SHEET",
 			dateSheet,
 			selected_student_number: "",
+			newSubject: ""
 		}
 		
 		this.former = new Former (this,[])
@@ -103,10 +112,62 @@ class Planner extends Component <propTypes, S> {
 		const header = `Date: ${moment().format("DD MMMM YYYY")}\nDate Sheet of ${this.props.classes[this.class_id()].name}\n`
 		
 		const dateSheet_message = Object.entries(this.state.dateSheet)
-				.map( ([ subject, date ]) => {
-					return `${subject}: ${moment(date).format("DD-MM-YYYY")}`
+				.map( ([ subject, {date, time} ]) => {
+					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}`
 			})
 		return header + dateSheet_message.join("\n")
+	}
+
+	uniqueSubjects = () => {
+		// instead of having a db of subjects, just going to derive it from the 
+		// sections table.
+		// so we need to loop through all sections, pull out the subjects and compile them
+
+		const s = new Set();
+
+		Object.values(this.props.classes)
+			.forEach(cl => {
+				Object.keys(cl.subjects)
+					.forEach(subj => s.add(subj))
+			})
+
+		return s;
+	}
+
+	addSubject = () => {
+
+		const subject = this.state.newSubject
+
+		if(this.state.dateSheet[subject] || this.state.newSubject === ""){
+			if(this.state.newSubject === "")
+				window.alert("Please Enter a Subject Name !!!")
+			else
+				window.alert("Subject Alreday Exists !!!")
+			return
+		}
+
+		const date = moment.now()
+		const time = moment().format("hh:mm")
+
+		this.setState({
+			dateSheet:{
+				...this.state.dateSheet,
+				[subject]: { date, time }
+			}
+		})
+	}
+
+	removeSubject = ( subject: string) => {
+
+		const val = window.confirm("Are you sure you want to delete?")
+		if(!val)
+			return
+		
+		const { [subject]: removed, ...rest }  = this.state.dateSheet
+
+		this.setState({
+			dateSheet: rest
+		})
 	}
 	
 	render() {
@@ -134,44 +195,77 @@ class Planner extends Component <propTypes, S> {
 			<PrintHeader settings={settings} logo={schoolLogo} />
 
 			<div className="planner">
-				<div className="divider no-print">Planner</div>
 
-				<div className="row no-print">
+			{/*
+				<div className="divider no-print">Planner</div>
+					<div className="row no-print">
 					<label> Plan </label>
 					<select {...this.former.super_handle(["selected_task"])}>
 						<option value="DATE_SHEET">Date Sheet</option>
 					</select>
-				</div>
-				<div className="divider">Date-Sheet</div>
+				</div> 
+			*/}
+				<div className="title">DateSheet</div>
 
-				<div> <b> Class/Section: </b> {`${curr_class.name +"/"+ curr_section.name}`}</div>
+				<div className="row input info"> 
+					<div className="row" style={{justifyContent:"flex-start"}}>
+						<label> <b> Class / Section: </b> </label>
+						<div>{`${curr_class.name +"/"+ curr_section.name}`} </div>
+					</div>
+					
+					<div className="row" style={{justifyContent:"flex-end"}}> 
+						<label> <b> Exam: </b> </label> 
+						<input type="text"/> 
+					</div>
+				</div>
 
 				<div className="section table">
 					<div className ="row">
 						<div className="item"><b> Date </b></div>
+						<div className="item"><b> Time </b></div>
 						<div className="item"><b> Subject </b></div>
 					</div>
 						{
-							Object.keys(curr_class.subjects)
-								.map((subject)=> {
+							Object.entries(this.state.dateSheet)
+								.map( ([ subject, { date, time}]) => {
 									return <div className="row" key={subject}>
-										<input className="item" type="date" 
-											value={moment(this.state.dateSheet[subject]).format("YYYY-MM-DD")}
-											onChange={this.former.handle(["dateSheet", subject])}
-											/>
+
+										<input className="item" type="date"
+											value={moment(date).format("YYYY-MM-DD")}
+											onChange={this.former.handle(["dateSheet", subject, "date"])}
+										/>
+
+
+										<input className="item" type="time"
+											{...this.former.super_handle(["dateSheet", subject, "time"])}
+										/>
+
 										<div className="item"> {subject}</div>
+
+										<div className="button red" onClick={()=> this.removeSubject(subject)}> x </div>
+
 									</div>
 							})
 						}
+				</div>
+				<div className="row input no-print">
+					<input list="subjects" type="text" {...this.former.super_handle(["newSubject"])} placeholder="Add Subject"/>
+					<datalist id="subjects">
+					{
+						[...this.uniqueSubjects().keys()]
+						.map(subj => <option key={subj} value={subj} />)
+					}
+					</datalist>
+					<div className="button green" onClick={() => this.addSubject()}> + </div>
 				</div>
 				<div className="row">
 					{ settings.sendSMSOption === "SIM" ? 
 						<a href={smsIntentLink({
 							messages,
 							return_link: window.location.href 
-							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> 
+							})} onClick={() => this.logSms(messages)} className="button blue">Send</a> 
 							: <div className="button" onClick={() => this.sendBatchMessages(messages)}>Send</div> }
-						
+
 					<div className="button blue" onClick={() => window.print()}> Print</div>
 				</div>
 			</div>

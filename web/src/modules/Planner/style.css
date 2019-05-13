@@ -13,7 +13,11 @@
 }
 
 .planner .section {
-	padding: 15px 0px;
+	padding: 15px 5px;
+}
+
+.planner .input {
+	border: none
 }
 
 .planner .table {
@@ -27,6 +31,10 @@
 }
 	.planner .table .row {
 		width: 100%
+	}
+
+	.planner .row.input input {
+		padding: 0px 10px;
 	}
 
 	.planner .table .row input.item {
@@ -63,11 +71,26 @@
 		.planner input.item {
 			display: none
 		}
+		.planner input{
+			border: none
+		}
+	}
+
+	::webkit-calendar-picker-indicator {
+		display: none
 	}
 
 @media only screen and  (max-width : 768px) {
 	.planner{
 		width: 95%;
 		padding: 15px 10px
+	}
+	.planner .row.input input{
+		width: 80%
+	}
+
+	.planner .row.input.info .row {
+		flex-direction: column;
+		align-items: baseline
 	}
 }

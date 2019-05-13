@@ -59,6 +59,10 @@ a.block {
 		margin: 10px;
 	}
 
+	input::-webkit-calendar-picker-indicator {
+		display: none;
+	}
+
 	* {
 		transition: none !important;
 	}
