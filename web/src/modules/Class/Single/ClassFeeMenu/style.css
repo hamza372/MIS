@@ -16,6 +16,10 @@
 	page-break-after: always;
 }
 
+.student-fees-ledger .section {
+	padding: 10px
+}
+
 .print-voucher {
 	display: none;
 }

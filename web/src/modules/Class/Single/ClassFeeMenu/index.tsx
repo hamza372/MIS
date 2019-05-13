@@ -5,9 +5,10 @@ import moment from 'moment'
 import former from '../../../../utils/former';
 import { addMultiplePayments } from '../../../../actions'
 import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
-import { PrintHeader } from '../../../../components/Layout'
+import { getFilteredPayments } from '../../../../utils/getFilteredPayments'
 
 import './style.css'
+import { LedgerPage } from './LedgerPage';
 
 type payment = {
 	student: MISStudent
@@ -33,8 +34,6 @@ interface RouteInfo {
 
 type propTypes = RouteComponentProps<RouteInfo> & P
 
-const numberWithCommas = ( x : number) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
 class ClassFeeMenu extends Component <propTypes, S> {
 
 	Former: former
@@ -47,29 +46,6 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		}
 
 		this.Former = new former(this, []);
-	}
-
-	getFilterCondition = (payment: MISStudentPayment) =>
-	{
-		//when both are empty
-		if(this.state.month === "" && this.state.year === "") {
-			return true
-		}
-		//when month is empty	
-		if(this.state.month === "" && this.state.year !== ""){
-			return  moment(payment.date).format("YYYY") === this.state.year;
-
-		}
-		//when year is empty
-		if(this.state.month !== "" && this.state.year === ""){
-			return moment(payment.date).format("MMMM") === this.state.month
-
-		}
-		//when both are not empty
-		if(this.state.month !== "" && this.state.year !== "")
-		{
-			return moment(payment.date).format("MMMM") === this.state.month && moment(payment.date).format("YYYY") === this.state.year;
-		}
 	}
 
 	componentDidMount(){
@@ -112,16 +88,13 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		
 		const relevant_payments = relevant_students.reduce((agg, s) => {
 			
-			const filteredPayments = Object.entries(s.payments || {} as MISStudent["payments"])
-				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-				.filter(([id,payment]) => this.getFilterCondition(payment))
-			
+			const filteredPayments = getFilteredPayments(s, this.state.year, this.state.month)
+
 			const owed = filteredPayments
 				.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
-			const totalOwed = Object.entries(s.payments || {} as MISStudent["payments"])
-			.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-			.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+			const totalOwed = getFilteredPayments(s, "", "")
+				.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 			
 			return {
 				...agg,
@@ -200,80 +173,3 @@ export default connect((state: RootReducerState, { match: { params: { id } } } :
 }), (dispatch: Function)=> ({
 	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments))
 }))(withRouter(ClassFeeMenu))
-
-
-interface LedgerPageProp {
-	relevant_payments: { [id: string]: { filteredPayments : [string, MISStudentPayment][], owed: number, totalOwed: number }}
-	settings: RootDBState["settings"]
-	students: RootDBState["students"]
-	curr_class: MISClass
-}
-
-const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students, settings, curr_class }) => {
-
-	return <div className="payment-history">
-	{
-		Object.entries(relevant_payments)
-			.map(([s_id, {filteredPayments, owed, totalOwed}]) => {
-			
-			const curr_student = students[s_id]
-			return <div className="payment-history section print-page">
-			<PrintHeader settings={settings} logo={""}/>
-			<div className="divider">Student Information</div>
-				<div className="row info">
-					<label> Name:</label>
-					<div>{curr_student.Name}</div>
-				</div>
-				<div className="row info">
-					<label> Father Name:</label>
-					<div>{curr_student.ManName}</div>
-				</div>
-				<div className="row info">
-					<label> Class Name:</label>
-					<div>{curr_class.name}</div>
-				</div>
-				<div className="row info">
-					<label> Roll #:</label>
-					<div>{curr_student.RollNumber}</div>
-				</div>
-				<div className="row info">
-					<label> Adm # :</label>
-					<div>{curr_student.RollNumber}</div>
-				</div>
-				<div className="row info">
-					<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}> {owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
-					<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}>{`${numberWithCommas(Math.abs(totalOwed))} Rs`}</div>
-				</div>
-				
-			<div className="divider">Payment Information</div>
-
-			<div className="table row heading">
-				<label><b>Date</b></label>
-				<label><b>Label</b></label>
-				<label><b>Amount</b></label>
-			</div>
-
-			{filteredPayments
-				.map(([id, payment]) => {
-
-					return <div className="payment" key={id} >
-						<div className="table row">
-							<div>{moment(payment.date).format("DD/MM")}</div>
-							<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
-							<div>{payment.type === "OWED" ? `${numberWithCommas(payment.amount)}` : `${numberWithCommas(payment.amount)}`}</div>
-						</div>
-					</div>
-				}
-			)}
-
-			<div className="table row last">
-				<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-				<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}><b>{numberWithCommas( Math.abs(owed))}</b></div>
-			</div>
-			</div>
-		})
-	}
-	</div>
-}
-
-

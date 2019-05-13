@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { withRouter, RouteComponentProps, Link } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
 
@@ -12,6 +12,9 @@ import { addMultiplePayments, addPayment, logSms, editPayment } from '../../../.
 import { sendSMS } from '../../../../actions/core'
 import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
 import { smsIntentLink } from '../../../../utils/intent'
+import { numberWithCommas } from '../../../../utils/numberWithCommas'
+import { getFeeLabel } from '../../../../utils/getFeeLabel'
+import { getFilteredPayments } from '../../../../utils/getFilteredPayments'
 
 import './style.css'
 
@@ -69,8 +72,6 @@ interface RouteInfo {
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
-
-const numberWithCommas = ( x : number) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class StudentFees extends Component <propTypes, S> {
 
@@ -182,29 +183,6 @@ class StudentFees extends Component <propTypes, S> {
 		})
 	}
 
-	getFilterCondition = (payment: MISStudentPayment) =>
-	{
-		//when both are empty
-		if(this.state.month === "" && this.state.year === "") {
-			return true
-		}
-		//when month is empty	
-		if(this.state.month === "" && this.state.year !== ""){
-			return  moment(payment.date).format("YYYY") === this.state.year;
-
-		}
-		//when year is empty
-		if(this.state.month !== "" && this.state.year === ""){
-			return moment(payment.date).format("MMMM") === this.state.month
-
-		}
-		//when both are not empty
-		if(this.state.month !== "" && this.state.year !== "")
-		{
-			return moment(payment.date).format("MMMM") === this.state.month && moment(payment.date).format("YYYY") === this.state.year;
-		}
-	}
-
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		const owedPayments = checkStudentDuesReturning(this.student());
@@ -281,10 +259,7 @@ class StudentFees extends Component <propTypes, S> {
 				.map(([id,payment]) => moment(payment.date).format("YYYY"))
 			)]
 			
-		const filteredPayments = Object.entries(this.student().payments || {})
-				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-				.filter(([id,payment]) => this.getFilterCondition(payment))
-		
+		const filteredPayments = getFilteredPayments(this.student(), this.state.year, this.state.month)
 
 		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 		//const curr_month = moment().format("MM/YYYY")
@@ -345,14 +320,14 @@ class StudentFees extends Component <propTypes, S> {
 							return <div className="payment" key={id}>
 								<div className="table row">
 									<div>{moment(payment.date).format("DD/MM")}</div>
-									<div>{payment.type === "SUBMITTED" ? "Payed" : payment.type === "FORGIVEN" ? "Need Scholarship" : payment.fee_name || "Fee"}</div>
+									<div>{getFeeLabel(payment)}</div>
 									
 									{ this.state.edits[id] !== undefined ? 
 										<div className="row" style={{color:"rgb(94, 205, 185)"}}>
 											<input style={{textAlign:"right", border: "none"}} type="number" {...this.Former.super_handle(["edits", id, "amount"])} />
 											<span className="no-print" style={{ width:"min-content" }}>*</span>
 										</div>
-									: <div> {payment.type === "OWED" ? `${numberWithCommas(payment.amount)}` : `${numberWithCommas(payment.amount)}`}</div>}
+									: <div> {numberWithCommas(payment.amount)}</div>}
 								</div>
 							</div> })
 				}
@@ -386,7 +361,7 @@ class StudentFees extends Component <propTypes, S> {
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> }
-				<div className="print button" onClick={() => window.print()}>Print</div>
+				<Link className="print button" to={`/student/${this.props.match.params.id}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`}>Print Preview</Link>
 			</div>
 
 		</div>

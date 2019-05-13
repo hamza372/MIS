@@ -7,6 +7,7 @@ import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 import { addMultiplePayments } from 'actions'
 import { PrintHeader } from 'components/Layout'
 import Former from 'utils/former'
+import { numberWithCommas } from '../../../utils/numberWithCommas'
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
@@ -76,8 +77,6 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 			</div> 
 				
 	}
-
-	const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class FeeAnalytics extends Component {
 

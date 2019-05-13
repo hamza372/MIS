@@ -9,6 +9,7 @@ import Attendance from './Attendance'
 import StudentFees from './Fees'
 import Marks from './Marks'
 import StudentCertificates from './Certificates'
+import printPreview from './Fees/printPreview'
 
 import './style.css'
 
@@ -41,6 +42,7 @@ class StudentPage extends Component {
 				<Route path="/student/new" component={Create} />
 				<Route path="/student/:id/profile" component={Create} />
 				<Route path="/student/:id/payment" component={StudentFees} />
+				<Route path="/student/:id/fee-print-preview" component={printPreview} />
 				<Route path="/student/:id/attendance" component={Attendance} />
 				<Route path="/student/:id/marks" component={Marks} />
 

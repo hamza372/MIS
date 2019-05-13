@@ -5,6 +5,7 @@ import moment from 'moment'
 
 import { createLogout } from 'actions'
 import Layout from 'components/Layout'
+import { numberWithCommas } from '../../utils/numberWithCommas'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
@@ -34,8 +35,6 @@ import diary from './icons/Diary/diary.svg'
  */
 
 import './style.css'
-
-const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class Landing extends Component {
 
