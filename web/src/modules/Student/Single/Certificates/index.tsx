@@ -10,10 +10,10 @@ import Former from '../../../../utils/former';
 import { PrintHeader } from '../../../../components/Layout';
 
 interface P {
-    students: RootDBState['students']
-    teachers: RootDBState["faculty"]
-    settings: RootDBState["settings"]
-    schoolLogo: RootDBState["assets"]["schoolLogo"]
+  students: RootDBState['students']
+  teachers: RootDBState["faculty"]
+  settings: RootDBState["settings"]
+  schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
@@ -21,24 +21,24 @@ interface S {
 }
 
 interface RouteInfo {
-    id: string
+  id: string
 }
 
 type propTypes = RouteComponentProps < RouteInfo > & P 
 
 class StudentCertificates extends Component < propTypes, S > {
-  
+
   former: Former
   constructor(props: propTypes) {
       super(props)
-    
+
       this.state = {
         selectedCertificate: "CHARACTER"
       }
 
       this.former = new Former(this,[])
     }
-    
+
     student = () : MISStudent => {
       const id = this.props.match.params.id
       return this.props.students[id]
@@ -62,7 +62,7 @@ class StudentCertificates extends Component < propTypes, S > {
           <PrintHeader settings={settings} logo={schoolLogo}/>
 
           <div className="divider no-print">Certificates</div>
-          
+
           <div className="cert-Info no-print">
             <div className="row">
                 <label>Type</label>
@@ -75,18 +75,17 @@ class StudentCertificates extends Component < propTypes, S > {
             <div className="button blue" onClick={()=> window.print()}>Print</div>
           </div>
           {this.getSelectedCertificate()}
-          
+
       </div>
     )
   }
 }
 export default connect ((state : RootReducerState) => ({
-    students: state.db.students,
-    teachers: state.db.faculty,
-    settings: state.db.settings,
-    schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
+  students: state.db.students,
+  teachers: state.db.faculty,
+  settings: state.db.settings,
+  schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }))(StudentCertificates)
-
 
 interface CertificateProps {
   curr_student: MISStudent
@@ -104,10 +103,10 @@ const CharacterCertificate: React.FC <CertificateProps> = ({ curr_student }) => 
 
     <div className="body">
       <div className="para">
-        This is to certify that <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.Name}</span>, {`${getGenderSpecificText("son/daughter", gender)}`} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.ManName}</span>, is a bonafide student of this school and bears a good moral character. {`${capitalize(getGenderSpecificText("his/her", gender))}`} behaviour was good with teachers and students. {`${capitalize(getGenderSpecificText("he/she", gender))}`} has neither displayed persistent violent or aggressive behavior nor any desire to harm other. 
+        This is to certify that <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.Name}</span>, {getGenderSpecificText("son/daughter", gender)} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.ManName}</span>, is a bonafide student of this school and bears a good moral character. {capitalize(getGenderSpecificText("his/her", gender))} behaviour was good with teachers and students. {capitalize(getGenderSpecificText("he/she", gender))} has neither displayed persistent violent or aggressive behavior nor any desire to harm other. 
       </div>
 
-      <div className="cert-row"> {`${capitalize(getGenderSpecificText("his/her", gender))}`} data according to our record is as follows;</div>
+      <div className="cert-row"> {capitalize(getGenderSpecificText("his/her", gender))} data according to our record is as follows;</div>
       <div className="cert-row">
         <label>Admission Number: </label>
         <div>
@@ -122,10 +121,6 @@ const CharacterCertificate: React.FC <CertificateProps> = ({ curr_student }) => 
       </div>
       <div className="cert-row">
         <label>Class: </label>
-        <div/>
-      </div>
-      <div className="cert-row">
-        <label>Batch: </label>
         <div/>
       </div>
     </div>
@@ -156,7 +151,7 @@ const SchoolLeavingCertificate: React.FC <CertificateProps> = ({ curr_student })
         This is to certify that <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.Name}</span>, {`${getGenderSpecificText("son/daughter", gender)}`} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.ManName}</span>, has Passed/Failed the Annual Examination held in ________________ for promotion to Class ____________________.
       </div>
 
-      <div className="cert-row"> {`${capitalize(getGenderSpecificText("his/her", gender))}`} data according to our record is as follows;</div>
+      <div className="cert-row"> {capitalize(getGenderSpecificText("his/her", gender))} data according to our record is as follows;</div>
 
       <div className="cert-row">
         <label>Admission Number: </label>
@@ -220,7 +215,7 @@ const SportsCertificate: React.FC <CertificateProps> = ({ curr_student }) => {
 
     <div className="body">
       <div className="para">
-      This certificate is awarded to <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.Name}</span>, {` ${getGenderSpecificText("son/daughter", gender)}`} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.ManName}</span>, for {`${getGenderSpecificText("his/her", gender)}`} excellent athletic performance in ____________________ at our school.
+      This certificate is awarded to <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.Name}</span>, {` ${getGenderSpecificText("son/daughter", gender)}`} of <span style={{fontWeight:"bold", textDecoration:"underline"}}>{curr_student.ManName}</span>, for {getGenderSpecificText("his/her", gender)} excellent athletic performance in ____________________ at our school.
       </div>
 
       <div className="cert-row">
