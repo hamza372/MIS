@@ -18,7 +18,7 @@ class SignUp extends Component {
           phone:"",
           city:"",
           schoolName:"",
-          packageName: "Taleem-1"
+          packageName: "Free-Trial"
         },
         banner: {
           active: false,
@@ -126,6 +126,7 @@ class SignUp extends Component {
           <div className="row">
             <label> Select Package </label>
             <select {...this.former.super_handle(["profile","packageName"])}>
+              <option value="Free-Trial">Free-Trial</option>
               <option value="Taleem-1">Taleem-1</option>
               <option value="Taleem-2">Taleem-2</option>
               <option value="Taleem-3">Taleem-3</option>

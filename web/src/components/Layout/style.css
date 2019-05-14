@@ -59,6 +59,10 @@ a.block {
 		margin: 10px;
 	}
 
+	input::-webkit-calendar-picker-indicator {
+		display: none;
+	}
+
 	* {
 		transition: none !important;
 	}
@@ -557,7 +561,7 @@ input::-webkit-inner-spin-button {
 	margin-right: 20%;
 }
 
-.tag-container{
+.tag-container {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap
@@ -566,18 +570,52 @@ input::-webkit-inner-spin-button {
 	flex-direction: row;
 	margin: 2px 2px;
 }
+
+.tags {
+	align-items: center;
+	flex-wrap: nowrap;
+	height: 50px;
+}
+
 .tag {
-    font-family: inherit;
-    border: 3px solid rgba(0,0,0,0.2);
-    font-weight: bold;
-    padding: 3px 20px 15px;
-	border-radius: 20px;
+    padding: 8px 5px;
 	height: 5px;
 	cursor: pointer;
+	border: 1px solid rgba(0,0,0,0.2);
+	border-radius:2px; 
+	margin: 2px;
+	background-color: rgba(0,0,0,0.05);
+	color: #222;
+	font-size: .7rem;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: nowrap;
+	flex-shrink: 0;
+	align-items: center;
 }
+
+.deletable-tag-wrapper {
+	display: flex;
+	flex-direction: row;
+	cursor: pointer;
+}
+	.deletable-tag-wrapper .tag {
+		margin: 0;
+		border-radius: 2px 0 0 2px;
+	}
+
 .cross {
 	font-size: inherit;
+	border: 1px solid #bbb;
+	border-left: none;
+	padding: 0 5px;
+	display: flex;
+	align-items: center;
+	border-radius: 0 2px 2px 0;
 }
+
 :hover.cross{
-	color: #ff6b68;
+	background-color: #ff6b68;
+	color: #fafafa;
 }

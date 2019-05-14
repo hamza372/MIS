@@ -26,6 +26,10 @@ import PromotionPage from 'modules/Settings/promote-students'
 import Help from "modules/Help"
 import Diary from  'modules/Diary'
 import Front from 'modules/Front'
+import FeeMenu from 'modules/FeeMenu'
+import PlannerList from 'modules/Planner/ClassList'
+import Planner from 'modules/Planner'
+import CertificateMenu from 'modules/CertificateMenu'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -92,9 +96,15 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/diary" component={Diary} />
 
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
-					<AuthedRoute path="/help" component={Help} />
 					<AuthedRoute path="/expenses" component={Expenses} />
+					
+					<AuthedRoute path="/ClassList" component={PlannerList} />
+					<AuthedRoute path="/planner/:class_id/:section_id" component={Planner} />
 
+					<AuthedRoute path="/help" component={Help} />
+					<AuthedRoute path="/certificate-menu" component={CertificateMenu} />
+					
+					<AuthedRoute path="/fee-menu" component={FeeMenu} />
 					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />
 					<Route path="/login" component={Login} />

@@ -81,11 +81,11 @@
             .mischool-resume .card .info {
                 display: inherit;
                 flex-direction: column;
-                width:60%
+                width: 60%
             }
                 .mischool-resume .card .info .card-title {
                     color: #fc6171;
-                    font-size: 1.3rem;
+                    font-size: 1.5rem;
                     font-weight: bold;
                     margin: 15px;
                 }
@@ -106,7 +106,7 @@
                     width: 100%;
                 }
 
-                    .mischool-resume .card .info .icon-card {
+                     .icon-card {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -119,7 +119,7 @@
                         height: 150px;
                     }
 
-                        .mischool-resume .card .info .icon-card .icard-image-container {
+                        .icon-card .icard-image-container {
                             display: flex;
                             flex-direction: column;
                             justify-content: center;
@@ -127,16 +127,16 @@
                             width: 85%;
                         }
     
-                            .mischool-resume .card .info .icon-card .icard-image { 
+                            .icon-card .icard-image { 
                                 height: 30px;
                                 width: 30px;
                             }
-                            .mischool-resume .card .info .icon-card .image-title { 
+                            .icon-card .image-title { 
                                 margin: 2px;
                                 text-align: center;
                             }
     
-                            .mischool-resume .card .info .icon-card .icard-para {
+                            .icon-card .icard-para {
                                 width: 85%;
                                 font-size: 12px;
                                 justify-content: center;
@@ -159,9 +159,9 @@
                     box-shadow: 5px 5px 10px 0px #bebebe;
                     border-radius: 25px;
                     border: 16px solid;
-                    width: 150px;
-                    max-height:300px;
-                    min-height: 100px;
+                    width: 200px;
+                    max-height: 400px;
+                    min-height: 300px;
                     border-image: url("./images/phone.png") 7% 10% 5% 10% stretch;
                 }
                 .mischool-resume .card .img-container .image-cerp{
@@ -307,7 +307,7 @@
 @media screen and (max-width : 768px){
 
     .card-title.intro {
-        font-size: 1.3rem
+        font-size: 1.5rem
     }
     .mischool-resume .card-heading {
         font-size: 1.5rem;
@@ -323,7 +323,10 @@
     .mischool-resume .card .info .icon-card {
         height: 260px;
     }
-    .mischool-resume .card.setup{
+    .mischool-resume .icon-card .icard-para {
+        overflow-y: scroll;
+    }
+    .mischool-resume .card.reverse{
         flex-direction: column-reverse;
     }
 

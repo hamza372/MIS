@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import Layout from 'components/Layout'
 import List from 'components/List'
 import Title from 'components/Title'
+import { LayoutWrap } from '../../../components/Layout';
  
 const TeacherItem = (T) => 
-	<Link key={T.id} to={`/faculty/${T.id}/profile`}>
+	<Link key={T.id} to={`/faculty/${T.id}/${T.forwardTo}`}>
 		{T.Name}
 	</Link>
 
@@ -17,14 +17,29 @@ const tableTitle = () =>{
 		 		</div>
 }
 
-const TeacherList = (props) => {
+export const TeacherList = (props) => {
+
+	let forwardTo = "profile"
 	
-	return <Layout history={props.history}>
-		<div className="teacher-list">
-			
+	if(props.forwardTo === "certificates"){
+		forwardTo = "certificates"
+	}
+
+	const items = Object.entries(props.teachers)
+			.filter(([,f]) => f.Name && f.id)
+			.map(([id,teacher]) => {
+				return {
+					...teacher,
+					id,
+					forwardTo
+				}
+			})
+
+	return <div className="teacher-list">
+
 			<Title>Teachers</Title>
 			<List
-				items={Object.values(props.teachers).filter(f => f.Name && f.id)}
+				items={items}
 				tableTitle={tableTitle}
 				Component={TeacherItem}
 				create={'/faculty/new'} 
@@ -32,9 +47,8 @@ const TeacherList = (props) => {
 				toLabel={T => T.Name} 
 			/>
 		</div>
-	</Layout>
 }
 
 export default connect(state => ({
 	teachers: state.db.faculty //Object.entries(state.db.faculty).reduce((agg, [k, v]) => v.Admin ? agg : {...agg, [k]: v}, { })
-}))(TeacherList);
+}))(LayoutWrap(TeacherList));

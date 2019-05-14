@@ -7,7 +7,6 @@ import { PrintHeader } from '../../../../components/Layout'
 
 import './style.css'
 import { RouteComponentProps } from 'react-router';
-import { Settings } from 'http2';
 
 interface P {
 	faculty: RootDBState["faculty"]
@@ -41,7 +40,7 @@ class FacultyAttendance extends Component< propTypes, S> {
 		this.former = new former(this, []);
 	}
 	
-	getFilterCondition = (date: string) =>{
+	getAttendanceFilterCondition = (date: string) =>{
 		//when both are empty
 		if(this.state.monthFilter === "" && this.state.yearFilter === "") {
 			return true
@@ -139,7 +138,7 @@ class FacultyAttendance extends Component< propTypes, S> {
 			</div>
 			{
 				Object.entries(attendance)
-				.filter(([date,]) => this.getFilterCondition(date))
+				.filter(([date,]) => this.getAttendanceFilterCondition(date))
 				.sort(([dateA,], [dateB,])=> moment(dateB).diff(moment(dateA)) )
 				.map(
 					([date, rec]) => {
