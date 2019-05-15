@@ -36,7 +36,18 @@ class Expenses extends Component <propTypes, S> {
   render() {
     return (
       <Layout history={this.props.history}>
-         <div>I'm Expenses Module</div>
+         <div className="expenses">
+            <div className="title"> Expenses </div>
+
+            <div className="table section">
+              <div className="row header">
+                <label>Date</label>
+                <label> Label</label>
+                <label> Type</label>
+                <label> Amount</label>
+              </div>
+            </div>
+         </div>
       </Layout>
     )
   }
