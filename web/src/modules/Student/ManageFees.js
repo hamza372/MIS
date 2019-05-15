@@ -55,7 +55,7 @@ class ManageFees extends Component {
 			}
 		
 		const fees = Object.values(students)
-			.filter( s => this.state.section_id === "" ? true : s.section_id === this.state.section_id)
+			.filter( s => s.Active && this.state.section_id === "" ? true : s.section_id === this.state.section_id)
 			.map(student => {
 				const fee_id = v4()
 				const {name, amount, type, period } = this.state.fee
