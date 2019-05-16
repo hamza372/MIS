@@ -75,8 +75,8 @@ class Front extends Component {
               width ="100%"
               frameBorder ='0'
               allowFullScreen
-              title='video'
-            />
+            			  title='video'
+/>
           </div>
           
           <div className="card">
@@ -91,296 +91,6 @@ class Front extends Component {
             </div>
           </div>
 
-          <div className="card">
-            <div className="info" >
-              <div className="card-title"> Setup </div>
-              <div className="para">
-              It is the section through which school would setup the system according to their school,
-              add/make/maintain record of the profiles of their teachers and students.
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={teachersIcon}/>
-                    <div className="image-title">Teacher Setup</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Teacher’s profile module facilitates schools to keep a detailed record of all teachers. 
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={studentsIcon}/>
-                    <div className="image-title">Student Setup</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Student’s profile module saves all required information of students. 
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={classesIcon}/>
-                    <div className="image-title">Classes</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Schools can add classes or sections according to their system.
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={settingsIcon}/>
-                    <div className="image-title">Settings</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Settings let the user setup basic things in MISchool such as teacher’s permission,
-                  logo, school information for header in printing etc.
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={prospective}/>
-                    <div className="image-title">Prospective Student</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Prospective students is especially made for schools marketing so through this
-                  schools can send a message to
-                  the parents that inquired about fees/school but didn’t come back for admission.                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={Help}/>
-                    <div className="image-title">Help</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Help button connects the user instantly to our customer service.
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={switchUserIcon}/>
-                    <div className="image-title">Logout</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Switch users with just a click
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-            <div className="img-container">
-              <img alt="" className="image" src={setup}/>
-            </div>
-          </div>
-
-          <div className="card reverse">
-            <div className="img-container">
-              <img alt="" className="image" src={action}/>
-            </div>
-            <div className="info" >
-              <div className="card-title"> Actions </div>
-              <div className="para">
-                Actions provides the user easy access to daily used modules such as,
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={attendanceIcon}/>
-                    <div className="image-title">Attendance</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Instant and easy access, One click process
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={teacherAttendanceIcon}/>
-                    <div className="image-title">Teacher Attendance</div>
-
-                  </div>
-      
-                  <div className="icard-para">
-                    MISchool teacher attendance module keeps the record of teachers attendance and timings as well.                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={feesIcon}/>
-                    <div className="image-title">Fees</div>
-
-                  </div>
-      
-                  <div className="icard-para">
-                    Computerized vouchers
-                    Automatic calculations 
-                    Safe record keeping
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={marksIcon}/>
-                    <div className="image-title">Marks</div>
-
-                  </div>
-      
-                  <div className="icard-para">
-                  Automatic grade calculations.
-                  Print result card of all your students in one click
-                  </div>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={analyticsIcon}/>
-                    <div className="image-title">Analytics</div>
-
-                  </div>
-      
-                  <div className="icard-para">
-                  Graphical representation of your data
-                  Informed decision by comparing old and new data                  
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={resultIcon}/>
-                    <div>Result</div>
-                  </div>
-
-                  <div className="icard-para">
-                    The result card module prints or send sms result card of all students of a class in one click.
-                  </div>
-
-                </div>
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={smsIcon}/>
-                    <div className="image-title">SMS</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Connects you with parents, faculty and staff efficiently 
-                  </div>
-
-                </div>
-
-                <div className="icon-card">
-
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={diary}/>
-                    <div className="image-title">Diary</div>
-                  </div>
-
-                  <div className="icard-para">
-                  A bonus module connecting faculty, students and parents
-                  </div>
-
-                </div>
-              </div>
-
-              <div className="icard-row">
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img alt="" className="icard-image" src={planner}/>
-                    <div className="image-title">Date-Sheet</div>
-                  </div>
-      
-                  <div className="icard-para">
-                  Allows you to send datesheet to parents and print it
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="info" >
-              <div className="card-title">Daily Statistics</div>
-              <div className="para">
-              Daily statistics lets the owner get daily updates about no. 
-              of students present, no. of teachers present, status of fee 
-              collection
-              </div>
-              
-            </div>
-            <div className="img-container">
-              <img alt="" className="image" src={dail_stats}/>
-            </div>
-          </div>
-
           <div className="card-heading"> What makes us Different? </div>
 
           <div className="card diff">
@@ -390,11 +100,10 @@ class Front extends Component {
                   
                   <div className="icard-image-container">
                     <img alt="" className="icard-image" src={syncIcon}/>
-                    <div className="image-title"> Auto-Synchronization </div>
+                    <div className="image-title">Online + Offline</div>
                   </div>
                   <div className="icard-para">
-                  Sync your MIS features to all your devices so that you can always access 
-                  your important data
+				  Use MISchool even when offline. When there is internet, your changes automatically sync so multiple devices can be used at the same time.
                   </div>
 
                 </div>
@@ -403,7 +112,7 @@ class Front extends Component {
                   
                   <div className="icard-image-container">
                     <img alt="" className="icard-image" src={mdsupportIcon}/>
-                    <div className="image-title"> Multiple Device Support </div>
+                    <div className="image-title">Phone, Tablet and Laptop Support</div>
                   </div>
                   <div className="icard-para">
                   Various platforms support MIS application with its features 
@@ -415,10 +124,10 @@ class Front extends Component {
                   
                   <div className="icard-image-container">
                     <img alt="" className="icard-image" src={cloudIcon}/>
-                    <div className="image-title"> Cloud-Backup </div>
+                    <div className="image-title">Cloud-Backup</div>
                   </div>
                   <div className="icard-para">
-                  Cloud backup system keeps your information safe on cloud for years and years. 
+                  When you come online, cloud backup system keeps your information safe for years and years. 
                   </div>
 
                 </div>
@@ -448,6 +157,295 @@ class Front extends Component {
                 
               </div>
                 
+          </div>
+
+
+          <div className="card reverse">
+            <div className="img-container">
+              <img alt="" className="image" src={action}/>
+            </div>
+            <div className="info" >
+              <div className="card-title">Actions</div>
+              <div className="para">
+				The Actions page provides easy access to daily used modules such as:
+              </div>
+
+              <div className="icard-row">
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={attendanceIcon}/>
+                    <div className="image-title">Attendance</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  One click process to mark student attendance
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={teacherAttendanceIcon}/>
+                    <div className="image-title">Teacher Attendance</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+					Easily keep track of teacher attendance, check-in and check-out timings
+				</div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={feesIcon}/>
+                    <div className="image-title">Fees</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+                    Computerized vouchers <br />
+                    Automatic calculations  <br />
+                    Safe record keeping <br />
+					SMS receipts
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={marksIcon}/>
+                    <div className="image-title">Marks</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+                  Automatic grade calculations <br />
+                  Print result card of all your students in one click, or send via SMS to parents
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={analyticsIcon}/>
+                    <div className="image-title">Analytics</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+                  Graphical representation of your data <br />
+                  Make informed decisions by comparing data month by month
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={resultIcon}/>
+                    <div>Result</div>
+                  </div>
+
+                  <div className="icard-para">
+                    Print or send via SMS the result cards for all students of a class in just one click
+                  </div>
+
+                </div>
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={smsIcon}/>
+                    <div className="image-title">SMS</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  	Easily communicate with students and parents by sending SMS using your own SMS package - no need to buy separately. <br />
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={diary}/>
+                    <div className="image-title">Diary</div>
+                  </div>
+
+                  <div className="icard-para">
+				  	Allows multiple users to write the daily diary and easily send to parents every day.
+                  </div>
+
+                </div>
+              </div>
+
+              <div className="icard-row">
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={planner}/>
+                    <div className="image-title">Date-Sheet</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  	You can easily create a date-sheet, and even more easily send as SMS or print.
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="info" >
+              <div className="card-title"> Setup </div>
+              <div className="para">
+			  Organize your schools settings, data and records in the Setup section
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={teachersIcon}/>
+                    <div className="image-title">Teacher Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Teacher’s profile module facilitates schools to keep a detailed record of all teachers. 
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={studentsIcon}/>
+                    <div className="image-title">Student Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Student’s profile module saves all required information of students. 
+                  </div>
+                </div>
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={classesIcon}/>
+                    <div className="image-title">Classes</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  Keep track of classes, class sections and subjects
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={settingsIcon}/>
+                    <div className="image-title">Settings</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  Add your schools logo and adjust teacher permissions <br />
+				  Promote a class from one year to the next
+                  </div>
+                </div>
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={prospective}/>
+                    <div className="image-title">Prospective Student</div>
+                  </div>
+      
+                  <div className="icard-para">
+
+					Easily send SMS reminders and messages to parents that inquired about your school, but have not yet come back for admission. <br />
+					<br />
+				  	Keep track of prospective students who are might join your school. 
+
+					</div>
+
+                </div>
+
+				<div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={Help}/>
+                    <div className="image-title">Help</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Help button connects the user instantly to our customer service.
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={switchUserIcon}/>
+                    <div className="image-title">Logout</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Switch users and share your device with other teachers, even while offline.
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+            <div className="img-container">
+              <img alt="" className="image" src={setup}/>
+            </div>
+          </div>
+
+
+          <div className="card">
+            <div className="info" >
+              <div className="card-title">Daily Statistics</div>
+              <div className="para">
+              Daily statistics lets the owner get daily updates about no. 
+              of students present, no. of teachers present, status of fee 
+              collection
+              </div>
+            </div>
+            <div className="img-container">
+              <img alt="" className="image" src={dail_stats}/>
+            </div>
           </div>
 
           <div className="package-container" >
