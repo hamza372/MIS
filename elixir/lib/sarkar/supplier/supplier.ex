@@ -255,11 +255,6 @@ defmodule Sarkar.Supplier do
 						old = path_date > last_sync_date and not Map.has_key?(new_writes, path_string) 
 						new = old and cid != client_id
 
-						if old and not new do
-							IO.puts "this would have been sent before but not now"
-							IO.inspect path_string
-						end
-
 						old and new
 					end)
 					|> Enum.into(%{})

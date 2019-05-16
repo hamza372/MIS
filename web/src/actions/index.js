@@ -52,6 +52,13 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
 	
 	const state = getState()
 
+	const faculty = state.db.faculty[faculty_id]
+
+	if(faculty === undefined || state.auth.name === faculty.Name) {
+		alert("Cannot delete this teacher they are currently logged in on this device")
+		return;
+	}
+
 	const deletes = []
 
 	for(let c of Object.values(state.db.classes)){
@@ -67,6 +74,9 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
  	dispatch(createDeletes([
 		{
 			path: ["db", "faculty", faculty_id]
+		},
+		{
+			path: ["db", "users", faculty_id]
 		},
 		...deletes
 	])) 
@@ -151,6 +161,47 @@ export const createLogin = (name, password) => (dispatch) => {
 			})
 		})
 }
+
+export const SIGN_UP_LOADING = "SIGN_UP_LOADING"
+export const SIGN_UP_SUCCEED = "SIGN_UP_SUCCEED"
+export const SIGN_UP_FAILED = "SIGN_UP_FAILED"
+export const createSignUp = (profile) => (dispatch, getState, syncr) => {
+
+	// dispatch action to say you are loading/sending the sign up
+	dispatch({
+		type: SIGN_UP_LOADING
+	})
+
+ 	syncr.send({
+		type: "SIGN_UP",
+		client_type,
+		sign_up_id: v4(),
+		payload:{
+			...profile,
+		}
+	})
+	.then(res => {
+		console.log(res)
+		dispatch({
+			type: SIGN_UP_SUCCEED
+		})
+		// dispatch action to say sign up succeeded
+	})
+	.catch(err => {
+		console.error(err)
+		if(err === "timeout")
+		{
+			console.log('your internet sucks')
+		}
+		
+		dispatch({
+			type: SIGN_UP_FAILED,
+			reason: err
+		})
+		// dispatch action to say sign up failed
+	})
+
+ }
 
 export const SCHOOL_LOGIN = "SCHOOL_LOGIN"
 export const createSchoolLogin = (school_id, password) => (dispatch, getState, syncr) => {
@@ -249,17 +300,11 @@ export const markFaculty = (faculty, date, status, time = moment.now()) => dispa
 }
 
 export const undoFacultyAttendance = (faculty, date) => dispatch => {
-	console.log("BEFORE UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
-
 	dispatch(createDeletes([
 		{
 			path:["db", "faculty", faculty.id, "attendance", date]
 		}
 	]))
-
-	console.log("AFTER UNDOING FACULTY ATTENDANCE", faculty, moment(date).format("YYYY-MM-DD"))
-
-
 } 
 
 

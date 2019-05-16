@@ -6,5 +6,11 @@
 	display: flex;
 	margin-left: auto;
 	flex-direction: row;
-	align-items: baseline;
+	align-items: center;
+	font-size: 1rem;
+	overflow-x: auto;
+}
+
+.teacher-attendance .status .button {
+	flex-shrink: 0;
 }

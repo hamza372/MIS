@@ -36,13 +36,13 @@ class Login extends Component {
 		// this needs to be looked into...
 		// we should keep client_id....
 		localStorage.removeItem("db");
-		this.props.history.push("/")
+		this.props.history.push("/landing")
 		window.location.reload()
 	}
 
 	componentWillReceiveProps(newProps) {
 		if(newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
-			this.props.history.push('/')
+			this.props.history.push('/landing')
 		}
 	}
 
@@ -71,7 +71,7 @@ class Login extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" />
+						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" autoCapitalize="off"/>
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>

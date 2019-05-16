@@ -6,8 +6,10 @@ import Layout from 'components/Layout'
 
 import Create from './Create'
 import Attendance from './Attendance'
-import Fees from './Fees'
+import StudentFees from './Fees'
 import Marks from './Marks'
+import StudentCertificates from './Certificates'
+import printPreview from './Fees/printPreview'
 
 import './style.css'
 
@@ -33,17 +35,20 @@ class StudentPage extends Component {
 						</Link> : false }
 					<Link className={`button ${loc === "attendance" ? "purple" : false}`} to="attendance" replace={true}>Attendance</Link>
 					<Link className={`button ${loc === "marks" ? "blue" : false}`} to="marks" replace={true}>Marks</Link>
+					<Link className={`button ${loc === "certificates" ? "yellow" : false}`} to="certificates" replace={true}>Certificates</Link>
 				</div>
 				}
 
 				<Route path="/student/new" component={Create} />
 				<Route path="/student/:id/profile" component={Create} />
-				<Route path="/student/:id/payment" component={Fees} />
+				<Route path="/student/:id/payment" component={StudentFees} />
+				<Route path="/student/:id/fee-print-preview" component={printPreview} />
 				<Route path="/student/:id/attendance" component={Attendance} />
 				<Route path="/student/:id/marks" component={Marks} />
 
 				<Route path="/student/:id/prospective-student" component={Create} />
 				<Route path="/student/prospective-student/new" component={Create} />
+				<Route path="/student/:id/certificates" component={StudentCertificates} />
 			</div>
 		</Layout>
 	}

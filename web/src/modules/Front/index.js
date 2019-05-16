@@ -1,12 +1,16 @@
 import React, { Component } from 'react'
+
 import Layout from "components/Layout"
 import logo from './favicon.ico'
-import play from './images/play.svg'
+import cerpLogo from './images/cerp-logo1.png'
 import setup from "./images/setup1.png"
+import cloudIcon from "./images/cloud.svg"
+import mdsupportIcon from "./images/mdsupport.svg"
+import syncIcon from "./images/sync.svg"
+import coinsIcon from "./images/coins.svg"
+import supportIcon from "./images/support.svg"
 import action from "./images/action.png"
-import dail_stats from "./images/daily_stats2.png"
-import home from "./images/home.png"
-
+import dail_stats from "./images/daily-stats.png"
 import attendanceIcon from '../Landing/icons/attendance/checklist_1.svg'
 import teacherAttendanceIcon from '../Landing/icons/attendance/Attendance.svg'
 import feesIcon from '../Landing/icons/fees/accounting.svg'
@@ -14,6 +18,7 @@ import marksIcon from '../Landing/icons/Marks/exam.svg'
 import analyticsIcon from '../Landing/icons/Analytics/increasing-stocks-graphic-of-bars.svg'
 import resultIcon from '../Landing/icons/result_card/exam-a-plus.svg'
 import smsIcon from '../Landing/icons/SMS/sms_1.svg'
+import planner from '../Landing/icons/Planner/planner.svg'
 import Help from '../Landing/icons/Help/help.svg'
 import diary from '../Landing/icons/Diary/diary.svg'
 import teachersIcon from '../Landing/icons/Teacher/teacher_1.svg'
@@ -23,245 +28,208 @@ import settingsIcon from '../Landing/icons/Settings/settings-gears.svg'
 import switchUserIcon from '../Landing/icons/switch_user/logout.svg'
 import prospective from '../Landing/icons/Prospective/prospective.svg'
 
+import SignUp from './SignUp'
+
 import './style.css'
 
-export default class Front extends Component {
-    constructor(props) {
-      super(props)
-    
-      this.state = {
-         iframe: false
-      }
+class Front extends Component {
+
+  constructor(props) {
+    super(props)
+  
+    this.state = {
+       signUp: false,
+       packageName: ""
     }
+  }
+
+  setPackage = (packageName) =>{
+    this.setState({
+      signUp: !this.state.signUp,
+      packageName
+    })
+  }
+  
     
   render() {
     return <Layout history={this.props.history}>
       <div className="mischool-resume">
         {/*Header*/}
         <div className="headers bg-red">
-            <img src={logo} className="logo"/> 
+            <div className="logo-container" to="/">
+              <img alt="" src={logo} className="logo"/> 
+            </div>
         </div>
 
-        {/**BODY */}
-        <div className="body">
-          
-            <div className="card-video" onClick={()=> this.setState({ iframe: true })}>
-                
-              {!this.state.iframe ?
-                <div className="cv-img-container" style={{ backgroundImage: `url(${play})`}}>
-                    <img className="cv-image" src={home}/>
-                </div>
-                :
-                <iframe src='https://youtube.com/embed/cm73XDWTiNQ'
-                  height = "300px"
-                  width ="100%"
-                  frameBorder ='0'
-                  allow ='autoplay; encrypted-media'
-                  allowFullScreen
-                  title='video'
-                />
-              }
-            </div>
 
-          {/** ==========================> CARD-1 <======================================== */}
+        {/**BODY */}
+                
+        <div className="body">
+
+          <div className="logo-container-cerp" style={{ backgroundColor:"#fafafa"}}>
+            <img alt="" src={cerpLogo} className="logo-cerp"/>
+          </div>
+          <div className="card video">
+            <iframe src='https://youtube.com/embed/cm73XDWTiNQ'
+              height = "290px"
+              width ="100%"
+              frameBorder ='0'
+              allowFullScreen
+            			  title='video'
+/>
+          </div>
+          
           <div className="card">
-            
-            <div className="img-container">
-                <img className="image" src={action} />
-            </div>
-            <div className="info" >
-              <h2 className="card-title">What is MISchool?</h2>
-              <p className="para">
+            <div className="info" style={{width:"100%", alignItems:"center"}}>
+              <div className="card-title intro">What is MISchool?</div>
+              <div className="para">
                 MISchool is a management information system for schools. MISchool enables school to collect,
                 organize, and store records giving your school full control of all academic, 
                 finance, wellbeing, and administrative information. It consists of almost everything that is 
                 required by the school administration.
-              </p>
+              </div>
             </div>
           </div>
-          
-          {/**======================> what are we offering? <============================== */}
-          <h1 style={{
-            display:"flex",
-            flexDirection:"row",
-            justifyContent:"center",
-            color:"#fc6171",
-            
-          }}> What is MISchool Offering? </h1>
 
+          <div className="card-heading"> What makes us Different? </div>
 
-          {/** =========================================== */}
+          <div className="card diff">
 
-          {/** ==========================> CARD-1 <======================================== */}
-          <div className="card">
             <div className="info" >
-              <h2 className="card-title"> Actions </h2>
-              <p className="para">
-                Actions provides the user easy access to daily used modules such as,
-              </p>
-
-              <div className="icard-row">
-                
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={attendanceIcon}/>
+                    <img alt="" className="icard-image" src={syncIcon}/>
+                    <div className="image-title">Online + Offline</div>
                   </div>
-      
-                  <p className="icard-para">
-                  Easy and fast student’s attendance module lets the user send daily attendance directly to parents.
-                  </p>
+                  <div className="icard-para">
+				  Use MISchool even when offline. When there is internet, your changes automatically sync so multiple devices can be used at the same time.
+                  </div>
 
                 </div>
 
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teacherAttendanceIcon}/>
+                    <img alt="" className="icard-image" src={mdsupportIcon}/>
+                    <div className="image-title">Phone, Tablet and Laptop Support</div>
                   </div>
-      
-                  <p className="icard-para">
-                  MISchool teacher attendance module keeps the record of teachers attendance and timings as well.                  </p>
+                  <div className="icard-para">
+                  Various platforms support MIS application with its features 
+                  adapting to the screen you are viewing through.
+                  </div>
 
                 </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={feesIcon}/>
+                    <img alt="" className="icard-image" src={cloudIcon}/>
+                    <div className="image-title">Cloud-Backup</div>
                   </div>
-      
-                  <p className="icard-para">
-                  Fees record of all students, 
-                  Payment information 
-                  Printable voucher 
-                  Fees receipt can be directly send to parents through sms.
-                  Charges on all student or on one class can be added in one click.
-
-                  </p>
+                  <div className="icard-para">
+                  When you come online, cloud backup system keeps your information safe for years and years. 
+                  </div>
 
                 </div>
-
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={marksIcon}/>
+                    <img alt="" className="icard-image" src={supportIcon}/>
+                    <div className="image-title"> Excellent Customer Service </div>
                   </div>
-      
-                  <p className="icard-para">
-                  The exam module keeps a record of all the tests, exams,to be compiled in result card.
-                  </p>
+                  <div className="icard-para">
+                  Our team is equipped to handle software issues in an efficient friendly
+                  manner to your satisfaction.
+                  </div>
+
+                </div>
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={coinsIcon}/>
+                    <div className="image-title"> Best Price </div>
+                  </div>
+                  <div className="icard-para">
+                  You can use the MIS application with just a one time payment and
+                   we assure you that there are no hidden fees such has monthly and annual charges.                  </div>
 
                 </div>
                 
               </div>
-
-              <div className="icard-row">
                 
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={analyticsIcon}/>
-                  </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={resultIcon}/>
-                  </div>
-      
-                  <p className="icard-para">
-                  The result card module prints or send sms result card of all students of a class in one click.
-                  </p>
-
-                </div>
-                
-              </div>
-
-              <div className="icard-row">
-                
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={smsIcon}/>
-                  </div>
-      
-                  <p className="icard-para">
-                  SMS module is the most significant module especially made for schools convenience. It allows sending all kinds of SMS to parents, students and staff right to their mobile phones directly from the cloud system.
-                  </p>
-
-                </div>
-
-                <div className="icon-card">
-                  
-                  <div className="icard-image-container">
-                    <img className="icard-image" src={diary}/>
-                  </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
-
-                </div>
-                
-              </div>
-              {/**============>_icard_<============== */}
-
-            </div>
-            <div className="img-container">
-              <img className="image" src={action} />
-            </div>
           </div>
 
-          {/** =========================================== */}
 
-
-          {/** ==========================> CARD-2 <======================================== */}
-          <div className="card">
+          <div className="card reverse">
             <div className="img-container">
-              <img className="image" src={setup} />
+              <img alt="" className="image" src={action}/>
             </div>
             <div className="info" >
-
-              <h2 className="card-title"> Setup </h2>
-              <p className="para">
-              It is the section through which school would setup the system according to their school,
-              add/make/maintain record of the profiles of their teachers and students.
-              </p>
+              <div className="card-title">Actions</div>
+              <div className="para">
+				The Actions page provides easy access to daily used modules such as:
+              </div>
 
               <div className="icard-row">
-                
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={teachersIcon}/>
+                    <img alt="" className="icard-image" src={attendanceIcon}/>
+                    <div className="image-title">Attendance</div>
                   </div>
       
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+                  <div className="icard-para">
+				  One click process to mark student attendance
+                  </div>
 
                 </div>
 
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={studentsIcon}/>
+                    <img alt="" className="icard-image" src={teacherAttendanceIcon}/>
+                    <div className="image-title">Teacher Attendance</div>
+
                   </div>
       
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+                  <div className="icard-para">
+					Easily keep track of teacher attendance, check-in and check-out timings
+				</div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={feesIcon}/>
+                    <div className="image-title">Fees</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+                    Computerized vouchers <br />
+                    Automatic calculations  <br />
+                    Safe record keeping <br />
+					SMS receipts
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={marksIcon}/>
+                    <div className="image-title">Marks</div>
+
+                  </div>
+      
+                  <div className="icard-para">
+                  Automatic grade calculations <br />
+                  Print result card of all your students in one click, or send via SMS to parents
+                  </div>
 
                 </div>
                 
@@ -272,27 +240,30 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={classesIcon}/>
+                    <img alt="" className="icard-image" src={analyticsIcon}/>
+                    <div className="image-title">Analytics</div>
+
                   </div>
       
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+                  <div className="icard-para">
+                  Graphical representation of your data <br />
+                  Make informed decisions by comparing data month by month
+                  </div>
 
                 </div>
 
                 <div className="icon-card">
-                  
+
                   <div className="icard-image-container">
-                    <img className="icard-image" src={settingsIcon}/>
+                    <img alt="" className="icard-image" src={resultIcon}/>
+                    <div>Result</div>
                   </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+
+                  <div className="icard-para">
+                    Print or send via SMS the result cards for all students of a class in just one click
+                  </div>
 
                 </div>
-                
               </div>
 
               <div className="icard-row">
@@ -300,135 +271,247 @@ export default class Front extends Component {
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={prospective}/>
+                    <img alt="" className="icard-image" src={smsIcon}/>
+                    <div className="image-title">SMS</div>
                   </div>
       
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+                  <div className="icard-para">
+				  	Easily communicate with students and parents by sending SMS using your own SMS package - no need to buy separately. <br />
+                  </div>
 
                 </div>
 
                 <div className="icon-card">
-                  
+
                   <div className="icard-image-container">
-                    <img className="icard-image" src={Help}/>
+                    <img alt="" className="icard-image" src={diary}/>
+                    <div className="image-title">Diary</div>
                   </div>
-      
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+
+                  <div className="icard-para">
+				  	Allows multiple users to write the daily diary and easily send to parents every day.
+                  </div>
 
                 </div>
-                
               </div>
 
               <div className="icard-row">
-                
                 <div className="icon-card">
                   
                   <div className="icard-image-container">
-                    <img className="icard-image" src={switchUserIcon}/>
+                    <img alt="" className="icard-image" src={planner}/>
+                    <div className="image-title">Date-Sheet</div>
                   </div>
       
-                  <p className="icard-para">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                  </p>
+                  <div className="icard-para">
+				  	You can easily create a date-sheet, and even more easily send as SMS or print.
+                  </div>
 
                 </div>
-                
               </div>
-              {/**============>_icard_<============== */}
 
             </div>
           </div>
 
-          {/** =========================================== */}
-
-          {/** ==========================> CARD-3 <======================================== */}
           <div className="card">
             <div className="info" >
-              <h2 className="card-title">Daily Statistics</h2>
-              <p className="para">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of type and scrambled it to make a type 
-                specimen book. It has survived not only five centuries, but also the leap into 
-                electronic typesetting, remaining essentially unchanged. It was popularised in 
-                the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
-                and more recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum.
-              </p>
-              
+              <div className="card-title"> Setup </div>
+              <div className="para">
+			  Organize your schools settings, data and records in the Setup section
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={teachersIcon}/>
+                    <div className="image-title">Teacher Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Teacher’s profile module facilitates schools to keep a detailed record of all teachers. 
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={studentsIcon}/>
+                    <div className="image-title">Student Setup</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Student’s profile module saves all required information of students. 
+                  </div>
+                </div>
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={classesIcon}/>
+                    <div className="image-title">Classes</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  Keep track of classes, class sections and subjects
+                  </div>
+
+                </div>
+
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={settingsIcon}/>
+                    <div className="image-title">Settings</div>
+                  </div>
+      
+                  <div className="icard-para">
+				  Add your schools logo and adjust teacher permissions <br />
+				  Promote a class from one year to the next
+                  </div>
+                </div>
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={prospective}/>
+                    <div className="image-title">Prospective Student</div>
+                  </div>
+      
+                  <div className="icard-para">
+
+					Easily send SMS reminders and messages to parents that inquired about your school, but have not yet come back for admission. <br />
+					<br />
+				  	Keep track of prospective students who are might join your school. 
+
+					</div>
+
+                </div>
+
+				<div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={Help}/>
+                    <div className="image-title">Help</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Help button connects the user instantly to our customer service.
+                  </div>
+
+                </div>
+                
+              </div>
+
+              <div className="icard-row">
+                
+                <div className="icon-card">
+                  
+                  <div className="icard-image-container">
+                    <img alt="" className="icard-image" src={switchUserIcon}/>
+                    <div className="image-title">Logout</div>
+                  </div>
+      
+                  <div className="icard-para">
+                  Switch users and share your device with other teachers, even while offline.
+                  </div>
+
+                </div>
+
+              </div>
             </div>
             <div className="img-container">
-              <img className="image" src={dail_stats} style={{ width:"200px"}}/>
+              <img alt="" className="image" src={setup}/>
             </div>
           </div>
 
-          {/** ===================> Packages <======================== */}
+
+          <div className="card">
+            <div className="info" >
+              <div className="card-title">Daily Statistics</div>
+              <div className="para">
+              Daily statistics lets the owner get daily updates about no. 
+              of students present, no. of teachers present, status of fee 
+              collection
+              </div>
+            </div>
+            <div className="img-container">
+              <img alt="" className="image" src={dail_stats}/>
+            </div>
+          </div>
 
           <div className="package-container" >
-              <h2 style={{ color: "#fc6171" }}>Packages</h2>
-              <div className="pcard-container">
-                <div className="pcard"> 
+              <div className="card-heading">Packages</div>
+              <div className="pcard-container slider">
+                <div className="pcard slide"> 
                   
-                  <h4>Starter</h4>
-                  <div>
-                    <li>asdasjkajkl 100</li>
+                  <div className="bg-blue pcard-title" >Taleem-1</div>
+                  <div className="para" >
+                    <li>150 Students </li>
+                    <li>Price: <strong>7,500 Pkr</strong></li>
                   </div>
-
                 </div>
 
-                <div className="pcard">
+                <div className="pcard slide">
                   
-                  <h4>Standard</h4>
-                  <div>
-                    <li>asdasjkajkl 100</li>
+                  <div className="bg-green pcard-title" >Taleem-2</div>
+                  <div className="para">
+                    <li>300 Students</li>
+                    <li>Price: <strong>10,500 Pkr</strong></li>
                   </div>
-
                 </div>
 
-                <div className="pcard">
+                <div className="pcard slide">
                   
-                  <h4>Pro</h4>
-                  <div>
-                    <li>asdasjkajkl 100</li>
+                  <div className="bg-red pcard-title" >Taleem-3</div>
+                  <div className="para">
+                    <li>Unlimited Students</li>
+                    <li>Price: <strong>14,500 Pkr</strong></li>
+                  </div>
+                </div>
+
+                <div className="pcard slide">
+                  
+                  <div className="bg-purple pcard-title">Special offer </div>
+                  <div className="para">
+                    <li>Free 15 days Trial</li>
+                    <li>Free data entry</li>
+                    <li>Free staff training</li>
                   </div>
 
-                </div>
+                </div> 
 
               </div>
           </div>
 
-          {/**======================> About Us <============================== */}
-          <h1 style={{
-            display:"flex",
-            flexDirection:"row",
-            justifyContent:"center",
-            color:"#fc6171",
-            
-          }}> About Us </h1>
+          <div className="card-heading"> Sign Up</div>
 
-          {/** ==========================> CARD-4 <======================================== */}
-          <div className="card">
+          <SignUp/>
+
+          <div className="card-heading"> About Us </div>
+
+          <div className="card" style={{ justifyContent:"center"}}>
             <div className="info" >
-              <h2 className="card-title"> Who are we?</h2>
-              <p className="para">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of type and scrambled it to make a type 
-                specimen book. It has survived not only five centuries, but also the leap into 
-                electronic typesetting, remaining essentially unchanged. It was popularised in 
-                the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
-                and more recently with desktop publishing software like Aldus PageMaker including 
-                versions of Lorem Ipsum.
-              </p>
-              
+              <div className="card-title"> Who are we?</div>
+              <div className="para">
+              MISchool is developed by the <a href="https://cerp.org.pk">Centre for Economic Research in Pakistan (CERP)</a>. 
+              CERP, is a leading independent nonpartisan policy institution that, 
+              amongst other areas, has been working towards the betterment of private schools 
+              since the last 15 years.
+              </div>
             </div>
-            {/* <div className="img-container">
-              <img className="image" src={dail_stats} style={{ width:"200px"}}/>
-            </div> */}
+
+            <div className="img-container">
+              <img alt="" className="image-cerp" src={cerpLogo}/>
+            </div>
           </div>
 
 
@@ -439,11 +522,11 @@ export default class Front extends Component {
         {/**FOOTER */}
         <div className="footer bg-red">
 
-          <div>
-            <h2>Contact Us</h2>
-            <li>Phone: +92 123 4567891</li>
-            <li>Phone: +92 123 4567891</li>
-            <li>Phone: +92 123 4567891</li>
+          <div className="contact-us">
+            <div className="title">Contact Us</div>
+            <a href="tel:+923481112004">+92 348 111 2004</a>
+            <a href="mailto:mischool@cer.org.pk" >mischool@cerp.org.pk</a>
+            <a href="https://maps.app.goo.gl/iR1Zx">19-A FCC Syed Maratib Ali Road, Lahore</a>
           </div>
 
           
@@ -454,3 +537,4 @@ export default class Front extends Component {
     </Layout>
   }
 }
+export default Front

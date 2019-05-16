@@ -5,6 +5,7 @@ import moment from 'moment'
 
 import { createLogout } from 'actions'
 import Layout from 'components/Layout'
+import { numberWithCommas } from '../../utils/numberWithCommas'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
@@ -19,6 +20,9 @@ import classesIcon from './icons/Classes/classes_1.svg'           //
 import settingsIcon from './icons/Settings/settings-gears.svg'    //
 import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
+import planner from './icons/Planner/planner.svg'
+import cerificate from './icons/Certificate/certificate1.svg'
+
 import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
@@ -31,8 +35,6 @@ import diary from './icons/Diary/diary.svg'
  */
 
 import './style.css'
-
-const numberWithCommas = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 class Landing extends Component {
 
@@ -64,7 +66,7 @@ class Landing extends Component {
 	render() {
 
 		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions } = this.props;
-		
+
 		const current_page = Math.floor(this.state.scroll / window.innerWidth);
 
 		const today_date = moment().format("YYYY-MM-DD");
@@ -136,8 +138,19 @@ class Landing extends Component {
 							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 						<div className="row">
-						<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
-
+						{
+							user.Admin && <div className="badge-container">
+								<img className="new-badge" src={newBadge}/>
+								<Link 
+									to="/certificate-menu"
+									className="button purple-shadow"
+									style={{backgroundImage: `url(${cerificate})`}}
+								>
+									Certificates
+								</Link> 
+							</div>
+						}
+							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 					</div>
 
@@ -187,7 +200,7 @@ class Landing extends Component {
 						{ 
 							user.Admin ||  teacher_fee_permission ?
 							<Link 
-								to="/student?forwardTo=payment" 
+								to= "/fee-menu" 
 								className="button blue-shadow" 
 								style={{backgroundImage: `url(${feesIcon})` }}>Fees</Link> 
 								
@@ -198,6 +211,16 @@ class Landing extends Component {
 								<Link to="/analytics/fees" className="button purple-shadow" style={{backgroundImage: `url(${analyticsIcon})` }}>Analytics</Link> 
 								: false
 						}
+						</div>
+						<div className="row">
+							<div className="badge-container">
+								<img className="new-badge" src={newBadge}/>
+								<Link
+									to="/ClassList" className="button grey-shadow"
+									style={{ backgroundImage: `url(${planner})` }}>
+									DateSheet
+								</Link>
+							</div>
 						</div>
 					</div>
 

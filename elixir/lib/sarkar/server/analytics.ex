@@ -10,7 +10,7 @@ defmodule Sarkar.Server.Analytics do
 	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
-		"SELECT school_id, to_timestamp(time/1000)::date as date, count(*) 
+		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
 		FROM writes
 		GROUP BY school_id, date 
 		ORDER BY date desc",
@@ -31,18 +31,18 @@ defmodule Sarkar.Server.Analytics do
 		)
 
 		{:ok, req, state}
-		
+
 	end
 
 	def init(%{bindings: %{type: "fees.csv"}} = req, state) do
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT 
-				to_timestamp(time/1000)::date as d, 
+				to_timestamp(time/1000)::date::text as d, 
 				school_id, 
 				count(distinct path[3]) as unique_students,
 				count(distinct path[5]) as num_payments, 
-				sum((value->>'amount')::float) as total, 
+				sum((value->>'amount')::float) as total
 			FROM writes 
 			WHERE path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED'
 			GROUP BY d, school_id 
@@ -66,7 +66,7 @@ defmodule Sarkar.Server.Analytics do
 	def init(%{bindings: %{type: "exams.csv"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT 
-				to_timestamp(time/1000)::date as d,
+				to_timestamp(time/1000)::date::text as d,
 				school_id,
 				count(distinct path[3]) as students_graded,
 				count(distinct path[5]) as exams 
@@ -93,7 +93,7 @@ defmodule Sarkar.Server.Analytics do
 	def init(%{bindings: %{type: "attendance.csv"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date as d, 
+				to_timestamp(time/1000)::date::text as d, 
 				school_id,
 				count(distinct path[3]) as students_marked 
 			FROM writes
@@ -118,7 +118,7 @@ defmodule Sarkar.Server.Analytics do
 	def init(%{bindings: %{type: "teacher_attendance.csv"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date as d, 
+				to_timestamp(time/1000)::date::text as d, 
 				school_id,
 				count(distinct path[3]) as teachers_marked 
 			FROM writes
@@ -144,7 +144,7 @@ defmodule Sarkar.Server.Analytics do
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date as d, 
+				to_timestamp(time/1000)::date::text as d, 
 				school_id, 
 				sum(CASE WHEN value->>'type' = 'ALL_STUDENTS' THEN (value->>'count')::int ELSE 0 END) AS ALL_STUDENTS,
 				sum(CASE WHEN value->>'type' = 'ALL_TEACHERS' THEN (value->>'count')::int ELSE 0 END) AS ALL_TEACHERS,
@@ -162,7 +162,7 @@ defmodule Sarkar.Server.Analytics do
 			GROUP BY d, school_id
 			ORDER BY d desc", [])
 		
-		csv = [ ["date", "school_id", "ALL_STUDENTS","ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE","EXAM","PROSPECTIVE", "TOTAL"] | resp.rows] 
+		csv = [ ["date", "school_id", "ALL_STUDENTS", "ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE", "EXAM", "PROSPECTIVE", "TOTAL"] | resp.rows] 
 			|> CSV.encode
 			|> Enum.join()
 		
