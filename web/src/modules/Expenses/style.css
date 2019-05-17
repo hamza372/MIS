@@ -1,0 +1,19 @@
+.expenses {
+	width: 100%;
+}
+
+.expenses .table {
+	width:90%
+}
+
+.expenses .section .table{
+	width: 100%;
+}
+
+.expenses .section {
+	width:90%
+}
+
+.expenses .form{
+	width:90%
+}
