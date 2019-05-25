@@ -1,19 +1,21 @@
+.expense-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow-x: hidden;
+}
+
 .expenses {
-	width: 100%;
+	width: 90%;
 }
 
-.expenses .table {
-	width:90%
+.expenses .form {
+	display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    width: 100%;
+    margin: auto;
 }
 
-.expenses .section .table{
-	width: 100%;
-}
-
-.expenses .section {
-	width:90%
-}
-
-.expenses .form{
-	width:90%
-}

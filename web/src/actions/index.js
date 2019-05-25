@@ -347,6 +347,77 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
+export const addExpense = (amount, label, type, category, quantity ) => dispatch => {
+
+	const id = v4()
+	const date = moment.now()
+	const expense =  "MIS_EXPENSE"
+
+
+	/* 	if(amount === undefined || amount === 0) {
+		return {};
+	} */
+
+	console.log("TCL: id", id)
+	console.log("TCL: expense", expense)
+	console.log("TCL: amount", amount)
+	console.log("TCL: label", label)
+	console.log("TCL: type", type)
+	console.log("TCL: category", category)
+	console.log("TCL: quantity", quantity)
+	console.log("TCL: date", date)
+
+/* 	dispatch(createMerges([
+		{
+			path: [ "db", "expenses", id ],
+			value: {
+				expense,
+				amount,
+				label,
+				type,
+				category,
+				quantity,
+				date
+			}
+		}
+	])) */
+}
+
+export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id ) => dispatch => {
+
+	const date = moment.now()
+/* 	if(amount === undefined || amount === 0) {
+		return {};
+	} */
+
+	//id, amount, label, type, category, faculty_id
+	const expense =  "SALARY_EXPENSE"
+	
+	console.log("TCL: id", id)
+	console.log("TCL: expense", expense)
+	console.log("TCL: amount", amount)
+	console.log("TCL: label", label)
+	console.log("TCL: type", type)
+	console.log("TCL: category", category)
+	console.log("TCL: faculty_id", faculty_id)
+	console.log("TCL: date", date)
+
+/* 	dispatch(createMerges([
+		{
+			path: [ "db", "expenses", id ],
+			value: {
+				expense,
+				amount,
+				label, // SALARY
+				type, // PAID or ADVANCE
+				category, // SALARY
+				faculty_id,
+				date
+			}
+		}
+	])) */
+}
+
 export const addMultipleFees = (fees) => dispatch => {
 	
 	//fees is an array of { student, fee_id, amount, type, period, name}

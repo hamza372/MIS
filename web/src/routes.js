@@ -34,7 +34,7 @@ import CertificateMenu from 'modules/CertificateMenu'
 import ManageFees from 'modules/Student/ManageFees'
 
 import AuthedRoute from 'components/AuthedRoute'
-import Expenses from './modules/Expenses';
+import ExpensePage from './modules/Expenses';
 
 export default class Routes extends React.Component {
 
@@ -96,7 +96,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/diary" component={Diary} />
 
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
-					<AuthedRoute path="/expenses" component={Expenses} />
+					<AuthedRoute path="/expenses" component={ExpensePage} />
 					
 					<AuthedRoute path="/ClassList" component={PlannerList} />
 					<AuthedRoute path="/planner/:class_id/:section_id" component={Planner} />

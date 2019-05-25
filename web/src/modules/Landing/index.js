@@ -142,7 +142,7 @@ class Landing extends Component {
 						<div className="row">
 						{
 							user.Admin && <div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
+								<img className="new-badge" src={newBadge} alt=""/>
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
@@ -217,7 +217,7 @@ class Landing extends Component {
 
 						<div className="row">
 							<div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
+								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									to="/ClassList" className="button grey-shadow"
 									style={{ backgroundImage: `url(${planner})` }}>
@@ -226,7 +226,7 @@ class Landing extends Component {
 							</div>
 							{
 							(user.Admin || teacher_expenses_permission) && <div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
+								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									className="button grey"
 									to="/expenses">

@@ -21,6 +21,9 @@ interface RootDBState {
 		[id: string]: MISExam
 	}
 	settings: MISSettings
+	expenses: {
+		[id: string]: MISExpense | MISSalaryExpense
+	}
 	analytics: {
 		sms_history: {
 			[id: string]: MISSMSHistory
@@ -172,6 +175,28 @@ interface MISStudentPayment {
 	type: "SUBMITTED" | "FORGIVEN" | "OWED"
 	fee_id?: string
 	fee_name?: string
+}
+
+interface BaseMISExpense {
+	expense: string
+	amount: number
+	label: string
+	type: string
+	category: string
+	date: number
+}
+
+interface MISExpense extends BaseMISExpense {
+	expense: "MIS_EXPENSE"
+	type: "PAYMENT_GIVEN"
+	quantity: number
+}
+
+interface MISSalaryExpense extends BaseMISExpense {
+	expense: "SALARY_EXPENSE"
+	type: "PAYMENT_DUE" | "PAYMENT_GIVEN"
+	faculty_id: string
+	category: "SALARY"
 }
 
 interface MISStudentAttendanceEntry {

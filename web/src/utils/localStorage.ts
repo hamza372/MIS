@@ -20,6 +20,7 @@ const initState : RootReducerState = {
 		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
 		settings: { } as MISSettings,
+		expenses: {},
 		analytics: {
 			sms_history: {}
 		},
