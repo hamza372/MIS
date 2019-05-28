@@ -347,16 +347,10 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
-export const addExpense = (amount, label, type, category, quantity ) => dispatch => {
+export const addExpense = (amount, label, type, category, quantity, date = moment.now() ) => dispatch => {
 
-	const id = v4()
-	const date = moment.now()
 	const expense =  "MIS_EXPENSE"
-
-
-	/* 	if(amount === undefined || amount === 0) {
-		return {};
-	} */
+	const id = v4()
 
 	console.log("TCL: id", id)
 	console.log("TCL: expense", expense)
@@ -367,7 +361,7 @@ export const addExpense = (amount, label, type, category, quantity ) => dispatch
 	console.log("TCL: quantity", quantity)
 	console.log("TCL: date", date)
 
-/* 	dispatch(createMerges([
+	dispatch(createMerges([
 		{
 			path: [ "db", "expenses", id ],
 			value: {
@@ -380,17 +374,11 @@ export const addExpense = (amount, label, type, category, quantity ) => dispatch
 				date
 			}
 		}
-	])) */
+	]))
 }
 
-export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id ) => dispatch => {
+export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id, date = moment.now() ) => dispatch => {
 
-	const date = moment.now()
-/* 	if(amount === undefined || amount === 0) {
-		return {};
-	} */
-
-	//id, amount, label, type, category, faculty_id
 	const expense =  "SALARY_EXPENSE"
 	
 	console.log("TCL: id", id)
@@ -402,20 +390,20 @@ export const addSalaryExpense = (id, amount, label, type, category = "SALARY", f
 	console.log("TCL: faculty_id", faculty_id)
 	console.log("TCL: date", date)
 
-/* 	dispatch(createMerges([
+	dispatch(createMerges([
 		{
 			path: [ "db", "expenses", id ],
 			value: {
 				expense,
-				amount,
-				label, // SALARY
-				type, // PAID or ADVANCE
+				amount, 
+				label, // Teacher name
+				type, // PAYMENT_GIVEN or PAYMENT_DUE
 				category, // SALARY
 				faculty_id,
 				date
 			}
 		}
-	])) */
+	]))
 }
 
 export const addMultipleFees = (fees) => dispatch => {

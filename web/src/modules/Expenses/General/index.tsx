@@ -10,6 +10,12 @@ import { addExpense, addSalaryExpense } from '../../../actions'
 import moment from 'moment'
 import Banner from '../../../components/Banner';
 import { PrintHeader } from '../../../components/Layout';
+import { v4 } from 'node-uuid';
+
+
+/**
+ * Need to think about Advance Salary
+ */
 
 interface P {
   teachers: RootDBState["faculty"]
@@ -80,7 +86,7 @@ class Expenses extends Component <propTypes, S> {
         if(!this.props.expenses[id])
         {
           //id, amount, label, type, category, faculty_id
-          this.props.addSalaryExpense( id, parseFloat(t.Salary), "SALARY", "PAYMENT_DUE", "SALARY", t.id )
+          this.props.addSalaryExpense( id, parseFloat(t.Salary), this.props.teachers[t.id].Name, "PAYMENT_DUE", "SALARY", t.id )
           console.log("<================================>\n")
         } 
       })
@@ -151,6 +157,13 @@ class Expenses extends Component <propTypes, S> {
     }
 
     if(payment.category === "SALARY"){
+
+      const salary_pre_exist = this.props.expenses[id]
+      if(salary_pre_exist && salary_pre_exist.amount !== parseFloat(payment.amount)){
+        this.props.addSalaryExpense( v4(), parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.category, payment.faculty_id)
+        return
+      }
+
       this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.category, payment.faculty_id)
       console.log("Adding salary expense")
 
@@ -179,7 +192,8 @@ class Expenses extends Component <propTypes, S> {
   render() {
 
     const { expenses, teachers, settings, schoolLogo } = this.props
-
+    
+    console.log("TCL: Expenses -> render -> expenses", expenses)
      return <div className="expenses">
           { this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
@@ -192,7 +206,7 @@ class Expenses extends Component <propTypes, S> {
 
             <div className="divider">Ledger</div>
 
-            {/* <div className="filter row no-print" style={{marginBottom:"10px"}}>
+{/*              <div className="filter row no-print" style={{marginBottom:"10px"}}>
               <select className="" style={{ width: "150px" }}>
                 <option value="">Select Month</option>
                 <option value="May">May</option>
@@ -202,8 +216,8 @@ class Expenses extends Component <propTypes, S> {
                 <option value="">Select Year</option>
                 <option value="2019"> 2019</option>
               </select>
-		      	</div>
-            */}
+		      	</div> */}
+            
             <div className="payment-history section">
               <div className="table row heading">
                 <label><b> Date   </b></label>
@@ -216,27 +230,27 @@ class Expenses extends Component <propTypes, S> {
               {
                 Object.values(expenses).map( e => {
                   if(e.expense === "SALARY_EXPENSE") {
-                    <div className="table row">
-                      <label> {moment(e.date).format("DD-MM-YYYY")} </label>
-                      <label> {teachers[e.faculty_id].Name}</label>
+                    return <div className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
+                      <label> {moment(e.date).format("DD-MM")} </label>
+                      <label> {e.label}</label>
                       <label> {e.category}</label>
                       <label> {`-`} </label>
-                      <label> {numberWithCommas(e.amount)} </label>
+                      <label> <span style={ e.type === "PAYMENT_DUE" ? { color: "#fc6171"}: {color: "#5ecdb971"}}>{numberWithCommas(e.amount)}</span></label>
                     </div>
                   }
                   else if (e.expense === "MIS_EXPENSE"){
-                    <div className="table row">
-                      <label> {moment(e.date).format("DD-MM-YYYY")} </label>
+                    return <div className="table row">
+                      <label> {moment(e.date).format("DD-MM")} </label>
                       <label> {e.label}</label>
                       <label> {e.category}</label>
                       <label> {e.quantity } </label>
-                      <label> {numberWithCommas(e.amount)} </label>
+                      <label> <span style={{ color: "#5ecdb971"}}> {numberWithCommas(e.amount)} </span></label>
                   </div>
                   }
                 })
               }
               <div className="table row last">
-                <label><b> Total</b></label>
+                <label><b> Total Paid:</b></label>
                 <div><b>{Object.values(expenses).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)}</b></div>
               </div>
             </div>
@@ -257,7 +271,7 @@ class Expenses extends Component <propTypes, S> {
                   <select {...this.former.super_handle(["payment", "faculty_id"])}>
                     <option value=""> SELECT</option>
                     {
-                      Object.values(this.props.teachers)
+                      Object.values(teachers)
                       .map(t => {
                         return <option key={t.id} value={t.id}> {t.Name} </option>
                       })

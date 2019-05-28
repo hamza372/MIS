@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Layout from '../../components/Layout'
 
 import Expenses from '../../modules/Expenses/General';
+import IncomeExpenditure from '../../modules/Expenses/Income-Expenditure'
 
 import './style.css'
 
@@ -38,16 +39,27 @@ class ExpensePage extends Component <propTypes> {
 					{ 
 						admin || permissions.fee.teacher ?
 						<Link
-							className={`button ${loc === "expenses" ? "green": false}`}
-							to="expenses"
+							className={`button ${loc === "general" ? "green": false}`}
+							to="general"
 							replace={true}
 							> 
 							General
+						</Link> : false
+					}
+					{
+						admin || permissions.fee.teacher ?
+						<Link
+							className={`button ${loc === "income-expenditure" ? "green": false}`}
+							to="income-expenditure"
+							replace={true}
+							> 
+							Income-Expenditure
 						</Link> : false 
 					}
 				</div>
 
-				<Route path="/expenses/" component={Expenses} />
+				<Route path="/expenses/general" component={Expenses} />
+				<Route path="/expenses/income-expenditure" component={IncomeExpenditure}/>
 
 			</div>
 		</Layout>

@@ -229,7 +229,7 @@ class Landing extends Component {
 								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									className="button grey"
-									to="/expenses">
+									to="/expenses/general">
 									Expenses 
 								</Link>
 								</div>
