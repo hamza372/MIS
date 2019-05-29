@@ -60,7 +60,6 @@ class StudentMarksContainer extends Component {
 
 		const url = smsIntentLink({ messages: [{ number: student.Phone, text: text }], return_link: window.location.href })
 
-		console.log("school logo thing", this.props.schoolLogo)
 		return <div className="student-marks-container">
 				<div className="no-print">
 					<div className="form">
