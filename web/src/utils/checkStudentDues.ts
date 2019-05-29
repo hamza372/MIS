@@ -11,7 +11,7 @@ export function checkStudentDuesReturning(student: MISStudent) : payment[] {
 	let payments : payment[] = []
 
 	for(let [id, fee] of Object.entries(student.fees || {})) {
-		if(fee.period === "MONTHLY") {
+		if(fee.period === "MONTHLY" && student.Active) {
 			// check if this fee exists in "owed" column.
 
 			const existing_monthly = Object.values(student.payments || {})
