@@ -197,6 +197,8 @@ interface MISSalaryExpense extends BaseMISExpense {
 	type: "PAYMENT_DUE" | "PAYMENT_GIVEN"
 	faculty_id: string
 	category: "SALARY"
+	advance: number
+	deduction: number
 }
 
 interface MISStudentAttendanceEntry {

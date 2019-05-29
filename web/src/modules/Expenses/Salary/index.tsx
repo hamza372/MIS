@@ -10,14 +10,19 @@ import { addExpense, addSalaryExpense } from '../../../actions'
 import moment from 'moment'
 import Banner from '../../../components/Banner';
 import { PrintHeader } from '../../../components/Layout';
+import { v4 } from 'node-uuid';
 
+
+/**
+ * Need to think about Advance Salary
+ */
 
 interface P {
   teachers: RootDBState["faculty"]
   expenses: RootDBState["expenses"]
   settings: RootDBState["settings"]
   schoolLogo: RootDBState["assets"]["schoolLogo"]
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number ) => any
+  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string, date: number ,advance: number, deduction: number) => any
 }
 
 interface S {
@@ -34,7 +39,9 @@ interface S {
     faculty_id: string
     quantity: string
     label: string
-  }
+    advance: number
+    deductions: string
+  },
   monthFilter: string
   yearFilter: string
 }
@@ -45,7 +52,7 @@ interface Routeinfo {
 
 type propTypes = RouteComponentProps<Routeinfo> & P
 
-class Expenses extends Component <propTypes, S> {
+class Salary extends Component <propTypes, S> {
 
   former: Former
   constructor(props: propTypes) {
@@ -65,12 +72,31 @@ class Expenses extends Component <propTypes, S> {
         category: "",
         faculty_id: "",
         quantity: "",
+        advance: 0,
+        deductions: "0"
       },
       monthFilter: "",
-      yearFilter: ""
+      yearFilter: "",
     }
 
     this.former = new Former (this,[])
+  }
+
+  componentDidMount () {
+
+    console.log("LOADED Expenses")
+    
+    Object.values(this.props.teachers)
+      .filter(t => t.Salary !== "")  
+      .forEach(t => {
+        const id = `${moment().format("MM-YYYY")}-${t.id}`
+        if(!this.props.expenses[id])
+        {
+          //id, amount, label, type, category, faculty_id
+          this.props.addSalaryExpense( id, parseFloat(t.Salary), this.props.teachers[t.id].Name, "PAYMENT_DUE", "SALARY", t.id, moment.now(),0, 0 )
+          console.log("<================================>\n")
+        } 
+      })
   }
 
   newPayment = () => {
@@ -81,7 +107,7 @@ class Expenses extends Component <propTypes, S> {
         amount: "",
         label:"",
         type: "PAYMENT_GIVEN",
-        category: "",
+        category: "SALARY",
         faculty_id: "",
         quantity: "",
       }
@@ -91,19 +117,13 @@ class Expenses extends Component <propTypes, S> {
   addPayment = () => {
 
     const payment = this.state.payment
+    const id = `${moment().format("MM-YYYY")}-${payment.faculty_id}`
 
-    let compulsoryFields
-    
-    if (this.state.payment.category){
-      compulsoryFields = checkCompulsoryFields(this.state.payment, [
-        ["amount"], ["label"], ["type"], ["quantity"]
-      ])
-    }
-    else {
-      compulsoryFields = checkCompulsoryFields(this.state.payment, [
-        ["category"]
-      ])
-    }
+    console.log("paymnet=>", payment)
+
+    const compulsoryFields = checkCompulsoryFields(this.state.payment, [
+      ["amount"], ["faculty_id"]
+    ])
 
     if(compulsoryFields){
       const erroText = `Please Fill ${(compulsoryFields as string[][]).map(x => x[0] === "faculty_id" ? "Teacher" : x[0]).join(", ")} !`
@@ -117,9 +137,22 @@ class Expenses extends Component <propTypes, S> {
       })
     }
 
-    console.log("Adding expense")
-    this.props.addExpense( parseFloat(payment.amount), payment.label, "PAYMENT_GIVEN", payment.category, parseFloat(payment.quantity))
-    
+    const salary_pre_exist = this.props.expenses[id]
+
+    if(salary_pre_exist){
+      
+      if(salary_pre_exist.amount > parseFloat(payment.amount)) 
+      {
+        payment.advance = (salary_pre_exist.amount - parseFloat(payment.deductions)) - parseFloat(payment.amount)
+      }
+      else if(salary_pre_exist.amount < parseFloat(payment.amount))
+      {
+        payment.advance = (salary_pre_exist.amount - parseFloat(payment.deductions)) - parseFloat(payment.amount)
+      }
+    }
+
+    this.props.addSalaryExpense( v4(), parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.category, payment.faculty_id, moment.now(), payment.advance, parseFloat(payment.deductions))
+
     this.setState({
       banner: {
         active: true,
@@ -136,6 +169,8 @@ class Expenses extends Component <propTypes, S> {
         }
       })
     }, 1000)
+    return
+  
   }
 
   getFilterCondition = (year: string, month: string, payment: any) =>
@@ -167,27 +202,31 @@ class Expenses extends Component <propTypes, S> {
 
     let Months  = new Set([])
     let Years = new Set([])
-  
+
     for(let e of Object.values(expenses)){
-      if(e.expense === "MIS_EXPENSE")
+      if(e.expense === "SALARY_EXPENSE")
       {
         Months.add(moment(e.date).format("MMMM"))
         Years.add(moment(e.date).format("YYYY"))
       }
     }
 
-    const totalGeneralExpense = Object.values(expenses)
-      .filter(e => e.expense === "MIS_EXPENSE")  
+    const totalSalaryExpense = Object.values(expenses)
+      .filter(e => e.expense === "SALARY_EXPENSE" && this.getFilterCondition(this.state.yearFilter, this.state.monthFilter,e))  
+      .reduce((agg, curr) => agg + curr.amount, 0)
+
+    const filteredSalaryExpense = Object.values(expenses)
+      .filter(e => e.expense === "SALARY_EXPENSE" && this.getFilterCondition(this.state.yearFilter, this.state.monthFilter,e))  
       .reduce((agg, curr) => agg + curr.amount, 0)
 
      return <div className="expenses">
           { this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
           <PrintHeader settings={settings} logo={schoolLogo}/>
-            <div className="divider">Expense Information</div>
+            <div className="divider">Salary Information</div>
             <div className="table row">
-              <label>Total General:</label>
-              <div>{totalGeneralExpense}</div>
+              <label>Current Month Total:</label>
+              <div>{numberWithCommas(totalSalaryExpense)}</div>
             </div>
 
             <div className="divider">Ledger</div>
@@ -211,52 +250,43 @@ class Expenses extends Component <propTypes, S> {
                 }
               </select>
             </div>
-
+            
             <div className="payment-history section">
               <div className="table row heading">
                 <label><b> Date   </b></label>
-                <label><b> Label  </b></label>
-                <label><b> Category   </b></label>
-                <label><b> Quantity</b></label>
+                <label><b> Name  </b></label>
+                <label><b> Base </b></label>
+                <label><b> Adv/Deduc</b></label>
                 <label><b> Amount </b></label>
               </div>
 
               {
                 Object.values(expenses)
-                .filter(e => e.expense === "MIS_EXPENSE" && this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
-                .sort((a,b) => a.date - b.date)
+                .filter(e => e.expense === "SALARY_EXPENSE" && this.getFilterCondition(this.state.yearFilter, this.state.monthFilter,e))
+                .sort((a,b)=> a.date - b.date)
                 .map( e => {
-                    return <div className="table row">
-                      <label> {moment(e.date).format("DD-MM")} </label>
+                  if(e.expense === "SALARY_EXPENSE"){
+                    return <div className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
+                      <label> {moment(e.date).format("DD-MM-YY")} </label>
                       <label> {e.label}</label>
-                      <label> {e.category}</label>
-                      <label style={{textAlign: "center"}}> {e.expense === "MIS_EXPENSE" ? e.quantity: "-"} </label>
                       <label> <span style={ e.type === "PAYMENT_DUE" ? { color: "#fc6171"}: {color: "#5ecdb971"}}>{numberWithCommas(e.amount)}</span></label>
+                      <label> {`${e.advance}/${e.deduction}`} </label>
+                      <label> { numberWithCommas((e.amount - e.deduction) - e.advance)} </label>
                     </div>
+                  }  
                 })
               }
               <div className="table row last">
                 <label><b> Total Paid:</b></label>
-                <div><b>{totalGeneralExpense}</b></div>
+                <div><b>{numberWithCommas(filteredSalaryExpense)}</b></div>
               </div>
             </div>
             <div className="form">
               <div className={`button ${this.state.payment.active ? "orange" : "green"}`} style={{marginTop:"10px"}} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
               {this.state.payment.active && <div className="new-payment">
+
                 <div className="row">
-                  <label>Category</label>
-                  <select {...this.former.super_handle(["payment", "category"])}>
-                    <option value="">Select</option>                    
-                    <option value="UTILITY_BILLS">Utility Bills</option>
-                    <option value="MISC">Miscellaneous</option>
-                    <option value="STATIONARY">Stationary/Books</option>
-                    <option value="Activity">Student Activity</option>
-                    <option value="TRIP">Trip</option>
-                    <option value="MAINTENANCE">Repair/Maintenance</option>
-                  </select>
-                </div>
-                { this.state.payment.category === "SALARY" && <div className="row">
                   <label> Teacher </label>
                   <select {...this.former.super_handle(["payment", "faculty_id"])}>
                     <option value=""> SELECT</option>
@@ -267,19 +297,16 @@ class Expenses extends Component <propTypes, S> {
                       })
                     }
                   </select>
-                </div>}
-
-                <div className="row">
-                  <label>Label</label>
-                  <input type="text" {...this.former.super_handle(["payment", "label"])} placeholder="Enter Name" />
                 </div>
+
                 <div className="row">
                   <label>Amount</label>
                   <input type="number" {...this.former.super_handle(["payment", "amount"])} placeholder="Enter Amount" />
                 </div>
+
                 <div className="row">
-                  <label>Quantity</label>
-                  <input type="number" {...this.former.super_handle(["payment", "quantity"])} placeholder="Enter Quantity" />
+                  <label>Deductions</label>
+                  <input type="number" {...this.former.super_handle(["payment","deductions"])} placeholder="Deductions(if any)" />
                 </div>
 
                 <div className="button save" onClick={this.addPayment}>Add Payment</div>
@@ -296,6 +323,5 @@ export default connect ( (state: RootReducerState) => ({
   settings : state.db.settings,
   schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), ( dispatch : Function ) => ({
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number ) => dispatch(addExpense(amount, label, type, category, quantity )),
-  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string) => dispatch(addSalaryExpense(id, amount, label, type, category, faculty_id))
-}))( Expenses )
+  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, category, faculty_id, date ,advance, deduction))
+}))( Salary )

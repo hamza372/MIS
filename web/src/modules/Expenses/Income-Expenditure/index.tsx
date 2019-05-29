@@ -94,121 +94,122 @@ class IncomeExpenditure extends Component <propTypes, S> {
   }
   getFilterCondition = (year: string, month: string, payment: any) =>
   {
-	  //when both are empty
-	  if(month === "" && year === "") {
-		  return true
-	  }
-	  //when month is empty	
-	  if(month === "" && year !== ""){
-		  return  moment(payment.date).format("YYYY") === year;
-  
-	  }
-	  //when year is empty
-	  if(month !== "" && year === ""){
-		  return moment(payment.date).format("MMMM") === month
-  
-	  }
-	  //when both are not empty
-	  if(month !== "" && year !== "")
-	  {
-		  return moment(payment.date).format("MMMM") === month && moment(payment.date).format("YYYY") === year;
-	  }
+    //when both are empty
+    if(month === "" && year === "") {
+      return true
+    }
+    //when month is empty	
+    if(month === "" && year !== ""){
+      return  moment(payment.date).format("YYYY") === year;
+
+    }
+    //when year is empty
+    if(month !== "" && year === ""){
+      return moment(payment.date).format("MMMM") === month
+
+    }
+    //when both are not empty
+    if(month !== "" && year !== "")
+    {
+      return moment(payment.date).format("MMMM") === month && moment(payment.date).format("YYYY") === year;
+    }
   }
 
 
   render() {
 
-	const { expenses, teachers, students, settings, schoolLogo } = this.props
+  const { expenses, teachers, students, settings, schoolLogo } = this.props
+
+  const stu_payments = Object.entries(students)
+  .filter(([id, s]) => s.Name)
+  .reduce((prev,[id, s]) => {
+    
+    const curr_pay = Object.entries(s.payments)
+    .filter(([, curr]) => curr.type === "SUBMITTED")
+    .reduce((prev, [id, curr]) => {
+      return {
+        ...prev,
+        [id]: curr
+      }
+    }, {})
+    
+      return {
+        ...prev,
+        ...curr_pay
+      }
+  }, {})
 	
-	const stu_payments = Object.entries(students)
-	.filter(([id, s]) => s.Name)
-	.reduce((prev,[id, s]) => {
-		
-		const curr_pay = Object.entries(s.payments)
-		.filter(([, curr]) => curr.type === "SUBMITTED")
-		.reduce((prev, [id, curr]) => {
-			return {
-				...prev,
-				[id]: curr
-			}
-		}, {})
-		
-			return {
-				...prev,
-				...curr_pay
-			}
-	}, {})
-	
-	const filtered_expense = Object.entries(expenses)
-	.filter(([id,e]) => e.type === "PAYMENT_GIVEN")
-	.reduce((agg, [id, curr]) => {
-		
-		return {
-			...agg,
-			[id]: curr
-		}
-	}, {})
-	
-	const income_exp = {...stu_payments, ...filtered_expense} as MISStudentPayment | MISExpense | MISSalaryExpense
-	
-	
-	let Months  = new Set([])
-	let Years = new Set([])
+  const filtered_expense = Object.entries(expenses)
+  .filter(([id,e]) => e.type === "PAYMENT_GIVEN")
+  .reduce((agg, [id, curr]) => {
+    
+    return {
+      ...agg,
+      [id]: curr
+    }
+  }, {})
 
-	for(let s of Object.values(income_exp)){
+  const income_exp = {...stu_payments, ...filtered_expense} as MISStudentPayment | MISExpense | MISSalaryExpense
 
-		Months.add(moment(s.date).format("MMMM"))
-		Years.add(moment(s.date).format("YYYY"))
-	}
 
-	const income_exp_sorted = Object.values(income_exp)
-		.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
-		.sort((a, b) => a.date - b.date)
+  let Months  = new Set([])
+  let Years = new Set([])
 
-	const total_income = Object.values(income_exp_sorted).reduce((agg, curr) =>	curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
-	const total_expense = Object.values(income_exp_sorted).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+  for(let s of Object.values(income_exp)){
 
-	const total_monthly_income = Object.values(income_exp).reduce((agg, curr) => curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
-	const total_monthly_expense = Object.values(income_exp).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+    Months.add(moment(s.date).format("MMMM"))
+    Years.add(moment(s.date).format("YYYY"))
+  }
 
-	console.log("Income Expense", income_exp)
-		
-	return <div className="expenses page">
+  const income_exp_sorted = Object.values(income_exp)
+    .filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
+    .sort((a, b) => a.date - b.date)
+
+  const total_income = Object.values(income_exp_sorted).reduce((agg, curr) =>	curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
+  const total_expense = Object.values(income_exp_sorted).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+
+  const total_monthly_income = Object.values(income_exp).reduce((agg, curr) => curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
+  const total_monthly_expense = Object.values(income_exp).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+
+  console.log("Income Expense", income_exp)
+
+  return <div className="expenses page">
           { this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
           <PrintHeader settings={settings} logo={schoolLogo}/>
             <div className="divider">Income and Expenditure</div>
+            
             <div className="table row">
               <label>Total Income:</label>
-			  <div><b>{numberWithCommas(total_monthly_income)}</b></div>
+              <div><b>{numberWithCommas(total_monthly_income)}</b></div>
             </div>
-			<div className="table row">
+            
+            <div className="table row">
               <label>Total Expense:</label>
-			  <div><b>{numberWithCommas(total_monthly_expense)}</b></div>
-
+               <div><b>{numberWithCommas(total_monthly_expense)}</b></div>
             </div>
 
             <div className="divider">Ledger</div>
 
-	        <div className="filter row no-print" style={{marginBottom:"10px"}}>
+            <div className="filter row no-print" style={{marginBottom:"10px"}}>
               <select className="" {...this.former.super_handle(["monthFilter"])} style={{ width: "150px" }}>
                 <option value="">Select Month</option>
-				{
-					[...Months].map( Month => {
-						return <option key={Month} value={Month}>{Month}</option>	
-					})
-				}
+                {
+                  [...Months].map( Month => {
+                    return <option key={Month} value={Month}>{Month}</option>	
+                  })
+                }
               </select>
               
               <select className="" {...this.former.super_handle(["yearFilter"])}>
                 <option value="">Select Year</option>
-				{
-					[...Years].map( year => {
-						return <option key={year} value={year}> {year} </option>
-					})
-				}
+                {
+                  [...Years].map( year => {
+                    return <option key={year} value={year}> {year} </option>
+                  })
+                }
               </select>
-		    </div>
+            </div>
             
             <div className="payment-history section">
               <div className="table row heading">

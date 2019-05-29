@@ -22,7 +22,7 @@ import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
 import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
-
+import expense from './icons/Expense/expense.svg'
 import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
@@ -228,8 +228,9 @@ class Landing extends Component {
 							(user.Admin || teacher_expenses_permission) && <div className="badge-container">
 								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
-									className="button grey"
-									to="/expenses/general">
+									className="button yellow-shadow"
+									to="/expenses/general"
+									style={{ backgroundImage: `url(${expense})`}}>
 									Expenses 
 								</Link>
 								</div>
