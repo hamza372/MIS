@@ -347,7 +347,7 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
-export const addExpense = (amount, label, type, category, quantity, date = moment.now() ) => dispatch => {
+export const addExpense = (amount, label, type, category, quantity, date ) => dispatch => {
 
 	const expense =  "MIS_EXPENSE"
 	const id = v4()
@@ -377,7 +377,7 @@ export const addExpense = (amount, label, type, category, quantity, date = momen
 	]))
 }
 
-export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id, date = moment.now(), advance, deduction ) => dispatch => {
+export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id, date, advance, deduction ) => dispatch => {
 
 	const expense = "SALARY_EXPENSE"
 	
@@ -388,7 +388,7 @@ export const addSalaryExpense = (id, amount, label, type, category = "SALARY", f
 	console.log("TCL: type", type)
 	console.log("TCL: category", category)
 	console.log("TCL: faculty_id", faculty_id)
-	console.log("TCL: date", date)
+	console.log("TCL: date", moment(date).format("DD-MM-YYYY"))
 	console.log("TCL: advance", advance)
 	console.log("TCL: deduction", deduction)
 

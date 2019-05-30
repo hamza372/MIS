@@ -1,20 +1,14 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
 import Former from '../../../utils/former';
-
-import '../style.css'
 import { connect } from 'react-redux';
-import checkCompulsoryFields from '../../../utils/checkCompulsoryFields'
 import numberWithCommas from '../../../utils/numberWithCommas';
-import { addExpense, addSalaryExpense } from '../../../actions'
 import moment from 'moment'
 import Banner from '../../../components/Banner';
 import { PrintHeader } from '../../../components/Layout';
-import { v4 } from 'node-uuid';
 
-/**
- * Need to think about Advance Salary
- */
+import '../style.css'
+
 
 interface P {
   teachers: RootDBState["faculty"]
@@ -22,8 +16,6 @@ interface P {
   settings: RootDBState["settings"]
   students: RootDBState["students"]
   schoolLogo: RootDBState["assets"]["schoolLogo"]
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number ) => any
-  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string ) => any
 }
 
 interface S {
@@ -56,42 +48,12 @@ class IncomeExpenditure extends Component <propTypes, S> {
 		},
 		monthFilter: "",
 		yearFilter: ""
-		
+
     }
 
     this.former = new Former (this,[])
   }
 
-  componentDidMount () {
-
-    console.log("LOADED Expenses")
-    
-    Object.values(this.props.teachers)
-      .filter(t => t.Salary !== "")  
-      .forEach(t => {
-        const id = `${moment().format("MM-YYYY")}-${t.id}`
-        if(!this.props.expenses[id])
-        {
-          //id, amount, label, type, category, faculty_id
-          this.props.addSalaryExpense( id, parseFloat(t.Salary), this.props.teachers[t.id].Name, "PAYMENT_DUE", "SALARY", t.id )
-          console.log("<================================>\n")
-        } 
-      })
-  }
-
-  checkSalaryExpenses = () => {
-
-    Object.values(this.props.teachers).forEach(t => {
-
-      const id = `${moment().format("MM-YYYY")}-${t.id}`
-
-      if(this.props.expenses[id])
-      {
-        this.props.addSalaryExpense( id ,parseFloat(t.Salary), "SALARY", "PAYMENT_DUE", "SALARY", t.id )
-      }
-
-    })
-  }
   getFilterCondition = (year: string, month: string, payment: any) =>
   {
     //when both are empty
@@ -115,10 +77,9 @@ class IncomeExpenditure extends Component <propTypes, S> {
     }
   }
 
-
   render() {
 
-  const { expenses, teachers, students, settings, schoolLogo } = this.props
+  const { expenses, students, settings, schoolLogo } = this.props
 
   const stu_payments = Object.entries(students)
   .filter(([id, s]) => s.Name)
@@ -165,13 +126,32 @@ class IncomeExpenditure extends Component <propTypes, S> {
     .filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
     .sort((a, b) => a.date - b.date)
 
-  const total_income = Object.values(income_exp_sorted).reduce((agg, curr) =>	curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
-  const total_expense = Object.values(income_exp_sorted).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+  let total_income = 0
+  let total_expense = 0
 
-  const total_monthly_income = Object.values(income_exp).reduce((agg, curr) => curr.type === "SUBMITTED" ? agg + curr.amount : agg, 0)
-  const total_monthly_expense = Object.values(income_exp).reduce((agg, curr) => curr.type === "PAYMENT_GIVEN" ? agg + curr.amount : agg, 0)
+  Object.values(income_exp_sorted).forEach(i => {
+    if(i.type === "SUBMITTED")
+    {
+      total_income += i.amount
+    }
+    else if(i.type === "PAYMENT_GIVEN"){
+      total_expense += i.amount - (i.expense === "SALARY_EXPENSE" ? i.deduction : 0)
+    }
+  })
 
-  console.log("Income Expense", income_exp)
+
+  let total_monthly_income = 0
+  let total_monthly_expense = 0
+
+  Object.values(income_exp).forEach(i => {
+    if(i.type === "SUBMITTED")
+    {
+      total_monthly_income += i.amount
+    }
+    else if(i.type === "PAYMENT_GIVEN"){
+      total_monthly_expense += i.amount - (i.expense === "SALARY_EXPENSE" ? i.deduction : 0)
+    }
+  })
 
   return <div className="expenses page">
           { this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -221,24 +201,24 @@ class IncomeExpenditure extends Component <propTypes, S> {
               </div>
 
               {
-				Object.values(income_exp_sorted)
-				.map( e => {
-                    return <div className="table row">
+                Object.entries(income_exp_sorted)
+                .map(([id,e]) => {
+                    return <div key={id} className="table row">
                       <label> {moment(e.date).format("DD-MM-YYYY")} </label>
                       <label> {e.label? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
                       <label> {e.category ? e.category : e.fee_name || "-"}</label>
                       <label> {e.quantity ? e.quantity : "1"} </label>
-                      <label> {e.type === "PAYMENT_GIVEN" ? -1 * e.amount : e.amount}</label>
+                      <label> {e.type === "PAYMENT_GIVEN" ? -1 * (e.amount - ((e.expense === "SALARY_EXPENSE" ? e.deduction : 0))) : e.amount}</label>
                     </div>
                 })
               }
               <div className="table row last">
                 <label><b>Income-expense</b></label>
-				<div><b>{numberWithCommas(total_income - total_expense)}</b></div>
+                <div><b>{numberWithCommas(total_income - total_expense)}</b></div>
               </div>
 
             </div>
-            <div className="print button" style={{marginTop:"5px"}} onClick={()=> window.print()} >Print</div>
+            <div className="print button" style={{marginTop:"5px"}} onClick={() => window.print()} >Print</div>
          </div>
   }
 }
@@ -249,7 +229,4 @@ export default connect ( (state: RootReducerState) => ({
   settings : state.db.settings,
   students: state.db.students,
   schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
-}), ( dispatch : Function ) => ({
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number ) => dispatch(addExpense(amount, label, type, category, quantity )),
-  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string) => dispatch(addSalaryExpense(id, amount, label, type, category, faculty_id))
 }))( IncomeExpenditure )

@@ -6,7 +6,6 @@ import Layout from '../../components/Layout'
 
 import Expenses from '../../modules/Expenses/General';
 import IncomeExpenditure from '../../modules/Expenses/Income-Expenditure'
-import Salary from '../../modules/Expenses/Salary'
 
 import './style.css'
 
@@ -47,16 +46,6 @@ class ExpensePage extends Component <propTypes> {
 							General
 						</Link> : false
 					}
-					{ 
-						admin || permissions.fee.teacher ?
-						<Link
-							className={`button ${loc === "salary" ? "blue": false}`}
-							to="salary"
-							replace={true}
-							> 
-							Salary
-						</Link> : false
-					}
 					{
 						admin || permissions.fee.teacher ?
 						<Link
@@ -71,7 +60,6 @@ class ExpensePage extends Component <propTypes> {
 
 				<Route path="/expenses/general" component={Expenses} />
 				<Route path="/expenses/income-expenditure" component={IncomeExpenditure}/>
-				<Route path="/expenses/salary" component={Salary}/>
 
 			</div>
 		</Layout>
