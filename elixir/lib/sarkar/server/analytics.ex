@@ -34,6 +34,28 @@ defmodule Sarkar.Server.Analytics do
 
 	end
 
+	def init(%{bindings: %{type: "raw-writes.csv"}} = req, state) do
+		
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT school_id, path, value, time, type, client_id, sync_time 
+			 FROM writes", [])
+
+		csv = [ 
+				["school_id", "path", "value", "time", "type", "client_id", "sync_time"] | 
+				Enum.map(resp.rows, fn [s, p, v, t, type, cid, st] -> [s, Poison.encode!(p), Poison.encode!(v), t, type, cid, st] end)]
+			|> CSV.encode
+			|> Enum.join()
+		
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{bindings: %{type: "fees.csv"}} = req, state) do
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
