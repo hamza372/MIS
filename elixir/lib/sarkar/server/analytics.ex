@@ -35,23 +35,35 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "raw-writes.csv"}} = req, state) do
-		
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
-			"SELECT school_id, path, value, time, type, client_id, sync_time 
-			 FROM writes", [])
 
-		csv = [ 
-				["school_id", "path", "value", "time", "type", "client_id", "sync_time"] | 
-				Enum.map(resp.rows, fn [s, p, v, t, type, cid, st] -> [s, Poison.encode!(p), Poison.encode!(v), t, type, cid, st] end)]
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
+		req1 = :cowboy_req.stream_reply(
 			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache", "connection" => "keep-alive"},
 			req
 		)
+
+		:cowboy_req.stream_body(
+			IO.iodata_to_binary(NimbleCSV.RFC4180.dump_to_iodata([["school_id", "path", "value", "time", "type", "client_id", "sync_time"]])),
+			:nofin,
+			req1
+		)
+
+		Postgrex.transaction(Sarkar.School.DB, fn(conn) ->
+			stream = Postgrex.stream(conn,
+				"SELECT school_id, path, value, time, type, client_id, sync_time 
+				FROM writes", [])
+
+			stream
+			|> Stream.map(fn res ->
+				res.rows 
+				|> Enum.map( fn [s, p, v, t, type, cid, st] -> [s, Poison.encode!(p), Poison.encode!(v), t, type, cid, st] end)
+				|> Enum.map(fn row -> :cowboy_req.stream_body(IO.iodata_to_binary(NimbleCSV.RFC4180.dump_to_iodata([row])), :nofin, req1) end)
+			end)
+			|> Enum.to_list
+
+		end, timeout: :infinity)
+
+		:cowboy_req.stream_body("", :fin, req1)
 
 		{:ok, req, state}
 	end
