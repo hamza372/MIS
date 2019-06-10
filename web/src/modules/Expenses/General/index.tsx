@@ -11,399 +11,406 @@ import { PrintHeader } from '../../../components/Layout';
 
 import '../style.css'
 
-/**
- * Need to think about Advance Salary
- */
-
 interface P {
-  teachers: RootDBState["faculty"]
-  expenses: RootDBState["expenses"]
-  settings: RootDBState["settings"]
-  schoolLogo: RootDBState["assets"]["schoolLogo"]
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => any
-  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string, date: number, advance: number, deduction: number ) => any
+	teachers: RootDBState["faculty"]
+	expenses: RootDBState["expenses"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => any
+	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number ) => any
 }
 
 interface S {
-  banner: {
-    active: boolean
-    good: boolean
-    text: string
-  }
-  payment: {
-    active: boolean
-    amount: string
-    type: string
-    category: string
-    faculty_id: string
-    quantity: string
-    label: string
-    deduction: string
-    date: number
-  }
-  monthFilter: string
-  yearFilter: string
+	banner: {
+		active: boolean
+		good: boolean
+		text: string
+	}
+	payment: {
+		active: boolean
+		amount: string
+		type: string
+		category: string
+		faculty_id: string
+		quantity: string
+		label: string
+		deduction: string
+		date: number
+	}
+	monthFilter: string
+	yearFilter: string
 }
 
 interface Routeinfo {
-  id: string
+	id: string
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P
 
 class Expenses extends Component <propTypes, S> {
 
-  former: Former
-  constructor(props: propTypes) {
-    super(props)
+	former: Former
+	constructor(props: propTypes) {
+		super(props)
 
-    this.state = {
-      banner: {
-        active: false,
-        good: true,
-        text: "Saved!"
-      },
-      payment:{
-        active: false,
-        amount: "",
-        label:"",
-        type: "PAYMENT_GIVEN",
-        category: "",
-        faculty_id: "",
-        quantity: "1",
-        deduction: "0",
-        date: moment.now()
-      },
-      monthFilter: "",
-      yearFilter: ""
-    }
+		this.state = {
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			},
+			payment:{
+				active: false,
+				amount: "",
+				label:"",
+				type: "PAYMENT_GIVEN",
+				category: "",
+				faculty_id: "",
+				quantity: "1",
+				deduction: "0",
+				date: moment.now()
+			},
+			monthFilter: "",
+			yearFilter: ""
+		}
+		this.former = new Former (this,[])
+	}
 
-    this.former = new Former (this,[])
-  }
-
-  componentDidMount () {
+	componentDidMount () {
 
 /*  
-      //In case we achange it to automatic
-     console.log("LOADED Expenses")
-    
-    Object.values(this.props.teachers)
-      .filter(t => t.Salary !== "")  
-      .forEach(t => {
-        const id = `${moment().format("MM-YYYY")}-${t.id}`
-        if(!this.props.expenses[id])
-        {
-          //id, amount, label, type, category, faculty_id
-          this.props.addSalaryExpense( id, parseFloat(t.Salary), this.props.teachers[t.id].Name, "PAYMENT_DUE", "SALARY", t.id )
-          console.log("<================================>\n")
-        } 
-      }) */
-  }
+			//In case we achange it to automatic
+		 console.log("LOADED Expenses")
+		
+		Object.values(this.props.teachers)
+			.filter(t => t.Salary !== "")  
+			.forEach(t => {
+				const id = `${moment().format("MM-YYYY")}-${t.id}`
+				if(!this.props.expenses[id])
+				{
+					//id, amount, label, type, category, faculty_id
+					this.props.addSalaryExpense( id, parseFloat(t.Salary), this.props.teachers[t.id].Name, "PAYMENT_DUE", "SALARY", t.id )
+					console.log("<================================>\n")
+				} 
+			}) */
+	}
 
-  newPayment = () => {
-    this.setState({ 
-      payment: {
-        ...this.state.payment,
-        active: !this.state.payment.active,
-        amount: "",
-        label:"",
-        type: "PAYMENT_GIVEN",
-        category: "",
-        faculty_id: "",
-        quantity: "1",
-        deduction: "0",
-        date: moment.now()
-      }
-    })
-  }
+	newPayment = () => {
+		this.setState({ 
+			payment: {
+				...this.state.payment,
+				active: !this.state.payment.active,
+				amount: "",
+				label:"",
+				type: "PAYMENT_GIVEN",
+				category: "",
+				faculty_id: "",
+				quantity: "1",
+				deduction: "0",
+				date: moment.now()
+			}
+		})
+	}
 
-  addPayment = () => {
+	addPayment = () => {
+		const payment = this.state.payment
+		const id = `${moment().format("MM-YYYY")}-${payment.faculty_id}`
 
-    const payment = this.state.payment
-    const id = `${moment().format("MM-YYYY")}-${payment.faculty_id}`
+		let compulsoryFields
+		if(this.state.payment.category && this.state.payment.category === "SALARY")
+		{
+			compulsoryFields = checkCompulsoryFields(this.state.payment, [
+				["amount"], ["type"], ["faculty_id"],
+			])
+		}
+		else if (this.state.payment.category){
+			compulsoryFields = checkCompulsoryFields(this.state.payment, [
+				["amount"], ["label"], ["type"], ["quantity"]
+			])
+		}
+		else {
+			compulsoryFields = checkCompulsoryFields(this.state.payment, [
+				["category"]
+			])
+		}
 
-    let compulsoryFields
-    if(this.state.payment.category && this.state.payment.category === "SALARY")
-    {
-      compulsoryFields = checkCompulsoryFields(this.state.payment, [
-        ["amount"], ["type"], ["faculty_id"],
-      ])
-    }
-    else if (this.state.payment.category){
-      compulsoryFields = checkCompulsoryFields(this.state.payment, [
-        ["amount"], ["label"], ["type"], ["quantity"]
-      ])
-    }
-    else {
-      compulsoryFields = checkCompulsoryFields(this.state.payment, [
-        ["category"]
-      ])
-    }
+		if(compulsoryFields){
+			const erroText = `Please Fill ${(compulsoryFields as string[][]).map(x => x[0] === "faculty_id" ? "Teacher" : x[0]).join(", ")} !`
 
-    if(compulsoryFields){
-      const erroText = `Please Fill ${(compulsoryFields as string[][]).map(x => x[0] === "faculty_id" ? "Teacher" : x[0]).join(", ")} !`
+			return this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: erroText
+				}
+			})
+		}
 
-      return this.setState({
-        banner:{
-          active: true,
-          good: false,
-          text: erroText
-        }
-      })
-    }
+		if(payment.category === "SALARY"){
 
-    if(payment.category === "SALARY"){
+			this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date,0,parseFloat(payment.deduction))
 
-      this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.category, payment.faculty_id, payment.date,0,parseFloat(payment.deduction))
-      
-      this.setState({
-        banner: {
-          active: true,
-          good: true,
-          text: "Saved"
-        }
-      })
+			this.setState({
+				banner: {
+					active: true,
+					good: true,
+					text: "Saved"
+				}
+			})
 
-      setTimeout(() => {
-        this.setState({
-          banner:{
-            ...this.state.banner,
-            active: false
-          }
-        })
-      }, 1000)
+			setTimeout(() => {
+				this.setState({
+					banner:{
+						...this.state.banner,
+						active: false
+					}
+				})
+			}, 1000)
 
-      this.newPayment()
-      return
-    }
+			this.newPayment()
+			return
+		}
 
-    this.props.addExpense( parseFloat(payment.amount), payment.label, "PAYMENT_GIVEN", payment.category, parseFloat(payment.quantity), payment.date)
-    this.newPayment()
-  }
+		this.props.addExpense( parseFloat(payment.amount), payment.label, "PAYMENT_GIVEN", payment.category, parseFloat(payment.quantity), payment.date)
 
-  getFilterCondition = (year: string, month: string, payment: any) =>
-  {
-    //when both are empty
-    if(month === "" && year === "") {
-      return true
-    }
-    //when month is empty	
-    if(month === "" && year !== ""){
-      return  moment(payment.date).format("YYYY") === year;
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved"
+			}
+		})
 
-    }
-    //when year is empty
-    if(month !== "" && year === ""){
-      return moment(payment.date).format("MMMM") === month
+		setTimeout(() => {
+			this.setState({
+				banner:{
+					...this.state.banner,
+					active: false
+				}
+			})
+		}, 1000)
 
-    }
-    //when both are not empty
-    if(month !== "" && year !== "")
-    {
-      return moment(payment.date).format("MMMM") === month && moment(payment.date).format("YYYY") === year;
-    }
-  }
+		this.newPayment()
+	}
 
-  addSalary = (e: { target: { value: any; }; }) => {
-    if(this.props.teachers[e.target.value]){
-        this.setState({
-          payment: {
-            ...this.state.payment,
-            faculty_id: e.target.value,
-            amount: this.props.teachers[e.target.value].Salary || "0"
-          }
-        })
-    }
-  }
+	getFilterCondition = (year: string, month: string, payment: any) =>
+	{
+		//when both are empty
+		if(month === "" && year === "") {
+			return true
+		}
+		//when month is empty	
+		if(month === "" && year !== ""){
+			return  moment(payment.date).format("YYYY") === year;
+		}
+		//when year is empty
+		if(month !== "" && year === ""){
+			return moment(payment.date).format("MMMM") === month
+		}
+		//when both are not empty
+		if(month !== "" && year !== "")
+		{
+			return moment(payment.date).format("MMMM") === month && moment(payment.date).format("YYYY") === year;
+		}
+	}
 
-  render() {
+	onTeacherSelect = (e: { target: { value: any } }) => {
+		if(this.props.teachers[e.target.value])
+		{
+			this.setState({
+				payment: {
+					...this.state.payment,
+					faculty_id: e.target.value,
+					amount: this.props.teachers[e.target.value].Salary || "0"
+				}
+			})
+		}
+	}
 
-    const { expenses, teachers, settings, schoolLogo } = this.props
+	render() {
 
-    let Months  = new Set([])
-    let Years = new Set([])
+		const { expenses, teachers, settings, schoolLogo } = this.props
 
-    for(let e of Object.values(expenses))
-    {
-      Months.add(moment(e.date).format("MMMM"))
-      Years.add(moment(e.date).format("YYYY"))
-    }
-    const total_expense = Object.values(expenses)
-      .reduce((agg, curr) => {
-        if(curr.type === "PAYMENT_GIVEN"){
-            return agg + (curr.amount - (curr.expense === "SALARY_EXPENSE" ? curr.deduction : 0))
-         }
-         else
-           return agg
-      },0)
-    
-    const total_filtered_expense = Object.values(expenses)
-      .filter(e => this.getFilterCondition(this.state.yearFilter,this.state.monthFilter,e))
-      .reduce((agg, curr) => {
-        if(curr.type === "PAYMENT_GIVEN"){
-          return agg + curr.amount - (curr.expense === "SALARY_EXPENSE" ? curr.deduction : 0)
-        }
-        else
-          return agg 
-      },0)
+		let Months  = new Set([])
+		let Years = new Set([])
 
-    const filtered_expenses = Object.entries(expenses)
-      .filter(([id, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
-      .sort(([,a],[,b]) => a.date -b.date)
+		for(let e of Object.values(expenses))
+		{
+			Months.add(moment(e.date).format("MMMM"))
+			Years.add(moment(e.date).format("YYYY"))
+		}
 
-    return <div className="expenses">
-      
-      { this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+		let total_filtered_expense = 0
 
-      <PrintHeader settings={settings} logo={schoolLogo}/>
+		const total_expense = Object.values(expenses)
+		.reduce((agg, curr) => {
+			if(curr.type === "PAYMENT_GIVEN")
+			{
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, curr)){
+					total_filtered_expense += curr.amount - ( curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
+				}
+				return agg + (curr.amount - (curr.expense === "SALARY_EXPENSE" ? curr.deduction : 0))
+			}
+			else
+				return agg
+		}, 0)
 
-      <div className="divider">Expense Information</div>
+		const filtered_expenses = Object.entries(expenses)
+			.filter(([id, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
+			.sort(([,a],[,b]) => a.date -b.date)
 
-      <div className="table row">
-        <label>Total Expense:</label>
-        <div>{numberWithCommas(total_expense)}</div>
-      </div>
+		return <div className="expenses">
 
-      <div className="divider">Ledger</div>
+			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
-      <div className="filter row no-print" style={{marginBottom:"10px"}}>
-        <select className="" {...this.former.super_handle(["monthFilter"])} style={{ width: "150px" }}>
-          <option value="">Select Month</option>
-          {
-            [...Months].map( Month => {
-              return <option key={Month} value={Month}>{Month}</option>	
-            })
-          }
-        </select>
+			<PrintHeader settings={settings} logo={schoolLogo}/>
 
-        <select className="" {...this.former.super_handle(["yearFilter"])}>
-          <option value="">Select Year</option>
-          {
-            [...Years].map( year => {
-              return <option key={year} value={year}> {year} </option>
-            })
-          }
-        </select>
-      </div>
+			<div className="divider">Expense Information</div>
 
-      <div className="payment-history section">
+			<div className="table row">
+				<label>Total Expense:</label>
+				<div>{numberWithCommas(total_expense)}</div>
+			</div>
 
-        <div className="table row heading">
-          <label><b> Date   </b></label>
-          <label><b> Label  </b></label>
-          <label><b> Category   </b></label>
-          <label><b> Quantity</b></label>
-          <label><b> Deductions</b></label>
-          <label><b> Amount </b></label>
-        </div>
+			<div className="divider">Ledger</div>
 
-        {
-          filtered_expenses
-          .map( ([id,e]) => {
-            if(e.expense === "SALARY_EXPENSE") {
-              return <div key={id} className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
-                <label> {moment(e.date).format("DD-MM")} </label>
-                <label> {e.label}</label>
-                <label> {e.category}</label>
-                <label> {`-`} </label>
-                <label> {`${e.deduction} Rs`} </label>
-                <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>
-              </div>
-            }
-            else if (e.expense === "MIS_EXPENSE"){
-              return <div key={id} className="table row">
-                <label> {moment(e.date).format("DD-MM")} </label>
-                <label> {e.label}</label>
-                <label> {e.category}</label>
-                <label> {e.quantity } </label>
-                <label> {`-`} </label>
-                <label> {`${numberWithCommas(e.amount)} Rs`} </label>
-            </div>
-            }
-          })
-        }
+			<div className="filter row no-print" style={{marginBottom:"10px"}}>
+				<select className="" {...this.former.super_handle(["monthFilter"])} style={{ width: "150px" }}>
+					<option value="">Select Month</option>
+					{
+						[...Months].map( Month => {
+							return <option key={Month} value={Month}>{Month}</option>	
+						})
+					}
+				</select>
 
-        <div className="table row last">
-          <label><b> Total Paid:</b></label>
-          <div><b>{numberWithCommas(total_filtered_expense)}</b></div>
-        </div>
-      
-      </div>
+				<select className="" {...this.former.super_handle(["yearFilter"])}>
+					<option value="">Select Year</option>
+					{
+						[...Years].map( year => {
+							return <option key={year} value={year}> {year} </option>
+						})
+					}
+				</select>
+			</div>
 
-      <div className="form">
-        <div className={`button ${this.state.payment.active ? "orange" : "green"}`} style={{marginTop:"10px"}} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
+			<div className="payment-history section">
+				<div className="table row heading">
+					<label><b> Date   </b></label>
+					<label><b> Label  </b></label>
+					<label><b> Category   </b></label>
+					<label><b> Quantity</b></label>
+					<label><b> Deductions</b></label>
+					<label><b> Amount </b></label>
+				</div>
+				{
+					filtered_expenses
+					.map( ([id,e]) => {
+						if(e.expense === "SALARY_EXPENSE")
+						{
+							return <div key={id} className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
+								<label> {moment(e.date).format("DD-MM")} </label>
+								<label> {e.label}</label>
+								<label> {e.category}</label>
+								<label> {`-`} </label>
+								<label> {`${e.deduction} Rs`} </label>
+								<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>
+							</div>
+						}
+						else if (e.expense === "MIS_EXPENSE")
+						{
+							return <div key={id} className="table row">
+								<label> {moment(e.date).format("DD-MM")} </label>
+								<label> {e.label}</label>
+								<label> {e.category}</label>
+								<label> {e.quantity } </label>
+								<label> {`-`} </label>
+								<label> {`${numberWithCommas(e.amount)} Rs`} </label>
+						</div>
+						}
+					})
+				}
+				<div className="table row last">
+					<label><b> Total Paid:</b></label>
+					<div><b>{numberWithCommas(total_filtered_expense)}</b></div>
+				</div>
+			</div>
 
-        {this.state.payment.active && <div className="new-payment">
-          <div className="row">
-            <label>Date</label>
-            <input
-              type="date"
-              value={moment(this.state.payment.date).format("YYYY-MM-DD")}
-              onChange={this.former.handle(["payment","date"])}
-            />
-          </div>
+			<div className="form">
+				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} style={{marginTop:"10px"}} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
-          <div className="row">
-            <label>Category</label>
-            <select {...this.former.super_handle(["payment", "category"])}>
-              <option value="">Select</option>
-              <option value="SALARY">Salary</option>
-              <option value="UTILITY_BILLS">Utility Bills</option>
-              <option value="STATIONARY">Stationary</option>
-              <option value="REPAIRS">Repairs</option>
-              <option value="RENT">Rent</option>
-              <option value="ACTIVITY">Student Activity</option>
-              <option value="DAILY">Daily</option>
-              <option value="PETTY_CASH">Petty Cash</option>
-            </select>
-          </div>
+				{this.state.payment.active && <div className="new-payment">
+					<div className="row">
+						<label>Date</label>
+						<input
+							type="date"
+							value={moment(this.state.payment.date).format("YYYY-MM-DD")}
+							onChange={this.former.handle(["payment","date"])}
+						/>
+					</div>
 
-          { this.state.payment.category === "SALARY" && <div className="row">
-              <label> Teacher </label>
-              <select {...this.former.super_handle(["payment", "faculty_id"])} onChange={(e) => this.addSalary(e)}>
-                <option value=""> SELECT</option>
-                {
-                  Object.values(teachers)
-                  .sort((a,b) => a.Name.localeCompare(b.Name))
-                  .map(t => {
-                    return <option key={t.id} value={t.id}> {t.Name} </option>
-                  })
-                }
-              </select>
-            </div>
-          }
+					<div className="row">
+						<label>Category</label>
+						<select {...this.former.super_handle(["payment", "category"])}>
+							<option value="">Select</option>
+							<option value="SALARY">Salary</option>
+							<option value="BILLS">Utility Bills</option>
+							<option value="STATIONARY">Stationary</option>
+							<option value="REPAIRS">Repairs</option>
+							<option value="RENT">Rent</option>
+							<option value="ACTIVITY">Student Activity</option>
+							<option value="DAILY">Daily</option>
+							<option value="PETTY_CASH">Petty Cash</option>
+						</select>
+					</div>
 
-          {this.state.payment.category !== "SALARY" && <div className="row">
-            <label>Label</label>
-            <input type="text" {...this.former.super_handle(["payment", "label"])} placeholder="Enter Name" />
-          </div>}
-          <div className="row">
-            <label>Amount</label>
-            <input type="number" {...this.former.super_handle(["payment", "amount"])} placeholder="Enter Amount" />
-          </div>
-          {this.state.payment.category !== "SALARY" && <div className="row">
-            <label>Quantity</label>
-            <input type="number" {...this.former.super_handle(["payment", "quantity"])} placeholder="Enter Quantity" />
-          </div>}
-          {this.state.payment.category === "SALARY" && <div className="row">
-            <label>Deductions</label>
-            <input type="number" {...this.former.super_handle(["payment", "deduction"])} placeholder="If any" />
-          </div>}
+					{ this.state.payment.category === "SALARY" && <div className="row">
+							<label> Teacher </label>
+							<select onChange={(e) => this.onTeacherSelect(e)}>
+								<option value=""> SELECT</option>
+								{
+									Object.values(teachers)
+									.sort((a,b) => a.Name.localeCompare(b.Name))
+									.map(t => {
+										return <option key={t.id} value={t.id}> {t.Name} </option>
+									})
+								}
+							</select>
+						</div>
+					}
+					
+					{this.state.payment.category !== "SALARY" && <div className="row">
+						<label>Label</label>
+						<input type="text" {...this.former.super_handle(["payment", "label"])} placeholder="Enter Name" />
+					</div>}
+					<div className="row">
+						<label>Amount</label>
+						<input type="number" {...this.former.super_handle(["payment", "amount"])} placeholder="Enter Amount" />
+					</div>
+					{this.state.payment.category !== "SALARY" && <div className="row">
+						<label>Quantity</label>
+						<input type="number" {...this.former.super_handle(["payment", "quantity"])} placeholder="Enter Quantity" />
+					</div>}
+					{this.state.payment.category === "SALARY" && <div className="row">
+						<label>Deductions</label>
+						<input type="number" {...this.former.super_handle(["payment", "deduction"])} placeholder="If any" />
+					</div>}
+					<div className="button save" onClick={this.addPayment}>Add Payment</div>
+				</div> 
+				}
+				<div className="print button" style={{marginTop:"5px"}} onClick={()=> window.print()} >Print</div>
 
-          <div className="button save" onClick={this.addPayment}>Add Payment</div>
-        </div> }
-          <div className="print button" style={{marginTop:"5px"}} onClick={()=> window.print()} >Print</div>
-        </div>
-    </div>
-  }
+			</div>
+		</div>
+	}
 }
 
 export default connect ( (state: RootReducerState) => ({
-  teachers: state.db.faculty,
-  expenses: state.db.expenses,
-  settings : state.db.settings,
-  schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
+	teachers: state.db.faculty,
+	expenses: state.db.expenses,
+	settings : state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), ( dispatch : Function ) => ({
-  addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
-  addSalaryExpense: (id: string, amount: number, label: string, type: string, category: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, category, faculty_id, date, advance, deduction))
+	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
+	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction))
 }))( Expenses )

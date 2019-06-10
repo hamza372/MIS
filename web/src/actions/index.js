@@ -352,15 +352,6 @@ export const addExpense = (amount, label, type, category, quantity, date ) => di
 	const expense =  "MIS_EXPENSE"
 	const id = v4()
 
-	console.log("TCL: id", id)
-	console.log("TCL: expense", expense)
-	console.log("TCL: amount", amount)
-	console.log("TCL: label", label)
-	console.log("TCL: type", type)
-	console.log("TCL: category", category)
-	console.log("TCL: quantity", quantity)
-	console.log("TCL: date", date)
-
 	dispatch(createMerges([
 		{
 			path: [ "db", "expenses", id ],
@@ -377,21 +368,10 @@ export const addExpense = (amount, label, type, category, quantity, date ) => di
 	]))
 }
 
-export const addSalaryExpense = (id, amount, label, type, category = "SALARY", faculty_id, date, advance, deduction ) => dispatch => {
+export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, category = "SALARY" ) => dispatch => {
 
 	const expense = "SALARY_EXPENSE"
 	
-	console.log("TCL: id", id)
-	console.log("TCL: expense", expense)
-	console.log("TCL: amount", amount)
-	console.log("TCL: label", label)
-	console.log("TCL: type", type)
-	console.log("TCL: category", category)
-	console.log("TCL: faculty_id", faculty_id)
-	console.log("TCL: date", moment(date).format("DD-MM-YYYY"))
-	console.log("TCL: advance", advance)
-	console.log("TCL: deduction", deduction)
-
 	dispatch(createMerges([
 		{
 			path: [ "db", "expenses", id ],

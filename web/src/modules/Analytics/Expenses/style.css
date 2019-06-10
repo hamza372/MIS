@@ -1,0 +1,17 @@
+.expense-analytics .section.table {
+	margin: 20px 0;
+	background-color: #c2bbbb21;
+	overflow-x: scroll
+}
+
+.expense-analytics .section.table .table.row label, .expense-analytics .section.table .table.row div {
+	text-align: center;
+}
+
+.expense-analytics .section.table .table.row :first-child {
+	text-align: center
+}
+
+.expense-analytics .section.table .table.row.footing {
+	border-top: 1.5px solid #333
+}
