@@ -390,6 +390,39 @@ export const addSalaryExpense = (id, amount, label, type, faculty_id, date, adva
 	]))
 }
 
+export const editExpense = (expense) => (dispatch, getState) => {
+	
+	//expense is an object of id and { amount }
+	
+	const state = getState()
+
+	const merges = Object.entries(expense).reduce((agg, [id, { amount }]) => {
+		return [...agg,
+			{
+				path:["db", "expenses", id ],
+				value: {
+					...state.db.expenses[id],
+					amount
+				}
+			}
+		]
+	}, [])
+
+	dispatch(createMerges(merges))
+
+}
+
+export const deleteExpense = (id) => dispatch => {
+
+	//Id of the expense to be deleted
+
+	dispatch(createDeletes([
+		{
+			path: ["db", "expenses", id]
+		}
+	]))
+}
+
 export const addMultipleFees = (fees) => dispatch => {
 	
 	//fees is an array of { student, fee_id, amount, type, period, name}

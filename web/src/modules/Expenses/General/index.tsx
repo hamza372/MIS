@@ -4,7 +4,7 @@ import Former from '../../../utils/former';
 import { connect } from 'react-redux';
 import checkCompulsoryFields from '../../../utils/checkCompulsoryFields'
 import numberWithCommas from '../../../utils/numberWithCommas';
-import { addExpense, addSalaryExpense } from '../../../actions'
+import { addExpense, addSalaryExpense, deleteExpense, editExpense } from '../../../actions'
 import moment from 'moment'
 import Banner from '../../../components/Banner';
 import { PrintHeader } from '../../../components/Layout';
@@ -18,6 +18,8 @@ interface P {
 	schoolLogo: RootDBState["assets"]["schoolLogo"]
 	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => any
 	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number ) => any
+	editExpense: ( edits: {[id: string]:{ amount: number }}) => any
+	deleteExpense: ( deletes: string) => any
 }
 
 interface S {
@@ -39,6 +41,9 @@ interface S {
 	}
 	monthFilter: string
 	yearFilter: string
+	edits: {
+		[id: string]: { amount :number }
+	}
 }
 
 interface Routeinfo {
@@ -52,6 +57,18 @@ class Expenses extends Component <propTypes, S> {
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
+		
+		const current_month = moment().format("MM-YYYY")
+		const edits = Object.entries(props.expenses)
+			.filter(([id,e]) => moment(e.date).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
+			.reduce((agg, [id, curr]) => {
+				return {
+					...agg,
+					[id]: {
+						amount: curr.amount
+					}
+				}
+			},{} as {[id: string]: { amount: number }})
 
 		this.state = {
 			banner: {
@@ -71,7 +88,8 @@ class Expenses extends Component <propTypes, S> {
 				date: moment.now()
 			},
 			monthFilter: "",
-			yearFilter: ""
+			yearFilter: "",
+			edits,
 		}
 		this.former = new Former (this,[])
 	}
@@ -93,6 +111,27 @@ class Expenses extends Component <propTypes, S> {
 					console.log("<================================>\n")
 				} 
 			}) */
+	}
+
+	componentWillReceiveProps(newProps: propTypes){
+		//Making sure to get latest changes
+
+		const current_month = moment().format("MM-YYYY")
+		const edits = Object.entries(newProps.expenses)
+			.filter(([id,e]) => moment(e.date).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
+			.reduce((agg, [id, curr]) => {
+				return {
+					...agg,
+					[id]: {
+						amount: curr.amount
+					}
+				}
+			},{} as {[id: string]: { amount: number }})
+
+		this.setState({
+			edits
+		})
+
 	}
 
 	newPayment = () => {
@@ -193,6 +232,62 @@ class Expenses extends Component <propTypes, S> {
 		this.newPayment()
 	}
 
+	onSave = () => {
+		
+		const filtered_edits = Object.entries(this.state.edits)
+			.filter(([id, exp])=> this.props.expenses[id].amount !== exp.amount)
+			.reduce((agg, [id, curr])=> {
+				return {
+					...agg,
+					[id]: {
+						amount: curr.amount
+					}
+				}
+			}, {})
+
+		this.props.editExpense(filtered_edits)
+
+		this.setState({
+			banner:{
+				active: true,
+				good: true,
+				text: "Saved!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner:{
+					...this.state.banner,
+					active: false
+				}
+			})
+		}, 1000)
+	}
+
+	onDelete = ( id: string) => {
+		if(!window.confirm("Are you sure you want to Delete this entry permanently?")){
+			return
+		}
+		this.props.deleteExpense(id)
+
+		this.setState({
+			banner:{
+				active: true,
+				good: false,
+				text: "Deleted!"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner:{
+					...this.state.banner,
+					active: false
+				}
+			})
+		}, 1000)
+	}
 	getFilterCondition = (year: string, month: string, payment: any) =>
 	{
 		//when both are empty
@@ -314,7 +409,11 @@ class Expenses extends Component <propTypes, S> {
 								<label> {e.category}</label>
 								<label> {`-`} </label>
 								<label> {`${e.deduction} Rs`} </label>
-								<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>
+								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
+									<input style={{ textAlign: "right", border: "none", width: "40%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
+									<span className="no-print" style={{width: "20%"}} >Rs</span>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}}>x</div>
+								</div> || <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>}
 							</div>
 						}
 						else if (e.expense === "MIS_EXPENSE")
@@ -325,7 +424,11 @@ class Expenses extends Component <propTypes, S> {
 								<label> {e.category}</label>
 								<label> {e.quantity } </label>
 								<label> {`-`} </label>
-								<label> {`${numberWithCommas(e.amount)} Rs`} </label>
+								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
+									<input style={{ textAlign: "right", border: "none", width: "40%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
+									<span className="no-print" style={{width: "20%"}} >Rs</span>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}} onClick={() => this.onDelete(id)} >x</div>
+								</div> || <label> {`${numberWithCommas(e.amount)} Rs`}</label>}
 						</div>
 						}
 					})
@@ -335,6 +438,7 @@ class Expenses extends Component <propTypes, S> {
 					<div><b>{numberWithCommas(total_filtered_expense)}</b></div>
 				</div>
 			</div>
+			<div className="button save" style={{marginTop:"5px"}} onClick={() => this.onSave()}> Save </div>
 
 			<div className="form">
 				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} style={{marginTop:"10px"}} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
@@ -398,8 +502,7 @@ class Expenses extends Component <propTypes, S> {
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> 
 				}
-				<div className="print button" style={{marginTop:"5px"}} onClick={()=> window.print()} >Print</div>
-
+				<div className="print button" style={{marginTop:"5px"}} onClick={() => window.print()}> Print </div>
 			</div>
 		</div>
 	}
@@ -412,5 +515,7 @@ export default connect ( (state: RootReducerState) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), ( dispatch : Function ) => ({
 	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
-	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction))
+	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction)),
+	editExpense: ( edits: {[id: string]:{ amount: number }}) => dispatch(editExpense(edits)),
+	deleteExpense: ( id: string) => dispatch(deleteExpense(id))
 }))( Expenses )
