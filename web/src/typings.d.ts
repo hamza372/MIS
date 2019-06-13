@@ -184,6 +184,7 @@ interface BaseMISExpense {
 	type: string
 	category: string
 	date: number
+	time: number
 }
 
 interface MISExpense extends BaseMISExpense {

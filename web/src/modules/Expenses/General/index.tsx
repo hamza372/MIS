@@ -60,7 +60,7 @@ class Expenses extends Component <propTypes, S> {
 		
 		const current_month = moment().format("MM-YYYY")
 		const edits = Object.entries(props.expenses)
-			.filter(([id,e]) => moment(e.date).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
+			.filter(([id,e]) => moment( e.time ).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
 			.reduce((agg, [id, curr]) => {
 				return {
 					...agg,
@@ -95,11 +95,10 @@ class Expenses extends Component <propTypes, S> {
 	}
 
 	componentDidMount () {
-
-/*  
-			//In case we achange it to automatic
+		/*  
+			//In case we change it to automatic
 		 console.log("LOADED Expenses")
-		
+
 		Object.values(this.props.teachers)
 			.filter(t => t.Salary !== "")  
 			.forEach(t => {
@@ -118,7 +117,7 @@ class Expenses extends Component <propTypes, S> {
 
 		const current_month = moment().format("MM-YYYY")
 		const edits = Object.entries(newProps.expenses)
-			.filter(([id,e]) => moment(e.date).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
+			.filter(([id,e]) => moment(e.time).format("MM-YYYY") === current_month && e.type === "PAYMENT_GIVEN" )
 			.reduce((agg, [id, curr]) => {
 				return {
 					...agg,
@@ -412,7 +411,7 @@ class Expenses extends Component <propTypes, S> {
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", width: "40%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<span className="no-print" style={{width: "20%"}} >Rs</span>
-									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}}>x</div>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}} onClick={() => this.onDelete(id)}>x</div>
 								</div> || <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>}
 							</div>
 						}
