@@ -7,6 +7,8 @@ import { mergeSettings, addLogo } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
+import moment from 'moment'
+import { v4 } from 'node-uuid';
 //import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
@@ -52,7 +54,9 @@ class Settings extends Component {
 				text: "Saved!"
 			},
 			client_id : localStorage.getItem("client_id"),
-			schoolLogo: props.schoolLogo
+			schoolLogo: props.schoolLogo,
+			importExportMenu: false,
+			importedDb: ""
 		}
 
 		this.former = new Former(this, [])
@@ -123,7 +127,41 @@ class Settings extends Component {
 		</div>
 	}
 
-	onSave = () => {		
+	importExport = () => {
+		return <div>
+			<div className="row">
+				<div className="button green" onClick={this.onExport}>Export</div>
+			</div>
+			<div className="row">
+				<div className="fileContainer button green">
+					<div>Import</div>
+					<input type="file" onChange={this.importHandler} accept="text"/>
+				</div>
+			</div>
+		</div>
+	}
+
+	onSave = () => {
+		
+		if(this.state.importedDb !== ""){
+			
+			const client_id = v4()
+
+			const db = JSON.parse(this.state.importedDb)
+			const new_db = {
+				...db,
+				acceptSnapshot: false,
+				client_id,
+				connected: false
+			}
+			localStorage.setItem("db", JSON.stringify(new_db))
+			window.location.reload()
+			return
+		} 
+		else {
+			console.log("Ignore: No Import File Selected")
+		}
+
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
 		if(this.state.schoolLogo === "" || this.state.schoolLogo !== this.props.schoolLogo){
@@ -179,7 +217,25 @@ class Settings extends Component {
 				schoolLogo: reader.result
 			})
 		}
+
 		reader.readAsDataURL(file);
+	}
+
+	importHandler = (e) => {
+
+		if(!window.confirm("Are you sure, you want to Import ? All of your unsynced changes will be lost. Please contact our helpline for more information.")){
+			return
+		}
+
+		var file = e.target.files[0];
+		var reader = new FileReader();
+		
+		reader.onloadend = () => {
+			this.setState({
+				importedDb: reader.result
+			})
+		}
+		reader.readAsText(file);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -199,13 +255,31 @@ class Settings extends Component {
 		})
 	}
 
+	onExport = () => {
+
+
+		if(!window.confirm("Are you sure, you want to export data to your device?")){
+			return
+		}
+
+		const db = localStorage.getItem("db")
+		const a = document.createElement("a")
+
+		const client_id = localStorage.getItem("client_id")
+		
+
+		a.href = URL.createObjectURL(new Blob([db], {type: "text/json"}))
+		a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.txt`
+		a.click()
+	}
+
 
 	render() {
 
 		const studentLength = Object.values(this.props.students)
-        .filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
+			.filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
 		).length
-		
+
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -302,6 +376,18 @@ class Settings extends Component {
 					{
 						this.state.permissionMenu ? this.changeTeacherPermissions() : false
 					}
+					{
+						this.props.user.Admin ?
+							<div className="row">
+								<div className="button grey" onClick={() => this.setState({ importExportMenu : !this.state.importExportMenu })}>
+									Import / Export
+								</div>
+							</div>
+							: false
+					}
+					{
+						this.state.importExportMenu && this.importExport()
+					}
 
 					<div className="row">
 						<Link className="button grey" to="/settings/promote">Promote Students</Link>
@@ -315,7 +401,7 @@ class Settings extends Component {
 }
 
 export default connect(
-	state => ({ 
+	state => ({
 		settings: state.db.settings,
 		students: state.db.students, 
 		user: state.db.faculty[state.auth.faculty_id], 

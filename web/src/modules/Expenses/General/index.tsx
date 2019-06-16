@@ -65,7 +65,7 @@ class Expenses extends Component <propTypes, S> {
 				return {
 					...agg,
 					[id]: {
-						amount: curr.amount
+						amount: curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
 					}
 				}
 			},{} as {[id: string]: { amount: number }})
