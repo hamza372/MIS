@@ -140,7 +140,7 @@ class SingleExam extends Component {
 		if(this.state.sendSMS) {
 			// send SMS with replace text for regex etc.
 			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
-			const message = this.props.feeSMSTemplate
+			const message = this.props.feeSMSprev_gradelate
 					.replace(/\$BALANCE/g, balance)
 					.replace(/\$AMOUNT/g, payment.amount)
 					.replace(/\$NAME/g, this.student().Name)
@@ -226,6 +226,44 @@ class SingleExam extends Component {
 		this.props.removeStudent(this.state.exam.id, student.id) //To remove exam from student
 	}
 
+	getGradeFromScore = (score) => {
+
+		const sorted_grades = Object.entries(this.props.grades)
+		.sort((a,b)=> parseFloat(b[1]) - parseFloat(a[1]))
+
+		let prev_grade = 0
+		const highest_grade = sorted_grades[0]
+		
+		for( let e of sorted_grades)
+		{
+			if(prev_grade !== 0 && parseFloat(score) >= parseFloat(highest_grade[1])){
+				return highest_grade[0]
+			}
+			else if(prev_grade !== 0 && parseFloat(score) <= prev_grade && parseFloat(score) >= e[1]){
+				return e[0]
+			}
+			else {
+				prev_grade = parseFloat(e[1])
+			}
+		}
+	}
+
+	setGrade = (student) => {
+
+		this.setState({
+			exam: {
+				...this.state.exam,
+				student_marks:{
+					...this.state.exam.student_marks,
+					[student.id]:{
+						...this.state.exam.student_marks[student.id],
+						grade: this.getGradeFromScore(this.state.exam.student_marks[student.id].score)
+					}
+				}
+			}
+		})
+	}
+
 	render() {
 
 		if(this.state.redirect) {
@@ -298,34 +336,31 @@ class SingleExam extends Component {
 									</div>
 
 									<div className="marks row">
-									<input type="number" 
-										{...this.former.super_handle(["student_marks", student.id, "score"])} 
+										<input type="number"
+										{...this.former.super_handle(["student_marks", student.id, "score"], () => true, () => this.setGrade(student))} 
 										placeholder="Score" />
-									<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
-										<option value="">Grade</option>
-										<option value="A+">A+</option>
-										<option value="A">A</option>
-										<option value="B+">B+</option>
-										<option value="B">B</option>
-										<option value="C">C</option>
-										<option value="D">D</option>
-										<option value="Fail">Fail</option>
-										<option value="Absent">Absent</option>
-									</select>
+										<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
+										{
+											Object.entries(this.props.grades)
+												.map(([ grade, percent ]) => {
+													return	<option key={grade} value={grade}>{grade}</option>
+												})
+										}
+										</select>
 
-									<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
-										<option value="">Remarks</option>
-										<option value="Excellent">Excellent</option>
-										<option value="Very Good">Very Good</option>
-										<option value="Good">Good</option>
-										<option value="Average">Average</option>
-										<option value="Needs Improvement">Needs Improvement</option>
-										<option value="Pass">Pass</option>
-										<option value="Fail">Fail</option>
-										<option value="Better">Better</option>
-										<option value="Shown Improvement">Shown Improvement</option>
-									</select>
-								</div>
+										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
+											<option value="">Remarks</option>
+											<option value="Excellent">Excellent</option>
+											<option value="Very Good">Very Good</option>
+											<option value="Good">Good</option>
+											<option value="Average">Average</option>
+											<option value="Needs Improvement">Needs Improvement</option>
+											<option value="Pass">Pass</option>
+											<option value="Fail">Fail</option>
+											<option value="Better">Better</option>
+											<option value="Shown Improvement">Shown Improvement</option>
+										</select>
+									</div>
 							</div>
 						))
 					}
@@ -353,7 +388,8 @@ class SingleExam extends Component {
 export default connect(state => ({
 	classes: state.db.classes,
 	exams: state.db.exams || {},
-	students: state.db.students
+	students: state.db.students,
+	grades: state.db.settings.exams.grades
 }), dispatch => ({
 	saveExam: (exam, class_id, section_id) => dispatch(mergeExam(exam, class_id, section_id)),
 	removeStudent: (exam_id, student_id) => dispatch(removeStudentFromExam(exam_id,student_id)),
