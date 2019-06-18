@@ -87,6 +87,11 @@ interface MISSettings {
 	devices: {
 		[client_id: string]: string
 	}
+	exams: {
+		grades:{
+			[grade: string]: string
+		}
+	}
 }
 
 interface MISUser {

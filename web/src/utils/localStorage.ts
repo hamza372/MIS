@@ -1,5 +1,6 @@
 import { v4 } from 'node-uuid'
 import requestFS from './requestFS'
+import { defaultExams } from '../modules/Settings';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -195,9 +196,25 @@ const checkPermissions = (state: RootReducerState) => {
 	return state;
 }
 
+const checkGrades = (state: RootReducerState) => {
+	if(state.db.settings.exams){
+		console.log("Not Running Grades Script")
+		return state
+	}
+
+	console.log("Running Grades Script")
+	state.db.settings = {
+		...state.db.settings,
+		exams: defaultExams
+	}
+
+	return state
+}
+
 // this modifies db in case any schema changes have happened
 // which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
+	checkGrades
 ];

@@ -4,10 +4,6 @@ defmodule Sarkar.ActionHandler do
 		Sarkar.ActionHandler.Mis.handle_action(action, state)
 	end
 
-	def handle_action(%{"client_type" => "bank_portal"} = action, state) do
-		Sarkar.ActionHandler.Platform.handle_action(action, state)
-	end
-
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.inspect state

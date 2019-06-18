@@ -44,3 +44,26 @@ div.settings .badge-container{
 div.settings .new-badge {
 	width: 10%;
 }
+
+.settings .button.grey {
+	margin-bottom: 2px
+}
+
+.settings .grade-menu .button.green {
+	width: auto;
+    align-self: flex-end;
+}
+
+.settings .grade-menu .editable-row {
+	flex-direction: row;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+	.settings .editable-row input[type=number] {
+		width: 90%;
+		margin-right: 5px;
+	}
+	.settings .editable-row div {
+		width: 2%
+	}
