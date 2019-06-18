@@ -392,13 +392,13 @@ export const addSalaryExpense = (id, amount, label, type, faculty_id, date, adva
 	]))
 }
 
-export const editExpense = (expense) => (dispatch, getState) => {
+export const editExpense = (expenses) => (dispatch, getState) => {
 	
-	//expense is an object of id and { amount }
+	//expenses is object of key (id) and value { amount }
 	
 	const state = getState()
 
-	const merges = Object.entries(expense).reduce((agg, [id, { amount }]) => {
+	const merges = Object.entries(expenses).reduce((agg, [id, { amount }]) => {
 		return [...agg,
 			{
 				path:["db", "expenses", id ],
