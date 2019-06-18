@@ -140,7 +140,7 @@ class SingleExam extends Component {
 		if(this.state.sendSMS) {
 			// send SMS with replace text for regex etc.
 			console.log("SENDING MESSAGE", this.state.payment.sendSMS)
-			const message = this.props.feeSMSprev_gradelate
+			const message = this.props.feeSMStemplate
 					.replace(/\$BALANCE/g, balance)
 					.replace(/\$AMOUNT/g, payment.amount)
 					.replace(/\$NAME/g, this.student().Name)
