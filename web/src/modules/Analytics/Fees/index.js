@@ -116,7 +116,7 @@ class FeeAnalytics extends Component {
 	let total_scholarship = 0;
 	let monthly_payments = {}; // [MM-DD-YYYY]: { due, paid, forgiven }
 	let total_student_debts = {}; // [id]: { due, paid, forgiven }
-	let total_debts = {};
+	let total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }; //Need a default otherwise throws an error when logged in for the first time
 	// first update fees
 
 	const nextPayments = Object.values(students)

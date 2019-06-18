@@ -68,7 +68,7 @@ class ClassReportMenu extends Component {
 				number: student.Phone,
 				text: sms_templates.result
 					.replace(/\$NAME/g, student.Name)
-					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilter))
+					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilterText))
 			}))
 				
 		const url = smsIntentLink({
