@@ -228,22 +228,28 @@ class SingleExam extends Component {
 
 	getGradeFromScore = (score) => {
 
-		const sorted_grades = Object.entries(this.props.grades)
-		.sort((a,b)=> parseFloat(b[1]) - parseFloat(a[1]))
+		const total_score = parseFloat(this.state.exam.total_score) || 0
+		const percent_score = Math.abs( (parseFloat(score) / total_score) * 100 ) || 0
 
-		let prev_grade = 0
-		const highest_grade = sorted_grades[0]
-		
-		for( let e of sorted_grades)
-		{
-			if(prev_grade !== 0 && parseFloat(score) >= parseFloat(highest_grade[1])){
-				return highest_grade[0]
-			}
-			else if(prev_grade !== 0 && parseFloat(score) <= prev_grade && parseFloat(score) >= e[1]){
-				return e[0]
-			}
-			else {
-				prev_grade = parseFloat(e[1])
+		if(total_score){
+			
+			const sorted_grades = Object.entries(this.props.grades)
+			.sort((a,b)=> parseFloat(b[1]) - parseFloat(a[1]))
+
+			let prev_grade = 0
+			const highest_grade = sorted_grades[0]
+
+			for( let e of sorted_grades)
+			{
+				if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
+					return highest_grade[0]
+				}
+				else if(prev_grade !== 0 && percent_score <= prev_grade && percent_score >= e[1]){
+					return e[0]
+				}
+				else {
+					prev_grade = parseFloat(e[1])
+				}
 			}
 		}
 	}

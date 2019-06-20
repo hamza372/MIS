@@ -130,7 +130,7 @@ class FeeAnalytics extends Component {
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
-	const {students, settings, addPayments, schoolLogo} = this.props
+	const {students, settings, schoolLogo} = this.props
 
 	let total_paid = 0;
 	let total_owed = 0;
