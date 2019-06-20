@@ -169,7 +169,7 @@ class Planner extends Component <propTypes, S> {
 			dateSheet: rest
 		})
 	}
-	
+
 	render() {
 		const {students, classes, settings, schoolLogo, history} = this.props
 		const { class_id, section_id } = this.props.match.params
@@ -227,6 +227,7 @@ class Planner extends Component <propTypes, S> {
 					</div>
 						{
 							Object.entries(this.state.dateSheet)
+								.sort(([,a],[, b]) => a.date !== b.date ? (a.date - b.date) : (a.time.localeCompare(b.time)))
 								.map( ([ subject, { date, time}]) => {
 									return <div className="row" key={subject}>
 
