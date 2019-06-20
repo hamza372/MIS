@@ -347,6 +347,84 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
+export const addExpense = (amount, label, type, category, quantity, date, time = moment.now() ) => dispatch => {
+
+	const expense =  "MIS_EXPENSE"
+	const id = v4()
+
+	dispatch(createMerges([
+		{
+			path: [ "db", "expenses", id ],
+			value: {
+				expense,
+				amount,
+				label,
+				type,
+				category,
+				quantity,
+				date,
+				time
+			}
+		}
+	]))
+}
+
+export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, category = "SALARY", time = moment.now() ) => dispatch => {
+
+	const expense = "SALARY_EXPENSE"
+	
+	dispatch(createMerges([
+		{
+			path: [ "db", "expenses", id ],
+			value: {
+				expense,
+				amount, 
+				label, // Teacher name
+				type, // PAYMENT_GIVEN or PAYMENT_DUE
+				category, // SALARY
+				faculty_id,
+				advance,
+				deduction,
+				date,
+				time
+			}
+		}
+	]))
+}
+
+export const editExpense = (expenses) => (dispatch, getState) => {
+	
+	//expenses is object of key (id) and value { amount }
+	
+	const state = getState()
+
+	const merges = Object.entries(expenses).reduce((agg, [id, { amount }]) => {
+		return [...agg,
+			{
+				path:["db", "expenses", id ],
+				value: {
+					...state.db.expenses[id],
+					amount
+				}
+			}
+		]
+	}, [])
+
+	dispatch(createMerges(merges))
+
+}
+
+export const deleteExpense = (id) => dispatch => {
+
+	//Id of the expense to be deleted
+
+	dispatch(createDeletes([
+		{
+			path: ["db", "expenses", id]
+		}
+	]))
+}
+
 export const addMultipleFees = (fees) => dispatch => {
 	
 	//fees is an array of { student, fee_id, amount, type, period, name}
