@@ -409,6 +409,19 @@ class SingleStudent extends Component<propTypes, S> {
 		return tags;
 	}
 
+	uniqueFeeName = () => {
+		const names = new Set()
+
+		Object.values(this.props.students)
+			.filter(s => s.id && s.Name)
+			.forEach(s => {
+				Object.values(s.fees)
+					.forEach(f => names.add(f.name))
+			})
+			
+		return names
+	}
+
 	addTag = () => {
 
 		const new_tag = this.state.new_tag;
@@ -659,8 +672,19 @@ class SingleStudent extends Component<propTypes, S> {
 								<div className="row">
 									<label>Name</label>
 									<input 
-										type="text" {...this.former.super_handle(["fees", id, "name"])} placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"} disabled={!admin}/>
+										list="fee_names"
+										type="text"
+										{...this.former.super_handle(["fees", id, "name"])}
+										placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"}
+										disabled={!admin}
+									/>
 								</div>
+									<datalist id="fee_names">
+									{
+										[...this.uniqueFeeName().keys()]
+										.map(n => <option key={n} value={n} />)
+									}
+									</datalist>
 								<div className="row">
 									<label>Amount</label>
 									<input type="number" {...this.former.super_handle_flex(
