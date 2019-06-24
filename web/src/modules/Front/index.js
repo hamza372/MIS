@@ -525,8 +525,8 @@ class Front extends Component {
           <div className="contact-us">
             <div className="title">Contact Us</div>
             <a href="tel:+923481112004">+92 348 111 2004</a>
-            <a href="mailto:mischool@cer.org.pk" >mischool@cerp.org.pk</a>
-            <a href="https://maps.app.goo.gl/iR1Zx">19-A FCC Syed Maratib Ali Road, Lahore</a>
+            <a href="mailto:mischool@cerp.org.pk" >mischool@cerp.org.pk</a>
+            <a href="https://maps.app.goo.gl/1fZycGncNDEritNT9">29-P Gulberg II, Lahore 54660, Pakistan</a>
           </div>
 
           

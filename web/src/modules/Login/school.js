@@ -13,7 +13,8 @@ class SchoolLogin extends Component {
 		this.state = {
 			loading: false,
 			school: "",
-			password: ""
+			password: "",
+			errorMessage: ""
 		}
 
 		this.former = new Former(this, [])
@@ -25,9 +26,24 @@ class SchoolLogin extends Component {
 	}
 
 	componentWillReceiveProps(newProps) {
+
+		if(newProps.auth.attempt_failed) {
+			this.setState({
+				errorMessage: "Login failed"
+			})
+		}
+
 		if(newProps.auth.token !== undefined && newProps.auth.token !== this.props.auth.token) {
 			this.props.history.push('/login')
 		}
+	}
+
+	removeErrorMessage = () => {
+		setTimeout(() => {
+			this.setState({
+				errorMessage: ""
+			})
+		}, 3000)
 	}
 
 	render() {
@@ -51,7 +67,8 @@ class SchoolLogin extends Component {
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>
 				{ this.props.auth.loading ? <div>Signing in....</div> : false }
-				{ this.props.auth.attempt_failed ? <div>Login failed</div> : false }
+				{ this.props.auth.attempt_failed ? <div>{ this.state.errorMessage }</div> : false }
+				{ this.state.errorMessage !== "" ? this.removeErrorMessage() : false }
 			</div>
 		</Layout>
 	}
