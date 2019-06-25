@@ -27,7 +27,7 @@ export const loadAuth = (): RootReducerState['auth'] => {
 	let init_auth : RootReducerState['auth'] = {
 		id: undefined,
 		token: undefined,
-		client_type: "tech_demo"
+		client_type: "dashboard"
 	};
 
 	try {

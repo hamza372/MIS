@@ -7,7 +7,7 @@ interface RootReducerState {
 	auth: {
 		id?: string
 		token?: string
-		client_type: "dasboard"
+		client_type: "dashboard"
 	}
 	client_id: string
 	queued: {
