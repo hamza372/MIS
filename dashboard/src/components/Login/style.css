@@ -1,0 +1,70 @@
+.login .cover {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 75px;
+	background-color: var(--darkgrey);
+}
+
+.login .bg-cover {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 99;
+	background-color: black;
+	opacity: 0.5;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login .mappy-boi {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 0;
+}
+
+.login .title {
+	color: white;
+}
+
+.login .form {
+	width: 30%;
+	display: flex;
+	flex-direction: column;
+}
+
+	.login .form .row * {
+		color: white;
+	}
+
+		.login .form .row input {
+			background-color: white;
+			color: black;
+		}
+
+	@media only screen and (max-width: 767px) {
+
+		.login .cover {
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+		}
+
+		.login .form {
+			width: 75%;
+		}
+	}
