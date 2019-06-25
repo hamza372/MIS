@@ -209,13 +209,13 @@ class Planner extends Component <propTypes, S> {
 
 				<div className="row input info"> 
 					<div className="row" style={{justifyContent:"flex-start"}}>
-						<label> <b> Class / Section: </b> </label>
-						<div>{`${curr_class.name +"/"+ curr_section.name}`} </div>
+						<label style={{marginRight:"2px"}}> <b> Class-Section: </b> </label>
+						<div>{`${curr_class.name +"-"+ curr_section.name}`} </div>
 					</div>
 					
-					<div className="row" style={{justifyContent:"flex-end"}}> 
-						<label> <b> Exam: </b> </label> 
-						<input type="text"/> 
+					<div className="row" style={{justifyContent:"flex-end"}}>
+						<label> <b> Exam: </b> </label>
+						<input style={{marginLeft:"1px"}} type="text"/> 
 					</div>
 				</div>
 
@@ -228,7 +228,7 @@ class Planner extends Component <propTypes, S> {
 						{
 							Object.entries(this.state.dateSheet)
 								.sort(([,a],[, b]) => a.date !== b.date ? (a.date - b.date) : (a.time.localeCompare(b.time)))
-								.map( ([ subject, { date, time}]) => {
+								.map( ([ subject, { date, time }]) => {
 									return <div className="row" key={subject}>
 
 										<input className="item" type="date"
