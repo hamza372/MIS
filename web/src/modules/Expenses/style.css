@@ -18,3 +18,10 @@
 	margin: auto;
 }
 
+.expenses .payment-history.section {
+	overflow-x: auto;
+}
+
+	.expenses .payment-history.section .table.row {
+		min-width: 600px;
+	}

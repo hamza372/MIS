@@ -41,6 +41,7 @@ interface S {
 	}
 	monthFilter: string
 	yearFilter: string
+	categoryFilter: string
 	edits: {
 		[id: string]: { amount :number }
 	}
@@ -65,7 +66,7 @@ class Expenses extends Component <propTypes, S> {
 				return {
 					...agg,
 					[id]: {
-						amount: curr.amount
+						amount: curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0) 
 					}
 				}
 			},{} as {[id: string]: { amount: number }})
@@ -87,8 +88,9 @@ class Expenses extends Component <propTypes, S> {
 				deduction: "0",
 				date: moment.now()
 			},
-			monthFilter: "",
-			yearFilter: "",
+			monthFilter: moment().format("MMMM"),
+			yearFilter: moment().format("YYYY"),
+			categoryFilter: "",
 			edits,
 		}
 		this.former = new Former (this,[])
@@ -337,20 +339,20 @@ class Expenses extends Component <propTypes, S> {
 		let total_filtered_expense = 0
 
 		const total_expense = Object.values(expenses)
-		.reduce((agg, curr) => {
-			if(curr.type === "PAYMENT_GIVEN")
-			{
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, curr)){
-					total_filtered_expense += curr.amount - ( curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
+			.reduce((agg, curr) => {
+				if(curr.type === "PAYMENT_GIVEN")
+				{
+					if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, curr) && (this.state.categoryFilter !== "" ? this.state.categoryFilter === curr.category: true)){
+						total_filtered_expense += curr.amount - ( curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
+					}
+					return agg + (curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0))
 				}
-				return agg + (curr.amount - (curr.expense === "SALARY_EXPENSE" ? curr.deduction : 0))
-			}
-			else
-				return agg
-		}, 0)
+				else
+					return agg
+			}, 0)
 
 		const filtered_expenses = Object.entries(expenses)
-			.filter(([id, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
+			.filter(([id, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) && (this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category: true))
 			.sort(([,a],[,b]) => a.date -b.date)
 
 		return <div className="expenses">
@@ -368,8 +370,8 @@ class Expenses extends Component <propTypes, S> {
 
 			<div className="divider">Ledger</div>
 
-			<div className="filter row no-print" style={{marginBottom:"10px"}}>
-				<select className="" {...this.former.super_handle(["monthFilter"])} style={{ width: "150px" }}>
+			<div className="filter row no-print" style={{marginBottom:"10px", flexWrap:"wrap"}}>
+				<select {...this.former.super_handle(["monthFilter"])}>
 					<option value="">Select Month</option>
 					{
 						[...Months].map( Month => {
@@ -378,13 +380,25 @@ class Expenses extends Component <propTypes, S> {
 					}
 				</select>
 
-				<select className="" {...this.former.super_handle(["yearFilter"])}>
+				<select {...this.former.super_handle(["yearFilter"])}>
 					<option value="">Select Year</option>
 					{
 						[...Years].map( year => {
 							return <option key={year} value={year}> {year} </option>
 						})
 					}
+				</select>
+
+				<select {...this.former.super_handle(["categoryFilter"])}>
+					<option value="">Select Category</option>
+					<option value="SALARY">Salary</option>
+					<option value="BILLS">Utility Bills</option>
+					<option value="STATIONARY">Stationary</option>
+					<option value="REPAIRS">Repairs</option>
+					<option value="RENT">Rent</option>
+					<option value="ACTIVITY">Student Activity</option>
+					<option value="DAILY">Daily</option>
+					<option value="PETTY_CASH">Petty Cash</option>
 				</select>
 			</div>
 
@@ -403,30 +417,28 @@ class Expenses extends Component <propTypes, S> {
 						if(e.expense === "SALARY_EXPENSE")
 						{
 							return <div key={id} className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
-								<label> {moment(e.date).format("DD-MM")} </label>
+								<label> {moment(e.date).format("DD-MM-YY")} </label>
 								<label> {e.label}</label>
 								<label> {e.category}</label>
 								<label> {`-`} </label>
 								<label> {`${e.deduction} Rs`} </label>
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
-									<input style={{ textAlign: "right", border: "none", width: "40%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
-									<span className="no-print" style={{width: "20%"}} >Rs</span>
-									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}} onClick={() => this.onDelete(id)}>x</div>
+									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
 								</div> || <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>}
 							</div>
 						}
 						else if (e.expense === "MIS_EXPENSE")
 						{
 							return <div key={id} className="table row">
-								<label> {moment(e.date).format("DD-MM")} </label>
+								<label> {moment(e.date).format("DD-MM-YY")} </label>
 								<label> {e.label}</label>
 								<label> {e.category}</label>
 								<label> {e.quantity } </label>
 								<label> {`-`} </label>
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
-									<input style={{ textAlign: "right", border: "none", width: "40%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
-									<span className="no-print" style={{width: "20%"}} >Rs</span>
-									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "20%"}} onClick={() => this.onDelete(id)} >x</div>
+									<input style={{ textAlign: "right", border: "none", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px"}} onClick={() => this.onDelete(id)} >x</div>
 								</div> || <label> {`${numberWithCommas(e.amount)} Rs`}</label>}
 						</div>
 						}
