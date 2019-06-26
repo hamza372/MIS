@@ -6,6 +6,7 @@ import { createSignUp } from 'actions'
 import {connect} from 'react-redux'
 
 import './style.css'
+import moment from 'moment';
 
 class SignUp extends Component {
 
@@ -49,7 +50,7 @@ class SignUp extends Component {
         })
       }
 
-      this.props.createSignUp(this.state.profile)
+      this.props.createSignUp({...this.state.profile, date: moment.now()})
     }
     
     componentWillReceiveProps(props) {

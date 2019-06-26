@@ -124,6 +124,32 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "sign_ups.csv"}} = req, state) do
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				form ->> 'name' as Name,
+				form ->> 'schoolName' as School,
+				form ->> 'city' as City,
+				form ->> 'packageName' as Package,
+				form->> 'phone' as Phone,
+				to_timestamp((form->>'date')::bigint/1000) as Date
+			FROM mischool_sign_ups",
+			[])
+
+		csv = [ ["Name", "School", "City", "Package", "Phone", "Date"] | resp.rows] 
+			|> CSV.encode
+			|> Enum.join()
+		
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{bindings: %{type: "attendance.csv"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
