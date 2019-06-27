@@ -26,6 +26,11 @@
 	margin: 5px !important;
 }
 
+input[disabled], select[disabled] {
+	background-color: #aaaaaa36;
+	color: #aaa
+}
+
 @media only screen and (min-width: 768px) {
 	.save-delete .button {
 		margin-left: 0;

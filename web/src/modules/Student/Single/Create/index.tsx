@@ -83,6 +83,9 @@ interface S {
 		text?: string
 	}
 	new_tag: string
+	edit: {
+		[id: string]: boolean
+	}
 }
 
 interface RouteInfo {
@@ -114,7 +117,8 @@ class SingleStudent extends Component<propTypes, S> {
 				good: true,
 				text: "Saved!"
 			},
-			new_tag: ""
+			new_tag: "",
+			edit: {}
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -122,6 +126,25 @@ class SingleStudent extends Component<propTypes, S> {
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 	isProspective = () => this.props.location.pathname.indexOf("prospective-student") > -1
+	
+	onFeeEdit = (id: string) => {
+		this.setState({
+			edit:{
+				...this.state.edit,
+				[id]: true
+			}
+		})
+	}
+
+	onFeeEditCompletion = (id: string) => {
+
+		const { [id]: removed_edit, ...rest} = this.state.edit
+
+		this.setState({
+			edit: rest
+		})
+	}
+
 	onSave = () => {
 		console.log('save!', this.state.profile)
 		let student = this.state.profile;
@@ -263,7 +286,8 @@ class SingleStudent extends Component<propTypes, S> {
 				active: true,
 				good: true,
 				text: "Saved!"
-			}
+			},
+			edit: {}
 		})
 
 		setTimeout(() => {
@@ -347,18 +371,23 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	addFee = () => {
+		const id = v4()
 		this.setState({
 			profile: {
 				...this.state.profile,
 				fees: {
 					...this.state.profile.fees,
-					[v4()]: {
+					[id]: {
 						name: "",
 						type: "FEE", 
 						amount: "",
 						period: "",
 					}
 				}
+			},
+			edit: {
+				...this.state.edit,
+				[id]: true
 			}
 		})
 	}
@@ -371,11 +400,13 @@ class SingleStudent extends Component<propTypes, S> {
 
 		const {[id]: removed, ...nextFee} = this.state.profile.fees;
 
+		const { [id]: removed_edit, ...rest} = this.state.edit
 		this.setState({
 			profile: {
 				...this.state.profile,
 				fees: nextFee
-			}
+			},
+			edit: rest
 		})
 	}
 
@@ -659,16 +690,25 @@ class SingleStudent extends Component<propTypes, S> {
 					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
 					{(admin || this.props.permissions.fee.teacher) && !prospective ?
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
+							const editable = this.state.edit[id] || this.isNew()
+
 							return <div className="section" key={id}>
-								{!admin ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
+								{!admin || editable ? false : <div className="click-label" onClick={() => this.onFeeEdit(id)}>Edit Fee</div>}
+								{!admin || !editable ? false : <div className="click-label" onClick={this.removeFee(id)}>Remove Fee</div>}
 								<div className="row">
 									<label>Type</label>
-									<select {...this.former.super_handle(["fees", id, "type"])} disabled={!admin}>
+									<select {...this.former.super_handle(["fees", id, "type"])} disabled={!admin || !editable}>
 										<option value="" disabled>Select Fee or Scholarship</option>
 										<option value="FEE">Fee</option>
 										<option value="SCHOLARSHIP">Scholarship</option>
 									</select>
 								</div>
+								<datalist id="fee_names">
+									{
+										[...this.uniqueFeeName().keys()]
+										.map(n => <option key={n} value={n} />)
+									}
+								</datalist>
 								<div className="row">
 									<label>Name</label>
 									<input 
@@ -676,32 +716,27 @@ class SingleStudent extends Component<propTypes, S> {
 										type="text"
 										{...this.former.super_handle(["fees", id, "name"])}
 										placeholder={this.state.profile.fees[id].type === "SCHOLARSHIP" ? "Scholarship Name" : "Fee Name"}
-										disabled={!admin}
+										disabled={!admin || !editable }
 									/>
 								</div>
-									<datalist id="fee_names">
-									{
-										[...this.uniqueFeeName().keys()]
-										.map(n => <option key={n} value={n} />)
-									}
-									</datalist>
 								<div className="row">
 									<label>Amount</label>
 									<input type="number" {...this.former.super_handle_flex(
 											["fees", id, "amount"],
 											{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} })
-										} 
-										placeholder="Amount" 
-										disabled={!admin}/>
+										}
+										placeholder="Amount"
+										disabled={!admin || !editable}/>
 								</div>
 								<div className="row">
 									<label>Fee Period</label>
-									<select {...this.former.super_handle(["fees", id, "period"])} disabled={!admin}>
+									<select {...this.former.super_handle(["fees", id, "period"])} disabled={!admin || !editable}>
 										<option value="" disabled>Please Select a Time Period</option>
 										<option value="SINGLE">One Time</option>
 										<option value="MONTHLY">Every Month</option>
 									</select>
 								</div>
+								{!admin || !editable ? false : <div className="button green" onClick={() => this.onFeeEditCompletion(id)}> Done </div>}
 							</div>
 						})
 					: false }
