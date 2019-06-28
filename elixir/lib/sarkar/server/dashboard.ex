@@ -5,24 +5,37 @@ defmodule Sarkar.Server.Dashboard do
 		req = :cowboy_req.reply(200, req)
 		{:ok, req, state}
     end
-    
-    def init(%{bindings: %{type: "student_attendance"}} = req, state) do
+
+    def init(%{bindings: %{type: "student_attendance"}, qs: query_string} = req, state) do
+
+      IO.inspect URI.decode_query(query_string)
+
       {:ok, resp} = Postgrex.query(Sarkar.School.DB,
         "SELECT
 				    to_timestamp(time/1000)::date::text as d, 
 				    school_id,
-				    count(distinct path[3]) as students_marked 
-			  FROM writes
-			  WHERE path[2] = 'students' and path[4] = 'attendance'
+            count(distinct path[3]) as students_marked
+        FROM writes
+        WHERE path[2] = 'students' and path[4] = 'attendance'
 			  GROUP BY d, school_id
         ORDER BY d desc", [])
-  
       #convert to JSON (read up on this)
-
       coordinates = resp.rows 
         |> Enum.map(fn [date, school_id, students_marked] -> %{"date" => date, "school_id" => school_id, "students_marked" => students_marked} end)
 
-      json_data = Poison.encode!(%{data: coordinates})
+        {:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+        "
+        SELECT count(*)
+        FROM (
+          select jsonb_object_keys(db->'students')
+          from backup
+        ) as total_students", [])
+      #convert to JSON 
+        totalstudents = resp2.rows
+      |> Enum.map(fn[total_students] -> %{"total_students" => total_students} end)
+
+      json_data = Poison.encode!(%{data: coordinates, data2: totalstudents})
+      
 
       req = :cowboy_req.reply(
         200, 
@@ -33,7 +46,10 @@ defmodule Sarkar.Server.Dashboard do
 		  {:ok, req, state}
   end
 
-  def init(%{bindings: %{type: "teacher_attendance"}} = req, state) do
+  def init(%{bindings: %{type: "teacher_attendance"}, qs: query_string} = req, state) do
+
+    IO.inspect URI.decode_query(query_string)
+
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
       "SELECT
         to_timestamp(time/1000)::date::text as d,
@@ -48,17 +64,34 @@ defmodule Sarkar.Server.Dashboard do
     coordinates = resp.rows
     |> Enum.map(fn[date, school_id, teachers_marked] -> %{"date" => date, "school_id" => school_id, "teachers_marked" => teachers_marked} end)
 
-  json_data = Poison.encode!(%{data: coordinates})
+    {:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+    "
+    SELECT count(*)
+    FROM (
+      select jsonb_object_keys(db->'faculty') 
+      from backup 
+      where school_id='darul-ehsan'
+    ) as total_teachers", [])
+    #convert to JSON
+    [[ total_teachers ]] = resp2.rows
+
+  json_data = Poison.encode!(%{data: coordinates, total_teachers: total_teachers})
 
   req = :cowboy_req.reply(
     200,
-    %{"content-type" => "application/json", "cache-control" => "no-cache"},
+    %{"content-type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
     json_data,
     req
     )
     {:ok, req, state}
   end
-  def init(%{bindings: %{type: "fees"}} = req, state) do
+
+
+
+
+  def init(%{bindings: %{type: "fees"}, qs: query_string} = req, state) do
+    IO.inspect URI.decode_query(query_string)
+    
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
       "SELECT
         to_timestamp(time/1000)::date::text as d,
@@ -75,11 +108,22 @@ defmodule Sarkar.Server.Dashboard do
     coordinates = resp.rows
     |> Enum.map(fn [date, school_id, unique_students, num_payments, total] -> %{ "date" => date, "school_id" => school_id, "unique_students" => unique_students, "num_payments" => num_payments, "total" => total} end)
   
-  json_data = Poison.encode!(%{data: coordinates})
+    {:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+        "
+        SELECT count(*)
+        FROM (
+          select jsonb_object_keys(db->'students') 
+          from backup 
+          where school_id='darul-ehsan'
+        ) as total_students", [])
+
+    [[ total_students ]] = resp2.rows
+
+  json_data = Poison.encode!(%{data: coordinates, total_students: total_students})
 
   req = :cowboy_req.reply(
     200,
-    %{"content_type" => "application/json", "cache-control" => "no-cache"},
+    %{"content_type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
     json_data,
     req
     )
@@ -91,7 +135,7 @@ defmodule Sarkar.Server.Dashboard do
     "SELECT 
 				to_timestamp(time/1000)::date::text as d,
 				school_id,
-				count(distinct path[3]) as students_graded,
+				count(distinct path[3]) as school_id,
 				count(distinct path[5]) as exams 
 			FROM writes 
 			WHERE path[2] = 'students' and path[4] = 'exams'
@@ -100,12 +144,22 @@ defmodule Sarkar.Server.Dashboard do
 			[])
     coordinates = resp.rows
     |> Enum.map(fn [date, students_graded, school_id, exams] -> %{ "date" => date, "students_graded" => students_graded, "school_id" => school_id, "exams" => exams} end)
-  
-    json_data = Poison.encode!(%{data: coordinates})
-    
+
+    {:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+    "
+    SELECT count(*)
+    FROM (
+      select jsonb_object_keys(db->'students') 
+      from backup 
+      where school_id='darul-ehsan'
+    ) as total_students", [])
+
+[[ total_students ]] = resp2.rows
+
+json_data = Poison.encode!(%{data: coordinates, total_students: total_students})    
     req = :cowboy_req.reply(
       200,
-      %{"content_type" => "application/json", "cache-control" => "no-cache"},
+      %{"content_type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
       json_data,
       req
     )
