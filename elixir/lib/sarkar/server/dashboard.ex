@@ -29,6 +29,7 @@ defmodule Sarkar.Server.Dashboard do
         FROM (
           select jsonb_object_keys(db->'students')
           from backup
+          where school_id = 'darul-ehsan'
         ) as total_students", [])
       #convert to JSON 
         totalstudents = resp2.rows
