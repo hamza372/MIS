@@ -83,6 +83,7 @@ interface MISSettings {
 		fee: { teacher: boolean }
 		dailyStats: { teacher: boolean }
 		setupPage: { teacher: boolean }
+		expense: { teacher: boolean }
 	}
 	devices: {
 		[client_id: string]: string

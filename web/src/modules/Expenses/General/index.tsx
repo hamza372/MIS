@@ -88,7 +88,7 @@ class Expenses extends Component <propTypes, S> {
 				deduction: "0",
 				date: moment.now()
 			},
-			monthFilter: moment().format("MMMM"),
+			monthFilter: "",
 			yearFilter: moment().format("YYYY"),
 			categoryFilter: "",
 			edits,

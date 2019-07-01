@@ -79,7 +79,7 @@ class Landing extends Component {
 		const setupPage = permissions && permissions.setupPage ? permissions.setupPage.teacher : true
 		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
 		const teacher_fee_permission = permissions && permissions.fee ? permissions.fee.teacher : true;
-		const teacher_expenses_permission = permissions && permissions.expenses ? permissions.expenses.teacher : true;
+		const teacher_expense_permission = permissions && permissions.expense ? permissions.expense.teacher : true;
 
 
 		for(let student of Object.values(students)) {
@@ -142,7 +142,6 @@ class Landing extends Component {
 						<div className="row">
 						{
 							user.Admin && <div className="badge-container">
-								<img className="new-badge" src={newBadge} alt=""/>
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
@@ -216,16 +215,13 @@ class Landing extends Component {
 						</div>
 
 						<div className="row">
-							<div className="badge-container">
-								<img className="new-badge" src={newBadge} alt=""/>
-								<Link
-									to="/ClassList" className="button grey-shadow"
-									style={{ backgroundImage: `url(${planner})` }}>
-									DateSheet
-								</Link>
-							</div>
+							<Link
+								to="/ClassList" className="button grey-shadow"
+								style={{ backgroundImage: `url(${planner})` }}>
+								DateSheet
+							</Link>
 							{
-							(user.Admin || teacher_expenses_permission) && <div className="badge-container">
+							(user.Admin || teacher_expense_permission) && <div className="badge-container">
 								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									className="button yellow-shadow"
@@ -235,7 +231,7 @@ class Landing extends Component {
 								</Link>
 								</div>
 							}
-							</div>
+						</div>
 					</div>
 
 					{ user.Admin || dailyStats ? <div className="page">

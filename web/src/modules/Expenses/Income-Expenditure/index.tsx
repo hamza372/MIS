@@ -46,7 +46,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			good: true,
 			text: "Saved!"
 		},
-		monthFilter: moment().format("MMMM"),
+		monthFilter: "",
 		yearFilter: moment().format("YYYY"),
 		categoryFilter: ""
 		}

@@ -14,7 +14,8 @@ import './style.css'
 export const defaultPermissions = {
 	fee:  { teacher: true },
 	dailyStats: { teacher: true },
-	setupPage: {teacher: true }
+	setupPage: {teacher: true },
+	expense: { teacher: true }
 }
 
 export const defaultExams = {
@@ -106,6 +107,13 @@ class Settings extends Component {
 							<option value={true}>Yes</option>
 							<option value={false}>No</option>
 						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Expense Information? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+					<option value={true}>Yes</option>
+					<option value={false}>No</option>
+				</select>
 			</div>
 		</div>
 	}

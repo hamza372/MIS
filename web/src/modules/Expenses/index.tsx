@@ -37,7 +37,7 @@ class ExpensePage extends Component <propTypes> {
 			<div className="expense-page">
 				<div className="row tabs">
 					{ 
-						admin || permissions.fee.teacher ?
+						admin || permissions.expense.teacher ?
 						<Link
 							className={`button ${loc === "general" ? "green": false}`}
 							to="general"
