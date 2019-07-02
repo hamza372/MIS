@@ -9,6 +9,7 @@ interface DataRow {
 	students_marked: number
 	school_id: string
 	date: string
+	total_students: number
 }
 
 interface S {
@@ -26,7 +27,7 @@ class StudentAttendance extends React.Component<P, S> {
 	}
 
 	componentDidMount() {
-		fetch('http://localhost:8080/dashboard/student_attendance')
+		fetch('http://localhost:8080/dashboard/student_attendance?school_id=brighterschool&start_date=2018-10-15&end_date=2018-12-19')
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -41,8 +42,8 @@ class StudentAttendance extends React.Component<P, S> {
 	render() {
 
 		return <div>
-			Hello, student attendance
-
+			Student Attendance Module Usage
+			
 			<ResponsiveContainer width="100%" height={500}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />
@@ -50,6 +51,7 @@ class StudentAttendance extends React.Component<P, S> {
 					<Tooltip />
 
 					<Line dataKey="students_marked" />
+					<Line dataKey="total_students"/>
 				</LineChart>
 
 			</ResponsiveContainer>

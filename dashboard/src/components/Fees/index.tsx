@@ -43,8 +43,7 @@ class Fees extends React.Component<P, S> {
 	render() {
 
 		return <div>
-			Hello, fees
-
+			Fees Module Usage
 			<ResponsiveContainer width="100%" height={500}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />

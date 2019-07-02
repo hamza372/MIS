@@ -27,7 +27,7 @@ class Exams extends React.Component<P, S> {
 	}
 
 	componentDidMount() {
-		fetch('http://localhost:8080/dashboard/exams')
+		fetch('http://localhost:8080/dashboard/exams?school_id=brighterschool&start_date=2018-10-15&end_date=2018-12-19')
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -42,8 +42,7 @@ class Exams extends React.Component<P, S> {
 	render() {
 
 		return <div>
-			Hello, exams
-
+			Exams Module Usage
 			<ResponsiveContainer width="100%" height={500}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />

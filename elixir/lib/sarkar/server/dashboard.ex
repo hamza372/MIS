@@ -10,18 +10,30 @@ defmodule Sarkar.Server.Dashboard do
 
       IO.inspect URI.decode_query(query_string)
 
+      decoded_params = URI.decode_query(query_string)
+
+      IO.inspect start_date = Map.get(decoded_params, "start_date")
+      
+      IO.inspect end_date = Map.get(decoded_params, "end_date")
+      
+      IO.inspect Map.get(decoded_params, "school_id")
+
+      school_id = Map.get(decoded_params, "school_id")
+
+      
       {:ok, resp} = Postgrex.query(Sarkar.School.DB,
         "SELECT
 				    to_timestamp(time/1000)::date::text as d, 
 				    school_id,
             count(distinct path[3]) as students_marked
         FROM writes
-        WHERE path[2] = 'students' and path[4] = 'attendance'
+        WHERE path[2] = 'students' and path[4] = 'attendance' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 			  GROUP BY d, school_id
-        ORDER BY d desc", [])
+        ORDER BY d desc", [school_id, start_date, end_date])
       #convert to JSON (read up on this)
       coordinates = resp.rows 
         |> Enum.map(fn [date, school_id, students_marked] -> %{"date" => date, "school_id" => school_id, "students_marked" => students_marked} end)
+
 
         {:ok, resp2} = Postgrex.query(Sarkar.School.DB,
         "
@@ -29,15 +41,12 @@ defmodule Sarkar.Server.Dashboard do
         FROM (
           select jsonb_object_keys(db->'students')
           from backup
-          where school_id = 'darul-ehsan'
-        ) as total_students", [])
+          where school_id = $1
+        ) as total_students", [school_id])
       #convert to JSON 
-        totalstudents = resp2.rows
-      |> Enum.map(fn[total_students] -> %{"total_students" => total_students} end)
+        [[ total_students ]] = resp2.rows
 
-      json_data = Poison.encode!(%{data: coordinates, data2: totalstudents})
-      
-
+        json_data = Poison.encode!(%{data: coordinates, total_students: total_students})
       req = :cowboy_req.reply(
         200, 
         %{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
@@ -47,19 +56,26 @@ defmodule Sarkar.Server.Dashboard do
 		  {:ok, req, state}
   end
 
+
   def init(%{bindings: %{type: "teacher_attendance"}, qs: query_string} = req, state) do
 
     IO.inspect URI.decode_query(query_string)
-
+    decoded_params = URI.decode_query(query_string)
+    
+    start_date = Map.get(decoded_params, "start_date")
+    
+    end_date = Map.get(decoded_params, "end_date")
+    
+    school_id = Map.get(decoded_params, "school_id")
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
       "SELECT
         to_timestamp(time/1000)::date::text as d,
         school_id,
         count(distinct path[3]) as teachers_marked
         FROM writes
-        WHERE path[2] = 'faculty' and path[4] = 'attendance'
+        WHERE path[2] = 'faculty' and path[4] = 'attendance' and school_id =$1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(tieme/1000)::date::text <= $3
         GROUP BY d, school_id
-        ORDER BY d desc", [])
+        ORDER BY d desc", [school_id, start_date, end_date])
 
     #convert to JSON (read up on this)
     coordinates = resp.rows
@@ -71,8 +87,8 @@ defmodule Sarkar.Server.Dashboard do
     FROM (
       select jsonb_object_keys(db->'faculty') 
       from backup 
-      where school_id='darul-ehsan'
-    ) as total_teachers", [])
+      where school_id= $1
+    ) as total_teachers", [school_id])
     #convert to JSON
     [[ total_teachers ]] = resp2.rows
 
@@ -93,6 +109,15 @@ defmodule Sarkar.Server.Dashboard do
   def init(%{bindings: %{type: "fees"}, qs: query_string} = req, state) do
     IO.inspect URI.decode_query(query_string)
     
+    decoded_params = URI.decode_query(query_string)
+
+    start_date = Map.get(decoded_params, "start_date")
+
+    end_date = Map.get(decoded_params, "end_date")
+
+    school_id = Map.get(decoded_params, "school_id")
+
+
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
       "SELECT
         to_timestamp(time/1000)::date::text as d,
@@ -101,9 +126,9 @@ defmodule Sarkar.Server.Dashboard do
         count(distinct path[5]) as num_payments,
         sum((value->>'amount')::float) as total
       FROM writes
-      WHERE path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED'
+      WHERE path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
       GROUP BY d, school_id
-      ORDER BY d desc", [])
+      ORDER BY d desc", [school_id, start_date, end_date])
       
     #convert to JSON (read up on this)
     coordinates = resp.rows
@@ -115,8 +140,8 @@ defmodule Sarkar.Server.Dashboard do
         FROM (
           select jsonb_object_keys(db->'students') 
           from backup 
-          where school_id='darul-ehsan'
-        ) as total_students", [])
+          where school_id= $1
+        ) as total_students", [school_id])
 
     [[ total_students ]] = resp2.rows
 
@@ -131,7 +156,17 @@ defmodule Sarkar.Server.Dashboard do
     {:ok, req, state}
   end
 
-  def init(%{bindings: %{type: "exams"}} = req, state) do
+
+  def init(%{bindings: %{type: "exams"}, qs: query_string} = req, state) do
+
+    decoded_params = URI.decode_query(query_string)
+    
+    start_date = Map.get(decoded_params, "start_date")
+
+    end_date = Map.get(decoded_params, "end_date")
+
+    school_id = Map.get(decoded_params, "school_id")
+
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
     "SELECT 
 				to_timestamp(time/1000)::date::text as d,
@@ -139,10 +174,9 @@ defmodule Sarkar.Server.Dashboard do
 				count(distinct path[3]) as school_id,
 				count(distinct path[5]) as exams 
 			FROM writes 
-			WHERE path[2] = 'students' and path[4] = 'exams'
+			WHERE path[2] = 'students' and path[4] = 'exams' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 			GROUP BY d, school_id
-			ORDER BY d desc",
-			[])
+			ORDER BY d desc", [school_id, start_date, end_date])
     coordinates = resp.rows
     |> Enum.map(fn [date, students_graded, school_id, exams] -> %{ "date" => date, "students_graded" => students_graded, "school_id" => school_id, "exams" => exams} end)
 
@@ -152,8 +186,8 @@ defmodule Sarkar.Server.Dashboard do
     FROM (
       select jsonb_object_keys(db->'students') 
       from backup 
-      where school_id='darul-ehsan'
-    ) as total_students", [])
+      where school_id= $1
+    ) as total_students", [school_id])
 
 [[ total_students ]] = resp2.rows
 
