@@ -8,7 +8,8 @@ defmodule Sarkar.Server do
 			:http,
 			[{ :port, 8080 }],
 			%{
-				:env => %{ :dispatch => config() }
+				:env => %{ :dispatch => config() },
+				:idle_timeout => :infinity
 			}
 		)
 	end

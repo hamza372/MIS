@@ -1,5 +1,6 @@
 import { v4 } from 'node-uuid'
 import requestFS from './requestFS'
+import { defaultExams } from '../modules/Settings';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -20,6 +21,7 @@ const initState : RootReducerState = {
 		sms_templates: defaultTemplates(),
 		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
 		settings: { } as MISSettings,
+		expenses: {},
 		analytics: {
 			sms_history: {}
 		},
@@ -176,7 +178,11 @@ const addFacultyID = (state : RootReducerState) => {
 }
 
 const checkPermissions = (state: RootReducerState) => {
-	if(state.db.settings.permissions !== undefined){
+
+	const permission = state.db.settings.permissions
+
+	if( permission.dailyStats !== undefined && permission.fee !== undefined &&
+		permission.setupPage !== undefined && permission.expense !== undefined ) {
 		console.log("NOT Running Permission Scripts")
 		return state
 	}
@@ -188,10 +194,26 @@ const checkPermissions = (state: RootReducerState) => {
 			fee: { teacher: true },
 			dailyStats: {teacher: true },
 			setupPage: {teacher: true},
+			expense: {teacher: true },
 			...state.db.settings.permissions
 		}
 	}
 	return state;
+}
+
+const checkGrades = (state: RootReducerState) => {
+	if(state.db.settings.exams){
+		console.log("Not Running Grades Script")
+		return state
+	}
+
+	console.log("Running Grades Script")
+	state.db.settings = {
+		...state.db.settings,
+		exams: defaultExams
+	}
+
+	return state
 }
 
 // this modifies db in case any schema changes have happened
@@ -199,4 +221,5 @@ const checkPermissions = (state: RootReducerState) => {
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
+	checkGrades
 ];

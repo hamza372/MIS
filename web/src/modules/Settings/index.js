@@ -14,9 +14,22 @@ import './style.css'
 export const defaultPermissions = {
 	fee:  { teacher: true },
 	dailyStats: { teacher: true },
-	setupPage: {teacher: true }
+	setupPage: {teacher: true },
+	expense: { teacher: true }
 }
 
+export const defaultExams = {
+	grades: {
+		"A+": "90",
+		"A": "80",
+		"B+": "70",
+		"B": "65",
+		"C+": "60",
+		"C": "55",
+		"D": "50",
+		"F": "40",
+	}
+}
 const defaultSettings = {
 	shareData: true,
 	schoolName: "",
@@ -24,21 +37,28 @@ const defaultSettings = {
 	schoolPhoneNumber: "",
 	sendSMSOption: "SIM", // API
 	permissions: defaultPermissions,
-	devices: {}
+	devices: {},
+	exams: defaultExams
 }
 
 class Settings extends Component {
 
 	constructor(props){ 
 		super(props);
-		
+
 		const settings = {
 			...(props.settings || defaultSettings),
 			permissions: {
 				...defaultPermissions,
 				...(props.settings || defaultSettings).permissions
 			},
-			devices: (props.settings ? (props.settings.devices || {}) : {})
+			devices: (props.settings ? (props.settings.devices || {}) : {}),
+			exams: {
+				...defaultExams,
+				grades: {
+					...((props.settings && props.settings.exams) || defaultSettings.exams).grades
+				}
+			}
 		}
 
 		this.state = {
@@ -46,13 +66,19 @@ class Settings extends Component {
 			settings,
 			templateMenu: false,
 			permissionMenu: false,
+			gradeMenu: false,
 			banner: {
 				active: false,
 				good: true,
 				text: "Saved!"
 			},
 			client_id : localStorage.getItem("client_id"),
-			schoolLogo: props.schoolLogo
+			schoolLogo: props.schoolLogo,
+			addGrade: false,
+			newGrade: {
+				grade: "",
+				percent: ""
+			}
 		}
 
 		this.former = new Former(this, [])
@@ -81,6 +107,13 @@ class Settings extends Component {
 							<option value={true}>Yes</option>
 							<option value={false}>No</option>
 						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Expense Information? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+					<option value={true}>Yes</option>
+					<option value={false}>No</option>
+				</select>
 			</div>
 		</div>
 	}
@@ -121,6 +154,106 @@ class Settings extends Component {
 				</div>
 			</div>
 		</div>
+	}
+
+	gradeMenu = () => {
+		const { exams } = this.state.settings
+		return <div className="grade-menu">
+			{
+				Object.entries(exams.grades)
+					.map(([grade, percent]) => {
+						return <div className="row">
+							<label> {grade} </label>
+							<div className="editable-row">
+								<input type="number" {...this.former.super_handle(["settings", "exams", "grades", grade])}/>
+								<div className="button red" onClick={()=> this.removeGrade(grade)}>x</div>
+							</div>
+						</div>
+					})
+			}
+
+			{!this.state.addGrade && <div className="row">
+				<div className="button green" onClick={() => this.setState({ addGrade: !this.state.addGrade })}>+</div>
+			</div>}
+
+			{
+				this.state.addGrade && 
+				<div className="add-grade section">
+					<div className="divider">New Grade</div>
+					<div className="row">
+						<label>Grade</label>
+						<input type="text" {...this.former.super_handle(["newGrade","grade"])}/>
+					</div>
+					<div className="row">
+						<label>Percent</label>
+						<input type="number" {...this.former.super_handle(["newGrade", "percent"])}/>
+					</div>
+					<div className="row">
+						<div className="button green" onClick={() => this.addGrade()}>+</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
+
+	addGrade = () => {
+
+		const newGrade = this.state.newGrade
+
+		if( !newGrade.grade || !newGrade.percent){
+			this.setState({
+				banner:{
+					active: true,
+					good: false,
+					text: "Please Fill all fields !"
+				}
+			})
+
+			setTimeout(() => {
+				this.setState({
+					banner: {
+						active: false
+					}
+				})
+			}, 1000);
+
+			return
+		}
+		
+		this.setState({
+			settings: {
+				...this.state.settings,
+				exams:{
+					...this.state.settings.exams,
+					grades: {
+						...this.state.settings.exams.grades,
+						[newGrade.grade]: newGrade.percent
+					}
+				}
+			},
+			addGrade: false,
+			newGrade: {
+				grade: "",
+				percent: ""
+			}
+		})
+	}
+	removeGrade = (x) => {
+
+		const { grades } = this.state.settings.exams
+
+		const { [x]: removed, ...rest } = grades
+
+		this.setState({
+			settings:{
+				...this.props.settings,
+				exams: {
+					...this.state.settings.exams,
+					grades: rest
+				}
+			}
+		})
+
 	}
 
 	onSave = () => {		
@@ -282,30 +415,34 @@ class Settings extends Component {
 					</div>
 
 
-					<div className="row">
-						<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
-							Change SMS Templates
-						</div>
+					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
+						Change SMS Templates
 					</div>
 					{
 						this.state.templateMenu ? this.changeSMStemplates() : false
 					}
 					{
 						this.props.user.Admin ?
-							<div className="row">
-								<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
-									Change Teacher Permissions
-								</div>
+							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
+								Change Teacher Permissions
 							</div>
 							: false
 					}
 					{
 						this.state.permissionMenu ? this.changeTeacherPermissions() : false
 					}
-
-					<div className="row">
-						<Link className="button grey" to="/settings/promote">Promote Students</Link>
-					</div>
+					{
+						this.props.user.Admin ?
+							<div className="button grey" onClick={()=> this.setState({ gradeMenu: !this.state.gradeMenu})}>
+								Grade Settings
+							</div>
+						: false
+					}
+					{
+						this.state.gradeMenu && this.gradeMenu()
+					}
+					
+					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>

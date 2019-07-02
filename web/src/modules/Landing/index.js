@@ -22,7 +22,7 @@ import switchUserIcon from './icons/switch_user/logout.svg'    //no-icon
 import prospective from './icons/Prospective/prospective.svg'
 import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
-
+import expense from './icons/Expense/expense.svg'
 import newBadge from "./icons/New/new.svg";
 
 import Help from './icons/Help/help.svg'
@@ -79,6 +79,8 @@ class Landing extends Component {
 		const setupPage = permissions && permissions.setupPage ? permissions.setupPage.teacher : true
 		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
 		const teacher_fee_permission = permissions && permissions.fee ? permissions.fee.teacher : true;
+		const teacher_expense_permission = permissions && permissions.expense ? permissions.expense.teacher : true;
+
 
 		for(let student of Object.values(students)) {
 
@@ -140,7 +142,6 @@ class Landing extends Component {
 						<div className="row">
 						{
 							user.Admin && <div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
@@ -212,15 +213,24 @@ class Landing extends Component {
 								: false
 						}
 						</div>
+
 						<div className="row">
-							<div className="badge-container">
-								<img className="new-badge" src={newBadge}/>
+							<Link
+								to="/ClassList" className="button grey-shadow"
+								style={{ backgroundImage: `url(${planner})` }}>
+								DateSheet
+							</Link>
+							{
+							(user.Admin || teacher_expense_permission) && <div className="badge-container">
+								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
-									to="/ClassList" className="button grey-shadow"
-									style={{ backgroundImage: `url(${planner})` }}>
-									DateSheet
+									className="button yellow-shadow"
+									to="/expenses/general"
+									style={{ backgroundImage: `url(${expense})`}}>
+									Expenses 
 								</Link>
-							</div>
+								</div>
+							}
 						</div>
 					</div>
 

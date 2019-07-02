@@ -99,6 +99,28 @@ class FeeAnalytics extends Component {
 
 	calculateDebt = ({SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP}) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
 
+	componentDidMount() {
+		// first update fees
+		const { students, addPayments } = this.props
+		const nextPayments = Object.values(students)
+			.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
+
+		if(nextPayments.length > 0) {
+			console.log(nextPayments)
+			addPayments(nextPayments)
+		}
+	}
+
+	componentWillReceiveProps(newProps) {
+		const { students, addPayments } = newProps
+		const nextPayments = Object.values(students)
+		.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
+
+		if(nextPayments.length > 0) {
+			console.log(nextPayments)
+			addPayments(nextPayments)
+		}
+	}
 	
   render() {
 
@@ -108,7 +130,7 @@ class FeeAnalytics extends Component {
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
-	const {students, settings, addPayments, schoolLogo} = this.props
+	const {students, settings, schoolLogo} = this.props
 
 	let total_paid = 0;
 	let total_owed = 0;
@@ -117,16 +139,6 @@ class FeeAnalytics extends Component {
 	let monthly_payments = {}; // [MM-DD-YYYY]: { due, paid, forgiven }
 	let total_student_debts = {}; // [id]: { due, paid, forgiven }
 	let total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }; //Need a default otherwise throws an error when logged in for the first time
-	// first update fees
-
-	const nextPayments = Object.values(students)
-		.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
-
-	if(nextPayments.length > 0) {
-		console.log(nextPayments)
-		addPayments(nextPayments)
-	}
-
 
 	for(let sid in students) {
 		const student = students[sid];

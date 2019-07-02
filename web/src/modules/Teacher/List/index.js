@@ -20,9 +20,11 @@ const tableTitle = () =>{
 export const TeacherList = (props) => {
 
 	let forwardTo = "profile"
-	
+	let create = '/faculty/new'
+
 	if(props.forwardTo === "certificates"){
 		forwardTo = "certificates"
+		create = ""
 	}
 
 	const items = Object.entries(props.teachers)
@@ -42,7 +44,7 @@ export const TeacherList = (props) => {
 				items={items}
 				tableTitle={tableTitle}
 				Component={TeacherItem}
-				create={'/faculty/new'} 
+				create={create} 
 				createText={"Add new Teacher"} 
 				toLabel={T => T.Name} 
 			/>
