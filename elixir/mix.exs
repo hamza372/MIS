@@ -31,7 +31,8 @@ defmodule Sarkar.MixProject do
 			{:cowboy, "~> 2.2", override: true, manager: :rebar3},
 			{:uuid, "~> 1.1"},
 			{:postgrex, "~>0.13.3"},
-			{:dynamic, github: "ironbay/dynamic", sparse: "elixir"}
+			{:dynamic, github: "ironbay/dynamic", sparse: "elixir"},
+			{:tesla, "~> 1.2.0"}
 		]
 	end
 end
