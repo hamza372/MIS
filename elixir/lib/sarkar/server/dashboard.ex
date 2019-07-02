@@ -47,7 +47,9 @@ defmodule Sarkar.Server.Dashboard do
         [[ total_students ]] = resp2.rows
 
         json_data = Poison.encode!(%{data: coordinates, total_students: total_students})
-      req = :cowboy_req.reply(
+      
+      
+        req = :cowboy_req.reply(
         200, 
         %{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
         json_data,
@@ -67,6 +69,7 @@ defmodule Sarkar.Server.Dashboard do
     end_date = Map.get(decoded_params, "end_date")
     
     school_id = Map.get(decoded_params, "school_id")
+
     {:ok, resp} = Postgrex.query(Sarkar.School.DB,
       "SELECT
         to_timestamp(time/1000)::date::text as d,
