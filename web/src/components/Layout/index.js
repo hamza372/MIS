@@ -18,7 +18,7 @@ const FrontHeader = ({user, history}) => <div className="header bg-red">
 </div>
 
 const Header = ({user, history}) => <div className="header"> 
-	{ (history.location.pathname !== "/landing" && history.location.pathname !== "/") && <div className="back" onClick={() => history.goBack()} style={{ backgroundImage: `url(${backIcon})`}} />}
+	{ (history.location.pathname !== "/landing" && history.location.pathname !== "/" && history.location.pathname !== "/login") && <div className="back" onClick={() => history.goBack()} style={{ backgroundImage: `url(${backIcon})`}} />}
 	<div className="left"><Link to="/landing">MISchool</Link></div>
 	{ user ? <Link className="profile" to={`/faculty/${user.id}/profile`}>{user.Name}</Link> : false }
 </div>
