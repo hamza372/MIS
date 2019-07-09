@@ -67,3 +67,13 @@ div.settings .new-badge {
 	.settings .editable-row div {
 		width: 2%
 	}
+
+/*<==============> Historical Fee Css <=============>*/
+
+.historical-fees .section {
+	width: 80%;
+}
+
+.historical-fees.form {
+	padding-bottom: 0px !important;
+}
