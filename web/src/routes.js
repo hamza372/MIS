@@ -30,6 +30,7 @@ import FeeMenu from 'modules/FeeMenu'
 import PlannerList from 'modules/Planner/ClassList'
 import Planner from 'modules/Planner'
 import CertificateMenu from 'modules/CertificateMenu'
+import historicalFee from './modules/Settings/HistoricalFees/historical-fee';
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -91,6 +92,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/fees/manage" component={ManageFees} />
 
 					<AuthedRoute path="/settings/promote" component={PromotionPage} />
+					<AuthedRoute path="/settings/historicalFee" component={historicalFee} />
 					<AuthedRoute path="/settings" component={Settings} />
 					<AuthedRoute path="/analytics" component={Analytics} />
 					<AuthedRoute path="/diary" component={Diary} />
