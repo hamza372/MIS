@@ -414,7 +414,7 @@ export const addExpense = (amount, label, type, category, quantity, date, time =
 	]))
 }
 
-export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, category = "SALARY", time = moment.now() ) => dispatch => {
+export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, deduction_reason, category = "SALARY", time = moment.now() ) => dispatch => {
 
 	const expense = "SALARY_EXPENSE"
 	
@@ -430,6 +430,7 @@ export const addSalaryExpense = (id, amount, label, type, faculty_id, date, adva
 				faculty_id,
 				advance,
 				deduction,
+				deduction_reason,
 				date,
 				time
 			}

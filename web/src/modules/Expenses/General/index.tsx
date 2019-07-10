@@ -17,7 +17,7 @@ interface P {
 	settings: RootDBState["settings"]
 	schoolLogo: RootDBState["assets"]["schoolLogo"]
 	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => any
-	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number ) => any
+	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string ) => any
 	editExpense: ( edits: {[id: string]:{ amount: number }}) => any
 	deleteExpense: ( deletes: string) => any
 }
@@ -37,6 +37,7 @@ interface S {
 		quantity: string
 		label: string
 		deduction: string
+		deduction_reason: string
 		date: number
 	}
 	monthFilter: string
@@ -86,10 +87,11 @@ class Expenses extends Component <propTypes, S> {
 				faculty_id: "",
 				quantity: "1",
 				deduction: "0",
+				deduction_reason: "",
 				date: moment.now()
 			},
 			monthFilter: "",
-			yearFilter: moment().format("YYYY"),
+			yearFilter: "",
 			categoryFilter: "",
 			edits,
 		}
@@ -124,7 +126,7 @@ class Expenses extends Component <propTypes, S> {
 				return {
 					...agg,
 					[id]: {
-						amount: curr.amount
+						amount: curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
 					}
 				}
 			},{} as {[id: string]: { amount: number }})
@@ -147,6 +149,7 @@ class Expenses extends Component <propTypes, S> {
 				faculty_id: "",
 				quantity: "1",
 				deduction: "0",
+				deduction_reason: "",
 				date: moment.now()
 			}
 		})
@@ -188,7 +191,7 @@ class Expenses extends Component <propTypes, S> {
 
 		if(payment.category === "SALARY"){
 
-			this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date,0,parseFloat(payment.deduction))
+			this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date,0,parseFloat(payment.deduction), payment.deduction_reason)
 
 			this.setState({
 				banner: {
@@ -406,9 +409,9 @@ class Expenses extends Component <propTypes, S> {
 				<div className="table row heading">
 					<label><b> Date   </b></label>
 					<label><b> Label  </b></label>
-					<label><b> Category   </b></label>
+					<label><b> Category </b></label>
 					<label><b> Quantity</b></label>
-					<label><b> Deductions</b></label>
+					<label><b> Deductions(Rs) </b></label>
 					<label><b> Amount </b></label>
 				</div>
 				{
@@ -421,7 +424,7 @@ class Expenses extends Component <propTypes, S> {
 								<label> {e.label}</label>
 								<label> {e.category}</label>
 								<label> {`-`} </label>
-								<label> {`${e.deduction} Rs`} </label>
+								<label> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
@@ -510,6 +513,10 @@ class Expenses extends Component <propTypes, S> {
 						<label>Deductions</label>
 						<input type="number" {...this.former.super_handle(["payment", "deduction"])} placeholder="If any" />
 					</div>}
+					{this.state.payment.category === "SALARY" && <div className="row">
+						<label>Reason</label>
+						<input type="text" {...this.former.super_handle(["payment", "deduction_reason"])} placeholder="If any" />
+					</div>}
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> 
 				}
@@ -526,7 +533,7 @@ export default connect ( (state: RootReducerState) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), ( dispatch : Function ) => ({
 	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
-	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction)),
+	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction, deduction_reason)),
 	editExpense: ( edits: {[id: string]:{ amount: number }}) => dispatch(editExpense(edits)),
 	deleteExpense: ( id: string) => dispatch(deleteExpense(id))
 }))( Expenses )

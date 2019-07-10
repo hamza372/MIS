@@ -206,6 +206,7 @@ interface MISSalaryExpense extends BaseMISExpense {
 	category: "SALARY"
 	advance: number
 	deduction: number
+	deduction_reason: string
 }
 
 interface MISStudentAttendanceEntry {
