@@ -13,7 +13,7 @@
 }
 
 .planner .section {
-	padding: 15px 5px;
+	padding: 15px 0px;
 }
 
 .planner .input {
@@ -62,10 +62,18 @@
 		border-bottom: none
 	}
 
-	.planner .button {
-		margin: 5px 0px auto; 
-		width:"90%";
-	}
+.planner .button {
+	margin: 5px 0px auto; 
+	width:"90%";
+}
+.planner .section .button.red {
+	margin-right: 5px
+}
+
+.planner .notes {
+	width: 90%;
+	border-radius: 5px;
+}
 
 	@media print {
 		.planner input.item {
