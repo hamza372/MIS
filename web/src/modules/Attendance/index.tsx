@@ -12,7 +12,6 @@ import moment from 'moment'
 import Former from '../../utils/former'
 
 import './style.css'
-import { string } from 'prop-types';
 
 interface P {
 	current_faculty: MISTeacher
@@ -116,6 +115,96 @@ class Attendance extends Component <propTypes, S> {
 		}
 	}
 
+	selectPresentOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(status === "PRESENT") {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
+	selectAbsentOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(status === "ABSENT") {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
+	selectLeaveOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(status === "LEAVE") {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
 	onSectionChange = (e : any) => {
 		const newSectionId = e.target.value;
 
@@ -161,6 +250,7 @@ class Attendance extends Component <propTypes, S> {
 		const isAdmin = current_faculty.Admin
 		const setupPage = settings.permissions && settings.permissions.setupPage ? settings.permissions.setupPage.teacher : true
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
+
 		return <Layout history={this.props.history}>
 			<div className="attendance">
 				<div className="title">Attendance</div>
@@ -169,15 +259,23 @@ class Attendance extends Component <propTypes, S> {
 					onChange={this.Former.handle(["date"], d => moment(d).unix() < moment.now())} 
 					value={moment(this.state.date).format("YYYY-MM-DD")} 
 					placeholder="Current Date" />
-
-				<div className="row" style={{width: "90%"}}>
-					<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
-					<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
-						{
-							getSectionsFromClasses(this.props.classes)
-								.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
-						}
-					</select>
+				
+				<div className="selectors">
+					<div className="row">
+						<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
+						<div className="button select-all" onClick={this.selectPresentOrNone}>P</div>
+						<div className="button select-all" onClick={this.selectAbsentOrNone}>A</div>
+						<div className="button select-all" onClick={this.selectLeaveOrNone}>L</div>
+					</div>
+					
+					<div className="row">
+						<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
+							{
+								getSectionsFromClasses(this.props.classes)
+									.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+							}
+						</select>
+					</div>
 				</div>
 				<div className="list">
 				{
