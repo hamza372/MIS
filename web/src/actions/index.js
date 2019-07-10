@@ -351,8 +351,10 @@ export const addHistoricalPayment = (payment, student_id) => dispatch => {
 	// paymnet = { amount_owed, amount_paid, amount_forgiven, date, name }
 
 	const { amount_owed, amount_paid, amount_forgiven, date, name } = payment
-	
-	const owed = amount_owed > 0 ? [
+	const merges = []
+
+	if(amount_owed > 0) {
+		merges.push(
 		{
 			path: ["db", "students", student_id, "payments", v4()],
 			value: {
@@ -361,10 +363,10 @@ export const addHistoricalPayment = (payment, student_id) => dispatch => {
 				amount: amount_owed,
 				date
 			}
-		}
-	] : []
-
-	const paid = amount_paid > 0 ? [
+		})
+	}
+	if(amount_paid > 0) {
+		merges.push(
 		{
 			path: ["db", "students", student_id, "payments", v4()],
 			value: {
@@ -372,10 +374,11 @@ export const addHistoricalPayment = (payment, student_id) => dispatch => {
 				amount: amount_paid,
 				date
 			}
-		}
-	] : []
+		})
+	}
 
-	const forgiven = amount_forgiven > 0 ? [
+	if(amount_forgiven > 0) {
+		merges.push(
 		{
 			path: ["db", "students", student_id, "payments", v4()],
 			value: {
@@ -383,10 +386,8 @@ export const addHistoricalPayment = (payment, student_id) => dispatch => {
 				amount: amount_forgiven,
 				date
 			}
-		}
-	] : []
-
-	const merges = 	[ ...owed, ...paid, ...forgiven]
+		})
+	}
 
 	dispatch(createMerges(merges))
 }

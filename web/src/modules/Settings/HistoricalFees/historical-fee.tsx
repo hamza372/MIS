@@ -1,16 +1,16 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
-import former from '../../utils/former';
+import former from '../../../utils/former';
 import { connect } from 'react-redux'
-import Layout from '../../components/Layout';
+import Layout from '../../../components/Layout';
 
 import './style.css'
 import moment from 'moment'
-import getSectionsFromClasses from '../../utils/getSectionsFromClasses';
-import { addHistoricalPayment } from '../../actions';
-import { StudentLedgerPage } from '../Student/Single/Fees/StudentLedgerPage';
-import getFilteredPayments from '../../utils/getFilteredPayments';
-import Banner from '../../components/Banner';
+import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
+import { addHistoricalPayment } from '../../../actions';
+import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
+import getFilteredPayments from '../../../utils/getFilteredPayments';
+import Banner from '../../../components/Banner';
 
 type historicalPayment = {
 	date: number
@@ -119,13 +119,19 @@ class historicalFee extends Component <propTypes, S > {
 			
 		const selected_student = students[this.state.selected_student]
 		
-		const filteredPayments = selected_student ? getFilteredPayments(selected_student, this.state.yearFilter, this.state.monthFilter) : false
+		let filteredPayments = selected_student ? getFilteredPayments(selected_student, this.state.yearFilter, this.state.monthFilter) : false
 		const curr_class_name = this.state.selected_class ? class_Items.find( s => s.id === this.state.selected_class).namespaced_name : "None Selected"
 		
 		const Months = new Set()
 		const Years = new Set()
 
 		if(selected_student){
+
+			if(this.state.selected_class && selected_student.section_id !== this.state.selected_class){
+				this.setState({
+					selected_student: ""
+				})
+			}
 
 			Object.entries(selected_student.payments || {})
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)

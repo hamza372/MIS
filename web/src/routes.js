@@ -30,7 +30,7 @@ import FeeMenu from 'modules/FeeMenu'
 import PlannerList from 'modules/Planner/ClassList'
 import Planner from 'modules/Planner'
 import CertificateMenu from 'modules/CertificateMenu'
-import historicalFee from './modules/Settings/historical-fee';
+import historicalFee from './modules/Settings/HistoricalFees/historical-fee';
 
 import ManageFees from 'modules/Student/ManageFees'
 
