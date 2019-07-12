@@ -82,7 +82,7 @@ defmodule Sarkar.Server.Analytics do
 			GROUP BY d, school_id 
 			ORDER BY d desc", [])
 		
-		
+
 		csv = [ ["date", "school_id", "unique_students", "num_payments", "total"] | resp.rows] 
 			|> CSV.encode
 			|> Enum.join()
@@ -131,7 +131,7 @@ defmodule Sarkar.Server.Analytics do
 				form ->> 'schoolName' as School,
 				form ->> 'city' as City,
 				form ->> 'packageName' as Package,
-				form->> 'phone' as Phone,
+				form ->> 'phone' as Phone,
 				to_timestamp((form->>'date')::bigint/1000) as Date
 			FROM mischool_sign_ups",
 			[])
@@ -189,7 +189,7 @@ defmodule Sarkar.Server.Analytics do
 		csv = [ ["date", "school_id", "teachers_marked"] | resp.rows] 
 			|> CSV.encode
 			|> Enum.join()
-		
+
 		req = :cowboy_req.reply(
 			200,
 			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
@@ -223,6 +223,32 @@ defmodule Sarkar.Server.Analytics do
 			ORDER BY d desc", [])
 		
 		csv = [ ["date", "school_id", "ALL_STUDENTS", "ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE", "EXAM", "PROSPECTIVE", "TOTAL"] | resp.rows] 
+			|> CSV.encode
+			|> Enum.join()
+		
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
+	def init(%{bindings: %{type: "expense.csv"}} = req, state) do 
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT 
+				to_timestamp(time/1000)::date::text as d,
+				school_id,
+				count(distinct path[3]) as unique_expense,
+				sum((value->> 'amount')::float) as total_amount
+			FROM writes 
+			WHERE path[2] = 'expenses' AND value ->> 'type' = 'PAYMENT_GIVEN' 
+			GROUP BY d, school_id 
+			ORDER BY d desc", [])
+
+		csv = [ ["date", "school_id", "unique_expense", "total_amount"] | resp.rows ]
 			|> CSV.encode
 			|> Enum.join()
 		
