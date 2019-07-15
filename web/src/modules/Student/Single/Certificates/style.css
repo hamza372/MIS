@@ -21,6 +21,21 @@
     border-top: 1px solid #bebebe;
 }
 
+.certificate-page .emphasize {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+/* In case we use input for text*/
+.certificate-page .text-input {
+	border-bottom: 1px solid #bbb;
+    text-align: center;
+	display: flex;
+	flex-direction: row;
+    border-radius: 0px;
+    border-width: 0px 0px 1px 0px;
+}
+
 .certificate .head .divider {
 	font-family: 'Bungee Inline', sans-serif;
 }
@@ -61,6 +76,10 @@
 		border-bottom: 1px solid #bbb;
 		font-weight: bold;
 		text-align: center
+	}
+	/* In case we use input for text*/
+	.cert-row .text-input {
+		width: 70%;
 	}
 
 .certificate .footer {
