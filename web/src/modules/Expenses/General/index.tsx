@@ -21,6 +21,12 @@ interface P {
 	editExpense: ( edits: {[id: string]:{ amount: number }}) => any
 	deleteExpense: ( deletes: string) => any
 }
+/**
+ * need to do something to show expense deduction 
+ * 
+ * might use this 
+  (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
+ */
 
 interface S {
 	banner: {
@@ -67,7 +73,7 @@ class Expenses extends Component <propTypes, S> {
 				return {
 					...agg,
 					[id]: {
-						amount: curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0) 
+						amount: curr.amount
 					}
 				}
 			},{} as {[id: string]: { amount: number }})
@@ -126,7 +132,7 @@ class Expenses extends Component <propTypes, S> {
 				return {
 					...agg,
 					[id]: {
-						amount: curr.amount - (curr.expense === "SALARY_EXPENSE" && curr.deduction || 0)
+						amount: curr.amount
 					}
 				}
 			},{} as {[id: string]: { amount: number }})
