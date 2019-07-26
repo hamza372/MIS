@@ -198,14 +198,14 @@ class historicalFee extends Component <propTypes, S > {
 				{selected_student && <div className="section">
 					<div className="row">
 						<select {...this.former.super_handle(["monthFilter"])}>
-							<option> Select Month</option>
+							<option value=""> Select Month</option>
 							{
 								Array.from(Months)
 									.map(m => <option key={m} value={m}>{m}</option>)
 							}
 						</select>
 						<select {...this.former.super_handle(["yearFilter"])}>
-							<option> Year</option>
+							<option value=""> Year</option>
 							{
 								Array.from(Years)
 									.map(y => <option key={y} value={y}>{y}</option>)
