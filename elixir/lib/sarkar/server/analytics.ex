@@ -262,6 +262,32 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "referrals.csv"}} = req, state) do 
+
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
+		"SELECT
+			to_timestamp(time/1000)::date::text as Date,
+			school_id,
+			value ->> 'name' as Name,
+			value ->> 'type' as Type,
+			value ->> 'city' as City,
+			value ->> 'notes' as Notes
+		FROM mischool_referrals", [])
+
+		csv = [["Date", "School", "Name", "Type", "City", "Notes"] | resp.rows]
+			|> CSV.encode
+			|> Enum.join()
+		
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(req, state) do 
 		req = :cowboy_req.reply(200, req)
 		IO.inspect req
