@@ -27,3 +27,31 @@ export const createLogin = (username: string, password: string, number: string) 
 	})
 
 }
+
+export const createSchoolLogin = (username: string, password: string, limit: number, agent_name: string, agent_type: string, agent_city: string, notes: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	syncr.send({
+		type:"CREATE_NEW_SCHOOL",
+		client_type: state.auth.client_type,
+		payload: {
+			username,
+			password,
+			limit,
+			agent_info: {
+				agent_name,
+				agent_type,
+				agent_city,
+				notes
+			}
+		}
+	})
+	.then((res)=> {
+		console.log("Create Login Succeede", res)
+	})
+	.catch(res => {
+		console.log("Login Failed", res)
+		alert("login Failed" + JSON.stringify(res))
+	})
+}

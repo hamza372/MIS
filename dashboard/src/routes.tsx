@@ -5,6 +5,7 @@ import { Store } from 'redux'
 
 import InputPage from './pages/input'
 import DashboardPage from './pages/dashboard'
+import SignUp from './pages/signUp';
 
 export default ({ store } : {store: Store}) => (
 	<Provider store={store}>
@@ -12,6 +13,7 @@ export default ({ store } : {store: Store}) => (
 			<Switch>
 				<Route exact path="/" component={InputPage} />
 				<Route path="/dashboard" component={DashboardPage} />
+				<Route path="/signUp" component={SignUp} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>
