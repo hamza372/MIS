@@ -25,6 +25,7 @@ interface S {
 	}
 	monthFilter: string
 	yearFilter: string
+	categoryFilter: string
 }
 
 interface Routeinfo {
@@ -46,7 +47,8 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			text: "Saved!"
 		},
 		monthFilter: "",
-		yearFilter: ""
+		yearFilter: moment().format("YYYY"),
+		categoryFilter: ""
 		}
 		this.former = new Former (this,[])
 	}
@@ -118,7 +120,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 		}
 
 		const income_exp_sorted = Object.values(income_exp)
-			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
+			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e)  && ( e.type === "PAYMENT_GIVEN" && this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category: true))
 			.sort((a, b) => a.date - b.date)
 
 		let total_income = 0
@@ -140,7 +142,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			{
 				total_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
 				
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)){
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i) && ( this.state.categoryFilter !== "" ? this.state.categoryFilter === i.category: true)){
 					total_monthly_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
 				}
 			}
@@ -171,7 +173,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 		<div className="divider">Ledger</div>
 
-		<div className="filter row no-print" style={{marginBottom:"10px"}}>
+		<div className="filter row no-print" style={{marginBottom:"10px", flexWrap:"wrap"}}>
 			<select {...this.former.super_handle(["monthFilter"])}>
 				<option value="">Select Month</option>
 				{
@@ -189,6 +191,19 @@ class IncomeExpenditure extends Component <propTypes, S> {
 					})
 				}
 			</select>
+
+
+			<select {...this.former.super_handle(["categoryFilter"])}>
+				<option value="">Select Category</option>
+				<option value="SALARY">Salary</option>
+				<option value="BILLS">Utility Bills</option>
+				<option value="STATIONARY">Stationary</option>
+				<option value="REPAIRS">Repairs</option>
+				<option value="RENT">Rent</option>
+				<option value="ACTIVITY">Student Activity</option>
+				<option value="DAILY">Daily</option>
+				<option value="PETTY_CASH">Petty Cash</option>
+			</select>
 		</div>
 
 		<div className="payment-history section">
@@ -203,7 +218,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 				Object.entries(income_exp_sorted)
 				.map(([id,e]) => {
 					return <div key={id} className="table row">
-						<label> { moment(e.date).format("DD-MM-YYYY")} </label>
+						<label> { moment(e.date).format("DD-MM-YY")} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.category : e.type === "SUBMITTED" && e.fee_name || "-"}</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.expense === "MIS_EXPENSE" && e.quantity : "1"} </label>

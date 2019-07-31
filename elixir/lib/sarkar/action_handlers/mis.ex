@@ -16,6 +16,8 @@ defmodule Sarkar.ActionHandler.Mis do
 		"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
 		[sign_up_id, payload])
 
+		{:ok,resp} = Sarkar.Slack.send_alert(payload)
+
 		{:reply, succeed(), state}
 	end
 

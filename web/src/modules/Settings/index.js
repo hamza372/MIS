@@ -14,7 +14,8 @@ import './style.css'
 export const defaultPermissions = {
 	fee:  { teacher: true },
 	dailyStats: { teacher: true },
-	setupPage: {teacher: true }
+	setupPage: {teacher: true },
+	expense: { teacher: true }
 }
 
 export const defaultExams = {
@@ -106,6 +107,13 @@ class Settings extends Component {
 							<option value={true}>Yes</option>
 							<option value={false}>No</option>
 						</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Expense Information? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+					<option value={true}>Yes</option>
+					<option value={false}>No</option>
+				</select>
 			</div>
 		</div>
 	}
@@ -435,6 +443,7 @@ class Settings extends Component {
 					}
 					
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
+					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>

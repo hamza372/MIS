@@ -347,6 +347,51 @@ export const addMultiplePayments = (payments) => dispatch => {
 	dispatch(createMerges(merges));
 }
 
+export const addHistoricalPayment = (payment, student_id) => dispatch => {
+	// paymnet = { amount_owed, amount_paid, amount_forgiven, date, name }
+
+	const { amount_owed, amount_paid, amount_forgiven, date, name } = payment
+	const merges = []
+
+	if(amount_owed > 0) {
+		merges.push(
+		{
+			path: ["db", "students", student_id, "payments", v4()],
+			value: {
+				type: "OWED",
+				fee_name: name,
+				amount: amount_owed,
+				date
+			}
+		})
+	}
+	if(amount_paid > 0) {
+		merges.push(
+		{
+			path: ["db", "students", student_id, "payments", v4()],
+			value: {
+				type: "SUBMITTED",
+				amount: amount_paid,
+				date
+			}
+		})
+	}
+
+	if(amount_forgiven > 0) {
+		merges.push(
+		{
+			path: ["db", "students", student_id, "payments", v4()],
+			value: {
+				type: "FORGIVEN",
+				amount: amount_forgiven,
+				date
+			}
+		})
+	}
+
+	dispatch(createMerges(merges))
+}
+
 export const addExpense = (amount, label, type, category, quantity, date, time = moment.now() ) => dispatch => {
 
 	const expense =  "MIS_EXPENSE"
@@ -369,7 +414,7 @@ export const addExpense = (amount, label, type, category, quantity, date, time =
 	]))
 }
 
-export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, category = "SALARY", time = moment.now() ) => dispatch => {
+export const addSalaryExpense = (id, amount, label, type, faculty_id, date, advance, deduction, deduction_reason, category = "SALARY", time = moment.now() ) => dispatch => {
 
 	const expense = "SALARY_EXPENSE"
 	
@@ -385,6 +430,7 @@ export const addSalaryExpense = (id, amount, label, type, faculty_id, date, adva
 				faculty_id,
 				advance,
 				deduction,
+				deduction_reason,
 				date,
 				time
 			}

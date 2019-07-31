@@ -27,6 +27,7 @@ interface S {
 	dateSheet : {[subject : string]: { date: number, time: string} }
 	selected_student_number: string
 	newSubject: string
+	notes: string
 }
 
 interface RouteInfo {
@@ -40,7 +41,7 @@ type propTypes = P & RouteComponentProps<RouteInfo>
 class Planner extends Component <propTypes, S> {
 
 	former: Former
-	constructor(props:  propTypes) {
+	constructor(props: propTypes) {
 		super(props)
 		
 		const { class_id, section_id } = this.props.match.params
@@ -63,7 +64,8 @@ class Planner extends Component <propTypes, S> {
 			selected_task: "DATE_SHEET",
 			dateSheet,
 			selected_student_number: "",
-			newSubject: ""
+			newSubject: "",
+			notes: ""
 		}
 		
 		this.former = new Former (this,[])
@@ -115,7 +117,7 @@ class Planner extends Component <propTypes, S> {
 				.map( ([ subject, {date, time} ]) => {
 					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}`
 			})
-		return header + dateSheet_message.join("\n")
+		return header + dateSheet_message.join("\n") + "\n" + this.state.notes
 	}
 
 	uniqueSubjects = () => {
@@ -173,7 +175,7 @@ class Planner extends Component <propTypes, S> {
 	render() {
 		const {students, classes, settings, schoolLogo, history} = this.props
 		const { class_id, section_id } = this.props.match.params
-		
+
 		const curr_class = classes[class_id]
 		const curr_section  = curr_class.sections[section_id]
 
@@ -209,13 +211,13 @@ class Planner extends Component <propTypes, S> {
 
 				<div className="row input info"> 
 					<div className="row" style={{justifyContent:"flex-start"}}>
-						<label> <b> Class / Section: </b> </label>
-						<div>{`${curr_class.name +"/"+ curr_section.name}`} </div>
+						<label style={{marginRight:"2px"}}> <b> Class-Section: </b> </label>
+						<div>{`${curr_class.name +"-"+ curr_section.name}`} </div>
 					</div>
 					
-					<div className="row" style={{justifyContent:"flex-end"}}> 
-						<label> <b> Exam: </b> </label> 
-						<input type="text"/> 
+					<div className="row" style={{justifyContent:"flex-end"}}>
+						<label> <b> Exam: </b> </label>
+						<input style={{marginLeft:"1px"}} type="text"/> 
 					</div>
 				</div>
 
@@ -228,7 +230,7 @@ class Planner extends Component <propTypes, S> {
 						{
 							Object.entries(this.state.dateSheet)
 								.sort(([,a],[, b]) => a.date !== b.date ? (a.date - b.date) : (a.time.localeCompare(b.time)))
-								.map( ([ subject, { date, time}]) => {
+								.map( ([ subject, { date, time }]) => {
 									return <div className="row" key={subject}>
 
 										<input className="item" type="date"
@@ -249,7 +251,8 @@ class Planner extends Component <propTypes, S> {
 							})
 						}
 				</div>
-				<div className="row input no-print">
+				<textarea className="notes" {...this.former.super_handle(["notes"])} placeholder="Notes"/>
+				<div className="row input no-print" style={{marginBottom:"5px"}}>
 					<input list="subjects" type="text" {...this.former.super_handle(["newSubject"])} placeholder="Add Subject"/>
 					<datalist id="subjects">
 					{
