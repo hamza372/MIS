@@ -33,12 +33,15 @@ defmodule Sarkar.Auth do
 
 	end
 
-	def create({ id, password, student_limit, ref_name, ref_type, ref_city, notes }) do 
-		{:ok, confirm_text } = Sarkar.Auth.create({id, password, "mischool", student_limit})
+	def create({ id, password, limit, package_name, agent_name, agent_type, agent_city, notes }) do 
+		{:ok, confirm_text } =  case limit === 0 do
+			true -> Sarkar.Auth.create({id, password})
+			false -> Sarkar.Auth.create({id, password, "mischool", limit})
+		end
 
 		time = :os.system_time(:millisecond)
-		value = %{ "name" => ref_name, "type" => ref_type, "city" => ref_city, "notes" => notes }
-		Poison.Encode
+		value = %{ "package" => package_name, "name" => agent_name, "type" => agent_type, "city" => agent_city, "notes" => notes }
+
 		case Postgrex.query(Sarkar.School.DB,
 			"INSERT INTO mischool_referrals (school_id, time, value) VALUES ($1,$2,$3)",
 			[id, time, value]) do
@@ -47,7 +50,9 @@ defmodule Sarkar.Auth do
 				{:error, err} ->
 					IO.inspect err
 					{:error, "Entry to referral Table Failed"}
-			end
+		end
+
+		{:ok, confirm_text}
 	end
 
 	def login({id, client_id, password}) do

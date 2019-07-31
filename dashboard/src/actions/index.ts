@@ -28,7 +28,7 @@ export const createLogin = (username: string, password: string, number: string) 
 
 }
 
-export const createSchoolLogin = (username: string, password: string, limit: number, agent_name: string, agent_type: string, agent_city: string, notes: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createSchoolLogin = (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -39,19 +39,19 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 			username,
 			password,
 			limit,
-			agent_info: {
-				agent_name,
-				agent_type,
-				agent_city,
-				notes
-			}
+			package_name,
+			agent_name,
+			agent_type,
+			agent_city,
+			notes
+			
 		}
 	})
 	.then((res)=> {
-		console.log("Create Login Succeede", res)
+		window.alert(`Success\n${JSON.stringify(res)}`)
 	})
 	.catch(res => {
 		console.log("Login Failed", res)
-		alert("login Failed" + JSON.stringify(res))
+		alert("School Creation Failed !!" + JSON.stringify(res))
 	})
 }

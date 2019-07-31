@@ -3,17 +3,13 @@ import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Store } from 'redux'
 
-import InputPage from './pages/input'
-import DashboardPage from './pages/dashboard'
-import SignUp from './pages/signUp';
+import Accordian from './components/Accordian';
 
 export default ({ store } : {store: Store}) => (
 	<Provider store={store}>
 		<BrowserRouter>
 			<Switch>
-				<Route exact path="/" component={InputPage} />
-				<Route path="/dashboard" component={DashboardPage} />
-				<Route path="/signUp" component={SignUp} />
+				<Route path="/" component={Accordian} />
 			</Switch>
 		</BrowserRouter>
 	</Provider>

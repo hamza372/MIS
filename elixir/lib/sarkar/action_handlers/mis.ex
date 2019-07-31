@@ -21,18 +21,6 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, succeed(), state}
 	end
 
-	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "agent_name" => agent_name, "agent_type" => agent_type, "agent_city" => agent_city, "notes" => notes }}, state) do		
-		
-		{:ok, confirm_text} = case limit === 0 || limit === 3 do
-			true  -> Sarkar.Auth.create({username, password})
-			false -> Sarkar.Auth.create({username, password, "mischool", limit})
-		end
-
-		IO.inspect confirm_text
-
-		{:reply, succeed(%{details: confirm_text}), state}
-	end
-
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
 		case Sarkar.Auth.verify({school_id, client_id, token}) do
 			{:ok, _} ->

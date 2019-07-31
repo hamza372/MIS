@@ -3,7 +3,9 @@ import StudentAttendance from '../../components/StudentAttendance'
 import TeacherAttendance from '../../components/TeacherAttendance';
 import Fees from '../../components/Fees';
 import Exams from '../../components/Exams';
-export default () => <div>
+
+
+export default () => <div className="page">
 	Dashboard
 	
 	<StudentAttendance />

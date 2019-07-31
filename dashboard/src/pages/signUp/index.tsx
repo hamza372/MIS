@@ -10,14 +10,14 @@ import Former from 'former';
 import checkCompulsoryFields from '../../utils/checkCompulsoryFields';
 
 interface P {
-	createSchoolLogin: (username: string, password: string, limit: number, agent_name: string, agent_type: string, agent_city: string, notes: string) => any
+	createSchoolLogin: (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => any
 }
 
 interface S {
 	login_info: {
 		username: string,
 		password: string,
-		limit: string,
+		package_name: "FREE_TRIAL" | "TALEEM1" | "TALEEM2" | "TALEEM3",
 		agent_name: string,
 		agent_type: string,
 		agent_city: string,
@@ -41,26 +41,35 @@ class SignUp extends Component <propTypes, S> {
 			login_info: {
 				username: "",
 				password: "",
-				limit: "0",
+				package_name: "FREE_TRIAL",
 				agent_name: "",
 				agent_type: "",
 				agent_city: "",
 				notes: ""
 			}
-			
 		}
 
 		this.former = new Former(this,["login_info"])
 	}
 
+	getLimitFromPackage = (package_name: string) => {
+		switch (package_name) {
+			case "TALEEM1":
+				return 150
+			case "TALEEM2":
+				return 300
+			default:
+				return 0
+		}
+	}
 	onSignUp = () => {
-		const { username, password, limit, agent_name, agent_type, agent_city, notes} = this.state.login_info
+		const { username, password, package_name, agent_name, agent_type, agent_city, notes} = this.state.login_info
 
 		const compulsory_fields = checkCompulsoryFields(this.state.login_info,
 			[
 				["username"],
 				["password"],
-				["limit"],
+				["package_name"],
 				["agent_name"],
 				["agent_type"],
 				["agent_city"]
@@ -69,28 +78,18 @@ class SignUp extends Component <propTypes, S> {
 
 		if(compulsory_fields) {
 			const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
-
 			return window.alert(erroText)
 		}
 
-		console.log("Login Details", this.state.login_info)
-		/* this.props.createSchoolLogin(
-			username,
-			password,
-			parseFloat(limit),
-			agent_name,
-			agent_type,
-			agent_city,
-			notes
-		) */
+		const limit = this.getLimitFromPackage(package_name)
 
-		window.alert(`Login Created Successfully!!\nUSERNAME: ${username}\nPASSWORD: ${password}`)
+		this.props.createSchoolLogin(username, password, limit, package_name, agent_name, agent_type, agent_city, notes)
 
 		this.setState({
 			login_info: {
 				username: "",
 				password: "",
-				limit: "0",
+				package_name: "FREE_TRIAL",
 				agent_name: "",
 				agent_type: "",
 				agent_city: "",
@@ -101,58 +100,52 @@ class SignUp extends Component <propTypes, S> {
 	}
 	
 	render() {
-
-/* 		console.log("From Render => ", this.state.login_info)
- */		return <Layout title="New-School">
-			<div className="school-sign-up">
-
-				<div className="title"> Sign-Up</div>
+ 		return <div className="school-sign-up page">
+			<div className="title"> Sign-Up</div>
 				
-				<div className="section form">
-					<div className="divider">School Information</div>
-					<div className="row">
-						<label>School Name:</label>
-						<input type="text" {...this.former.super_handle(["username"])}/>
-					</div>
-					<div className="row">
-						<label>Password:</label>
-						<input type="text" {...this.former.super_handle(["password"])}/>
-					</div>
-					<div className="row">
-						<label>Package</label>
-						<select {...this.former.super_handle(["limit"])}>
-							<option value="0">Free Trial</option>
-							<option value="150">Taleem-1</option>
-							<option value="300">Taleem-2</option>
-							<option value="3">Taleem-3</option>
-						</select>
-					</div>
-
-					<div className="divider">Agent Information</div>
-					<div className="row">
-						<label>Agent Name:</label>
-						<input type="text" {...this.former.super_handle(["agent_name"])}/>
-					</div>
-					<div className="row">
-						<label>City</label>
-						<input type="text" {...this.former.super_handle(["agent_city"])}/>
-					</div>
-					<div className="row">
-						<label>Type</label>
-						<input type="text" {...this.former.super_handle(["agent_type"])}/>
-					</div>
-					<div className="row">
-						<label>Notes:</label>
-						<textarea {...this.former.super_handle(["notes"])}/>
-					</div>
-					<div className="button save" onClick={() => this.onSignUp()}> SignUp</div>
+			<div className="section form">
+				<div className="divider">School Information</div>
+				<div className="row">
+					<label>School Name:</label>
+					<input type="text" {...this.former.super_handle(["username"])}/>
 				</div>
+				<div className="row">
+					<label>Password:</label>
+					<input type="text" {...this.former.super_handle(["password"])}/>
+				</div>
+				<div className="row">
+					<label>Package</label>
+					<select {...this.former.super_handle(["package_name"])}>
+						<option value="FREE_TRIAL">Free Trial</option>
+						<option value="TALEEM1">Taleem-1</option>
+						<option value="TALEEM2">Taleem-2</option>
+						<option value="TALEEM3">Taleem-3</option>
+					</select>
+				</div>
+
+				<div className="divider">Agent Information</div>
+				<div className="row">
+					<label>Agent Name:</label>
+					<input type="text" {...this.former.super_handle(["agent_name"])}/>
+				</div>
+				<div className="row">
+					<label>City</label>
+					<input type="text" {...this.former.super_handle(["agent_city"])}/>
+				</div>
+				<div className="row">
+					<label>Type</label>
+					<input type="text" {...this.former.super_handle(["agent_type"])}/>
+				</div>
+				<div className="row">
+					<label>Notes:</label>
+					<textarea {...this.former.super_handle(["notes"])}/>
+				</div>
+				<div className="button save" onClick={() => this.onSignUp()}> SignUp</div>
 			</div>
-		</Layout> 
-		
+		</div>
 	}
 }
 
 export default connect( state => ({}), ( dispatch: Function ) => ({
-	createSchooLogin: (username: string, password: string, limit: number, agent_name: string, agent_type: string, agent_city: string, notes: string) => dispatch(createSchoolLogin(username, password, limit, agent_name, agent_type, agent_city, notes))
+	createSchoolLogin: (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => dispatch(createSchoolLogin(username, password, limit, package_name, agent_name, agent_type, agent_city, notes))
 }))(SignUp)
