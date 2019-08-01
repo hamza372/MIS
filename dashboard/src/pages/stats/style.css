@@ -1,0 +1,12 @@
+.stats .section {
+	width: 85%
+}
+
+.stats .stat-card {
+	width: 85%;
+    display: flex;
+    align-items: center;
+    border-radius: 2px;
+    box-shadow: 1px 3px 3px 0px #dadada;
+    padding: 20px;
+}

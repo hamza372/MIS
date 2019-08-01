@@ -23,4 +23,7 @@ interface RootReducerState {
 	last_snapshot: number
 	accept_snapshot: boolean
 	connected: boolean
+	school_Info: {
+		school_list: string[]
+	}
 }

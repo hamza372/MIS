@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import {schoolInfo} from '../actions/index'
 
 export const saveDB = (db : RootReducerState) => {
 
@@ -103,6 +104,9 @@ export const loadDB = () : RootReducerState => {
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
-		sync_state: loadSyncState()
+		sync_state: loadSyncState(),
+		school_Info: {
+			school_list: [""]
+		}
 	}
 }

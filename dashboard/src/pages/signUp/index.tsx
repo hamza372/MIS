@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
-import { Layout } from '../../components/Layout';
-
 import { createSchoolLogin } from '../../actions/index'
-
-import './style.css'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
 import checkCompulsoryFields from '../../utils/checkCompulsoryFields';
+
+import './style.css'
 
 interface P {
 	createSchoolLogin: (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => any

@@ -28,6 +28,23 @@ export const createLogin = (username: string, password: string, number: string) 
 
 }
 
+export const SCHOOL_INFO = "SCHOOL_INFO"
+export const schoolInfo = () => (dispatch: Dispatch) => {
+
+	fetch('http://localhost:8080/dashboard/school_list')
+		.then(resp => resp.json())
+		.then(resp => {
+			dispatch({
+				type: SCHOOL_INFO,
+				school_list: resp.school_list
+			})
+		})
+		.catch(res => {
+			window.alert("Error Fetching List!")
+		})
+
+}
+
 export const createSchoolLogin = (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();

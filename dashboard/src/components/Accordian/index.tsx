@@ -1,10 +1,10 @@
 import React from 'react'
 import { Route, Link, RouteComponentProps, withRouter } from 'react-router-dom'
-
 import icon from './icon.svg'
-import './style.css'
 import signUp from '../../pages/signUp';
-import DashboardPage from '../../pages/dashboard';
+import DashboardPage from '../../pages/stats';
+
+import './style.css'
 
 type P = RouteComponentProps
 

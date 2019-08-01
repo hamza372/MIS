@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
-interface P {
+import '../style.css'
 
+interface P {
+	school_id: string
+	start_date: string
+	end_date: string
 }
 
 interface DataRow {
@@ -26,7 +30,26 @@ class TeacherAttendance extends React.Component<P, S> {
 	}
 
 	componentDidMount() {
-		fetch('http://localhost:8080/dashboard/teacher_attendance?school_id=brighterschool&start_date=2018-10-15&end_date=2018-12-19')
+
+		const {school_id, start_date, end_date } = this.props
+
+		fetch(`http://localhost:8080/dashboard/teacher_attendance?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`)
+			.then(res => res.json())
+			.then(parsed => {
+				this.setState({
+					data: parsed.data
+				})
+			})
+			.catch(err => {
+				console.error(err)
+			})
+	}
+
+	componentWillReceiveProps (newProps: P) {
+
+		const {school_id, start_date, end_date } = newProps
+
+		fetch(`http://localhost:8080/dashboard/teacher_attendance?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -40,11 +63,8 @@ class TeacherAttendance extends React.Component<P, S> {
 
 	render() {
 
-		console.log("teacher-data", this.state)
-
-		return <div>
-			Teach Attendance Module Usage				
-			<ResponsiveContainer width="100%" height={500}>
+		return <div className="stat-card">
+			<ResponsiveContainer width="90%" height={300}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />
 					<YAxis />

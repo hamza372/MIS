@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
+import '../style.css'
+
 interface P {
 
 }
@@ -42,9 +44,8 @@ class Fees extends React.Component<P, S> {
 
 	render() {
 
-		return <div>
-			Fees Module Usage
-			<ResponsiveContainer width="100%" height={500}>
+		return <div className="stat-card">
+			<ResponsiveContainer width="90%" height={300}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />
 					<YAxis />
