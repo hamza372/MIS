@@ -1,5 +1,4 @@
 import { v4 } from 'uuid';
-import {schoolInfo} from '../actions/index'
 
 export const saveDB = (db : RootReducerState) => {
 

@@ -9,6 +9,9 @@ import { RouteComponentProps } from 'react-router';
 
 import './style.css'
 import { schoolInfo } from '../../actions';
+import Expense from './Expense';
+import SMS from './SMS';
+import Diary from './Diary';
 
 interface P {
 	school_list: RootReducerState["school_Info"]["school_list"]
@@ -17,6 +20,8 @@ interface P {
 
 interface S {
 	selected_school: string
+	start_date: string
+	end_date: string
 }
 
 interface RouteInfo {
@@ -32,11 +37,12 @@ class Stats extends Component <propTypes, S> {
 		super(props)
 	
 		this.state = {
-			selected_school: ""
+			selected_school: "",
+			start_date: "2018-10-15",
+			end_date: "2019-12-19"
 		}
 
 		this.former = new Former(this,[])
-
 	}
 
 	componentDidMount () {
@@ -45,13 +51,10 @@ class Stats extends Component <propTypes, S> {
 	
 	render() {
 
-		console.log(this.props)
-		const { school_list} = this.props
+		const { school_list } = this.props
 
-		const start_date = '2018-10-15'
-		const end_date = '2019-12-19'
+		const { start_date, end_date } = this.state
 
-		console.log("School List",school_list)
 		return <div className="page stats">
 
 			<div className="title">Stats</div>
@@ -65,19 +68,40 @@ class Stats extends Component <propTypes, S> {
 					}
 					</select>
 				</div>
+{/* 				<div className="row">
+					<label>Start Date</label>
+					<input type="date" onChange={this.former.handle(["start_date"])} />
+				</div>
+				<div className="row">
+					<label>End Date</label>
+					<input type="date" onChange={this.former.handle(["end_date"])} />
+				</div> */}
 			</div>
 			
-			<div className="divider">Student Attendance</div>
-			<StudentAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+			{ this.state.selected_school && <div className="stat-card-container">
+				<div className="divider">Student Attendance</div>
+				<StudentAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
 
-			<div className="divider">Teacher Attendance</div>
-			<TeacherAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
-			
-			{/* <div className="divider">Student Fee</div>
-			<Fees school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
- */}			
-			<div className="divider">Student Exams</div>
-			<Exams school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<div className="divider">Teacher Attendance</div>
+				<TeacherAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				
+				<div className="divider">Student Fee</div>
+				<Fees school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				
+				<div className="divider">Student Exams</div>
+				<Exams school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+
+				<div className="divider"> Expense </div>
+				<Expense school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+
+				<div className="divider"> SMS </div>
+				<SMS school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+
+				<div className="divider"> Diary </div>
+				<Diary school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+
+			</div>}
+
 		</div>
 	}
 }

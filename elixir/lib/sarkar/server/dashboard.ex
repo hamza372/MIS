@@ -27,6 +27,101 @@ defmodule Sarkar.Server.Dashboard do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "expense" }, qs: query_string } = req, state) do
+
+		decoded_params = URI.decode_query(query_string)
+
+		school_id = Map.get(decoded_params, "school_id")
+		start_date = Map.get(decoded_params, "start_date")
+		end_date = Map.get(decoded_params, "end_date")
+
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				to_timestamp(time/1000)::date::text as date,
+				count(distinct path[3]) as expense_usage
+				FROM writes 
+				WHERE school_id='five' and path[2] = 'expenses' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				GROUP BY date", [school_id, start_date, end_date])
+
+		list = resp.rows
+					|> Enum.map( fn [date, expense_usage] -> %{ "date" => date, "expense_usage" => expense_usage} end)
+
+		json_resp = Poison.encode!(%{"data" => list})
+
+		req = :cowboy_req.reply(
+			200, 
+			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			json_resp,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
+	def init(%{bindings: %{type: "sms" }, qs: query_string } = req, state) do
+
+		decoded_params = URI.decode_query(query_string)
+
+		school_id = Map.get(decoded_params, "school_id")
+		start_date = Map.get(decoded_params, "start_date")
+		end_date = Map.get(decoded_params, "end_date")
+
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				to_timestamp(time/1000)::date::text as date,
+				count(value ->> 'count') as sms_usage
+				FROM writes 
+				WHERE school_id='five' and path[2] = 'analytics' and path[3] = 'sms_history' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				GROUP BY date
+				ORDER BY date desc", [school_id, start_date, end_date])
+
+		list = resp.rows
+					|> Enum.map( fn [date, sms_usage] -> %{ "date" => date, "sms_usage" => sms_usage} end)
+
+		json_resp = Poison.encode!(%{"data" => list})
+
+		req = :cowboy_req.reply(
+			200, 
+			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			json_resp,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
+	def init(%{bindings: %{type: "diary" }, qs: query_string } = req, state) do
+
+		decoded_params = URI.decode_query(query_string)
+
+		school_id = Map.get(decoded_params, "school_id")
+		start_date = Map.get(decoded_params, "start_date")
+		end_date = Map.get(decoded_params, "end_date")
+
+		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				to_timestamp(time/1000)::date::text as date,
+				count(distinct path[3]) as diary_usage
+				FROM writes 
+				WHERE school_id='five' and path[2] = 'diary' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				GROUP BY date
+				ORDER BY date desc", [school_id, start_date, end_date])
+
+		list = resp.rows
+					|> Enum.map( fn [date, diary_usage] -> %{ "date" => date, "diary_usage" => diary_usage} end)
+
+		json_resp = Poison.encode!(%{"data" => list})
+
+		req = :cowboy_req.reply(
+			200, 
+			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			json_resp,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
 	def init(%{bindings: %{type: "student_attendance"}, qs: query_string} = req, state) do
 
 		IO.inspect URI.decode_query(query_string)

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
 import '../style.css'
+import { getEndPointURL } from '../../../utils/getEndPointURL';
 
 interface P {
 	school_id: string
@@ -33,7 +34,7 @@ class TeacherAttendance extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = this.props
 
-		fetch(`http://localhost:8080/dashboard/teacher_attendance?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`)
+		fetch(getEndPointURL("teacher_attendance",school_id, start_date,end_date))
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -49,7 +50,7 @@ class TeacherAttendance extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = newProps
 
-		fetch(`http://localhost:8080/dashboard/teacher_attendance?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`)
+		fetch(getEndPointURL("teacher_attendance",school_id, start_date,end_date))
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({

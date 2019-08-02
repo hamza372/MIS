@@ -2,9 +2,12 @@ import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
 import '../style.css'
+import { getEndPointURL } from '../../../utils/getEndPointURL';
 
 interface P {
-
+	school_id: string
+	start_date: string
+	end_date: string
 }
 
 interface DataRow {
@@ -30,7 +33,26 @@ class Fees extends React.Component<P, S> {
 	}
 
 	componentDidMount() {
-		fetch('http://localhost:8080/dashboard/fees')
+
+		const { school_id, start_date, end_date } = this.props
+		
+		fetch(getEndPointURL("fees", school_id, start_date,end_date))
+			.then(res => res.json())
+			.then(parsed => {
+				this.setState({
+					data: parsed.data
+				})
+			})
+			.catch(err => {
+				console.error(err)
+			})
+	}
+
+	componentWillReceiveProps (newProps: P) {
+
+		const {school_id, start_date, end_date } = newProps
+
+		fetch(getEndPointURL("fees",school_id, start_date,end_date))
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
