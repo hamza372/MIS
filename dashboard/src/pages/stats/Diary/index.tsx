@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
 import '../style.css'
-import { getEndPointURL } from '../../../utils/getEndPointURL';
+import { getEndPointResource } from '../../../utils/getEndPointResource';
 
 interface P {
 	school_id: string
@@ -34,7 +34,7 @@ class Diary extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = this.props
 
-		fetch( getEndPointURL("diary",school_id, start_date,end_date))
+		getEndPointResource("diary", school_id, start_date, end_date)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -50,7 +50,7 @@ class Diary extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = newProps
 
-		fetch( getEndPointURL("diary",school_id, start_date,end_date))
+		getEndPointResource("diary", school_id, start_date, end_date)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({

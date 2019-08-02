@@ -2,7 +2,8 @@ import * as React from 'react'
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
 
 import '../style.css'
-import { getEndPointURL } from '../../../utils/getEndPointURL';
+import { getEndPointResource } from '../../../utils/getEndPointResource';
+import { loadAuth } from '../../../utils/localStorage';
 
 interface P {
 	school_id: string
@@ -17,7 +18,8 @@ interface DataRow {
 }
 
 interface S {
-	data: DataRow[]
+	data: DataRow[],
+	loading: boolean
 }
 
 class SMS extends React.Component<P, S> {
@@ -26,7 +28,8 @@ class SMS extends React.Component<P, S> {
 		super(props);
 
 		this.state = {
-			data: []
+			data: [],
+			loading: false
 		}
 	}
 
@@ -34,7 +37,7 @@ class SMS extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = this.props
 
-		fetch(getEndPointURL("sms",school_id, start_date,end_date))
+		getEndPointResource("sms",school_id, start_date,end_date)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -50,11 +53,19 @@ class SMS extends React.Component<P, S> {
 
 		const {school_id, start_date, end_date } = newProps
 
-		fetch(getEndPointURL("sms",school_id, start_date,end_date))
+		if(school_id !== this.props.school_id) {
+			this.setState({
+				data: [],
+				loading: true
+			})
+		}
+
+		getEndPointResource("sms",school_id, start_date,end_date)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
-					data: parsed.data
+					data: parsed.data,
+					loading: false
 				})
 			})
 			.catch(err => {
@@ -65,6 +76,7 @@ class SMS extends React.Component<P, S> {
 	render() {
 
 		return <div className="stat-card">
+			{ this.state.loading && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
 				<LineChart data={this.state.data}>
 					<XAxis dataKey="date" />

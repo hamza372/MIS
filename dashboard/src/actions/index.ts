@@ -31,7 +31,7 @@ export const createLogin = (username: string, password: string, number: string) 
 export const SCHOOL_INFO = "SCHOOL_INFO"
 export const schoolInfo = () => (dispatch: Dispatch) => {
 
-	fetch('http://localhost:8080/dashboard/school_list')
+	fetch('https:/mis-socket-dev.metal.fish/dashboard/school_list')
 		.then(resp => resp.json())
 		.then(resp => {
 			dispatch({
