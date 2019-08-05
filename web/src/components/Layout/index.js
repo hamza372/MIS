@@ -26,12 +26,16 @@ const Header = ({user, history}) => <div className="header">
 export const PrintHeader = ({settings, logo}) => <div className="print-only school-header">
 			<div className="header-body">
 				<div className="logo-container" style={{width: "20%"}}>
-					{logo !== "" && <img className="header-logo" src={logo} alt="No Logo"/>}
+					{logo !== "" && <img className="header-logo" src={logo} alt="School Logo"/>}
 				</div>
 				<div className="header-style">
-					<div className="title">{settings.schoolName}</div>
-					<div className="address" style={{marginBottom: "5px"}}>{settings.schoolAddress}</div>
-					<div className="phone-number">{settings.schoolPhoneNumber}</div>
+					<div className="title">{settings.schoolName ? settings.schoolName.toUpperCase() : ""}</div>
+					<div className="address" style={{marginBottom:"4px"}}>{settings.schoolAddress}</div>
+					<div className="phone-number">
+						Tel:{settings.schoolPhoneNumber}</div>
+					<div className="school-code">
+						School Code: {settings.schoolCode || "_______"}					
+					</div>
 				</div>
 			</div>
 		</div>

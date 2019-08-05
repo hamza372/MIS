@@ -58,9 +58,7 @@ export default class Card extends Component <propTypes, S> {
 				</div>
 				{ this.props.create ? <this.create to={this.props.create} text={this.props.createText} /> : false }
 			</div>
-
-			<input className="search-bar no-print" type="text" placeholder="Search" onChange={this.onChange}/>
-
+			<input className="search-bar no-print" type="text" placeholder="Search by name | class | admission # | phone #" onChange={this.onChange}/>
 			{ children }
 
 			<div className="card-list">
