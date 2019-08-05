@@ -1,6 +1,7 @@
 import Syncr from '../syncr'
 import { createLoginSucceed } from './core';
 
+
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
@@ -31,7 +32,14 @@ export const createLogin = (username: string, password: string, number: string) 
 export const SCHOOL_INFO = "SCHOOL_INFO"
 export const schoolInfo = () => (dispatch: Dispatch) => {
 
-	fetch('https:/mis-socket-dev.metal.fish/dashboard/school_list')
+	const headers = new Headers();
+
+	// @ts-ignore
+	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+
+	fetch('https://mis-socket.metal.fish/dashboard/school_list', {
+		headers
+	})
 		.then(resp => resp.json())
 		.then(resp => {
 			dispatch({
@@ -45,7 +53,7 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 
 }
 
-export const createSchoolLogin = (username: string, password: string, limit: number, package_name: string, agent_name: string, agent_type: string, agent_city: string, notes: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createSchoolLogin = (username: string, password: string, limit: number, value: SignUpValue) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -56,12 +64,7 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 			username,
 			password,
 			limit,
-			package_name,
-			agent_name,
-			agent_type,
-			agent_city,
-			notes
-			
+			value
 		}
 	})
 	.then((res)=> {

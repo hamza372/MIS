@@ -33,14 +33,13 @@ defmodule Sarkar.Auth do
 
 	end
 
-	def create({ id, password, limit, package_name, agent_name, agent_type, agent_city, notes }) do 
+	def create({ id, password, limit, value }) do 
 		{:ok, confirm_text } =  case limit === 0 do
 			true -> Sarkar.Auth.create({id, password})
 			false -> Sarkar.Auth.create({id, password, "mischool", limit})
 		end
 
 		time = :os.system_time(:millisecond)
-		value = %{ "package" => package_name, "name" => agent_name, "type" => agent_type, "city" => agent_city, "notes" => notes }
 
 		case Postgrex.query(Sarkar.School.DB,
 			"INSERT INTO mischool_referrals (school_id, time, value) VALUES ($1,$2,$3)",

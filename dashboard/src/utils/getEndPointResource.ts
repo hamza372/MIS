@@ -1,6 +1,15 @@
 
-const END_POINT_URL = "https://mis-socket-dev.metal.fish/dashboard/"
+//const END_POINT_URL = "https://localhost:8080/dashboard/"
+const END_POINT_URL = "https://mis-socket.metal.fish/dashboard/"
 
 export const getEndPointResource = ( point:string, school_id: string, start_date:string, end_date:string) => {
-	return fetch(END_POINT_URL + `${point}?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`)
+	
+	const headers = new Headers();
+
+	// @ts-ignore
+	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+
+	return fetch(`${END_POINT_URL}${point}?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`, {
+		headers
+	})
 }

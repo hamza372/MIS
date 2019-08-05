@@ -1,5 +1,15 @@
 defmodule Sarkar.Server.Dashboard do
 
+	defp headers() do
+		%{
+			"content-type" => "application/json",
+			"cache-control" => "no-cache",
+			"access-control-allow-methods" => "GET, OPTIONS",
+			"access-control-allow-origin" => "*",
+			"access-control-allow-headers" => "*"
+		}
+	end
+
 	def init(%{bindings: %{type: "hi"}} = req, state) do
 		IO.puts "wowwww"
 		req = :cowboy_req.reply(200, req)
@@ -19,7 +29,7 @@ defmodule Sarkar.Server.Dashboard do
 
 		req = :cowboy_req.reply(
 			200, 
-			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_resp,
 			req
 		)
@@ -40,17 +50,22 @@ defmodule Sarkar.Server.Dashboard do
 				to_timestamp(time/1000)::date::text as date,
 				count(distinct path[3]) as expense_usage
 				FROM writes 
-				WHERE school_id='five' and path[2] = 'expenses' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				WHERE school_id = $1 and 
+					path[2] = 'expenses' and 
+					to_timestamp(time/1000)::date::text >= $2 and 
+					to_timestamp(time/1000)::date::text <= $3
 				GROUP BY date", [school_id, start_date, end_date])
 
 		list = resp.rows
-					|> Enum.map( fn [date, expense_usage] -> %{ "date" => date, "expense_usage" => expense_usage} end)
+					|> Enum.map( fn [date, expense_usage] -> 
+						%{ "date" => date, "expense_usage" => expense_usage} 
+					end)
 
 		json_resp = Poison.encode!(%{"data" => list})
 
 		req = :cowboy_req.reply(
 			200, 
-			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_resp,
 			req
 		)
@@ -71,18 +86,24 @@ defmodule Sarkar.Server.Dashboard do
 				to_timestamp(time/1000)::date::text as date,
 				count(value ->> 'count') as sms_usage
 				FROM writes 
-				WHERE school_id='five' and path[2] = 'analytics' and path[3] = 'sms_history' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				WHERE school_id = $1 and 
+					path[2] = 'analytics' and 
+					path[3] = 'sms_history' and 
+					to_timestamp(time/1000)::date::text >= $2 and 
+					to_timestamp(time/1000)::date::text <= $3
 				GROUP BY date
 				ORDER BY date desc", [school_id, start_date, end_date])
 
 		list = resp.rows
-					|> Enum.map( fn [date, sms_usage] -> %{ "date" => date, "sms_usage" => sms_usage} end)
+					|> Enum.map( fn [date, sms_usage] -> 
+						%{ "date" => date, "sms_usage" => sms_usage} 
+					end)
 
 		json_resp = Poison.encode!(%{"data" => list})
 
 		req = :cowboy_req.reply(
 			200, 
-			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_resp,
 			req
 		)
@@ -103,7 +124,7 @@ defmodule Sarkar.Server.Dashboard do
 				to_timestamp(time/1000)::date::text as date,
 				count(distinct path[3]) as diary_usage
 				FROM writes 
-				WHERE school_id='five' and path[2] = 'diary' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				WHERE school_id = $1 and path[2] = 'diary' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 				GROUP BY date
 				ORDER BY date desc", [school_id, start_date, end_date])
 
@@ -114,7 +135,7 @@ defmodule Sarkar.Server.Dashboard do
 
 		req = :cowboy_req.reply(
 			200, 
-			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_resp,
 			req
 		)
@@ -124,26 +145,20 @@ defmodule Sarkar.Server.Dashboard do
 
 	def init(%{bindings: %{type: "student_attendance"}, qs: query_string} = req, state) do
 
-		IO.inspect URI.decode_query(query_string)
-
 		decoded_params = URI.decode_query(query_string)
 
-		IO.inspect start_date = Map.get(decoded_params, "start_date")
+		start_date = Map.get(decoded_params, "start_date")
+		end_date = Map.get(decoded_params, "end_date")
 		
-		IO.inspect end_date = Map.get(decoded_params, "end_date")
-		
-		IO.inspect Map.get(decoded_params, "school_id")
-
 		school_id = Map.get(decoded_params, "school_id")
 
-		
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 		"SELECT
 			to_timestamp(time/1000)::date::text as d, 
 			school_id,
 			count(distinct path[3]) as students_marked
 		FROM writes
-		WHERE path[2] = 'students' and path[4] = 'attendance' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+		WHERE school_id = $1 and path[2] = 'students' and path[4] = 'attendance' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 		GROUP BY d, school_id
 		ORDER BY d desc",[school_id, start_date, end_date])
 		#convert to JSON (read up on this)
@@ -165,8 +180,8 @@ defmodule Sarkar.Server.Dashboard do
 		
 		
 		req = :cowboy_req.reply(
-			200, 
-			%{"content-type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			200,
+			headers(),
 			json_data,
 			req
 		)
@@ -177,11 +192,9 @@ defmodule Sarkar.Server.Dashboard do
 
 	def init(%{bindings: %{type: "teacher_attendance"}, qs: query_string} = req, state) do
 
-		IO.inspect URI.decode_query(query_string)
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
-
 		end_date = Map.get(decoded_params, "end_date")
 
 		school_id = Map.get(decoded_params, "school_id")
@@ -215,23 +228,18 @@ defmodule Sarkar.Server.Dashboard do
 
 		req = :cowboy_req.reply(
 			200,
-			%{"content-type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_data,
 			req
 		)
 		{:ok, req, state}
 	end
 
-
-
-
 	def init(%{bindings: %{type: "fees"}, qs: query_string} = req, state) do
-		IO.inspect URI.decode_query(query_string)
 
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
-
 		end_date = Map.get(decoded_params, "end_date")
 
 		school_id = Map.get(decoded_params, "school_id")
@@ -245,7 +253,7 @@ defmodule Sarkar.Server.Dashboard do
 				count(distinct path[5]) as num_payments,
 				sum((value->>'amount')::float) as total
 			FROM writes
-			WHERE path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+			WHERE school_id = $1 and path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 			GROUP BY d, school_id
 			ORDER BY d desc", [school_id, start_date, end_date])
 			
@@ -268,7 +276,7 @@ defmodule Sarkar.Server.Dashboard do
 
 		req = :cowboy_req.reply(
 			200,
-			%{"content_type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_data,
 			req
 		)
@@ -293,7 +301,7 @@ defmodule Sarkar.Server.Dashboard do
 				count(distinct path[3]) as school_id,
 				count(distinct path[5]) as exams 
 			FROM writes 
-			WHERE path[2] = 'students' and path[4] = 'exams' and school_id = $1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+			WHERE school_id = $1 and path[2] = 'students' and path[4] = 'exams' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
 			GROUP BY d, school_id
 			ORDER BY d desc", [school_id, start_date, end_date])
 		coordinates = resp.rows
@@ -314,48 +322,12 @@ defmodule Sarkar.Server.Dashboard do
 		
 		req = :cowboy_req.reply(
 			200,
-			%{"content_type" => "application/json", "cache-control" => "no-cache",  "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
+			headers(),
 			json_data,
 			req
 		)
 
 		{:ok, req, state}
 
-	end
-	
-	def init(%{bindings: %{type: "sms"}} = req, state) do
-
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
-			"SELECT
-				to_timestamp(time/1000)::date::text as d, 
-				school_id, 
-				sum(CASE WHEN value->>'type' = 'ALL_STUDENTS' THEN (value->>'count')::int ELSE 0 END) AS ALL_STUDENTS,
-				sum(CASE WHEN value->>'type' = 'ALL_TEACHERS' THEN (value->>'count')::int ELSE 0 END) AS ALL_TEACHERS,
-				sum(CASE WHEN value->>'type' = 'TEACHER' THEN (value->>'count')::int ELSE 0 END) AS SINGLE_TEACHER,
-				sum(CASE WHEN value->>'type' = 'FEE_DEFAULTERS' THEN (value->>'count')::int ELSE 0 END) AS FEE_DEFAULTERS,
-				sum(CASE WHEN value->>'type' = 'STUDENT' THEN (value->>'count')::int ELSE 0 END) AS STUDENT,
-				sum(CASE WHEN value->>'type' = 'CLASS' THEN (value->>'count')::int ELSE 0 END) AS CLASS,
-				sum(CASE WHEN value->>'type' = 'ATTENDANCE' THEN (value->>'count')::int ELSE 0 END) AS ATTENDANCE,
-				sum(CASE WHEN value->>'type' = 'FEE' THEN (value->>'count')::int ELSE 0 END) AS FEE,
-				sum(CASE WHEN value->>'type' = 'EXAM' THEN (value->>'count')::int ELSE 0 END) AS EXAM,
-				sum(CASE WHEN value->>'type' = 'PROSPECTIVE' THEN (value->>'count')::int ELSE 0 END) AS PROSPECTIVE,
-				sum((value->>'count')::int) as total
-			FROM writes
-			WHERE path[2] = 'analytics' AND path[3] = 'sms_history'
-			GROUP BY d, school_id
-		ORDER BY d desc", [])
-		
-		coordinates = resp.rows
-		|> Enum.map(fn[date, school_id, all_students, all_teachers, single_teacher, fee_defaulters, student, class, attendance, fee, exam, prospective, total] -> %{"date" => date, "school_id" => school_id, "ALL_STUDENTS" => all_students, "ALL_TEACHERS" => all_teachers, "SINGLE_TEACHER" => single_teacher, "FEE_DEFAULTERS" => fee_defaulters, "STUDENT" => student, "CLASS" => class, "ATTENDANCE" => attendance, "FEE" => fee, "EXAM" => exam, "PROSPECTIVE" => prospective, "total" => total} end)
-
-		json_data = Poison.encode!(%{data: coordinates})
-
-		req = :cowboy_req.reply(
-			200,
-			%{"content_type" => "application/json", "cache-control" => "no-cache", "access-control-allow-methods" => "GET, OPTIONS", "access-control-allow-origin" => "*"},
-			json_data,
-			req
-		)
-		{:ok, req, state}
 	end
 end

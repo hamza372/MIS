@@ -1,8 +1,8 @@
 defmodule Sarkar.ActionHandler.Dashboard do
 
-	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "package_name" => package_name, "agent_name" => agent_name, "agent_type" => agent_type, "agent_city" => agent_city, "notes" => notes }}, state) do		
+	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value }}, state) do		
 			
-		{:ok, resp} = Sarkar.Auth.create({username, password, limit, package_name, agent_name, agent_type, agent_city, notes })
+		{:ok, resp} = Sarkar.Auth.create({username, password, limit, value })
 			
 		IO.inspect resp
 

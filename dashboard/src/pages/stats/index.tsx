@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import moment from 'moment'
 import Former from 'former';
 import StudentAttendance from './StudentAttendance'
 import TeacherAttendance from './TeacherAttendance';
@@ -20,8 +21,8 @@ interface P {
 
 interface S {
 	selected_school: string
-	start_date: string
-	end_date: string
+	start_date: number
+	end_date: number
 }
 
 interface RouteInfo {
@@ -38,8 +39,8 @@ class Stats extends Component <propTypes, S> {
 	
 		this.state = {
 			selected_school: "",
-			start_date: "2018-10-15",
-			end_date: "2019-12-19"
+			start_date: moment().subtract(12, "month").unix() * 1000,
+			end_date: moment.now()
 		}
 
 		this.former = new Former(this,[])
@@ -53,7 +54,8 @@ class Stats extends Component <propTypes, S> {
 
 		const { school_list } = this.props
 
-		const { start_date, end_date } = this.state
+		const start_date = moment(this.state.start_date).format("YYYY-MM-DD")
+		const end_date = moment(this.state.end_date).format("YYYY-DD-MM")
 
 		return <div className="page stats">
 
@@ -68,14 +70,14 @@ class Stats extends Component <propTypes, S> {
 					}
 					</select>
 				</div>
-{/* 				<div className="row">
+				<div className="row">
 					<label>Start Date</label>
-					<input type="date" onChange={this.former.handle(["start_date"])} />
+					<input type="date" onChange={this.former.handle(["start_date"])} value={moment(this.state.start_date).format("YYYY-MM-DD")} />
 				</div>
 				<div className="row">
 					<label>End Date</label>
-					<input type="date" onChange={this.former.handle(["end_date"])} />
-				</div> */}
+					<input type="date" onChange={this.former.handle(["end_date"])} value={moment(this.state.end_date).format("YYYY-MM-DD")}/>
+				</div>
 			</div>
 			
 			{ this.state.selected_school && <div className="stat-card-container">
