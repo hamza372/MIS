@@ -1,7 +1,6 @@
 import Syncr from '../syncr'
 import { createLoginSucceed } from './core';
 
-
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
