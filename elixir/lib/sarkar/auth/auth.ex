@@ -42,7 +42,7 @@ defmodule Sarkar.Auth do
 		time = :os.system_time(:millisecond)
 
 		case Postgrex.query(Sarkar.School.DB,
-			"INSERT INTO mischool_referrals (school_id, time, value) VALUES ($1,$2,$3)",
+			"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
 			[id, time, value]) do
 				{:ok, res} -> 
 					{:ok, confirm_text}
