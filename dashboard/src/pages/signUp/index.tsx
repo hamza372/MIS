@@ -218,8 +218,6 @@ class SignUp extends Component <propTypes, S> {
 			const erroText = `Please Fill ${(login_detail_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
 			return window.alert(erroText)
 		}
-		
-
 
 		this.props.createSchoolLogin(username, password, limit, value)
 	}
@@ -238,6 +236,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="UMER">Umer</option>
 						<option value="ZAHID"> Zahid </option>
 						<option value="FAROOQ">Farooq</option>
+						<option value="KAMRAN">Kamran</option>
 					</select>
 				</div>
 				<div className="row">
@@ -248,7 +247,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="SARGODHA">Sargodha</option>
 						<option value="SIALKOT">Sialkot</option>
 						<option value="GUJRANWALA">Gujranwala</option>
-						<option value="FAISALABAD">Fsisalabad</option>
+						<option value="FAISALABAD">Faisalabad</option>
 					</select>
 				</div>
 
@@ -263,7 +262,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="">Select</option>
 						<option value="AGENT">Agent </option>
 						<option value="ASSOCIATION">Association</option>
-						<option value="EDFIN">Edfin</option>
+						<option value="EDFIN">EdFin</option>
 						<option value="SCHOOL_REFERRAL">School Referrals</option>
 						<option value="INDIVIDUAL">Individual </option>
 					</select>
@@ -298,7 +297,7 @@ class SignUp extends Component <propTypes, S> {
 				</div>
 			</div>}
 
-			{this.former.check(["value","agent_name"]) && <div className="section form">
+			{ this.former.check(["value","agent_name"]) && <div className="section form">
 				<div className="divider">Agent Information</div>
 			
 				<div className="row">
@@ -310,7 +309,7 @@ class SignUp extends Component <propTypes, S> {
 					<label>Agent Easy Paisa</label>
 					<input type="number" {...this.former.super_handle(["value","agent_easypaisa_number"])} placeholder="Easy Paisa"/>
 				</div>
-			</div>}
+			</div> }
 			
 			<div className="section form">
 				<div className="divider">SignUp Information</div>

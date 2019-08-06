@@ -267,7 +267,7 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
 		"SELECT
 			to_timestamp(time/1000)::date::text as Date,
-			school_id,
+			id,
 			value ->> 'name' as Name,
 			value ->> 'type' as Type,
 			value ->> 'package' as Package,
