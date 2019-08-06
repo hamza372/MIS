@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, Bar, BarChart } from 'recharts'
 
 import '../style.css'
 import { getEndPointResource } from '../../../utils/getEndPointResource';
@@ -59,7 +59,7 @@ class Expense extends React.Component<P, S> {
 			})
 		}
 
-		getEndPointResource("teacher_attendance",school_id, start_date,end_date)
+		getEndPointResource("expense", school_id, start_date,end_date)
 			.then(res => res.json())
 			.then(parsed => {
 				this.setState({
@@ -74,16 +74,18 @@ class Expense extends React.Component<P, S> {
 
 	render() {
 
+		console.log("Expense data", this.state.data)
+
 		return <div className="stat-card">
 			{ this.state.loading && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
-				<LineChart data={this.state.data}>
+				<BarChart data={this.state.data} barCategoryGap={0}>
 					<XAxis dataKey="date" />
 					<YAxis />
 					<Tooltip />
 
-					<Line dataKey="expense_usage" />
-				</LineChart>
+					<Bar dataKey="expense_usage" stackId="a" fill="#8884d8"/>
+				</BarChart>
 
 			</ResponsiveContainer>
 		</div>

@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
+import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar } from 'recharts'
 
 import '../style.css'
 import { getEndPointResource } from '../../../utils/getEndPointResource';
-import { loadAuth } from '../../../utils/localStorage';
 
 interface P {
 	school_id: string
@@ -78,13 +77,13 @@ class SMS extends React.Component<P, S> {
 		return <div className="stat-card">
 			{ this.state.loading && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
-				<LineChart data={this.state.data}>
+				<BarChart data={this.state.data} barCategoryGap={0} barGap={0}>
 					<XAxis dataKey="date" />
 					<YAxis />
 					<Tooltip />
 
-					<Line dataKey="sms_usage" />
-				</LineChart>
+					<Bar dataKey="sms_usage" stackId="a" fill="#ffc658"/>
+				</BarChart>
 
 			</ResponsiveContainer>
 		</div>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Tooltip, Line } from 'recharts'
+import { ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts'
 import { getEndPointResource } from '../../../utils/getEndPointResource';
 
 import '../style.css'
@@ -86,14 +86,14 @@ class StudentAttendance extends React.Component<P, S> {
 		return <div className="stat-card">
 			{ this.state.loading && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
-				<LineChart data={this.state.data}>
+				<BarChart
+					data={this.state.data}
+					barCategoryGap={0}>
 					<XAxis dataKey="date" />
 					<YAxis />
 					<Tooltip />
-
-					<Line dataKey="students_marked" stroke="#93d0c5" strokeWidth={3}/>
-					<Line dataKey="total_students"  color="#222"/>
-				</LineChart>
+					<Bar dataKey="students_marked" stackId="a" fill="#8884d8"/>
+				</BarChart>
 
 			</ResponsiveContainer>
 		</div>
