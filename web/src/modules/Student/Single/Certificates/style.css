@@ -16,8 +16,9 @@
 }
 
 .certificate-page{
-    width: 95%;
-    margin: 10px auto;
+    width: 80%;
+    margin: 50px auto;
+    border-top: 1px solid #bebebe;
 }
 
 .certificate-page .emphasize {
@@ -36,8 +37,7 @@
 }
 
 .certificate .head .divider {
-	font-weight: 800;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+	font-family: 'Bungee Inline', sans-serif;
 }
 
 .certificate .head .sub-divider {
@@ -49,7 +49,7 @@
 
 .certificate .body {
     line-height: 30px;
-    word-spacing: 3px;
+    word-spacing: 5px;
  	font-size: 1rem;
 
 }
@@ -68,7 +68,7 @@
 	
 }
 	.cert-row label {
-		width: 20%;
+		width: 30%;
 		justify-content: center;
 	}
 	.cert-row div {
@@ -101,20 +101,9 @@
     @media print {
         .certificate {
             margin-top: 50px;
+            border: 10px double rgba(0,0,0,0.3);
         }
         .certificate-page{
             border-top: none;
         }
-    }
-    .school-code{	
-        color: black;
-        font-weight: 800;
-    }
-    .address {
-        font-size: 1.2rem;
-        font-weight: 800;
-        margin-bottom: 2px;
-    }
-    .text-center {
-        text-align: center;
-    }
+	}

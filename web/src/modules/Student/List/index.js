@@ -29,11 +29,6 @@ const StudentItem = (S) => {
 						<div className="para-row">
 							<b>{`Adm #: `}</b>{S.AdmissionNumber}
 						</div>}
-					{
-						<div className="para-row">
-							<b>{`Phone:`}</b>{S.Phone?S.Phone.substr(0,10):""}
-						</div>
-					}	
 					{ tags && 
 						<div className="tags row">
 						{
@@ -50,9 +45,9 @@ const StudentItem = (S) => {
 const toLabel = (S) => {
 	
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
-	const admissionNumber = S.AdmissionNumber ? `a${S.AdmissionNumber}` : "";
-	const Phone = S.Phone;
-	return S.Name + S.ManName + cname + admissionNumber + Phone;
+	const admissionNumber = S.AdmissionNumber ? `a${S.AdmissionNumber}` : ""
+
+	return S.Name + S.ManName + cname + admissionNumber;
 
 }
 
