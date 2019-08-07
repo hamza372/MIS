@@ -43,18 +43,21 @@ defmodule Sarkar.Server.Dashboard do
 
 		school_id = Map.get(decoded_params, "school_id")
 		start_date = Map.get(decoded_params, "start_date")
+			|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
+			|> String.to_integer
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date::text as date,
+				to_timestamp(time/1000)::date as date,
 				count(distinct path[3]) as expense_usage
 				FROM writes 
 				WHERE school_id = $1 and 
 					path[2] = 'expenses' and 
-					to_timestamp(time/1000)::date::text >= $2 and 
-					to_timestamp(time/1000)::date::text <= $3
-				GROUP BY date", [school_id, start_date, end_date])
+					time >= $2 and 
+					time <= $3
+				GROUP BY date
+				ORDER BY date asc", [school_id, start_date, end_date])
 
 		list = resp.rows
 					|> Enum.map( fn [date, expense_usage] -> 
@@ -79,20 +82,22 @@ defmodule Sarkar.Server.Dashboard do
 
 		school_id = Map.get(decoded_params, "school_id")
 		start_date = Map.get(decoded_params, "start_date")
+					|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
+					|> String.to_integer
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date::text as date,
+				to_timestamp(time/1000)::date as date,
 				count(value ->> 'count') as sms_usage
-				FROM writes 
+				FROM writes
 				WHERE school_id = $1 and 
 					path[2] = 'analytics' and 
-					path[3] = 'sms_history' and 
-					to_timestamp(time/1000)::date::text >= $2 and 
-					to_timestamp(time/1000)::date::text <= $3
+					path[3] = 'sms_history' and
+					time >= $2 and 
+					time <= $3
 				GROUP BY date
-				ORDER BY date desc", [school_id, start_date, end_date])
+				ORDER BY date asc", [school_id, start_date, end_date])
 
 		list = resp.rows
 					|> Enum.map( fn [date, sms_usage] -> 
@@ -117,16 +122,18 @@ defmodule Sarkar.Server.Dashboard do
 
 		school_id = Map.get(decoded_params, "school_id")
 		start_date = Map.get(decoded_params, "start_date")
+			|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
+			|> String.to_integer
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date::text as date,
+				to_timestamp(time/1000)::date as date,
 				count(distinct path[3]) as diary_usage
 				FROM writes 
-				WHERE school_id = $1 and path[2] = 'diary' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+				WHERE school_id = $1 and path[2] = 'diary' and time >= $2 and time <= $3
 				GROUP BY date
-				ORDER BY date desc", [school_id, start_date, end_date])
+				ORDER BY date asc", [school_id, start_date, end_date])
 
 		list = resp.rows
 					|> Enum.map( fn [date, diary_usage] -> %{ "date" => date, "diary_usage" => diary_usage} end)
@@ -148,19 +155,20 @@ defmodule Sarkar.Server.Dashboard do
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
+			|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
-		
+			|> String.to_integer
 		school_id = Map.get(decoded_params, "school_id")
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 		"SELECT
-			to_timestamp(time/1000)::date::text as d, 
+			to_timestamp(time/1000)::date as d,
 			school_id,
 			count(distinct path[3]) as students_marked
 		FROM writes
-		WHERE school_id = $1 and path[2] = 'students' and path[4] = 'attendance' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+		WHERE school_id = $1 and path[2] = 'students' and path[4] = 'attendance' and time >= $2 and time <= $3
 		GROUP BY d, school_id
-		ORDER BY d desc",[school_id, start_date, end_date])
+		ORDER BY d asc",[school_id, start_date, end_date])
 		#convert to JSON (read up on this)
 		coordinates = resp.rows 
 		|> Enum.map(fn [date, school_id, students_marked] -> %{"date" => date, "school_id" => school_id, "students_marked" => students_marked} end)
@@ -195,19 +203,21 @@ defmodule Sarkar.Server.Dashboard do
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
+			|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
+			|> String.to_integer
 
 		school_id = Map.get(decoded_params, "school_id")
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date::text as d,
+				to_timestamp(time/1000)::date as d,
 				school_id,
 				count(distinct path[3]) as teachers_marked
 			FROM writes
-			WHERE path[2] = 'faculty' and path[4] = 'attendance' and school_id =$1 and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+			WHERE path[2] = 'faculty' and path[4] = 'attendance' and school_id =$1 and time >= $2 and time <= $3
 			GROUP BY d, school_id
-			ORDER BY d desc", [school_id, start_date, end_date])
+			ORDER BY d asc", [school_id, start_date, end_date])
 
 		#convert to JSON (read up on this)
 		coordinates = resp.rows
@@ -240,22 +250,26 @@ defmodule Sarkar.Server.Dashboard do
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
+			|> String.to_integer
+
 		end_date = Map.get(decoded_params, "end_date")
+			|> String.to_integer
 
 		school_id = Map.get(decoded_params, "school_id")
 
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT
-				to_timestamp(time/1000)::date::text as d,
+				to_timestamp(time/1000)::date as d,
 				school_id,
 				count(distinct path[3]) as unique_students,
 				count(distinct path[5]) as num_payments,
 				sum((value->>'amount')::float) as total
 			FROM writes
-			WHERE school_id = $1 and path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+			WHERE school_id = $1 and path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED' and 
+			time >= $2 and time <= $3
 			GROUP BY d, school_id
-			ORDER BY d desc", [school_id, start_date, end_date])
+			ORDER BY d asc", [school_id, start_date, end_date])
 			
 		#convert to JSON (read up on this)
 		coordinates = resp.rows
@@ -289,23 +303,23 @@ defmodule Sarkar.Server.Dashboard do
 		decoded_params = URI.decode_query(query_string)
 
 		start_date = Map.get(decoded_params, "start_date")
-
+			|> String.to_integer
 		end_date = Map.get(decoded_params, "end_date")
-
+			|> String.to_integer
 		school_id = Map.get(decoded_params, "school_id")
 
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 			"SELECT 
-				to_timestamp(time/1000)::date::text as d,
+				to_timestamp(time/1000)::date as d,
 				school_id,
-				count(distinct path[3]) as school_id,
+				count(distinct path[3]) as students_graded,
 				count(distinct path[5]) as exams 
 			FROM writes 
-			WHERE school_id = $1 and path[2] = 'students' and path[4] = 'exams' and to_timestamp(time/1000)::date::text >= $2 and to_timestamp(time/1000)::date::text <= $3
+			WHERE school_id = $1 and path[2] = 'students' and path[4] = 'exams' and time >= $2 and time <= $3
 			GROUP BY d, school_id
-			ORDER BY d desc", [school_id, start_date, end_date])
+			ORDER BY d asc", [school_id, start_date, end_date])
 		coordinates = resp.rows
-		|> Enum.map(fn [date, students_graded, school_id, exams] -> %{ "date" => date, "students_graded" => students_graded, "school_id" => school_id, "exams" => exams} end)
+		|> Enum.map(fn [date, school_id, students_graded, exams] -> %{ "date" => date, "school_id" => school_id, "students_graded" => students_graded,  "exams" => exams} end)
 
 		{:ok, resp2} = Postgrex.query(Sarkar.School.DB,
 		"

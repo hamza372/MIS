@@ -3,16 +3,16 @@ import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar } from 'recha
 
 import '../style.css'
 import { getEndPointResource } from '../../../utils/getEndPointResource';
+import moment from 'moment';
 
 interface P {
 	school_id: string
-	start_date: string
-	end_date: string
+	start_date: number
+	end_date: number
 }
 
 interface DataRow {
-	teachers_marked: number
-	school_id: string
+	diary_usage: number
 	date: string
 }
 
@@ -64,12 +64,30 @@ class Diary extends React.Component<P, S> {
 
 	render() {
 
+		const data = this.state.data
+			.reduce((agg, { diary_usage, date }) => {
+				return [
+					...agg,
+					{
+						date: moment(date, "YYYY-MM-DD").unix(),
+						diary_usage
+					}
+				]
+			},[] as any)
+
 		return <div className="stat-card">
 			<ResponsiveContainer width="90%" height={300}>
-				<BarChart data={this.state.data} barCategoryGap={0}>
-					<XAxis dataKey="date" />
+				<BarChart data={data} barCategoryGap={0}>
+					<XAxis
+						dataKey="date"
+						tickFormatter={(unixTime) => moment(unixTime * 1000).format('MM/DD/YYYY')}
+						domain={['auto', 'auto']}
+						minTickGap={0}
+						type="number"/>
 					<YAxis />
-					<Tooltip />
+					<Tooltip
+						labelFormatter={(a) => moment(parseInt(a as string)*1000).format("MM/DD/YYYY")}
+						/>>
 
 					<Bar dataKey="diary_usage" fill="#8884d8" />
 				</BarChart>

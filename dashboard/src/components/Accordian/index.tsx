@@ -39,12 +39,12 @@ class Accordian extends React.Component<P, S> {
 			<div className="burger">
 				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat`}} />
 				{ this.state.visible && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>New School</Link> }
-				{ this.state.visible && <Link to={{ pathname: "/dashboard", search }} className={current === "/dashboard" ? "active" : ""}> Stats</Link> }
+				{ this.state.visible && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard" ? "active" : ""}> Stats</Link> }
 			</div>
 
 			<div className="burger-stub">
 				<Route exact path="/" component={signUp} />
-				<Route path="/dashboard" component={DashboardPage} />
+				<Route path="/dashboard/:school_id/:start_date/:end_date/" component={DashboardPage} />
 			</div>
 
 		</div>

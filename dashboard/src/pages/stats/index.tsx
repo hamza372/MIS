@@ -6,7 +6,7 @@ import StudentAttendance from './StudentAttendance'
 import TeacherAttendance from './TeacherAttendance';
 import Fees from './Fees';
 import Exams from './Exams';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 
 import './style.css'
 import { schoolInfo } from '../../actions';
@@ -26,7 +26,9 @@ interface S {
 }
 
 interface RouteInfo {
-	id: string
+	school_id: string
+	start_date: string
+	end_date: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
@@ -38,7 +40,7 @@ class Stats extends Component <propTypes, S> {
 		super(props)
 	
 		this.state = {
-			selected_school: "",
+			selected_school: "five",
 			start_date: moment().subtract(12, "month").unix() * 1000,
 			end_date: moment.now()
 		}
@@ -46,16 +48,38 @@ class Stats extends Component <propTypes, S> {
 		this.former = new Former(this,[])
 	}
 
+	// updateUrlParams = (path: string) => {
+	// 	this.props.history.push({
+	// 		pathname: path,
+	// 		search: ""
+	// 	})
+
+	// 	console.log("sdsdds")
+	// }
+
 	componentDidMount () {
 		this.props.schoolInfo()
 	}
+
+	getSchoolId = (): string => this.props.match.params.school_id === "school_id" ? this.state.selected_school : this.props.match.params.school_id
+	getStartDate = (): number => this.props.match.params.start_date === "start_date" ? this.state.start_date : parseInt(this.props.match.params.start_date)
+	getEndDate = () : number => this.props.match.params.end_date === "end_date" ? this.state.end_date : parseInt(this.props.match.params.end_date)
 	
 	render() {
 
 		const { school_list } = this.props
 
-		const start_date = moment(this.state.start_date).format("YYYY-MM-DD")
-		const end_date = moment(this.state.end_date).format("YYYY-DD-MM")
+		const school_id = this.getSchoolId()
+		const start_date = this.getStartDate()
+		const end_date = this.getEndDate()
+
+		//const path = `/dashboard/${school_id}/${start_date}/${end_date}/`
+
+		/* if (school_id !== "") {
+			
+			this.updateUrlParams(path)
+		} */
+
 
 		return <div className="page stats">
 
@@ -80,27 +104,27 @@ class Stats extends Component <propTypes, S> {
 				</div>
 			</div>
 			
-			{ this.state.selected_school && <div className="stat-card-container">
+			{ school_id && <div className="stat-card-container">
 				<div className="divider">Student Attendance</div>
-				<StudentAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<StudentAttendance school_id={school_id} start_date={start_date} end_date={end_date}/>
 
 				<div className="divider">Teacher Attendance</div>
-				<TeacherAttendance school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<TeacherAttendance school_id={school_id} start_date={start_date} end_date={end_date}/>
 				
 				<div className="divider">Student Fee</div>
-				<Fees school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<Fees school_id={school_id} start_date={start_date} end_date={end_date}/>
 				
 				<div className="divider">Student Exams</div>
-				<Exams school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<Exams school_id={school_id} start_date={start_date} end_date={end_date}/>
 
 				<div className="divider"> Expense </div>
-				<Expense school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<Expense school_id={school_id} start_date={start_date} end_date={end_date}/>
 
 				<div className="divider"> SMS </div>
-				<SMS school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<SMS school_id={school_id} start_date={start_date} end_date={end_date}/>
 
 				<div className="divider"> Diary </div>
-				<Diary school_id={this.state.selected_school} start_date={start_date} end_date={end_date}/>
+				<Diary school_id={school_id} start_date={start_date} end_date={end_date}/>
 
 			</div>}
 
@@ -112,4 +136,4 @@ export default connect((state : RootReducerState) => ({
 	school_list: state.school_Info.school_list
 }), ( dispatch: Function )  => ({
 	schoolInfo: () => dispatch(schoolInfo())
-}))(Stats)
+}))(withRouter(Stats))
