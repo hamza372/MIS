@@ -128,9 +128,11 @@ export const deleteFaculty = (faculty_id: string) => (dispatch: Function, getSta
 	])) 
 }
 
-interface PromotionMap{
-	student_id: string
-	value: string
+type PromotionMap = {
+	[student_id: string]:{
+		current: string
+		next: string
+	}
 }
 
 type Section = {
