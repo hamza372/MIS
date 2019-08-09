@@ -12,7 +12,7 @@ import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
 import getFilteredPayments from '../../../utils/getFilteredPayments';
 import Banner from '../../../components/Banner';
 
-type historicalPayment = {
+export type historicalPayment = {
 	date: number
 	name: string
 	amount_owed: number
