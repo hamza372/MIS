@@ -12,6 +12,7 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
 		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
 		FROM writes
+		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
 		GROUP BY school_id, date 
 		ORDER BY date desc",
 		[]) do
