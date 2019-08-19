@@ -424,10 +424,6 @@ export const addHistoricalPayment = (payment: historicalPayment, student_id: str
 	dispatch(createMerges(merges))
 }
 
-interface ExpenseAddItemCategory {
-	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH"   
-}
-
 export const addExpense = (amount: number, label: string, type: MISExpense["type"], category: MISExpense["category"], quantity: number, date: number, time = moment.now() ) => (dispatch: Function) => {
 
 	const expense =  "MIS_EXPENSE"
@@ -511,13 +507,9 @@ export const deleteExpense = (id: string) => (dispatch: Function) => {
 	]))
 }
 
-interface FeeAddItem{
-	student:MISStudent 
+type FeeAddItem  = MISStudentFee & {
+	student: MISStudent 
 	fee_id: string
-	amount: number
-	type: "FEE" | "SCHOLARSHIP" | ""
-	period: "MONTHLY" | "SINGLE" | ""
-	name: string
 }
 
 export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
@@ -547,18 +539,9 @@ export const createTemplateMerges = (templates: RootDBState["sms_templates"]) =>
 	]))
 }
 
-type Exam = {
-	id: string 
-	name: string
-	subject: string
-	total_score: number
-	date: number
-	student_marks:{
-		[id: string]: { 
-			score: string
-			grade: string
-			remarks: string
-		}
+type Exam = MISExam & {
+	student_marks: {
+		[id: string]: MISStudentExam
 	}
 }
 export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (dispatch: Function) => {
@@ -617,13 +600,7 @@ export const deleteExam = ( students: string[], exam_id: string ) => (dispatch: 
 
 }
 
-type History = {
-	date: string
-	type: string
-	count: string
-}
-
-export const logSms = (history: History) => (dispatch: Function) => {
+export const logSms = (history: MISSMSHistory) => (dispatch: Function) => {
 	
 	//history is an object { date: "", type: "", count:"" }
 
