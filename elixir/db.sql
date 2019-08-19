@@ -8,7 +8,7 @@ create table mischool_sign_ups(
 	form jsonb
 );
 
-create table mischool_referral (
+create table mischool_referrals (
 	id text unique not null,
 	time bigint,
 	value jsonb

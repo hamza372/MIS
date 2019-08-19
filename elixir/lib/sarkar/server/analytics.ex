@@ -267,14 +267,15 @@ defmodule Sarkar.Server.Analytics do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
 		"SELECT
 			to_timestamp(time/1000)::date::text as Date,
-			school_id,
+			id,
 			value ->> 'name' as Name,
 			value ->> 'type' as Type,
+			value ->> 'package' as Package,
 			value ->> 'city' as City,
 			value ->> 'notes' as Notes
 		FROM mischool_referrals", [])
 
-		csv = [["Date", "School", "Name", "Type", "City", "Notes"] | resp.rows]
+		csv = [["Date", "School", "Name", "Type", "Package", "City", "Notes"] | resp.rows]
 			|> CSV.encode
 			|> Enum.join()
 		

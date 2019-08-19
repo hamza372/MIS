@@ -21,8 +21,6 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, succeed(), state}
 	end
 
-
-
 	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
 		case Sarkar.Auth.verify({school_id, client_id, token}) do
 			{:ok, _} ->
