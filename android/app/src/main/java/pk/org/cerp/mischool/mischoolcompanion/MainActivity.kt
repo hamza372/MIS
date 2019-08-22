@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import com.beust.klaxon.Klaxon
 import java.io.File
@@ -14,6 +15,7 @@ import kotlin.Exception
 const val TAG = "MISchool-Companion"
 const val MY_PERMISSIONS_SEND_SMS = 1
 const val filename = "pending_messages.json"
+const val logFileName = "logFile.txt"
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,13 +28,24 @@ class MainActivity : AppCompatActivity() {
         val data = intent.data
         val dataString = intent.dataString
 
+
+
+
         permissions()
 
         Log.d(TAG, "HELLOOOO")
         Log.d(TAG, intent.action)
 
+        val logMessages = readLogMessages()
         val tv = findViewById<TextView>(R.id.logBox)
-        tv.text = intent.action
+        tv.text = logMessages
+
+        val clearButton = findViewById<Button>(R.id.clearLogButton)
+        clearButton.setOnClickListener {
+            clearLogMessages()
+
+            tv.text = readLogMessages()
+        }
 
         if(data == null || dataString == null) {
             return
@@ -76,6 +89,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun updateLogText(text : String) {
+
+        runOnUiThread {
+            run {
+                Log.d(TAG, "doing shit on thread....")
+                val tv = findViewById<TextView>(R.id.logBox)
+                tv.append(text)
+            }
+        }
+    }
+
     private fun appendMessagesToFile( messages : List<SMSItem>) {
 
         // first read the file as json
@@ -110,6 +134,28 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "DONE writing")
 
+    }
+
+    private fun readLogMessages() : String {
+
+        val file = File(filesDir, "${logFileName}")
+
+        var content = if(file.exists()) {
+            val bytes = file.readBytes()
+            String(bytes)
+        } else {
+            ""
+        }
+
+        return content
+
+    }
+
+    private fun clearLogMessages() {
+
+        val file = File(filesDir, "${logFileName}")
+
+        file.writeBytes("".toByteArray())
     }
 
 
