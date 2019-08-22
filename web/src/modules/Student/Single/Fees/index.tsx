@@ -42,7 +42,7 @@ interface P {
 	settings: RootDBState["settings"]
 	feeSMSTemplate: RootDBState["sms_templates"]["fee"]
 	schoolLogo: RootDBState["assets"]["schoolLogo"]
-	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: string, fee_id?: string, fee_name?: string) => any
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id?: string, fee_name?: string) => any
 	addMultiplePayments: (payments: payment[] ) => any
 	sendSMS: (text: string, number: string) => any
 	logSms: (history: any) => any
@@ -376,7 +376,7 @@ export default connect((state: RootReducerState) => ({
 	feeSMSTemplate: (state.db.sms_templates || {} as RootDBState["sms_templates"]).fee || "",
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
 }), (dispatch : Function) => ({
-	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: string, fee_id: string, fee_name: string) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id: string, fee_name: string) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text: string, number: string) => dispatch(sendSMS(text, number)),
 	logSms: (history: any) => dispatch(logSms(history)),

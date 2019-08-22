@@ -20,7 +20,7 @@ interface P {
 	settings: RootDBState["settings"]
 	connected: RootReducerState["connected"]
 	attendance_message_template: RootDBState["sms_templates"]["attendance"]
-	markStudent: (student: MISStudent, date: string, status: string) => any
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any
 	logSms: (history: any) => any
 }
 
@@ -67,7 +67,7 @@ class Attendance extends Component <propTypes, S> {
 		this.Former = new Former(this, [])
 	}
 
-	mark = (student: MISStudent, status: string) => () => {
+	mark = (student: MISStudent, status: MISStudentAttendanceEntry["status"]) => () => {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
@@ -306,6 +306,7 @@ class Attendance extends Component <propTypes, S> {
 	}
 }
 
+
 export default connect((state: RootReducerState) => ({
 	current_faculty: state.db.faculty[state.auth.faculty_id],
 	students: state.db.students,
@@ -314,6 +315,6 @@ export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {} as RootDBState["sms_templates"]).attendance || "",
 }), (dispatch : Function) => ({
-	markStudent: (student: MISStudent, date: string, status: string) => dispatch(markStudent(student, date, status)),
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => dispatch(markStudent(student, date, status)),
 	logSms: (history: any) => dispatch(logSms(history))
 }))(Attendance)
