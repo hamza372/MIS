@@ -186,7 +186,7 @@ class Attendance extends Component <propTypes, S> {
 				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
 				const status = current_attendance ? current_attendance.status : "n/a"
 
-				if(status === "LEAVE") {
+				if(this.getLeaveStatus(status)) {
 					return {
 						...agg,
 						[sid]: true
@@ -218,6 +218,19 @@ class Attendance extends Component <propTypes, S> {
 	relevant_students = () => {
 		Object.keys(this.state.selected_students)
 			.map(id => this.props.students[id])
+	}
+
+	getLeaveStatus = (s : string) : boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
+
+	markLeave = (e: { target: { value: any; }; }, x: MISStudent) => {
+		const status = e.target.value
+		
+		if (status === "") {
+			console.log("EMPTY RETURNING")
+			return
+		}
+
+		this.mark(x, status)()
 	}
 
 	render() {
@@ -280,7 +293,7 @@ class Attendance extends Component <propTypes, S> {
 				<div className="list">
 				{
 					Object.keys(this.state.selected_students)
-						.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && (parseFloat(students[id_a].RollNumber) - parseFloat(students[id_b].RollNumber)))
+							.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && (parseFloat(students[id_a].RollNumber) - parseFloat(students[id_b].RollNumber)))
 						.map(sid => {
 							const x = students[sid]
 
@@ -294,7 +307,13 @@ class Attendance extends Component <propTypes, S> {
 								<div className="status">
 									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 									<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
-									<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
+									<select value={status} className={`select button ${this.getLeaveStatus(status) ? "grey" : false}`} onChange={(e) => this.markLeave(e,x)}>
+										<option value="">Select Leave</option>
+										<option value="LEAVE">Leave</option>
+										<option value="SHORT_LEAVE">Short Leave</option>
+										<option value="SICK_LEAVE">Sick Leave</option>
+										<option value="CASUAL_LEAVE">Casual Leave</option>
+									</select>
 								</div>
 							</div>
 						})
