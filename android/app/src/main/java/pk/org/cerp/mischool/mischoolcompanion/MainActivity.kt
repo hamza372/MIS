@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         val logMessages = readLogMessages()
         val tv = findViewById<TextView>(R.id.logBox)
         tv.text = logMessages
+        tv.movementMethod = ScrollingMovementMethod()
 
         val clearButton = findViewById<Button>(R.id.clearLogButton)
         clearButton.setOnClickListener {
