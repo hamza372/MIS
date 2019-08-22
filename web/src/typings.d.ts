@@ -213,7 +213,7 @@ interface MISSalaryExpense extends BaseMISExpense {
 
 interface MISStudentAttendanceEntry {
 	date: string
-	status: "PRESENT" | "ABSENT" | "LEAVE"
+	status: "PRESENT" | "ABSENT" | "LEAVE" | "SHORT_LEAVE" | "SICK_LEAVE" | "CASUAL_LEAVE"
 	time: number
 }
 

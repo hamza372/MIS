@@ -61,7 +61,7 @@ class Diary extends Component {
 		this.former = new former(this, [])
 	}
 	
-	logSms = (messages) =>{
+	logSms = (messages) => {
 
 		if(messages.length === 0){
 			console.log("No Messaged to Log")
@@ -76,6 +76,15 @@ class Diary extends Component {
 		}
 
 		this.props.logSms(historyObj)
+	}
+
+	componentWillReceiveProps(newProps) {
+
+		const curr_date = moment().format("DD/MM/YYYY")
+
+		this.setState({
+			diary: newProps.diary && moment(newProps.diary.date).format("DD/MM/YYYY") === curr_date ? newProps.diary : this.props.diary
+		})
 	}
 
 	onSave = () => {
