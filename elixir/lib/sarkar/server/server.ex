@@ -20,6 +20,7 @@ defmodule Sarkar.Server do
 				{"/ws", Sarkar.Websocket, []},
 				{"/", Sarkar.Server.OK, []},
 				{"/analytics/:type", Sarkar.Server.Analytics, []},
+				{"/dashboard/:type", Sarkar.Server.Dashboard, []}
 			]}
 		])
 	end

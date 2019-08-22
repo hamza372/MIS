@@ -47,11 +47,30 @@ class SMSJob : Job() {
         }
     }
 
+    fun updateLogText(text : String) {
+        // here we'll write logs to a file
+        // on the ui we'll read the file and display it.
+
+        try {
+
+            // val activityThreadClass = Class.forName("pk.org.cerp.mischool.mischoolcompanion.MainActivity")
+
+            // (context as MainActivity).updateLogText("doing run job")
+
+            writeMessageToLogFile(text)
+        }
+        catch (e : Exception) {
+            Log.e(TAG, e.message)
+        }
+    }
+
     override fun onRunJob(params: Params): Result {
 
         var reschedule = true
         return try {
             Log.d(TAG, "doing run job")
+            // updateLogText("doing run job")
+
             val pending = readMessagesFromFile()
             val num_messages = pending.size
 
@@ -63,6 +82,7 @@ class SMSJob : Job() {
             val max_sendable = max_per_minute - last_min_messages
 
             Log.d(TAG, "${pending.size} items queued")
+            updateLogText("${pending.size} items queued")
 
 
             // we assume that sending messages will not error for now.
@@ -105,7 +125,10 @@ class SMSJob : Job() {
             Log.e(TAG, e.message)
             Result.FAILURE
         } finally {
-            if(reschedule) SMSJob.scheduleJob() else Log.d(TAG, "done sending messages!")
+            if(reschedule) SMSJob.scheduleJob() else {
+                Log.d(TAG, "done sending messages!")
+                updateLogText("all messages sent")
+            }
         }
     }
 
@@ -130,14 +153,18 @@ class SMSJob : Job() {
 
             if(messages.size > 1) {
                 Log.d(TAG, "SENDING MULTIPART")
+                updateLogText("sending multipart message")
                 smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
             }
 
             smsManager.sendTextMessage(phoneNumber, null, text, null, null)
+            // updateLogText("message sent")
 
+            smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
             //Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
         } catch( e: Exception) {
             Log.d(TAG, e.message)
+            updateLogText("ERROR ${e.message}")
         }
 
     }
@@ -205,6 +232,25 @@ class SMSJob : Job() {
         }
 
         return if(content == null) emptyList<SMSItem>() else Klaxon().parseArray<SMSItem>(content).orEmpty()
+    }
+
+    fun writeMessageToLogFile(message : String) {
+
+        val file = File(context.filesDir, "$logFileName")
+
+        Log.d(TAG, "appending messages to log file.....")
+
+        var content = if(file.exists()) {
+            val bytes = file.readBytes()
+            String(bytes) + "\n" + message
+        } else {
+            message
+        }
+
+        file.writeBytes(content.toByteArray())
+
+        Log.d(TAG, "DONE writing")
+
     }
 
     fun writeMessagesToFile(messages : List<SMSItem>) {

@@ -1,0 +1,53 @@
+steps:
+- name: 'gcr.io/cloud-builders/curl'
+  args:
+  - '-X' 
+  - 'POST' 
+  - '--data-urlencode'
+  - 'payload={"channel": "#mis", "username": "deploybot", "text": "Starting build of $SHORT_SHA to $BRANCH_NAME...", "icon_emoji": ":construction_worker:"}'
+  - "$_SLACK_URL"
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME']
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--cache-from'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME'
+  - '-t'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA'
+  - '-t'
+  - 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME'
+  - '--build-arg'
+  - 'VERSION=$SHORT_SHA'
+  - 'web'
+  env:
+    - 'VERSION=$SHORT_SHA'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'asia.gcr.io/$PROJECT_ID/mischool-web:$BRANCH_NAME']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['set', 'image', 'deployment/mischool-web-$BRANCH_NAME', 'mischool-web=asia.gcr.io/$PROJECT_ID/mischool-web:$SHORT_SHA']
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=asia-southeast1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=mischool-web-cluster'
+- name: 'gcr.io/cloud-builders/curl'
+  args:
+  - '-X'
+  - 'POST'
+  - "https://api.cloudflare.com/client/v4/zones/$_CLOUDFLARE_ZONE/purge_cache"
+  - '-H'
+  - "X-Auth-Email: $_EMAIL"
+  - '-H'
+  - "X-Auth-Key: $_CLOUDFLARE_API" 
+  - '-H'
+  - "Content-Type: application/json" 
+  - '-d' 
+  - '{"purge_everything": true}'
+- name: 'gcr.io/cloud-builders/curl'
+  args:
+  - '-X' 
+  - 'POST' 
+  - '--data-urlencode'
+  - 'payload={"channel": "#mis", "username": "deploybot", "text": "MISchool has been succesfully deployed version $SHORT_SHA to $BRANCH_NAME", "icon_emoji": ":construction_worker:"}'
+  - "$_SLACK_URL"

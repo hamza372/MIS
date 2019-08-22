@@ -16,8 +16,8 @@ interface P {
 	expenses: RootDBState["expenses"]
 	settings: RootDBState["settings"]
 	schoolLogo: RootDBState["assets"]["schoolLogo"]
-	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => any
-	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string ) => any
+	addExpense: (amount: number, label: string, type: MISExpense["type"], category: MISExpense["category"], quantity: number, date: number ) => any
+	addSalaryExpense: (id: string, amount: number, label: string, type: MISSalaryExpense["type"], faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string ) => any
 	editExpense: ( edits: {[id: string]:{ amount: number }}) => any
 	deleteExpense: ( deletes: string) => any
 }
@@ -38,7 +38,7 @@ interface S {
 		active: boolean
 		amount: string
 		type: string
-		category: string
+		category: MISExpense["category"]
 		faculty_id: string
 		quantity: string
 		label: string
@@ -402,7 +402,7 @@ class Expenses extends Component <propTypes, S> {
 					<option value="">Select Category</option>
 					<option value="SALARY">Salary</option>
 					<option value="BILLS">Utility Bills</option>
-					<option value="STATIONARY">Stationary</option>
+					<option value="STATIONERY">Stationery</option>
 					<option value="REPAIRS">Repairs</option>
 					<option value="RENT">Rent</option>
 					<option value="ACTIVITY">Student Activity</option>
@@ -532,14 +532,15 @@ class Expenses extends Component <propTypes, S> {
 	}
 }
 
+
 export default connect ( (state: RootReducerState) => ({
 	teachers: state.db.faculty,
 	expenses: state.db.expenses,
 	settings : state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), ( dispatch : Function ) => ({
-	addExpense: (amount: number, label: string, type: string, category: string, quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
-	addSalaryExpense: (id: string, amount: number, label: string, type: string, faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction, deduction_reason)),
+	addExpense: (amount: number, label: string, type: MISExpense["type"], category: MISExpense["category"], quantity: number, date: number ) => dispatch(addExpense(amount, label, type, category, quantity, date )),
+	addSalaryExpense: (id: string, amount: number, label: string, type: MISSalaryExpense["type"], faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string) => dispatch(addSalaryExpense(id, amount, label, type, faculty_id, date, advance, deduction, deduction_reason)),
 	editExpense: ( edits: {[id: string]:{ amount: number }}) => dispatch(editExpense(edits)),
 	deleteExpense: ( id: string) => dispatch(deleteExpense(id))
 }))( Expenses )
