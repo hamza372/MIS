@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.TextView
 import com.beust.klaxon.Klaxon
 import java.io.File
 import kotlin.Exception
@@ -30,6 +31,9 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "HELLOOOO")
         Log.d(TAG, intent.action)
 
+        val tv = findViewById<TextView>(R.id.logBox)
+        tv.text = intent.action
+
         if(data == null || dataString == null) {
             return
         }
@@ -38,6 +42,8 @@ class MainActivity : AppCompatActivity() {
 
         val json_string = java.net.URLDecoder.decode(dataString.split("=")[1], "UTF-8")
         Log.d(TAG, json_string)
+
+        tv.append(json_string)
 
         val parsed : SMSPayload? = Klaxon().parse(json_string)
 
@@ -64,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         catch(e : Exception) {
             Log.e(TAG, e.message)
         }
+
 
         finish()
 

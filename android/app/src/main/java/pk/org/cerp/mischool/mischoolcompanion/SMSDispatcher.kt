@@ -52,6 +52,7 @@ class SMSJob : Job() {
         var reschedule = true
         return try {
             Log.d(TAG, "doing run job")
+
             val pending = readMessagesFromFile()
             val num_messages = pending.size
 
