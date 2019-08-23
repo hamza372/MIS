@@ -16,13 +16,28 @@
 }
 
 .certificate-page{
-    width: 80%;
-    margin: 50px auto;
-    border-top: 1px solid #bebebe;
+    width: 95%;
+    margin: 10px auto;
+}
+
+.certificate-page .emphasize {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+/* In case we use input for text*/
+.certificate-page .text-input {
+	border-bottom: 1px solid #bbb;
+    text-align: center;
+	display: flex;
+	flex-direction: row;
+    border-radius: 0px;
+    border-width: 0px 0px 1px 0px;
 }
 
 .certificate .head .divider {
-	font-family: 'Bungee Inline', sans-serif;
+	font-weight: 800;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
 }
 
 .certificate .head .sub-divider {
@@ -34,7 +49,7 @@
 
 .certificate .body {
     line-height: 30px;
-    word-spacing: 5px;
+    word-spacing: 3px;
  	font-size: 1rem;
 
 }
@@ -53,7 +68,7 @@
 	
 }
 	.cert-row label {
-		width: 30%;
+		width: 20%;
 		justify-content: center;
 	}
 	.cert-row div {
@@ -61,6 +76,10 @@
 		border-bottom: 1px solid #bbb;
 		font-weight: bold;
 		text-align: center
+	}
+	/* In case we use input for text*/
+	.cert-row .text-input {
+		width: 70%;
 	}
 
 .certificate .footer {
@@ -87,4 +106,16 @@
         .certificate-page{
             border-top: none;
         }
-	}
+    }
+    .school-code{	
+        color: black;
+        font-weight: 800;
+    }
+    .address {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 2px;
+    }
+    .text-center {
+        text-align: center;
+    }

@@ -14,6 +14,7 @@
 
 .attendance .list {
 	margin-top: 5px;
+	overflow: auto;
 }
 
 .button.PRESENT {
@@ -39,4 +40,38 @@
 
 .attendance .list {
 	border-radius: 4px;
+}
+
+.attendance .button.select-all {
+	margin-right: 2px;
+}
+
+.attendance .selectors {
+	margin-top: 5px;
+	display: flex;
+	width: 90%;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+
+.attendance .selectors .row {
+	width: 40%;
+}
+
+@media only screen and (max-width: 768px) {
+
+	.attendance .selectors .row {
+		width: 100%;
+	}
+	.attendance .selectors .row select {
+		margin-top: 5px;
+		width: 100%;
+	}
+}
+
+.select.button {
+	-webkit-appearance: button;
+	height: auto;
 }

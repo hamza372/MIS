@@ -36,3 +36,9 @@ input[disabled], select[disabled] {
 		margin-left: 0;
 	}
 }
+
+@media print {
+	::-webkit-input-placeholder {
+		color: transparent
+	}
+}

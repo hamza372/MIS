@@ -78,6 +78,7 @@ interface MISSettings {
 	schoolName: string
 	schoolAddress: string
 	schoolPhoneNumber: string
+	schoolPhoneNumber: string
 	sendSMSOption: "SIM" | "API"
 	permissions: {
 		fee: { teacher: boolean }
@@ -188,7 +189,7 @@ interface BaseMISExpense {
 	amount: number
 	label: string
 	type: string
-	category: string
+	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | ""   
 	date: number
 	time: number
 }
@@ -206,11 +207,13 @@ interface MISSalaryExpense extends BaseMISExpense {
 	category: "SALARY"
 	advance: number
 	deduction: number
+	deduction_reason: string
 }
+
 
 interface MISStudentAttendanceEntry {
 	date: string
-	status: "PRESENT" | "ABSENT" | "LEAVE"
+	status: "PRESENT" | "ABSENT" | "LEAVE" | "SHORT_LEAVE" | "SICK_LEAVE" | "CASUAL_LEAVE"
 	time: number
 }
 
@@ -255,4 +258,12 @@ interface MISSms {
 interface MISSmsPayload {
 	messages: MISSms[]
 	return_link: string
+}
+
+interface MISDiary{
+	[section_id: string]: {
+		[subject: string]: {
+			homework: string
+		}
+	}
 }

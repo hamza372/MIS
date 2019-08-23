@@ -415,7 +415,7 @@ class Front extends Component {
 								<div className="para">
 									<li>300 Students</li>
 									<li>Price: <strong>10,500 Pkr</strong></li>
-									<li>Annual: <strong>2,000 Pkr</strong></li>
+									<li>Annual: <strong>1,500 Pkr</strong></li>
 								</div>
 							</div>
 
@@ -424,7 +424,7 @@ class Front extends Component {
 								<div className="para">
 									<li>Unlimited Students</li>
 									<li>Price: <strong>14,500 Pkr</strong></li>
-									<li>Annual: <strong>3,000 Pkr</strong></li>
+									<li>Annual: <strong>2,000 Pkr</strong></li>
 								</div>
 							</div>
 

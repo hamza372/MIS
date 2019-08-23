@@ -20,8 +20,9 @@ import Banner from '../../../../components/Banner'
 import Former from '../../../../utils/former'
 
 import './style.css'
+import { PrintHeader } from '../../../../components/Layout';
 
-// this page will have all the profile info for a teacher.
+// this page will have all the profile info for a student.
 // all this data will be editable.
 
 // should come up with reusable form logic. 
@@ -67,6 +68,8 @@ const blankStudent = () : MISStudent => ({
 interface P {
 	students: RootDBState['students']
 	classes: RootDBState['classes'],
+	settings: RootDBState["settings"],
+	logo: RootDBState["assets"]["schoolLogo"]
 	permissions: RootDBState['settings']['permissions'],
 	max_limit: RootDBState['max_limit']
 	user: MISTeacher
@@ -241,7 +244,7 @@ class SingleStudent extends Component<propTypes, S> {
 				student.payments = payments;
 			}
 			
-			for(let p_id of Object.keys(student.payments)){
+			for(let p_id of Object.keys(student.payments)) {
 				
 				const current_payment = student.payments[p_id];
 				const corresponding_fees = student.fees[current_payment.fee_id]
@@ -494,9 +497,11 @@ class SingleStudent extends Component<propTypes, S> {
 		const {students, max_limit} = this.props;
 		const prospective = this.isProspective()
 
+		const { settings, logo } = this.props
+
 		return <div className="single-student">
 				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
-
+				<PrintHeader settings={settings} logo={logo} />
 				<div className="title">Edit Student</div>
 
 
@@ -748,6 +753,7 @@ class SingleStudent extends Component<propTypes, S> {
 					}
 					<div className="row">
 					{prospective && !this.isNew() && !getStudentLimit(students, max_limit) ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
+						<div className="button blue" onClick={() => window.print()}> Print</div>
 					</div>
 				</div>
 			</div>
@@ -757,6 +763,8 @@ class SingleStudent extends Component<propTypes, S> {
 export default connect((state : RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes,
+	settings: state.db.settings,
+	logo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 	permissions: state.db.settings.permissions,
 	max_limit: state.db.max_limit || -1 ,
 	user: state.db.faculty[state.auth.faculty_id] }), (dispatch : Function) => ({ 

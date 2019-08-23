@@ -12,7 +12,6 @@ import moment from 'moment'
 import Former from '../../utils/former'
 
 import './style.css'
-import { string } from 'prop-types';
 
 interface P {
 	current_faculty: MISTeacher
@@ -21,7 +20,7 @@ interface P {
 	settings: RootDBState["settings"]
 	connected: RootReducerState["connected"]
 	attendance_message_template: RootDBState["sms_templates"]["attendance"]
-	markStudent: (student: MISStudent, date: string, status: string) => any
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any
 	logSms: (history: any) => any
 }
 
@@ -68,7 +67,7 @@ class Attendance extends Component <propTypes, S> {
 		this.Former = new Former(this, [])
 	}
 
-	mark = (student: MISStudent, status: string) => () => {
+	mark = (student: MISStudent, status: MISStudentAttendanceEntry["status"]) => () => {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
@@ -116,6 +115,96 @@ class Attendance extends Component <propTypes, S> {
 		}
 	}
 
+	selectPresentOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(status === "PRESENT") {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
+	selectAbsentOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(status === "ABSENT") {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
+	selectLeaveOrNone = () => {
+		const students = this.props.students
+
+		const selection = Object.keys(this.state.selected_students)
+			.reduce((agg, sid) => {
+				
+				const x = students[sid]
+
+				const current_attendance = (x.attendance || {})[moment(this.state.date).format("YYYY-MM-DD")];
+				const status = current_attendance ? current_attendance.status : "n/a"
+
+				if(this.getLeaveStatus(status)) {
+					return {
+						...agg,
+						[sid]: true
+					}
+				}
+
+				return {
+					...agg,
+					[sid]: false
+				}
+
+			}, {})
+
+		this.setState({
+			selected_students: selection
+		})
+	}
+
 	onSectionChange = (e : any) => {
 		const newSectionId = e.target.value;
 
@@ -129,6 +218,19 @@ class Attendance extends Component <propTypes, S> {
 	relevant_students = () => {
 		Object.keys(this.state.selected_students)
 			.map(id => this.props.students[id])
+	}
+
+	getLeaveStatus = (s : string) : boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
+
+	markLeave = (e: { target: { value: any; }; }, x: MISStudent) => {
+		const status = e.target.value
+		
+		if (status === "") {
+			console.log("EMPTY RETURNING")
+			return
+		}
+
+		this.mark(x, status)()
 	}
 
 	render() {
@@ -161,6 +263,7 @@ class Attendance extends Component <propTypes, S> {
 		const isAdmin = current_faculty.Admin
 		const setupPage = settings.permissions && settings.permissions.setupPage ? settings.permissions.setupPage.teacher : true
 		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
+
 		return <Layout history={this.props.history}>
 			<div className="attendance">
 				<div className="title">Attendance</div>
@@ -169,20 +272,28 @@ class Attendance extends Component <propTypes, S> {
 					onChange={this.Former.handle(["date"], d => moment(d).unix() < moment.now())} 
 					value={moment(this.state.date).format("YYYY-MM-DD")} 
 					placeholder="Current Date" />
-
-				<div className="row" style={{width: "90%"}}>
-					<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
-					<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
-						{
-							getSectionsFromClasses(this.props.classes)
-								.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
-						}
-					</select>
+				
+				<div className="selectors">
+					<div className="row">
+						<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
+						<div className="button select-all" onClick={this.selectPresentOrNone}>P</div>
+						<div className="button select-all" onClick={this.selectAbsentOrNone}>A</div>
+						<div className="button select-all" onClick={this.selectLeaveOrNone}>L</div>
+					</div>
+					
+					<div className="row">
+						<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
+							{
+								getSectionsFromClasses(this.props.classes)
+									.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+							}
+						</select>
+					</div>
 				</div>
 				<div className="list">
 				{
 					Object.keys(this.state.selected_students)
-						.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && (parseFloat(students[id_a].RollNumber) - parseFloat(students[id_b].RollNumber)))
+							.sort((id_a, id_b) => (students[id_a].RollNumber !== undefined && students[id_b].RollNumber !== undefined ) && (parseFloat(students[id_a].RollNumber) - parseFloat(students[id_b].RollNumber)))
 						.map(sid => {
 							const x = students[sid]
 
@@ -196,7 +307,13 @@ class Attendance extends Component <propTypes, S> {
 								<div className="status">
 									<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 									<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
-									<div className={`button ${status === "LEAVE" ? "grey" : false}`} onClick={this.mark(x, "LEAVE")}>L</div>
+									<select value={status} className={`select button ${this.getLeaveStatus(status) ? "grey" : false}`} onChange={(e) => this.markLeave(e,x)}>
+										<option value="">Select Leave</option>
+										<option value="LEAVE">Leave</option>
+										<option value="SHORT_LEAVE">Short Leave</option>
+										<option value="SICK_LEAVE">Sick Leave</option>
+										<option value="CASUAL_LEAVE">Casual Leave</option>
+									</select>
 								</div>
 							</div>
 						})
@@ -208,6 +325,7 @@ class Attendance extends Component <propTypes, S> {
 	}
 }
 
+
 export default connect((state: RootReducerState) => ({
 	current_faculty: state.db.faculty[state.auth.faculty_id],
 	students: state.db.students,
@@ -216,6 +334,6 @@ export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {} as RootDBState["sms_templates"]).attendance || "",
 }), (dispatch : Function) => ({
-	markStudent: (student: MISStudent, date: string, status: string) => dispatch(markStudent(student, date, status)),
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => dispatch(markStudent(student, date, status)),
 	logSms: (history: any) => dispatch(logSms(history))
 }))(Attendance)

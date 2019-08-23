@@ -4,6 +4,10 @@ defmodule Sarkar.ActionHandler do
 		Sarkar.ActionHandler.Mis.handle_action(action, state)
 	end
 
+	def handle_action(%{"client_type" => "dashboard"} = action, state) do
+		Sarkar.ActionHandler.Dashboard.handle_action(action, state)
+	end
+
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.inspect state

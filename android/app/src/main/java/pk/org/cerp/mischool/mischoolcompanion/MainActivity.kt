@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.widget.Button
+import android.widget.TextView
 import com.beust.klaxon.Klaxon
 import java.io.File
 import kotlin.Exception
@@ -13,6 +16,7 @@ import kotlin.Exception
 const val TAG = "MISchool-Companion"
 const val MY_PERMISSIONS_SEND_SMS = 1
 const val filename = "pending_messages.json"
+const val logFileName = "logFile.txt"
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,10 +29,25 @@ class MainActivity : AppCompatActivity() {
         val data = intent.data
         val dataString = intent.dataString
 
+
+
+
         permissions()
 
         Log.d(TAG, "HELLOOOO")
         Log.d(TAG, intent.action)
+
+        val logMessages = readLogMessages()
+        val tv = findViewById<TextView>(R.id.logBox)
+        tv.text = logMessages
+        tv.movementMethod = ScrollingMovementMethod()
+
+        val clearButton = findViewById<Button>(R.id.clearLogButton)
+        clearButton.setOnClickListener {
+            clearLogMessages()
+
+            tv.text = readLogMessages()
+        }
 
         if(data == null || dataString == null) {
             return
@@ -38,6 +57,8 @@ class MainActivity : AppCompatActivity() {
 
         val json_string = java.net.URLDecoder.decode(dataString.split("=")[1], "UTF-8")
         Log.d(TAG, json_string)
+
+        tv.append(json_string)
 
         val parsed : SMSPayload? = Klaxon().parse(json_string)
 
@@ -65,8 +86,20 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, e.message)
         }
 
+
         finish()
 
+    }
+
+    fun updateLogText(text : String) {
+
+        runOnUiThread {
+            run {
+                Log.d(TAG, "doing shit on thread....")
+                val tv = findViewById<TextView>(R.id.logBox)
+                tv.append(text)
+            }
+        }
     }
 
     private fun appendMessagesToFile( messages : List<SMSItem>) {
@@ -103,6 +136,28 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "DONE writing")
 
+    }
+
+    private fun readLogMessages() : String {
+
+        val file = File(filesDir, "${logFileName}")
+
+        var content = if(file.exists()) {
+            val bytes = file.readBytes()
+            String(bytes)
+        } else {
+            ""
+        }
+
+        return content
+
+    }
+
+    private fun clearLogMessages() {
+
+        val file = File(filesDir, "${logFileName}")
+
+        file.writeBytes("".toByteArray())
     }
 
 

@@ -14,7 +14,8 @@ defmodule Sarkar.Auth do
 
 	def create({id, password, "mischool", student_limit}) do
 		{:ok, confirm_text} = Sarkar.Auth.create({id, password})
-		IO.inspect confirm_text
+		
+		#IO.inspect confirm_text
 
 		Sarkar.Store.School.save(id, %{
 			"max_limit" => student_limit
@@ -28,6 +29,29 @@ defmodule Sarkar.Auth do
 			}
 		})
 
+		{:ok, confirm_text}
+
+	end
+
+	def create({ id, password, limit, value }) do 
+		{:ok, confirm_text } =  case limit === 0 do
+			true -> Sarkar.Auth.create({id, password})
+			false -> Sarkar.Auth.create({id, password, "mischool", limit})
+		end
+
+		time = :os.system_time(:millisecond)
+
+		case Postgrex.query(Sarkar.School.DB,
+			"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
+			[id, time, value]) do
+				{:ok, res} -> 
+					{:ok, confirm_text}
+				{:error, err} ->
+					IO.inspect err
+					{:error, "Entry to referral Table Failed"}
+		end
+
+		{:ok, confirm_text}
 	end
 
 	def login({id, client_id, password}) do
