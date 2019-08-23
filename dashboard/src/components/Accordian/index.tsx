@@ -5,6 +5,7 @@ import signUp from '../../pages/signUp';
 import DashboardPage from '../../pages/stats';
 
 import './style.css'
+import trials from '../../pages/trials';
 
 type P = RouteComponentProps
 
@@ -39,12 +40,14 @@ class Accordian extends React.Component<P, S> {
 			<div className="burger">
 				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat`}} />
 				{ this.state.visible && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>New School</Link> }
-				{ this.state.visible && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard" ? "active" : ""}> Stats</Link> }
+				{this.state.visible && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard/school_id/start_date/end_date/" ? "active" : ""}> Stats</Link>}
+				{ this.state.visible && <Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link> }
 			</div>
 
 			<div className="burger-stub">
 				<Route exact path="/" component={signUp} />
 				<Route path="/dashboard/:school_id/:start_date/:end_date/" component={DashboardPage} />
+				<Route path="/trials" component={trials} />
 			</div>
 
 		</div>
