@@ -18,12 +18,21 @@
 		}
 	},
 	{
-	"relation": ["delegate_permission/common.handle_all_urls"],
-	"target": {
-		"namespace": "android_app",
-		"package_name": "pk.org.cerp.mischool.mischoolcompanion",
-		"sha256_cert_fingerprints":
-		["5F:34:4C:FB:E4:47:21:5E:FE:8E:12:7F:7E:5C:15:D2:7D:2A:5E:E3:8E:80:A8:A2:B1:5F:0B:23:94:45:53:57"]
-	}
-	}
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "pk.org.cerp.mischool.mischoolcompanion",
+            "sha256_cert_fingerprints":
+            ["5F:34:4C:FB:E4:47:21:5E:FE:8E:12:7F:7E:5C:15:D2:7D:2A:5E:E3:8E:80:A8:A2:B1:5F:0B:23:94:45:53:57"]
+        }
+	},
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "pk.org.cerp.mischool.mischoolcompanion",
+            "sha256_cert_fingerprints":
+                ["97:A3:BF:24:DB:07:62:2F:37:CA:CD:77:6E:17:AC:98:8F:5C:1E:46:87:98:89:C6:78:00:73:F5:98:F5:32:9E"]
+        }
+    }
 ]
