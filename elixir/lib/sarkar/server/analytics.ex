@@ -269,14 +269,16 @@ defmodule Sarkar.Server.Analytics do
 		"SELECT
 			to_timestamp(time/1000)::date::text as Date,
 			id,
-			value ->> 'name' as Name,
-			value ->> 'type' as Type,
-			value ->> 'package' as Package,
+			value ->> 'area_manager_name' as name,
+			value ->> 'agent_name' as agent_name,
+			value ->> 'type_of_login' as type,
+			value ->> 'package_name' as package,
 			value ->> 'city' as City,
+			value ->> 'office' as Office,
 			value ->> 'notes' as Notes
 		FROM mischool_referrals", [])
 
-		csv = [["Date", "School", "Name", "Type", "Package", "City", "Notes"] | resp.rows]
+		csv = [["date", "school_id", "area_manager_name", "agent_name", "type", "package", "city", "office", "notes"] | resp.rows]
 			|> CSV.encode
 			|> Enum.join()
 		
