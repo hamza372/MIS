@@ -7,6 +7,7 @@ import { TeacherList } from '../../modules/Teacher/List'
 
 import former from '../../utils/former'
 import { RouteComponentProps } from 'react-router';
+import { Link } from 'react-router-dom';
 
 // give option to select student list or class list, with forwardTo ---> reports.
 // need to give this a route 
@@ -54,6 +55,10 @@ class CerificateMenu extends Component <propTypes, S> {
 							<option value="STUDENT">Student</option>
 						</select>
 					</div>
+				</div>
+				<div className="row" style={{ display: "flex", width: "90%"}}>
+					<label style={{ width : "70%", color: "#aaa" }}>Add Custom</label>
+					<Link to="/custom-certificate" style={{ width : "30%" }} className="button blue"> Custom </Link>
 				</div>
 
 				<div className="sub-list" style={{width: "100%"}}>
