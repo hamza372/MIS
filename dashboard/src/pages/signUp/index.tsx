@@ -33,6 +33,9 @@ interface S {
 
 		notes: string
 	}
+	agents: {
+		[id: string]: string
+	}
 }
 
 interface Routeinfo {
@@ -67,6 +70,25 @@ class SignUp extends Component <propTypes, S> {
 				agent_name: "",
 				agent_easypaisa_number: "",
 				notes: ""
+			},
+			agents: {
+				"33102-9810681-3": "M_Shahbaz" ,
+				"33105-5781621-0": "Sadaf_Tauqeer" ,
+				"33202-7012810-1": "Umar_Zaheer",
+				"33100-1186757-3": "M_Zikran_Shakeel",
+				"36501-1621413-9": "M_Farooq",
+				"33100-0579798-3": "Tabassum_Munir",
+				"33100-4103401-9": "M_Ahmad",
+				"33102-8009325-7": "Qasim_M_Chaudhary",
+				"33102-1796653-9": "M_Tayyab",
+				"34104-6359607-3": "Tariq_Mehmood",
+				"34104-1789481-1": "Haroon_Shezhad",
+				"34603-7984945-7": "Sheraz_Ahmed",
+				"34603-7437696-1": "M_Suleman",
+				"34201-1911838-9": "Raheel_Abbas",
+				"34603-6670462-7": "Huraira_Abbas",
+				"34603-1880990-3": "Zeeshan",
+				"34201-2295675-9": "Raza_Mustafa"
 			}
 		}
 	
@@ -151,7 +173,16 @@ class SignUp extends Component <propTypes, S> {
 
 	onSave = () => {
 
-		const {	username, password, value } = this.state
+		const { username, password } = this.state
+		
+		console.log(this.state.value)
+
+		const value = {
+			...this.state.value,
+			agent_name: this.state.agents[this.state.value.agent_easypaisa_number]
+		}
+
+		console.log(value)
 
 		const compulsory_fields = checkCompulsoryFields(this.state.value,
 			[
@@ -196,12 +227,11 @@ class SignUp extends Component <propTypes, S> {
 		else if(this.former.check(["value","agent_name"])) {
 			const compulsory_fields = checkCompulsoryFields(this.state.value,
 				[
-					["agent_name"],
 					["agent_easypaisa_number"]
 				]
 			)
 			if(compulsory_fields) {
-				const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
+				const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_easypaisa_number" ? "Agent Name" : x[0]).join(", ")} !`
 				return window.alert(erroText)
 			}
 			
@@ -223,6 +253,10 @@ class SignUp extends Component <propTypes, S> {
 	}
 
 	render() {
+
+		const { agents } = this.state
+
+		console.log(Object.entries(agents))
 
  		return <div className="school-sign-up page">
 			<div className="title"> New School</div>
@@ -300,7 +334,7 @@ class SignUp extends Component <propTypes, S> {
 			{ this.former.check(["value","agent_name"]) && <div className="section form">
 				<div className="divider">Agent Information</div>
 			
-				<div className="row">
+{/* 				<div className="row">
 					<label>Agent Name:</label>
 					<input type="text" {...this.former.super_handle(["value","agent_name"])} placeholder="Agent Name"/>
 				</div>
@@ -308,7 +342,20 @@ class SignUp extends Component <propTypes, S> {
 				<div className="row">
 					<label>Agent Easy Paisa</label>
 					<input type="number" {...this.former.super_handle(["value","agent_easypaisa_number"])} placeholder="Easy Paisa"/>
+				</div> */}
+
+				<div className="row">
+						<label>Agent Name</label>
+						<select {...this.former.super_handle(["value", "agent_easypaisa_number"])}>
+							<option value=""> Select Agent</option>
+							{
+								Object.entries(agents)
+									.map(([id, agent]) => <option key={id} value={id}>{agent}</option>)
+							}
+
+						</select>
 				</div>
+
 			</div> }
 			
 			<div className="section form">

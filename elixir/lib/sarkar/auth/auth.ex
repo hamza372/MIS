@@ -51,6 +51,10 @@ defmodule Sarkar.Auth do
 					{:error, "Entry to referral Table Failed"}
 		end
 
+		alert_message = Poison.encode!(%{"text" => confirm_text })
+
+		{:ok, resp} = Sarkar.Slack.send_alert(alert_message)
+
 		{:ok, confirm_text}
 	end
 
