@@ -305,7 +305,7 @@ class SignUp extends Component <propTypes, S> {
 
 			
 			{ this.former.check(["value","school_name"]) && <div className="section form">
-				<div className="divider">School Information</div>
+				<div className="divider"> Referral School Information </div>
 				
 				<div className="row">
 					<label>School Name</label>

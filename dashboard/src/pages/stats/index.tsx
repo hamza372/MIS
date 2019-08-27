@@ -40,7 +40,7 @@ class Stats extends Component <propTypes, S> {
 		super(props)
 	
 		this.state = {
-			selected_school: "five",
+			selected_school: "",
 			start_date: moment().subtract(12, "month").unix() * 1000,
 			end_date: moment.now()
 		}
@@ -87,12 +87,12 @@ class Stats extends Component <propTypes, S> {
 			<div className="section form">
 				<div className="row">
 					<label>School</label>
-					<select {...this.former.super_handle(["selected_school"])}>
-					<option value="">Select</option>
+					<input list="school-list" {...this.former.super_handle(["selected_school"])} />
+					<datalist id="school-list">
 					{
-						school_list.map(s => <option value={s} key={s}> {s} </option>)
+						school_list.map(s => <option value={s}/> )
 					}
-					</select>
+					</datalist>	
 				</div>
 				<div className="row">
 					<label>Start Date</label>
