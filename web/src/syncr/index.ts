@@ -20,7 +20,7 @@ export default class Syncr {
 		this.ws = undefined;
 		this.pingInterval = undefined;
 		this.dispatch = dispatch;
-		this.message_timeout = 30000;
+		this.message_timeout = 90000;
 
 		this.pending = new Map(); // key: uuid, value: promise
 

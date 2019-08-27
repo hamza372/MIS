@@ -55,7 +55,7 @@ class Diary extends Component {
 				text: "Saved!"
 			},
 			selected_section_id: "",
-			diary: props.diary && moment(props.diary.date).format("DD/MM/YYYY") === curr_date ? props.diary : diary
+			diary: props.diary && moment(props.diary.date).format("DD/MM/YYYY") === curr_date ? JSON.parse(JSON.stringify(props.diary)) : diary
 		}
 
 		this.former = new former(this, [])
@@ -83,13 +83,24 @@ class Diary extends Component {
 		const curr_date = moment().format("DD/MM/YYYY")
 
 		this.setState({
-			diary: newProps.diary && moment(newProps.diary.date).format("DD/MM/YYYY") === curr_date ? newProps.diary : this.props.diary
+			diary: newProps.diary && moment(newProps.diary.date).format("DD/MM/YYYY") === curr_date ? JSON.parse(JSON.stringify(newProps.diary)) : JSON.parse(JSON.stringify(this.props.diary))
 		})
 	}
 
 	onSave = () => {
+		//Here need to send subjects rather then the whole section's diary
 
-		const diary = this.state.diary[this.state.selected_section_id]
+		const diary = Object.entries(this.state.diary[this.state.selected_section_id])
+			.filter(([subject, d]) => d.homework !== "" && d.homework !== this.props.diary[this.state.selected_section_id][subject].homework)
+			.reduce((agg, [s, diary]) => {
+
+				return {
+					...agg,
+					[s]: diary
+				}
+
+			}, {})
+
 		if(diary === undefined) {
 			this.setState({
 				banner: {
@@ -245,8 +256,8 @@ export default connect(state => ({
 	classes: state.db.classes,
 	smsOption: state.db.settings.sendSMSOption
 }), dispatch => ({
-	sendMessage: (text, number) => dispatch(sendSMS(text, number)),
+	sendMessage : (text, number) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages ) => dispatch(sendBatchSMS(messages)),
 	logSms: (faculty_id, history) => dispatch(logSms(faculty_id, history)),
 	addDiary: (section_diary, section_id) => dispatch(addDiary(section_diary, section_id))
-}))(Diary);
+	}))(Diary);

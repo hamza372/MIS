@@ -16,6 +16,27 @@ defmodule Sarkar.Server.Dashboard do
 		{:ok, req, state}
 	end
 
+	def init(%{bindings: %{type: "referrals"}} = req, state) do
+		
+		{:ok, resp } = Postgrex.query(Sarkar.School.DB,
+		"SELECT * FROM mischool_referrals", [])
+
+		referrals = resp.rows
+			|> Enum.map(fn [school_id, time, value] -> %{"school_id" => school_id, "time" => time, "value" => value} end)
+
+		json_resp = Poison.encode!(%{"referrals" => referrals})
+
+		req = :cowboy_req.reply(
+			200,
+			headers(),
+			json_resp,
+			req
+		)
+
+		{:ok, req, state}
+		IO.inspect referrals
+	end
+
 	def init(%{bindings: %{type: "school_list"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 		"SELECT

@@ -11,12 +11,16 @@ defmodule Sarkar.ActionHandler.Mis do
 		end
 	end
 
-	def handle_action(%{"type"=> "SIGN_UP", "sign_up_id" => sign_up_id, "payload" => payload}, state) do		
+	def handle_action(%{"type"=> "SIGN_UP", "sign_up_id" => sign_up_id, "payload" => %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }}, state) do		
+		payload = %{"city" => city, "name" => name, "packageName" => packageName, "phone" => phone, "schoolName" => schoolName }
+		
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
 		"INSERT INTO mischool_sign_ups (id,form) VALUES ($1, $2)",
 		[sign_up_id, payload])
 
-		{:ok,resp} = Sarkar.Slack.send_alert(payload)
+		alert_message = Poison.encode!(%{"text" => "New Sign-Up\nSchool Name: #{schoolName},\nPhone: #{phone},\nPackage: #{packageName},\nName: #{name},\nCity: #{city}"})
+		
+		{:ok, resp} = Sarkar.Slack.send_alert(alert_message)
 
 		{:reply, succeed(), state}
 	end
