@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { type } from 'os';
 import { RouteComponentProps } from 'react-router';
 import Former from '../../../utils/former';
 import Layout from '../../../components/Layout';
@@ -24,7 +23,7 @@ export default class Custom extends Component <propTypes, S> {
 		super(props)
 	
 		this.state = {
-			 
+		
 		}
 
 		this.former = new Former(this, [])
