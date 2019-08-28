@@ -30,10 +30,10 @@ interface RootReducerState {
 
 interface SignUpValue {
 	package_name: "FREE_TRIAL" | "TALEEM1" | "TALEEM2" | "TALEEM3"
-	area_manager_name: "AYESHA" | "UMER" | "FAROOQ" | "ZAHID" | "KAMRAN" | ""
+	area_manager_name: "AYESHA" | "UMER" | "FAROOQ" | "ZAHID" | "KAMRAN" | "NOMAN" | ""
 	office: "" | "LAHORE" | "SARGODHA" | "SIALKOT" | "GUJRANWALA" | "FAISALABAD"
 	city: string
-	type_of_login: "" | "SCHOOL_REFERRAL" | "ASSOCIATION" | "EDFIN" | "INDIVIDUAL" | "AGENT"
+	type_of_login: "" | "SCHOOL_REFERRAL" | "ASSOCIATION" | "EDFIN" | "INDIVIDUAL" | "AGENT" | "PLATFORM"
 
 	school_name: string
 	owner_name: string
@@ -42,7 +42,6 @@ interface SignUpValue {
 	association_name: string
 
 	agent_name: string
-	agent_easypaisa_number: string
 
 	notes: string
 }

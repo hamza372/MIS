@@ -15,27 +15,8 @@ interface S {
 
 	username: string
 	password: string
-	value: {
-		package_name: "FREE_TRIAL" | "TALEEM1" | "TALEEM2" | "TALEEM3"
-		area_manager_name: "AYESHA" | "UMER" | "FAROOQ" | "ZAHID" | "KAMRAN" | "NOMAN" | ""
-		office: "" | "LAHORE" | "SARGODHA" | "SIALKOT" | "GUJRANWALA" | "FAISALABAD"
-		city: string
-		type_of_login: "" | "SCHOOL_REFERRAL" | "ASSOCIATION" | "EDFIN" | "INDIVIDUAL" | "AGENT" | "PLATFORM"
-
-		school_name: string
-		owner_name: string
-		owner_easypaisa_number: string
-
-		association_name: string
-
-		agent_name: string
-		agent_easypaisa_number: string
-
-		notes: string
-	}
-	agents: {
-		[id: string]: string
-	}
+	value:  SignUpValue
+	agents: Array<string>
 }
 
 interface Routeinfo {
@@ -68,28 +49,27 @@ class SignUp extends Component <propTypes, S> {
 				association_name: "",
 		
 				agent_name: "",
-				agent_easypaisa_number: "",
 				notes: ""
 			},
-			agents: {
-				"33102-9810681-3": "M_Shahbaz" ,
-				"33105-5781621-0": "Sadaf_Tauqeer" ,
-				"33202-7012810-1": "Umar_Zaheer",
-				"33100-1186757-3": "M_Zikran_Shakeel",
-				"36501-1621413-9": "M_Farooq",
-				"33100-0579798-3": "Tabassum_Munir",
-				"33100-4103401-9": "M_Ahmad",
-				"33102-8009325-7": "Qasim_M_Chaudhary",
-				"33102-1796653-9": "M_Tayyab",
-				"34104-6359607-3": "Tariq_Mehmood",
-				"34104-1789481-1": "Haroon_Shezhad",
-				"34603-7984945-7": "Sheraz_Ahmed",
-				"34603-7437696-1": "M_Suleman",
-				"34201-1911838-9": "Raheel_Abbas",
-				"34603-6670462-7": "Huraira_Abbas",
-				"34603-1880990-3": "Zeeshan",
-				"34201-2295675-9": "Raza_Mustafa"
-			}
+			agents: [
+				"M. Shahbaz",
+				"Sadaf Tauqeer ",
+				"Umar Zaheer ",
+				"M.Zikran shakeel",
+				"M.Farooq",
+				"Tabassum Munir",
+				"M.Ahmad",
+				"Qasim M. Chadhary ",
+				"M.Tayyab",
+				"Tariq Mehmood",
+				"Haroon Shahzad",
+				"Sheraz Ahmed",
+				"M.Suleman",
+				"Raheel Abbas",
+				"Huraira Abbas",
+				"Zeeshan",
+				"Raza Mustafa",
+			],
 		}
 	
 		this.former = new Former(this,[], [
@@ -147,16 +127,6 @@ class SignUp extends Component <propTypes, S> {
 					}
 				]
 			},
-			{
-				path:["value", "agent_easypaisa_number"],
-				value: "",
-				depends: [
-					{
-						path: ["value", "type_of_login"],
-						value: "AGENT"
-					}
-				]
-			}
 		])
 	}
 
@@ -178,8 +148,7 @@ class SignUp extends Component <propTypes, S> {
 		console.log(this.state.value)
 
 		const value = {
-			...this.state.value,
-			agent_name: this.state.agents[this.state.value.agent_easypaisa_number]
+			...this.state.value
 		}
 
 		console.log(value)
@@ -224,18 +193,6 @@ class SignUp extends Component <propTypes, S> {
 				return window.alert(erroText)
 			}
 		}
-		else if(this.former.check(["value","agent_name"])) {
-			const compulsory_fields = checkCompulsoryFields(this.state.value,
-				[
-					["agent_easypaisa_number"]
-				]
-			)
-			if(compulsory_fields) {
-				const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_easypaisa_number" ? "Agent Name" : x[0]).join(", ")} !`
-				return window.alert(erroText)
-			}
-			
-		}
 
 		const login_detail_fields = checkCompulsoryFields(this.state,
 			[
@@ -256,7 +213,6 @@ class SignUp extends Component <propTypes, S> {
 
 		const { agents } = this.state
 
-		console.log(Object.entries(agents))
 
  		return <div className="school-sign-up page">
 			<div className="title"> New School</div>
@@ -271,6 +227,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="ZAHID"> Zahid </option>
 						<option value="FAROOQ">Farooq</option>
 						<option value="KAMRAN">Kamran</option>
+						<option value="NOMAN">Noman</option>
 					</select>
 				</div>
 				<div className="row">
@@ -299,6 +256,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="EDFIN">EdFin</option>
 						<option value="SCHOOL_REFERRAL">School Referrals</option>
 						<option value="INDIVIDUAL">Individual </option>
+						<option value="PLATFORM">Platform</option>
 					</select>
 				</div>
 			</div>
@@ -346,11 +304,11 @@ class SignUp extends Component <propTypes, S> {
 
 				<div className="row">
 						<label>Agent Name</label>
-						<select {...this.former.super_handle(["value", "agent_easypaisa_number"])}>
-							<option value=""> Select Agent</option>
+						<select {...this.former.super_handle(["value", "agent_name"])}>
+							<option value="">Select Agent</option>
 							{
-								Object.entries(agents)
-									.map(([id, agent]) => <option key={id} value={id}>{agent}</option>)
+								agents
+									.map(name => <option key={name} value={name}>{name}</option>)
 							}
 
 						</select>
