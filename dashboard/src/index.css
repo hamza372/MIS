@@ -119,6 +119,37 @@ body {
   .no-print {
 	  width: 100%;
   }
+
+  .newtable {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		overflow-x: auto;
+	}
+
+		.newtable-row {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+		}
+
+			.newtable-row.heading {
+				font-weight: bold;
+				background-color: #f0f0f0 
+			}
+
+			.newtable-row div {  /* Cell*/
+				width: 20%;
+				padding: 5px;
+				border-bottom: 1px solid #bebebe;
+				min-width: 150px;
+				border-right: 1px solid #bebebe;
+				overflow-x: auto; 
+			}
+
+		.newtable-row :last-child {
+			border-right: none
+		}
   
   @media print {
 	  @page {

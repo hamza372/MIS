@@ -16,5 +16,6 @@
 		"**/bower_components": true,
 		"**/_build": true,
 		"**/deps": true
-	}
+	},
+	"editor.fontSize": 14
 }

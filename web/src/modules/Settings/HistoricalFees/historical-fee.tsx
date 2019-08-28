@@ -122,8 +122,8 @@ class historicalFee extends Component <propTypes, S > {
 		let filteredPayments = selected_student ? getFilteredPayments(selected_student, this.state.yearFilter, this.state.monthFilter) : false
 		const curr_class_name = this.state.selected_class ? class_Items.find( s => s.id === this.state.selected_class).namespaced_name : "None Selected"
 		
-		const Months = new Set()
-		const Years = new Set()
+		const Months = new Set<string>()
+		const Years = new Set<string>()
 
 		if(selected_student){
 

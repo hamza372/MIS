@@ -12,8 +12,10 @@ import reducer from './reducers'
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
+//const debug_url = "wss://mis-socket.metal.fish/ws"
 
-const debug_url = "wss://c26dc055.ngrok.io/ws"
+const debug_url = "wss://3cfbb43e.ngrok.io/ws"
+
 //@ts-ignore
 const host = window.api_url || debug_url;
 

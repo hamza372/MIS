@@ -33,8 +33,13 @@ class Login extends Component {
 
 	onSwitchSchool = () => {
 
-		// this needs to be looked into...
-		// we should keep client_id....
+		if(this.props.unsyncd_changes > 0) {
+			const res = window.confirm(`You have ${this.props.unsyncd_changes} pending changes. If you switch schools, this data will be lost. Are you sure you want to continue?`);
+			if(!res) {
+				return;
+			}
+		}
+
 		localStorage.removeItem("db");
 		this.props.history.push("/landing")
 		window.location.reload()
@@ -87,7 +92,8 @@ export default connect(state => ({
 	auth: state.auth,
 	users: state.db.users,
 	num_users: Object.keys(state.db.users).length,
-	connected: state.connected
+	connected: state.connected,
+	unsyncd_changes: Object.keys(state.queued).length
 }), dispatch => ({
 	login: (login) => {
 		dispatch(createLogin(login.name, login.password))
