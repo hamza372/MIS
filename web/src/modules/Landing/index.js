@@ -151,6 +151,20 @@ class Landing extends Component {
 								</Link> 
 							</div>
 						}
+						{
+							user.Admin && <div className="badge-container">
+								<img className="new-badge" src={newBadge} alt=""/>
+								<Link 
+									to="/inventory"
+									className="button green-shadow"
+									style={{backgroundImage: `url(${cerificate})`}}
+								>
+									Inventory
+								</Link> 
+							</div>
+						}	
+						</div>
+						<div className="row">
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 					</div>
