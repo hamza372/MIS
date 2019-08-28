@@ -90,8 +90,13 @@ class Diary extends Component {
 	onSave = () => {
 		//Here need to send subjects rather then the whole section's diary
 
-		const diary = Object.entries(this.state.diary[this.state.selected_section_id])
-			.filter(([subject, d]) => d.homework !== "" && d.homework !== this.props.diary[this.state.selected_section_id][subject].homework)
+		const diary = Object.entries(this.state.diary[this.state.selected_section_id] || {})
+			.filter(([subject, d]) => 
+				(this.props.diary === undefined) || 
+				(this.props.diary[this.state.selected_section_id] === undefined) ||
+				(this.props.diary[this.state.selected_section_id][subject] === undefined) ||
+				d.homework !== this.props.diary[this.state.selected_section_id][subject].homework
+			)
 			.reduce((agg, [s, diary]) => {
 
 				return {
