@@ -1,37 +1,70 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { PrintHeader } from 'components/Layout'
-import Former from "utils/former"
-import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import { PrintHeader } from '../../../components/Layout'
+import Former from "../../../utils/former"
 
 import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'recharts'
 
-import './style.css'
+interface Attendance {
+	PRESENT: number
+	ABSENT: number
+	LEAVE: number
+}
 
-const MonthlyAttendanceChart = ({monthly_attendance, filter}) => {		
+type TAttendance = Attendance & { teacher: MISTeacher}
+
+interface Filter {
+		present: boolean
+		absent: boolean
+		leave: boolean
+		percentage: boolean
+}
+
+interface ChartData {
+	monthly_attendance: {
+		[id: string]: Attendance
+	}
+	filter: Filter
+}
+
+interface TableData {
+	monthly_attendance: {
+		[id: string]: Attendance
+	}
+	totals: {
+		PRESENT: number;
+		LEAVE: number;
+		ABSENT: number;
+	}
+}
+
+const MonthlyAttendanceChart = ({monthly_attendance, filter}: ChartData) => {		
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
-						data={Object.entries(monthly_attendance)
-						.sort(([month, ], [m2, ]) => month.localeCompare(m2))
-						.map(([month, { student, PRESENT, LEAVE, ABSENT }]) => ({
-							month, PRESENT, LEAVE, ABSENT, percent: (1 - ABSENT / (PRESENT + LEAVE)) * 100
-						}))}>
+				data={Object.entries(monthly_attendance)
+					.sort(([month,], [m2,]) => month.localeCompare(m2))
+					.map(([month, { PRESENT, LEAVE, ABSENT }]) => {
+							
+						const percent = (1 - ABSENT / (PRESENT + LEAVE)) * 100
+							return { month, PRESENT, LEAVE, ABSENT, percent: isFinite(percent) ? percent : 1 }
+						})}>
 
 						<XAxis dataKey="month"/>
 						<YAxis />
 
 						<Tooltip />
-						
-						{ filter.present && <Line dataKey="PRESENT" stackId="a" stroke="#93d0c5" strokeWidth={3} name="Present"/> }
-						{ filter.absent && <Line dataKey="ABSENT" stackId="a" stroke="#ff6b68" strokeWidth={3} name="Absent" />}
-						{ filter.leave && <Line dataKey="LEAVE" stackId="a" stroke="#807f7f" strokeWidth={3} name="Leave" />}
+
+						{ filter.present && <Line dataKey="PRESENT" stroke="#93d0c5" strokeWidth={3} name="Present"/> }
+						{ filter.absent && <Line dataKey="ABSENT" stroke="#ff6b68" strokeWidth={3} name="Absent" />}
+						{ filter.leave && <Line dataKey="LEAVE" stroke="#807f7f" strokeWidth={3} name="Leave" />}
 						{ filter.percentage && <Line dataKey="percent" stroke="#74aced" strokeWidth={3} name="Percentage" />}
 					</LineChart>
 			</ResponsiveContainer>
 }
-const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
+
+const MonthlyAttendanceTable = ({monthly_attendance, totals}: TableData) =>{
 	return <div className="section table line" style={{margin: "20px 0", backgroundColor:"#c2bbbb21" }}>
 				<div className="table row heading">
 					<label style={{ backgroundColor: "#efecec"}}><b>Date</b></label>
@@ -43,14 +76,14 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 				{
 					[...Object.entries(monthly_attendance)
 						.sort(([month, ], [m2, ]) => month.localeCompare(m2))
-						.map(([month, {student ,PRESENT, LEAVE, ABSENT} ]) =>
+						.map(([month, {PRESENT, LEAVE, ABSENT} ]) =>
 						
-							<div className="table row">
+							<div className="table row" key={Math.random()}>
 								<div style={{ backgroundColor: "#efecec"}}>{month }</div>
 								<div style={{ backgroundColor: "#93d0c5"}}>{PRESENT}</div>
 								<div style={{ backgroundColor: "#fc6171"}}>{ABSENT}</div>
 								<div style={{ backgroundColor: "#e0e0e0"}}>{LEAVE}</div>
-								<div style={{ backgroundColor: "#bedcff"}}>{ Math.round((ABSENT / (PRESENT + LEAVE)) * 100)}%</div>
+								<div style={{ backgroundColor: "#bedcff"}}>{ isFinite( Math.round((ABSENT / (PRESENT + LEAVE )) * 100)) ? Math.round((ABSENT / (PRESENT + LEAVE )) * 100) : "0"}%</div>
 							</div>
 						),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>   
@@ -65,9 +98,30 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}) =>{
 			</div> 
 }
 
-class AttendanceAnalytics extends Component {
+interface P {
+	teachers: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+}
 
-	constructor(props) {
+interface S {
+	filterText: string
+	chartFilter: {
+		present: boolean
+		absent: boolean
+		leave: boolean
+		percentage: boolean
+	},
+	classFilter: string
+}
+
+type propTypes = RouteComponentProps & P
+	
+	
+class TeacherAttendanceAnalytics extends Component < propTypes, S > {
+
+	former: Former
+	constructor(props: propTypes) {
 	  super(props)
 	
 	  this.state = {
@@ -82,43 +136,52 @@ class AttendanceAnalytics extends Component {
 	  }
 	  this.former = new Former(this, [])
 	}
+
+	getKey = (record: { [status in MISTeacherAttendanceStatus ]: number}) => {
+		
+		if (record["check_in"]) {
+			return "PRESENT"
+		}
+		else if (record["absent"]) {
+			return "ABSENT"
+		}
+		else if (record["leave"]) {
+			return "LEAVE"
+		}
+	} 
 	
 	render()
 	{
-		const { students, classes, settings, schoolLogo } = this.props
+		const { teachers, settings, schoolLogo } = this.props
 
 		let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0 };
-		let monthly_attendance = { } // [mm/yyyy]: { present / absent / leave }
-		let student_attendance = { } // [id]: { absents, presents, leaves }
+		let monthly_attendance : {[id: string]: Attendance } = { }
+		let teacher_attendance : {[id: string]: TAttendance } = { }
 
-		for(let [sid, student] of Object.entries(students)) {
+		for(let [tid, teacher] of Object.entries(teachers)) {
 	
-			if(student.Name === undefined || student.attendance === undefined) {
+			if(teacher.Name === undefined || teacher.attendance === undefined) {
 				continue;
 			}
 
-			let s_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
+			let t_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 
-			for(let [date, record] of Object.entries(student.attendance)) {
+			for(let [date, record] of Object.entries(teacher.attendance)) {
 
-				totals[record.status] += 1;
-				s_record[record.status] += 1;
+				const key = this.getKey(record)
+
+				totals[key] += 1;
+				t_record[key] += 1;
 
 				const month_key = moment(date).format('MM/YYYY');
 				const m_status = monthly_attendance[month_key] || { PRESENT: 0, LEAVE: 0, ABSENT: 0}
-				m_status[record.status] += 1;
+				m_status[key] += 1;
 				monthly_attendance[month_key] = m_status;
 			}
-			student_attendance[sid] = {student, ...s_record}
+			teacher_attendance[tid] = { teacher ,...t_record }
 		}
 
-		const sections = getSectionsFromClasses(classes)
-		const items = Object.entries(student_attendance)
-			.filter(([ sid, { student } ]) => 
-				( (student.tags === undefined || !student.tags["PROSPECTIVE"]) && 
-				(this.state.classFilter === "" || student.section_id === this.state.classFilter)) && 
-				(student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
-			)
+		const items = Object.entries(teacher_attendance)
 			.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
 
 		return <div className="attendance-analytics">
@@ -202,15 +265,6 @@ class AttendanceAnalytics extends Component {
 					{...this.former.super_handle(["filterText"])}
 					placeholder="search"
 				/>
-				<select {...this.former.super_handle(["classFilter"])}>
-					<option value="">Select Class</option>
-					{
-						sections
-							.map(s => {
-								return <option value={s.id} key={s.id}>{s.namespaced_name}</option>
-							})
-					}
-				</select>
 			</div>
 
 			<div className="table row">
@@ -219,10 +273,13 @@ class AttendanceAnalytics extends Component {
 			</div>
 			{
 				items
-					.map(([ sid, { student, PRESENT, ABSENT, LEAVE } ]) => <div className="table row">
-						<Link to={`/student/${sid}/attendance`}>{student.Name}</Link>
-						<div style={ ABSENT === 0 ? { color:"#5ecdb9" } : { color:"#fc6171" }}>{ABSENT}</div>
-					</div>)
+					.filter(([,{ ABSENT }]) => ABSENT !== 0)		
+					.map(([tid, { teacher, PRESENT, ABSENT, LEAVE }]) => {
+						return <div key={tid} className="table row">
+							<Link to={`/faculty/${tid}/attendance`}>{teacher.Name}</Link>
+							<div style={ABSENT === 0 ? { color: "#5ecdb9" } : { color: "#fc6171" }}>{ABSENT}</div>
+						</div>
+					})
 			}
 			<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
 
@@ -230,9 +287,8 @@ class AttendanceAnalytics extends Component {
 	</div>
 	}
 }
-export default connect(state =>({
-	students: state.db.students,
-	classes: state.db.classes,
+export default connect((state : RootReducerState ) =>({
+	teachers: state.db.faculty,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
-}))(AttendanceAnalytics)
+}))(TeacherAttendanceAnalytics)
