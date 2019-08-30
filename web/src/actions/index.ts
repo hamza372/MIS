@@ -680,3 +680,22 @@ export const editPayment = (student: MISStudent, payments: MISStudent["payments"
 	}, [])
 	dispatch(createMerges(merges))
 }
+
+export const issueCertificate = (type: string, student_id: string, faculty_id: string) => (dispatch: Function) => {
+	const date = moment.now()
+	console.log("IN ISSUE CERTIFCATE",
+		type,
+		faculty_id,
+		date,
+		student_id
+	)
+	
+	dispatch(createMerges([{
+		path: ["db", "students", student_id, "certificates", `${date}`],
+		value: {
+			type,
+			faculty_id,
+			date
+		}
+	}]))
+}

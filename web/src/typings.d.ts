@@ -151,6 +151,15 @@ interface MISStudent {
 		[id: string]: MISStudentExam
 	}
 	tags: { [tag: string]: boolean }
+	certificates: {
+		[id: string]: MISCertificate 
+	}
+}
+
+interface MISCertificate {
+	type: string
+	faculty_id: string
+	date: number
 }
 
 interface MISExam {

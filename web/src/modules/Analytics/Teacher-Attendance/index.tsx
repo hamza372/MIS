@@ -256,7 +256,7 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 			totals={totals}
 		/>
 
-		<div className="divider">Student Attendance</div>
+		<div className="divider">Teacher Attendance</div>
 		<div className="section">
 			<div className="row no-print">
 				<input 
