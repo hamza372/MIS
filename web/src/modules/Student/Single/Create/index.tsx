@@ -59,7 +59,8 @@ const blankStudent = () : MISStudent => ({
 	payments: {},
 	attendance: {},
 	section_id: "",
-	tags:{},
+	tags: {},
+	certificates: {},
 	prospective_section_id: ""
 
 })
@@ -487,6 +488,18 @@ class SingleStudent extends Component<propTypes, S> {
 		})
 	}
 
+	removeCertificate = (id: string) => {
+
+		const {[id]: removed, ...rest} = this.state.profile.certificates;
+
+		this.setState({
+			profile: {
+				...this.state.profile,
+				certificates: rest
+			}
+		})
+	}
+
 	render() {
 
 		if(this.state.redirect) {
@@ -690,6 +703,19 @@ class SingleStudent extends Component<propTypes, S> {
 						}
 						</datalist>
 						<div className="button green" style={{ width: "initial", marginLeft:"auto" }} onClick={this.addTag}>+</div>
+					</div>}
+
+					{!prospective && <div className="divider"> Certificates </div>}
+					{!prospective && <div>
+					{
+						Object.entries(this.state.profile.certificates || {})
+							.map(([c_id, cert_info]) => {
+								return <div className="row" key={c_id}>
+									<label>{`${cert_info.type}-${moment(cert_info.date).format("DD-MM-YY")}`}</label>
+									<div className="button red" onClick={() => this.removeCertificate(c_id)}>x</div>
+								</div>
+							})
+					}
 					</div>}
 
 					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
