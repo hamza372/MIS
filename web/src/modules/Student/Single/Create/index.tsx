@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom';
+import { Redirect, RouteComponentProps, Link} from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
@@ -48,6 +48,7 @@ const blankStudent = () : MISStudent => ({
 	StartDate: moment(),
 	AdmissionNumber: "",
 	BloodType: "",
+	FamilyID: "",
 
 	fees: {
 		[v4()]: {
@@ -102,6 +103,8 @@ type propTypes = P & RouteComponentProps<RouteInfo>
 class SingleStudent extends Component<propTypes, S> {
 
 	former: Former
+	siblings: MISStudent[]
+
 	constructor(props : propTypes) {
 		super(props);
 
@@ -127,6 +130,9 @@ class SingleStudent extends Component<propTypes, S> {
 		}
 
 		this.former = new Former(this, ["profile"])
+		this.siblings = []
+		
+		this.updateSiblings()
 	}
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
@@ -308,30 +314,6 @@ class SingleStudent extends Component<propTypes, S> {
 
 	}
 
-	addSibling = (sibling : any) => {
-		console.log("ADD SIBLING", sibling)
-
-		// we create another table called "families" with a unique id, and loop and check that map
-		// on the student there would be a family id. similar to how we do classes.
-
-		/*
-		families: {
-			[id]: { 
-				name: "",
-				students: { [id]: true},
-				contact: { phone: number, address: string},
-				profile: {
-					fathername: "",
-					fathercnic: ""
-				}
-			}
-		}
-
-		once added to a family, these fields should also be set on the student profile. if that is the case then it should be above these fields 
-		then like a subject, if it's not there they will need to be able to set this 
-		*/
-	}
-
 	onEnrolled = () => {
 		
 	const { prospective_section_id : section_id, tags: { "PROSPECTIVE": removed, ...rest_tags }, ...rest_profile } = this.state.profile;
@@ -458,6 +440,16 @@ class SingleStudent extends Component<propTypes, S> {
 		return names
 	}
 
+	updateSiblings = () => {
+
+		this.siblings = Object.values(this.props.students)
+			.filter(s => (this.state.profile.Phone && this.state.profile.Phone === s.Phone) ||
+				(this.state.profile.ManCNIC && this.state.profile.ManCNIC === s.ManCNIC) ||
+				(this.state.profile.FamilyID && this.state.profile.FamilyID === s.FamilyID)
+			)
+
+	}
+
 	addTag = () => {
 
 		const new_tag = this.state.new_tag;
@@ -518,7 +510,6 @@ class SingleStudent extends Component<propTypes, S> {
 				<PrintHeader settings={settings} logo={logo} />
 				<div className="title">Edit Student</div>
 
-
 				<div className="form">
 					<div className="divider">Personal Information</div>
 					
@@ -540,7 +531,10 @@ class SingleStudent extends Component<propTypes, S> {
 							type="tel" {...this.former.super_handle(
 								["BForm"],
 								(val) => val.length <= 15,
-								this.addHyphens(["profile", "BForm"]) )} 
+								() => {
+									this.addHyphens(["profile", "BForm"])();
+									this.updateSiblings();
+								})} 
 							placeholder="BForm" 
 							disabled={!admin} />
 					</div> : false}
@@ -583,6 +577,20 @@ class SingleStudent extends Component<propTypes, S> {
 					</div>: false}
 
 					<div className="row">
+						<label>Family ID Code</label>
+						<input type="text" {...this.former.super_handle(["FamilyID"], () => true, this.updateSiblings)} placeholder="Optional Family ID Code" />
+					</div>
+
+					{ this.siblings.length > 0 && <React.Fragment>
+						<div className="divider">Siblings</div>
+						{
+							this.siblings.map(s => <div className="row">
+								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
+							</div>)
+						}
+					</React.Fragment> }
+
+					<div className="row">
 						<label>Blood Type</label>
 						<select {...this.former.super_handle(["BloodType"])}>
 							<option value="">Select Blood Type</option>
@@ -606,7 +614,7 @@ class SingleStudent extends Component<propTypes, S> {
 							<input 
 								style={{ width:"100%" }}
 								type="tel"
-								{...this.former.super_handle(["Phone"], (num) => num.length <= 11)}
+								{...this.former.super_handle(["Phone"], (num) => num.length <= 11, this.updateSiblings)}
 								placeholder="Phone Number" 
 								disabled={!admin}
 							/>
@@ -724,15 +732,15 @@ class SingleStudent extends Component<propTypes, S> {
 
 					{!prospective && <div className="divider"> Certificates </div>}
 					{!prospective && <div>
-					{
-						Object.entries(this.state.profile.certificates || {})
-							.map(([c_id, cert_info]) => {
-								return <div className="row" key={c_id}>
-									<label>{`${cert_info.type}-${moment(cert_info.date).format("DD-MM-YY")}`}</label>
-									<div className="button red" onClick={() => this.removeCertificate(c_id)}>x</div>
-								</div>
-							})
-					}
+						{
+							Object.entries(this.state.profile.certificates || {})
+								.map(([c_id, cert_info]) => {
+									return <div className="row" key={c_id}>
+										<label>{`${cert_info.type}-${moment(cert_info.date).format("DD-MM-YY")}`}</label>
+										<div className="button red" onClick={() => this.removeCertificate(c_id)}>x</div>
+									</div>
+								})
+						}
 					</div>}
 
 					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
