@@ -402,9 +402,17 @@ class SingleStudent extends Component<propTypes, S> {
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
 
-		this.setState({
-			profile: newProps.students[this.props.match.params.id] || this.state.profile
-		})
+		const nextStudent = newProps.students[newProps.match.params.id]
+
+		if(nextStudent) {
+			this.setState({
+				profile: {
+					...nextStudent,
+					tags: nextStudent.tags || {}
+				}
+			})
+		}
+
 	}
 
 	addHyphens = (path : string[]) => () => {
@@ -600,7 +608,7 @@ class SingleStudent extends Component<propTypes, S> {
 					{ this.siblings.length > 0 && <React.Fragment>
 						<div className="divider">Siblings</div>
 						{
-							this.siblings.map(s => <div className="row">
+							this.siblings.map(s => <div className="row" key={s.id}>
 								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
 							</div>)
 						}
