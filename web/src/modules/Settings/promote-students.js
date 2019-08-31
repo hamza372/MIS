@@ -69,8 +69,8 @@ class PromotePage extends Component {
 	render() {
 		const { history, students, classes } = this.props;
 
-		const sections = getSectionsFromClasses(classes);
-		const class_options = sections.map(x => <option value={x.id} key={x.id}>{x.namespaced_name}</option>)
+		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
+		const class_options = sortedSections.map(x => <option value={x.id} key={x.id}>{x.namespaced_name}</option>)
 
 		return <Layout history={history}>
 			<div className="promote-student">
@@ -79,7 +79,7 @@ class PromotePage extends Component {
 				<select {...this.Former.super_handle(["current_section"])}>
 					<option value="">Select Class</option>
 					{
-						sections.map(x => <option value={x.id} key={x.id}>{x.namespaced_name}</option>)
+						sortedSections.map(s => <option value={s.id} key={s.id}>{s.namespaced_name}</option>)
 					}
 				</select>
 
@@ -94,7 +94,7 @@ class PromotePage extends Component {
 						.filter(x => x.Name && x.section_id === this.state.current_section)
 						.sort((a, b) => a.Name - b.Name)
 						.map(student => {
-							const s = sections.find(x => x.id === student.section_id);
+							const s = sortedSections.find(x => x.id === student.section_id);
 
 							return <div className="table row" key={student.id}>
 								<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
