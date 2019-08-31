@@ -577,20 +577,6 @@ class SingleStudent extends Component<propTypes, S> {
 					</div>: false}
 
 					<div className="row">
-						<label>Family ID Code</label>
-						<input type="text" {...this.former.super_handle(["FamilyID"], () => true, this.updateSiblings)} placeholder="Optional Family ID Code" />
-					</div>
-
-					{ this.siblings.length > 0 && <React.Fragment>
-						<div className="divider">Siblings</div>
-						{
-							this.siblings.map(s => <div className="row">
-								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
-							</div>)
-						}
-					</React.Fragment> }
-
-					<div className="row">
 						<label>Blood Type</label>
 						<select {...this.former.super_handle(["BloodType"])}>
 							<option value="">Select Blood Type</option>
@@ -604,6 +590,21 @@ class SingleStudent extends Component<propTypes, S> {
 							<option value="O-">O Negative</option>
 						</select>
 					</div>
+
+					<div className="row">
+						<label>Family ID Code</label>
+						<input type="text" {...this.former.super_handle(["FamilyID"], () => true, this.updateSiblings)} placeholder="Optional Family ID Code" />
+					</div>
+
+
+					{ this.siblings.length > 0 && <React.Fragment>
+						<div className="divider">Siblings</div>
+						{
+							this.siblings.map(s => <div className="row">
+								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
+							</div>)
+						}
+					</React.Fragment> }
 
 
 					<div className="divider">Contact Information</div>
