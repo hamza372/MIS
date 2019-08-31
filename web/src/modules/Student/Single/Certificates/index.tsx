@@ -9,6 +9,7 @@ import {getSectionsFromClasses} from '../../../../utils/getSectionsFromClasses';
 import './style.css'
 import Former from '../../../../utils/former';
 import { PrintHeader } from '../../../../components/Layout';
+import { issueCertificate } from '../../../../actions';
 
 interface P {
 	students: RootDBState['students']
@@ -16,6 +17,8 @@ interface P {
 	settings: RootDBState["settings"]
 	schoolLogo: RootDBState["assets"]["schoolLogo"]
 	classes: RootDBState["classes"]
+	curr_teacher: string
+	issueCertificate: (type: string, student_id: string, faculty_id: string) => any
 }
 
 interface S {
@@ -61,11 +64,38 @@ class StudentCertificates extends Component < propTypes, S > {
 		}
 	}
 
+	handlePrint = () => {
+
+		const curr_student = this.student()
+		const certType = this.state.selectedCertificate
+		const faculty_id = this.props.curr_teacher
+
+		const issued = Object.values(curr_student.certificates || {})
+			.filter(value => value.type === certType)
+		
+			if( issued.length === 0)
+			{
+				window.print()
+				this.props.issueCertificate(certType, curr_student.id, faculty_id)	
+			}
+			else if ( issued.length >= 1 && window.confirm("Are you sure you want to issue again?")) {
+					
+				window.print()
+				this.props.issueCertificate(certType, curr_student.id, faculty_id)
+	
+				return
+			}
+
+	}
+
 	render() {
 		const { settings, schoolLogo, classes} = this.props
     	const sections = getSectionsFromClasses(classes);
     	const relevant_section = sections.find(section => this.student().section_id === section.id);
 		
+		const issued = Object.values(this.student().certificates || {})
+			.filter(value => value.type === this.state.selectedCertificate)
+
 		return	<div className="certificate">
 			<PrintHeader settings={settings} logo={schoolLogo}/>
 
@@ -84,19 +114,21 @@ class StudentCertificates extends Component < propTypes, S > {
 						<option value="COMPLETION"> Completion </option>
 					</select>
 				</div>
-				<div className="button blue" onClick={()=> window.print()}>Print</div>
+				<div className="button blue" onClick={() => this.handlePrint()}>{`Print ${ issued.length >= 1 ? "( Already Issued )": ""}`}</div>
 			</div>
 			{this.getSelectedCertificate(relevant_section)}
 
 		</div>
 	}
 }
-export default connect ((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	teachers: state.db.faculty,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
-	classes: state.db.classes
+	classes: state.db.classes,
+	curr_teacher: state.auth.faculty_id}), (dispatch: Function) => ({
+	issueCertificate: (type: string, student_id: string, faculty_id: string) => dispatch(issueCertificate(type, student_id, faculty_id))
 }))(StudentCertificates)
 
 interface CertificateProps {
@@ -246,6 +278,13 @@ const SchoolLeavingCertificate: React.FC <CertificateProps> = ({ curr_student, r
 				<div>	
 				</div>
 			</div>
+
+			<div className="cert-row">
+				<label>&nbsp;</label>
+				<div>	
+				</div>
+			</div>
+
 		</div>
 
 		<div className="footer">

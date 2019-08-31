@@ -259,10 +259,11 @@ class Attendance extends Component <propTypes, S> {
 			messages,
 			return_link: window.location.href
 		});
-		const { settings, current_faculty, students } = this.props;
+		const { settings, current_faculty, students, classes } = this.props;
 		const isAdmin = current_faculty.Admin
 		const setupPage = settings.permissions && settings.permissions.setupPage ? settings.permissions.setupPage.teacher : true
-		// also check if the template is blank - then drop a link to the /sms page and tell them to fill a template out.
+
+		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
 
 		return <Layout history={this.props.history}>
 			<div className="attendance">
@@ -284,11 +285,11 @@ class Attendance extends Component <propTypes, S> {
 					<div className="row">
 						<select onChange={this.onSectionChange} value={this.state.selected_section} style={{ marginLeft: "auto"}}>
 							{
-								getSectionsFromClasses(this.props.classes)
-									.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+								sortedSections.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
 							}
 						</select>
 					</div>
+					
 				</div>
 				<div className="list">
 				{
