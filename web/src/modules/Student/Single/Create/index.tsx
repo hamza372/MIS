@@ -432,7 +432,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 	uniqueTags = () => {
 
-		const tags = new Set();
+		const tags = new Set<string>();
 
 		Object.values(this.props.students)
 			.filter(s => s.id && s.Name)
@@ -445,7 +445,7 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	uniqueFeeName = () => {
-		const names = new Set()
+		const names = new Set<string>()
 
 		Object.values(this.props.students)
 			.filter(s => s.id && s.Name)
