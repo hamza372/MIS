@@ -134,6 +134,7 @@ interface MISStudent {
 	Notes: string
 	StartDate: string 
 	AdmissionNumber: string
+	BloodType: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
 
 	section_id: string
 	prospective_section_id?: string

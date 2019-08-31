@@ -47,6 +47,7 @@ const blankStudent = () : MISStudent => ({
 	// @ts-ignore
 	StartDate: moment(),
 	AdmissionNumber: "",
+	BloodType: "",
 
 	fees: {
 		[v4()]: {
@@ -567,6 +568,22 @@ class SingleStudent extends Component<propTypes, S> {
 							placeholder="Father CNIC" 
 							disabled={!admin} />
 					</div>: false}
+
+					<div className="row">
+						<label>Blood Type</label>
+						<select {...this.former.super_handle(["BloodType"])}>
+							<option value="">Select Blood Type</option>
+							<option value="A+">A Positive</option>
+							<option value="A-">A Negative</option>
+							<option value="B+">B Positive</option>
+							<option value="B-">B Negative</option>
+							<option value="AB+">AB Positive</option>
+							<option value="AB-">AB Negative</option>
+							<option value="O+">O Positive</option>
+							<option value="O-">O Negative</option>
+						</select>
+					</div>
+
 
 					<div className="divider">Contact Information</div>
 
