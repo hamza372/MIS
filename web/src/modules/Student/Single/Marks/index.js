@@ -157,15 +157,17 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			total_marks: 0
 		})
 
+
 	return <div className="student-marks">
 		<PrintHeader settings={settings} logo={logo} />
 		
 		<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
+		<div><b>Class:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
 		<div className="student-info">
 			<div className="row">
 				<div className="name"><b>Student Name:</b> {student.Name}</div>
+				<div className="name" style={{ marginLeft: "1em"}}><b>Father Name:</b> {student.ManName}</div>
 				<div style={{ marginLeft: "1em"}}><b>Roll No:</b> {student.RollNumber !== undefined ? student.RollNumber : "______"}</div>
-				<div style={{ marginLeft: "1em"}}><b>Class Name:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
 			</div>
 		</div>
 		<div className="section table">
