@@ -299,13 +299,15 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 			Fee: 0,
 
 			section_id: "",
+			BloodType: "",
 			prospective_section_id: "",
 
 			fees: { },
 			payments: { },
 			attendance: { },
 			exams: { },
-			tags: { }
+			tags: {},
+			certificates: {}
 		}
 	
 		return student;
