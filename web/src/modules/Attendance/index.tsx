@@ -6,7 +6,7 @@ import getSectionsFromClasses from '../../utils/getSectionsFromClasses'
 
 import { smsIntentLink } from '../../utils/intent'
 import Layout from '../../components/Layout'
-import { markStudent, logSms } from '../../actions'
+import { markStudent, markAllStudents, logSms } from '../../actions'
 
 import moment from 'moment'
 import Former from '../../utils/former'
@@ -21,6 +21,8 @@ interface P {
 	connected: RootReducerState["connected"]
 	attendance_message_template: RootDBState["sms_templates"]["attendance"]
 	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any
+	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) => any
+
 	logSms: (history: any) => any
 }
 
@@ -233,6 +235,11 @@ class Attendance extends Component <propTypes, S> {
 		this.mark(x, status)()
 	}
 
+	markAllPresent = () => {
+		const students = getStudentsForSection(this.state.selected_section, this.props.students);
+		this.props.markAllStudents(students, moment(this.state.date).format("YYYY-MM-DD"), "PRESENT");
+	}
+
 	render() {
 
 		const messages = Object.entries(this.state.selected_students)
@@ -280,6 +287,7 @@ class Attendance extends Component <propTypes, S> {
 						<div className="button select-all" onClick={this.selectPresentOrNone}>P</div>
 						<div className="button select-all" onClick={this.selectAbsentOrNone}>A</div>
 						<div className="button select-all" onClick={this.selectLeaveOrNone}>L</div>
+						<div className="button" onClick={this.markAllPresent}>Mark All Present</div>
 					</div>
 					
 					<div className="row">
@@ -335,6 +343,7 @@ export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {} as RootDBState["sms_templates"]).attendance || "",
 }), (dispatch : Function) => ({
+	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) =>dispatch(markAllStudents(students, date, status)),
 	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => dispatch(markStudent(student, date, status)),
 	logSms: (history: any) => dispatch(logSms(history))
 }))(Attendance)
