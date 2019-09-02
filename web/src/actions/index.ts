@@ -327,6 +327,47 @@ export const markStudent = (student: MISStudent, date: string, status: MISStuden
 	]))
 }
 
+export const addStudentToFamily = (student : MISStudent, family_id: string) => (dispatch : Function) => {
+
+	dispatch(createMerges([
+		{
+			path: ["db", "students", student.id, "FamilyID"],
+			value: family_id
+		}
+	]))
+}
+
+export const saveFamilyInfo = (siblings: MISStudent[], info: MISFamilyInfo) => (dispatch : Function) => {
+
+	const siblingMerges = siblings.map(s => ([
+		{
+			path: ["db", "students", s.id, "ManName"],
+			value: info.ManName
+		},
+		{
+			path: ["db", "students", s.id, "Phone"],
+			value: info.Phone
+		},
+		{
+			path: ["db", "students", s.id, "ManCNIC"],
+			value: info.ManCNIC
+		},
+		{
+			path: ["db", "students", s.id, "Address"],
+			value: info.Address
+		}
+	]))
+	.reduce((agg, curr) => {
+		return [
+			...agg,
+			...curr
+		]
+	}, [])
+
+	dispatch(createMerges(siblingMerges))
+
+}
+
 export const markFaculty = (faculty: MISTeacher, date: string, status: MISTeacherAttendanceStatus, time = moment.now()) => (dispatch: Function) => {
 	console.log('mark faculty', faculty, 'as', status);
 

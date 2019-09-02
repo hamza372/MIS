@@ -32,6 +32,7 @@ import Planner from 'modules/Planner'
 import CertificateMenu from 'modules/CertificateMenu'
 import historicalFee from './modules/Settings/HistoricalFees/historical-fee';
 import FamilyModule from './modules/Family'
+import SingleFamily from './modules/Family/Single'
 
 import ManageFees from 'modules/Student/ManageFees'
 
@@ -103,6 +104,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 					<AuthedRoute path="/expenses" component={ExpensePage} />
 
+					<AuthedRoute path="/families/:id" component={SingleFamily} />
 					<AuthedRoute path="/families" component={FamilyModule} />
 					
 					<AuthedRoute path="/ClassList" component={PlannerList} />

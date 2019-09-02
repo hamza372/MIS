@@ -435,6 +435,20 @@ class SingleStudent extends Component<propTypes, S> {
 		return tags;
 	}
 
+	uniqueFamilies = () => {
+		const families = new Set<string>();
+
+		Object.values(this.props.students)
+			.filter(s => s.id && s.Name)
+			.forEach(s => {
+				if(s.FamilyID) {
+					families.add(s.FamilyID)
+				}
+			})
+
+		return families;
+	}
+
 	uniqueFeeName = () => {
 		const names = new Set<string>()
 
@@ -450,11 +464,19 @@ class SingleStudent extends Component<propTypes, S> {
 
 	updateSiblings = () => {
 
-		this.siblings = Object.values(this.props.students)
-			.filter(s => (this.state.profile.Phone && this.state.profile.Phone === s.Phone) ||
-				(this.state.profile.ManCNIC && this.state.profile.ManCNIC === s.ManCNIC) ||
-				(this.state.profile.FamilyID && this.state.profile.FamilyID === s.FamilyID)
-			)
+		// there is information we should keep syncd between families.
+		// ex: all 3 of these things.
+		// on-save, should update other siblings if this changes...
+
+		const nextSiblings = Object.values(this.props.students)
+			.filter(s => (this.state.profile.FamilyID && this.state.profile.FamilyID === s.FamilyID))
+				/* (this.state.profile.Phone && this.state.profile.Phone === s.Phone) ||
+				(this.state.profile.ManCNIC && this.state.profile.ManCNIC === s.ManCNIC) || 
+			*/
+		
+		// is there any new sibling that is not in the old siblings?
+
+		this.siblings = nextSiblings;
 
 	}
 
@@ -510,6 +532,8 @@ class SingleStudent extends Component<propTypes, S> {
 		const admin = this.props.user.Admin;
 		const {students, max_limit} = this.props;
 		const prospective = this.isProspective()
+
+		const oldStudent = students[this.props.match.params.id]
 
 		const { settings, logo } = this.props
 
@@ -567,6 +591,40 @@ class SingleStudent extends Component<propTypes, S> {
 					</div>
 
 					<div className="row">
+						<label>Blood Type</label>
+						<select {...this.former.super_handle(["BloodType"])}>
+							<option value="">Select Blood Type</option>
+							<option value="A+">A Positive</option>
+							<option value="A-">A Negative</option>
+							<option value="B+">B Positive</option>
+							<option value="B-">B Negative</option>
+							<option value="AB+">AB Positive</option>
+							<option value="AB-">AB Negative</option>
+							<option value="O+">O Positive</option>
+							<option value="O-">O Negative</option>
+						</select>
+					</div>
+
+
+					<div className="divider">Family & Contact Information</div>
+
+					{ oldStudent && oldStudent.FamilyID && <div className="row">
+						<label>Link to Family Page</label>
+						<Link to={`/families/${oldStudent.FamilyID}`} className="button purple">Family Profile</Link>
+					</div>}
+
+					<div className="row">
+						<label>Family ID Code</label>
+						<datalist id="families">
+						{
+							[...this.uniqueFamilies().keys()]
+								.map(f => <option key={f} value={f} />)
+						}
+						</datalist>
+						<input list="families" {...this.former.super_handle(["FamilyID"], () => true, this.updateSiblings)} placeholder="Optional Family ID Code" />
+					</div>
+
+					<div className="row">
 						<label>Father Name</label>
 						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father Name"  disabled={!admin}/>
 					</div>
@@ -584,38 +642,10 @@ class SingleStudent extends Component<propTypes, S> {
 							disabled={!admin} />
 					</div>: false}
 
-					<div className="row">
-						<label>Blood Type</label>
-						<select {...this.former.super_handle(["BloodType"])}>
-							<option value="">Select Blood Type</option>
-							<option value="A+">A Positive</option>
-							<option value="A-">A Negative</option>
-							<option value="B+">B Positive</option>
-							<option value="B-">B Negative</option>
-							<option value="AB+">AB Positive</option>
-							<option value="AB-">AB Negative</option>
-							<option value="O+">O Positive</option>
-							<option value="O-">O Negative</option>
-						</select>
-					</div>
-
-					<div className="row">
-						<label>Family ID Code</label>
-						<input type="text" {...this.former.super_handle(["FamilyID"], () => true, this.updateSiblings)} placeholder="Optional Family ID Code" />
-					</div>
-
-
-					{ this.siblings.length > 0 && <React.Fragment>
-						<div className="divider">Siblings</div>
-						{
-							this.siblings.map(s => <div className="row" key={s.id}>
-								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
-							</div>)
-						}
-					</React.Fragment> }
-
-
-					<div className="divider">Contact Information</div>
+					{!prospective ? <div className="row">
+						<label>Address</label>
+						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={!admin}/>
+					</div> : false }
 
 					<div className="row">
 						<label>Phone Number</label>
@@ -631,10 +661,16 @@ class SingleStudent extends Component<propTypes, S> {
 						</div>
 					</div>
 
-					{!prospective ? <div className="row">
-						<label>Address</label>
-						<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={!admin}/>
-					</div> : false }
+					{ this.siblings.length > 0 && <React.Fragment>
+						<div className="divider">Siblings</div>
+						<div className="section">
+						{
+							this.siblings.map(s => <div className="row" key={s.id}>
+								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
+							</div>)
+						}
+						</div>
+					</React.Fragment> }
 
 					<div className="divider">School Information</div>
 

@@ -158,6 +158,13 @@ interface MISStudent {
 	}
 }
 
+interface MISFamilyInfo { 
+	ManName : string
+	Phone: string
+	ManCNIC: string
+	Address: string
+}
+
 interface MISCertificate {
 	type: string
 	faculty_id: string

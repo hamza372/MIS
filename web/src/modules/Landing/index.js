@@ -171,7 +171,7 @@ class Landing extends Component {
 							<div className="badge-container">
 								<Link
 									to="/diary"
-									className="button red-shadow"
+									className="button purple-shadow"
 									style={{ backgroundImage: `url(${diary})` }}>
 									Diary
 								</Link>

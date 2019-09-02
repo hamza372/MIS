@@ -278,7 +278,7 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 
 	console.log(studentImportCSV)
 	console.log(lines)
-	
+
 	// note that this is linked to the headers in the template above. see 
 	const students = lines.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
 		const student : MISStudent = {
@@ -305,7 +305,8 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 			payments: { },
 			attendance: { },
 			exams: { },
-			tags: { }
+			tags: { },
+			certificates: { }
 		}
 	
 		return student;

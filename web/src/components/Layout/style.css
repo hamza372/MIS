@@ -342,6 +342,13 @@ textarea {
 		border: 1px solid black;
 	}
 
+	.warning {
+		color: #fc6171;
+		padding: 10px 0px;
+		border: 2px solid #fc6171;
+		text-align: center;
+	}
+
 	.button.red {
 		background-color: #EDAFB8;
 		background-color: #fc6171;
