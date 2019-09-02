@@ -132,7 +132,7 @@ interface MISStudent {
 	Birthdate: string
 	Address: string
 	Notes: string
-	StartDate: string 
+	StartDate: number 
 	AdmissionNumber: string
 	BloodType: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
 
