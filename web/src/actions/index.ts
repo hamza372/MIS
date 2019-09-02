@@ -325,6 +325,25 @@ export const markStudent = (student: MISStudent, date: string, status: MISStuden
 			}
 		}
 	]))
+}	
+
+export const markAllStudents = (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"], time = moment.now()) => (dispatch: Function) => {
+
+	const merges = students.reduce((agg, s) => {
+
+		return [
+			...agg, 
+			{
+				path: ["db", "students", s.id, "attendance", date],
+				value: {
+					date,
+					status,
+					time
+				}
+			},
+		]}, [])
+
+	dispatch(createMerges(merges));
 }
 
 export const markFaculty = (faculty: MISTeacher, date: string, status: MISTeacherAttendanceStatus, time = moment.now()) => (dispatch: Function) => {
