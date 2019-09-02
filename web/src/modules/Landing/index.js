@@ -145,13 +145,17 @@ class Landing extends Component {
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
-									style={{backgroundImage: `url(${cerificate})`}}
-								>
+									style={{backgroundImage: `url(${cerificate})`}}>
 									Certificates
 								</Link> 
 							</div>
 						}
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+						</div>
+						<div className="row">
+							<Link to="/families" className="button green-shadow">
+								Families
+							</Link>
 						</div>
 					</div>
 
