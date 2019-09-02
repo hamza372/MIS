@@ -710,3 +710,28 @@ export const issueCertificate = (type: string, student_id: string, faculty_id: s
 		}
 	}]))
 }
+
+export const addInventoryItem = (item: any) => ( dispatch: Function) => {
+
+	console.log("item")
+
+	const merge = [{
+		path: ["db","inventory",v4()],
+		value: item
+	}]
+
+	console.log("In Add Inventory Item",merge)
+	dispatch(createMerges(merge))
+}
+
+export const deleteInventoryItem = (id: string) => ( dispatch: Function) => {
+
+	console.log("item")
+
+	const deletes = [{
+		path: ["db","inventory",id],
+	}]
+
+	console.log("In Delete Inventory Item",deletes)
+	dispatch(createDeletes(deletes))
+}

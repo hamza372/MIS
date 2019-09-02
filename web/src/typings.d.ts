@@ -32,6 +32,9 @@ interface RootDBState {
 	assets : {
 		schoolLogo : string
 	}
+	inventory: {
+		[id: string] : MISInventoryItem
+	}
 	max_limit: number
 }
 
@@ -276,4 +279,12 @@ interface MISDiary{
 			homework: string
 		}
 	}
+}
+
+interface MISInventoryItem {
+	name: string
+	date: number
+	quantity: number
+	price: number
+	cost: number
 }
