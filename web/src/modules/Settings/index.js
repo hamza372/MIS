@@ -444,6 +444,7 @@ class Settings extends Component {
 					
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
+					<Link className="button grey" to="/settings/excel-import/students">Import From Excel</Link>
 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>

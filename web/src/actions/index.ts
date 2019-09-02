@@ -43,6 +43,17 @@ export const createStudentMerge = (student: MISStudent) => (dispatch: Function) 
 	]))
 }
 
+export const createStudentMerges = (students: MISStudent[]) => (dispatch : Function) => {
+
+	dispatch(createMerges(
+		students.map(s => ({
+			path: ["db", "students", s.id],
+			value: s
+		}))
+	))
+
+}
+
 export const deleteStudent = (student: MISStudent) => (dispatch: Function) => {
 	dispatch(createDeletes([
 		{
