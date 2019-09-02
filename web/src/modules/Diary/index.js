@@ -90,8 +90,13 @@ class Diary extends Component {
 	onSave = () => {
 		//Here need to send subjects rather then the whole section's diary
 
-		const diary = Object.entries(this.state.diary[this.state.selected_section_id])
-			.filter(([subject, d]) => d.homework !== "" && d.homework !== this.props.diary[this.state.selected_section_id][subject].homework)
+		const diary = Object.entries(this.state.diary[this.state.selected_section_id] || {})
+			.filter(([subject, d]) => 
+				(this.props.diary === undefined) || 
+				(this.props.diary[this.state.selected_section_id] === undefined) ||
+				(this.props.diary[this.state.selected_section_id][subject] === undefined) ||
+				d.homework !== this.props.diary[this.state.selected_section_id][subject].homework
+			)
 			.reduce((agg, [s, diary]) => {
 
 				return {
@@ -161,6 +166,8 @@ class Diary extends Component {
 
 		const { classes, students, sendBatchMessages, smsOption } = this.props;
 
+		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
+
 		const subjects = new Set()
 		
 		for(let c of Object.values(classes)){
@@ -189,7 +196,7 @@ class Diary extends Component {
 					}
 				]
 			}, [])
-	
+
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
 
@@ -205,8 +212,7 @@ class Diary extends Component {
 							<select {...this.former.super_handle(["selected_section_id"])}>
 								<option value="" disabled>Select Section</option>
 								{
-									Object.entries(getSectionsFromClasses(classes))
-										.map(([id, C]) => <option key={id} value={C.id}>{C.namespaced_name}</option>)
+									sortedSections.map( s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)	
 								}
 							</select>
 						</div>

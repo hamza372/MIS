@@ -53,13 +53,13 @@ class SignUp extends Component <propTypes, S> {
 			},
 			agents: [
 				"M. Shahbaz",
-				"Sadaf Tauqeer ",
-				"Umar Zaheer ",
+				"Sadaf Tauqeer",
+				"Umar Zaheer",
 				"M.Zikran shakeel",
 				"M.Farooq",
 				"Tabassum Munir",
 				"M.Ahmad",
-				"Qasim M. Chadhary ",
+				"Qasim M. Chadhary",
 				"M.Tayyab",
 				"Tariq Mehmood",
 				"Haroon Shahzad",
@@ -68,7 +68,7 @@ class SignUp extends Component <propTypes, S> {
 				"Raheel Abbas",
 				"Huraira Abbas",
 				"Zeeshan",
-				"Raza Mustafa",
+				"Raza Mustafa"
 			],
 		}
 	

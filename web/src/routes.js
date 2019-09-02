@@ -31,12 +31,14 @@ import PlannerList from 'modules/Planner/ClassList'
 import Planner from 'modules/Planner'
 import CertificateMenu from 'modules/CertificateMenu'
 import historicalFee from './modules/Settings/HistoricalFees/historical-fee';
+import excelImport from './modules/Settings/ExcelImport'
 
 import ManageFees from 'modules/Student/ManageFees'
 
 import AuthedRoute from 'components/AuthedRoute'
 import ExpensePage from './modules/Expenses';
 import Inventory from './modules/Inventory';
+import ExcelImport from './modules/Settings/ExcelImport';
 
 export default class Routes extends React.Component {
 
@@ -92,6 +94,7 @@ export default class Routes extends React.Component {
 
 					<AuthedRoute path="/fees/manage" component={ManageFees} />
 
+					<AuthedRoute path="/settings/excel-import" component={ExcelImport} />
 					<AuthedRoute path="/settings/promote" component={PromotionPage} />
 					<AuthedRoute path="/settings/historicalFee" component={historicalFee} />
 					<AuthedRoute path="/settings" component={Settings} />

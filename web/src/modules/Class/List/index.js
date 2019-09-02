@@ -19,14 +19,14 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		.map(c => ({...c, forwardTo}))
 	
-		let create = '/class/new'
+	let create = '/class/new'
 
-		if(forwardTo === 'fee-menu'){
-			create = ''
-		}
-		if(forwardTo === 'report-menu'){
-			create = '';
-		}
+	if(forwardTo === 'fee-menu'){
+		create = ''
+	}
+	if(forwardTo === 'report-menu'){
+		create = '';
+	}
 		
 	return <div className="class-module">
 		<div className="title">Classes</div>
