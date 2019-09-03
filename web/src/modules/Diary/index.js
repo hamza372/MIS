@@ -55,6 +55,7 @@ class Diary extends Component {
 				text: "Saved!"
 			},
 			selected_section_id: "",
+			students_filter: "all_students",
 			diary: props.diary && moment(props.diary.date).format("DD/MM/YYYY") === curr_date ? JSON.parse(JSON.stringify(props.diary)) : diary
 		}
 
@@ -160,8 +161,6 @@ class Diary extends Component {
 		return curr_date + diary_message.join("\n")
 	}
 
-
-
 	render() {
 
 		const { classes, students, sendBatchMessages, smsOption } = this.props;
@@ -176,7 +175,37 @@ class Diary extends Component {
 			}
 		}
 
-		const messages = Object.values(students)
+		let students_arr = new Array()
+		
+		if(this.state.students_filter === "all_students") {
+			students_arr = Object.values(students)
+		}
+		else if(this.state.students_filter === "absent_students") {
+			students_arr = Object.values(students).filter( s => {
+				const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")] 
+				
+				// if today's attendance not marked
+				if(curr_attendance === undefined)
+					return false
+
+				return s.section_id === this.state.selected_section_id && curr_attendance.status === "ABSENT"
+			})
+		}
+		else if(this.state.students_filter === "leave_students") {
+			students_arr = Object.values(students).filter( s => {
+				const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")];		
+				
+				// if today's attendance not marked				
+				if(curr_attendance === undefined)
+					return false
+
+				return s.section_id === this.state.selected_section_id && curr_attendance &&
+					    (curr_attendance.status === "LEAVE" || curr_attendance.status === "SHORT_LEAVE" || 
+					   curr_attendance.status === "SICK_LEAVE" || curr_attendance.status === "CASUAL_LEAVE")
+			})
+		}
+		
+		const messages = students_arr
 			.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
 			.reduce((agg,student)=> {
 
@@ -216,8 +245,18 @@ class Diary extends Component {
 								}
 							</select>
 						</div>
+						{
+							this.state.selected_section_id !== "" && <div className="row">
+								<label>Send diary to</label>
+								<select {...this.former.super_handle(["students_filter"])}>
+									<option value="" disabled>Select Students</option>
+									<option value="all_students"> All students</option>
+									<option value="absent_students"> Only Absent students</option>
+									<option value="leave_students"> Only Leave students</option>
+								</select>
+							</div>
+						}
 					</div>
-
 				{ 
 					this.state.selected_section_id !== "" && <div className="section">
 						{
