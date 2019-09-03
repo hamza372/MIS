@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
 import Former from '../../utils/former';
 import Layout from '../../components/Layout';
-import { addInventoryItem, deleteInventoryItem } from '../../actions'
+import { addInventoryItem, deleteInventoryItem, editInventoryItems } from '../../actions'
 
 import "./style.css"
 import moment from 'moment';
 import Banner from '../../components/Banner';
 import { connect } from 'react-redux';
+import { v4 } from 'node-uuid';
 
 /**
  * Inventory {
@@ -17,9 +18,14 @@ import { connect } from 'react-redux';
 				quantity: number
 				price: number
 				cost: number
+				expense_id: string
  * 		}
  * }
  * 
+ * 1) adding new expense entry on quantity change if quantity is more than the previous quantity one
+ * 2) updating quantity per sale
+ * 3) Should I also the expense entry with item delete
+ * 4) Adding payment per sale in student payments and updating items
  */
 
 interface S {
@@ -43,8 +49,9 @@ interface S {
 
 interface P {
 	inventory: RootDBState["inventory"]
-	addItem: (item: any) => any
+	addItem: (item: MISInventoryItem) => any
 	deleteItem: (id: string) => any
+	editItem: (merges : MISMerge[]) => any
 }
 
 type propTypes = RouteComponentProps & P
@@ -53,8 +60,11 @@ class Inventory extends Component < propTypes, S > {
 
 	mutations: {
 		[id: string]: {
-			
-	} }
+			price: boolean
+			quantity: boolean
+			name: boolean
+		}
+	}
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
@@ -83,16 +93,23 @@ class Inventory extends Component < propTypes, S > {
 		this.former = new Former(this,[])
 	}
 
+	componentWillReceiveProps (newProps: propTypes) {
+		this.setState({
+			edits: JSON.parse(JSON.stringify(newProps.inventory || {}))
+		})
+	}
+
 	additem = () => {
 		
 		const { date, name, quantity, price, cost, discount } = this.state.item
 		
-		const item = {
+		const item: MISInventoryItem = {
 			date,
 			name,
 			quantity: parseFloat(quantity),
 			price: parseFloat(price),
 			cost: parseFloat(cost),
+			expense_id: v4()
 		}
 
 		this.props.addItem(item)
@@ -119,40 +136,65 @@ class Inventory extends Component < propTypes, S > {
 	}
 
 	onSave = () => {
-		console.log("Save")
-		const inventory = this.props.inventory
+		
+		const changes = Object.entries(this.mutations)
+			.reduce((agg, [id, curr]) => {
 
-		const changes = Object.entries(this.state.edits)
-			.filter(([id, item]) =>
-				item.name === inventory[id].name || 
-				item.quantity === inventory[id].quantity ||
-				item.price === inventory[id].price
-			)
-		console.log("Changes", changes)
+				const curr_item = this.state.edits[id]
+
+				const merges = Object.keys(curr)
+					.reduce((agg, curr) => {
+
+						//@ts-ignore
+						const value = curr === "name" ? curr_item[curr] : parseFloat(curr_item[curr]) 
+
+						return [
+							...agg,
+							{
+								path: ["db", "inventory", id, curr],
+								value
+							}
+						]
+					}, [])
+					
+				return [...agg, ...merges ]
+				
+			}, [])
+		
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000);
+		
+		this.props.editItem(changes)
 
 	}
 
-	tracker = ( id: string , path: string) => () => {
+	tracker = ( id: string , name: string) => () => {
 
 		//this.mutations[path.join(',')] = path
-		console.log("MUTATIONSSSSSSS", this.mutations)
+		//console.log("MUTATIONSSSSSSS", this.mutations)
 		
 		this.mutations[id] = {
 			...this.mutations[id],
-			[path]: true
+			[name]: true
 		}
-
 	}
 	
 	render() {
 
-		console.log("Edits",this.state.edits)
-		console.log("Inventory",this.props.inventory)
-
-		//const { inventory } = this.props
-
 		const { banner } = this.state
-
 
 		return <Layout history={this.props.history}>
 			{banner.active && <Banner isGood={banner.good} text={banner.text} />}
@@ -180,10 +222,10 @@ class Inventory extends Component < propTypes, S > {
 											<input className="newtable-input" type="text" {...this.former.super_handle(["edits", id, "name"], () => true, this.tracker(id,"name"))}/>
 										</div>
 										<div>
-											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "quantity"],() => true, this.tracker(id,"quantity"))} />
+											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "quantity"], () => true, this.tracker(id,"quantity"))} />
 										</div>
 										<div>
-											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "price"],() => true, this.tracker(id,"price"))} />
+											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "price"], () => true, this.tracker(id,"price"))} />
 										</div>
 										<div className="button-cell">
 											<div className="button red" onClick={() => this.deleteItem(id)}>Delete</div>
@@ -264,6 +306,7 @@ class Inventory extends Component < propTypes, S > {
 export default connect((state: RootReducerState) => ({
 	inventory: state.db.inventory
 }), (dispatch: Function) => ({
-	addItem: (item: any) => dispatch(addInventoryItem(item)),
-	deleteItem: (id: string) => dispatch(deleteInventoryItem(id))
+	addItem: (item: MISInventoryItem) => dispatch(addInventoryItem(item)),
+	deleteItem: (id: string) => dispatch(deleteInventoryItem(id)),
+	editItem: (merges: MISMerge[]) => dispatch(editInventoryItems(merges))
 }))(Inventory)

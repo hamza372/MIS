@@ -1,3 +1,9 @@
+.inventory {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .inventory .section {
 	width: 80%;
 }

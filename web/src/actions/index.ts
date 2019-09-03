@@ -730,27 +730,72 @@ export const issueCertificate = (type: string, student_id: string, faculty_id: s
 	}]))
 }
 
-export const addInventoryItem = (item: any) => ( dispatch: Function) => {
+export const addInventoryItem = (item: MISInventoryItem) => ( dispatch: Function) => {
 
-	console.log("item")
+	const expense: MISExpense = {
+		expense: "MIS_EXPENSE",
+		amount: item.cost,
+		label: item.name,
+		type: "PAYMENT_GIVEN",
+		category: "INVENTORY",
+		date: item.date,
+		time: moment.now(),
+		quantity: item.quantity,
+	}
 
-	const merge = [{
-		path: ["db","inventory",v4()],
-		value: item
-	}]
+	const merge = [
+		{
+			path: ["db", "inventory", v4()],
+			value: item,
 
-	console.log("In Add Inventory Item",merge)
-	dispatch(createMerges(merge))
+		},
+		{
+			path: ["db", "expenses", item.expense_id],
+			value: expense
+		}
+	]
+
+	console.log("Merges", merge )
+
+	//dispatch(createMerges(merge))
 }
 
 export const deleteInventoryItem = (id: string) => ( dispatch: Function) => {
-
-	console.log("item")
 
 	const deletes = [{
 		path: ["db","inventory",id],
 	}]
 
-	console.log("In Delete Inventory Item",deletes)
 	dispatch(createDeletes(deletes))
+}
+
+export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) => {
+
+	if (merges.length === 0) {
+		console.log("EMPTY")
+		return
+	}
+
+	dispatch(createMerges(merges))
+}
+
+export const sellInventoryItem = (s_id: string, i_id: string, i: MISInventoryItem) => ( dispatch: Function) => {
+
+	const merge = [
+		{
+			path: ["db", "inventory",],
+			value: {
+				
+			}
+		},
+		{
+			path: ["db", "students", s_id, "payments", v4()],
+			value: {
+				amount: i.price,
+				date: moment.now(),
+				fee_name: `${i.name} (${i.quantity})`,
+				type: "SUBMITTED"
+			}
+		}
+	]
 }

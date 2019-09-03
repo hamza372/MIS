@@ -202,7 +202,7 @@ interface BaseMISExpense {
 	amount: number
 	label: string
 	type: string
-	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | ""   
+	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | "INVENTORY" | ""   
 	date: number
 	time: number
 }
@@ -287,4 +287,10 @@ interface MISInventoryItem {
 	quantity: number
 	price: number
 	cost: number
+	expense_id: string
+}
+
+interface MISMerge {
+	path: string[],
+	value: any
 }
