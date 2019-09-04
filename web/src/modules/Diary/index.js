@@ -10,6 +10,9 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import former from 'utils/former'
 import moment from 'moment'
 
+import './style.css'
+
+
 /** Structure of Diary
  * diary:{
  *    section_id:{
@@ -227,17 +230,22 @@ class Diary extends Component {
 				]
 			}, [])
 
+	const selected_section_name  = sortedSections.filter(s => s.id === this.state.selected_section_id).map (s => s.namespaced_name)
+
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
 		<PrintHeader settings={settings} logo={schoolLogo}/>
 		
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
-			<div className="title">Diary</div>
+			<div className="title">School Diary</div>
 				<div className="form">
 					<div className="no-print divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
-					<div className="print-only row"><b>Date:</b> {moment().format("DD-MMMM-YYYY")}</div>
-					<div className="section">
+					<div className ="print-only row">
+						<div><b>Date:</b> {moment().format("DD-MMMM-YYYY")}</div>
+						<div><b>Class:</b> {selected_section_name}</div>
+					</div>
+					<div className="no-print section">
 						<div className="row">
 							<label>Select Class/Section</label>
 							<select {...this.former.super_handle(["selected_section_id"])}>
@@ -297,11 +305,11 @@ class Diary extends Component {
 				
 			</div>
 			
-			<div className="print-only">
-				<div className="row" style={{ marginTop: "20px" }}>
+			<div className="print-only form">
+				<div className="row signature">
 					<div>Teacher Signature: ___________________</div>
 				</div>
-				<div className="row" style={{ marginTop: "20px", marginBottom:"40px" }}>
+				<div className="row signature">
 					<div>Parents Signature: ___________________</div>
 				</div>
 			</div>
