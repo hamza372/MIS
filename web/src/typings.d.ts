@@ -288,6 +288,22 @@ interface MISInventoryItem {
 	price: number
 	cost: number
 	expense_id: string
+	sales: {
+		[id: string]: {
+			cost: number
+			quantity: number,
+			date: number,
+			price: number,
+			discount: number
+		}
+	}
+}
+
+interface MISItemSale {
+	student_id: string
+	item_id: string
+	quantity: number
+	discount: number
 }
 
 interface MISMerge {

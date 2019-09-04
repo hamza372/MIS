@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
 import Former from '../../utils/former';
 import Layout from '../../components/Layout';
-import { addInventoryItem, deleteInventoryItem, editInventoryItems } from '../../actions'
+import { addInventoryItem, deleteInventoryItem, editInventoryItems, sellInventoryItem, mergeExam } from '../../actions'
 
 import "./style.css"
 import moment from 'moment';
@@ -23,9 +23,9 @@ import { v4 } from 'node-uuid';
  * }
  * 
  * 1) adding new expense entry on quantity change if quantity is more than the previous quantity one
- * 2) updating quantity per sale
+ * 2) updating quantity per sale (Done)
  * 3) Should I also the expense entry with item delete
- * 4) Adding payment per sale in student payments and updating items
+ * 4) Adding payment per sale in student payments and updating items (Done)
  */
 
 interface S {
@@ -35,6 +35,12 @@ interface S {
 		quantity: string
 		price: string
 		cost: string
+		discount: string
+	}
+	sale: {
+		student_id: string
+		item_id: string
+		quantity: string
 		discount: string
 	}
 	sell_item: boolean
@@ -49,8 +55,10 @@ interface S {
 
 interface P {
 	inventory: RootDBState["inventory"]
+	students: RootDBState["students"]
 	addItem: (item: MISInventoryItem) => any
-	deleteItem: (id: string) => any
+	deleteItem: (id: string, item: MISInventoryItem) => any
+	sellItem: (sale: MISItemSale, item: MISInventoryItem) => any
 	editItem: (merges : MISMerge[]) => any
 }
 
@@ -77,6 +85,12 @@ class Inventory extends Component < propTypes, S > {
 				price: "0",
 				cost: "0",
 				discount: "0"
+			},
+			sale: {
+				student_id: "",
+				item_id: "",
+				quantity: "0",
+				discount: "0",
 			},
 			edits: JSON.parse(JSON.stringify(props.inventory || {})),
 			sell_item: false,
@@ -109,18 +123,49 @@ class Inventory extends Component < propTypes, S > {
 			quantity: parseFloat(quantity),
 			price: parseFloat(price),
 			cost: parseFloat(cost),
-			expense_id: v4()
+			expense_id: v4(),
+			sales: {}
 		}
 
 		this.props.addItem(item)
 		
 		this.setState({
+			item: {
+				...this.state.item,
+				name: "",
+				quantity: "0",
+				price: "0",
+				cost: "0",
+				discount: "0"
+			},
 			add_item: !this.state.add_item
 		})
 	}
 
 	sellItem = () => {
+
+		if (!this.state.sale.item_id || !this.state.sale.student_id) {
+			
+			console.log("Not all required fields selected")
+			return
+		}
+
+		const sale = {
+			...this.state.sale,
+			quantity: parseFloat(this.state.sale.quantity || "0"),
+			discount: parseFloat(this.state.sale.discount || "0")
+		}
+		
+		console.log("Selling", sale, )
+		this.props.sellItem(sale, this.props.inventory[sale.item_id])
+
 		this.setState({
+			sale: {
+				student_id: "",
+				item_id: "",
+				quantity: "0",
+				discount: "0",
+			},
 			sell_item: !this.state.sell_item
 		})
 	}
@@ -131,7 +176,8 @@ class Inventory extends Component < propTypes, S > {
 			return
 		}
 		console.log("Deleting Item", id)
-		this.props.deleteItem(id)
+		const item = this.props.inventory[id]
+		this.props.deleteItem(id, item)
 
 	}
 
@@ -146,7 +192,7 @@ class Inventory extends Component < propTypes, S > {
 					.reduce((agg, curr) => {
 
 						//@ts-ignore
-						const value = curr === "name" ? curr_item[curr] : parseFloat(curr_item[curr]) 
+						const value = curr === "name" ? curr_item[curr] : parseFloat(curr_item[curr])
 
 						return [
 							...agg,
@@ -156,8 +202,36 @@ class Inventory extends Component < propTypes, S > {
 							}
 						]
 					}, [])
-					
-				return [...agg, ...merges ]
+
+				const costMerges = Object.keys(curr)
+					.reduce((agg, curr) => {
+
+						//@ts-ignore
+						const addExpenseEntry = curr === "cost" & curr_item.quantity !== this.props.inventory[id].quantity 
+						
+						if (addExpenseEntry) {
+							return [
+								...agg,
+								{
+									path: ["db", "expenses", v4()],
+									value: {
+										expense: "MIS_EXPENSE",
+										amount: curr_item.cost,
+										label: curr_item.name,
+										type: "PAYMENT_GIVEN",
+										category: "INVENTORY",
+										date: curr_item.date,
+										time: moment.now(),
+										quantity: curr_item.quantity - this.props.inventory[id].quantity,
+									}
+								}
+							]
+						}
+
+						return agg
+					}, [])
+
+				return [...agg, ...merges, ...costMerges ]
 				
 			}, [])
 		
@@ -177,24 +251,55 @@ class Inventory extends Component < propTypes, S > {
 			})
 		}, 2000);
 		
-		this.props.editItem(changes)
+		console.log("CHANGES FROM EIT ITEM", changes)
+		//this.props.editItem(changes)
 
 	}
 
 	tracker = ( id: string , name: string) => () => {
-
-		//this.mutations[path.join(',')] = path
-		//console.log("MUTATIONSSSSSSS", this.mutations)
 		
 		this.mutations[id] = {
 			...this.mutations[id],
 			[name]: true
 		}
 	}
+
+	cancel = (type: string) => {
+		if (type === "Sale")
+		{
+			this.setState({
+				sale: {
+					student_id: "",
+					item_id: "",
+					quantity: "0",
+					discount: "0",
+				},
+				sell_item: !this.state.sell_item
+			})	
+		}
+		else if (type === "Add")
+		{
+			this.setState({
+				item: {
+					...this.state.item,
+					name: "",
+					quantity: "0",
+					price: "0",
+					cost: "0",
+					discount: "0"
+				},
+				add_item: !this.state.add_item
+			})
+		}
+	}
 	
 	render() {
 
 		const { banner } = this.state
+		const { inventory, students} = this.props
+
+		const student_list = Object.values(students).filter(s => s.Name && s.Active)
+		const item_list = Object.entries(inventory).map(([id, item]) => ({ id, ...item}))
 
 		return <Layout history={this.props.history}>
 			{banner.active && <Banner isGood={banner.good} text={banner.text} />}
@@ -206,10 +311,10 @@ class Inventory extends Component < propTypes, S > {
 				<div className="section" style={{width: "80%",overflow: "auto" }}>
 					<div className="newtable">
 						<div className="newtable-row heading">
-							<div>Date</div>
 							<div>Name</div>
 							<div>Quantity</div>
 							<div>Price (Rs)</div>
+							<div>Cost (Rs)</div>
 							<div></div>
 						</div>
 
@@ -217,7 +322,6 @@ class Inventory extends Component < propTypes, S > {
 							Object.entries(this.state.edits)
 								.map(([id, item]) => {
 									return <div key={id} className="newtable-row">
-										<div>{moment(item.date).format("DD-MM-YY")}</div>
 										<div>
 											<input className="newtable-input" type="text" {...this.former.super_handle(["edits", id, "name"], () => true, this.tracker(id,"name"))}/>
 										</div>
@@ -227,6 +331,9 @@ class Inventory extends Component < propTypes, S > {
 										<div>
 											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "price"], () => true, this.tracker(id,"price"))} />
 										</div>
+										<div>
+											<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "cost"], () => true, this.tracker(id,"cost"))} />
+										</div>
 										<div className="button-cell">
 											<div className="button red" onClick={() => this.deleteItem(id)}>Delete</div>
 										</div>
@@ -235,7 +342,7 @@ class Inventory extends Component < propTypes, S > {
 						}
 
 					</div>
-					<div className="button blue" style={{ marginTop: "5px" }} onClick={() => this.onSave()}> Save </div>
+					{ item_list.length > 0 && <div className="button blue" style={{ marginTop: "5px" }} onClick={() => this.onSave()}> Save </div>}
 				</div>
 				
 				{ this.state.add_item && <div className="section form">
@@ -256,45 +363,60 @@ class Inventory extends Component < propTypes, S > {
 						<label> Price </label>
 						<input type="number" placeholder="Price" {...this.former.super_handle(["item","price"])}/>
 					</div>
-					<div className="button save" onClick={() => this.additem()}> Add </div>
+					<div className="save-delete">
+						<div className="button red" onClick={() => this.cancel("Add")}> Cancel </div>
+						<div className="button blue" onClick={() => this.additem()}> Add </div>
+					</div>
 				</div>}
 
 				{ this.state.sell_item && <div className="section form">
 					<div className="divider">Sell Item</div>
 						<div className="row">
 							<label> Student</label>
-							<select>
-								<option>Ali</option>
-								<option>Ayesha</option>
-								<option>Taimur</option>
-								<option>Mudassir</option>
+							<select {...this.former.super_handle(["sale","student_id"])}>
+								<option value="">Select</option>
+							{
+								student_list
+									.map(s => <option key={s.id} value={s.id}> {`${s.Name} - ${s.ManName}`} </option>)
+							}
 							</select>
 						</div>
 					<div className="row">
 						<label> Select Item </label>
-						<select>
-							<option> Pencil  </option>
-							<option> Uniform </option>
-							<option> Syllabus</option>
+						<select {...this.former.super_handle(["sale", "item_id"])}>
+							<option value=""> Select </option>
+							{
+								item_list
+									.map(i => <option key={i.id} value={i.id}>{i.name} </option>)
+							}
 						</select>
 					</div>
 					<div className="row">
 						<label> Quantity </label>
-						<input type="number" placeholder="Quantity"/>
+						<input type="number" placeholder="Quantity" {...this.former.super_handle_flex(["sale", "quantity"],{ 
+									styles: (val : any) => { return parseFloat(val) >  (inventory[this.state.sale.item_id] ? inventory[this.state.sale.item_id].quantity : 0) ? { borderColor : "#fc6171" } : {} } 
+								})}/>
 					</div>
 					<div className="row">
 						<label> Discount </label>
-						<input type="number" placeholder="Discount"/>
+						<input type="number" placeholder="Discount" {...this.former.super_handle(["sale", "discount"])}/>
 					</div>
-					<div className="button save" onClick={() => this.sellItem()}> Sell</div>
+					 <div> 
+						<label>Price</label>
+						<label> {(( this.state.sale.item_id ? inventory[this.state.sale.item_id].price : 0) - parseFloat(this.state.sale.discount)) * parseFloat(this.state.sale.quantity)}</label>
+					</div> 
+					<div className="save-delete">
+						<div className="button red" onClick={() => this.cancel("Sale")}> Cancel</div>
+						<div className="button save" onClick={() => this.sellItem()}> Sell</div>
+					</div>
 				</div>}
 
 				<div className="row" style={{ marginBottom: "5px" ,display:"flex", width:"80%", justifyContent:"space-between"}}>
-					{ !this.state.add_item && <div className="button blue" onClick={() => this.setState({ add_item: !this.state.add_item })}>
+					{ !this.state.add_item && !this.state.sell_item && <div className="button blue" onClick={() => this.setState({ add_item: !this.state.add_item })}>
 						Add Item
 					</div>}
 
-					{ !this.state.sell_item && <div className="button blue" onClick={() => this.setState({ sell_item: !this.state.sell_item })}>
+					{ !this.state.sell_item && !this.state.add_item && <div className="button blue" onClick={() => this.setState({ sell_item: !this.state.sell_item })}>
 						Sell
 					</div>}
 				</div>
@@ -304,9 +426,11 @@ class Inventory extends Component < propTypes, S > {
 }
 
 export default connect((state: RootReducerState) => ({
-	inventory: state.db.inventory
+	inventory: state.db.inventory,
+	students: state.db.students
 }), (dispatch: Function) => ({
 	addItem: (item: MISInventoryItem) => dispatch(addInventoryItem(item)),
-	deleteItem: (id: string) => dispatch(deleteInventoryItem(id)),
-	editItem: (merges: MISMerge[]) => dispatch(editInventoryItems(merges))
+	deleteItem: (id: string, item: MISInventoryItem) => dispatch(deleteInventoryItem(id, item)),
+	editItem: (merges: MISMerge[]) => dispatch(editInventoryItems(merges)),
+	sellItem: (sale: MISItemSale, item: MISInventoryItem) => dispatch(sellInventoryItem(sale, item))
 }))(Inventory)

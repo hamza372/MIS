@@ -757,16 +757,27 @@ export const addInventoryItem = (item: MISInventoryItem) => ( dispatch: Function
 
 	console.log("Merges", merge )
 
-	//dispatch(createMerges(merge))
+	dispatch(createMerges(merge))
 }
 
-export const deleteInventoryItem = (id: string) => ( dispatch: Function) => {
+export const deleteInventoryItem = (id: string, item: MISInventoryItem) => ( dispatch: Function) => {
+
+	const expense_deletes = []
+
+	if (!moment(item.date).isAfter(moment.now(), "day"))
+	{
+		expense_deletes.push({
+			path: ["db", "expenses", item.expense_id]
+		})
+
+		console.log("Expense is one day old not deleting expense")
+	}
 
 	const deletes = [{
 		path: ["db","inventory",id],
 	}]
 
-	dispatch(createDeletes(deletes))
+	dispatch(createDeletes([ ...deletes, ...expense_deletes ]))
 }
 
 export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) => {
@@ -779,23 +790,36 @@ export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) 
 	dispatch(createMerges(merges))
 }
 
-export const sellInventoryItem = (s_id: string, i_id: string, i: MISInventoryItem) => ( dispatch: Function) => {
+export const sellInventoryItem = (sale: MISItemSale, i: MISInventoryItem) => ( dispatch: Function) => {
 
-	const merge = [
+	const curr_date = moment.now()
+	const merges = [
 		{
-			path: ["db", "inventory",],
+			path: ["db", "inventory", sale.item_id, "quantity" ],
+			value: i.quantity - sale.quantity,
+		},
+		{
+			path: ["db", "inventory", sale.item_id, "sales", `${curr_date}` ],
 			value: {
-				
+				cost: i.cost,
+				quantity: sale.quantity,
+				date: curr_date,
+				price: i.price,
+				discount: sale.discount
 			}
 		},
 		{
-			path: ["db", "students", s_id, "payments", v4()],
+			path: ["db", "students", sale.student_id, "payments", v4()],
 			value: {
-				amount: i.price,
-				date: moment.now(),
-				fee_name: `${i.name} (${i.quantity})`,
+				amount: (i.price - sale.discount) * sale.quantity,
+				date: curr_date,
+				fee_name: `${i.name} (${sale.quantity})`,
 				type: "SUBMITTED"
 			}
 		}
 	]
+
+	console.log("Iin Sell Item", merges)
+
+	//dispatch(createMerges(merge))
 }
