@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Layout from 'components/Layout'
+import {PrintHeader} from 'components/Layout'
 import {connect} from 'react-redux'
 import { sendSMS, sendBatchSMS } from 'actions/core'
 import { logSms, addDiary } from 'actions'
@@ -163,7 +164,7 @@ class Diary extends Component {
 
 	render() {
 
-		const { classes, students, sendBatchMessages, smsOption } = this.props;
+		const { classes, students, sendBatchMessages, settings, schoolLogo } = this.props;
 
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
 
@@ -228,13 +229,14 @@ class Diary extends Component {
 
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
-
+		<PrintHeader settings={settings} logo={schoolLogo}/>
+		
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 
 			<div className="title">Diary</div>
 				<div className="form">
-					<div className="divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
-
+					<div className="no-print divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
+					<div className="print-only row"><b>Date:</b> {moment().format("DD-MMMM-YYYY")}</div>
 					<div className="section">
 						<div className="row">
 							<label>Select Class/Section</label>
@@ -246,7 +248,7 @@ class Diary extends Component {
 							</select>
 						</div>
 						{
-							this.state.selected_section_id !== "" && <div className="row">
+							this.state.selected_section_id !== "" && <div className="no-print row">
 								<label>Send diary to</label>
 								<select {...this.former.super_handle(["students_filter"])}>
 									<option value="" disabled>Select Students</option>
@@ -277,18 +279,31 @@ class Diary extends Component {
 				}
 
 				{
-					subjects.size === 0 ? false : smsOption === "SIM" ? 
+					subjects.size === 0 ? false : settings.sendSMSOption === "SIM" ?
+						<div className ="row"> 
 						<a 
 							className="button blue"
 							href={smsIntentLink({
 								messages,
 								return_link: window.location.href 
 							})}
-							onClick={() => this.logSms(messages)}
-							style={{width: "20%"}}>Send using Local SIM </a> : 
+							onClick={() => this.logSms(messages)}>
+							Send using Local SIM </a>
+							<div className="button" onClick={() => window.print()}>Print</div>
+						</div>
+							 :
 						<div className="button" onClick={() => sendBatchMessages(messages)} style={{width: "20%"}}>Send</div>
 				}
 				
+			</div>
+			
+			<div className="print-only">
+				<div className="row" style={{ marginTop: "20px" }}>
+					<div>Teacher Signature: ___________________</div>
+				</div>
+				<div className="row" style={{ marginTop: "20px", marginBottom:"40px" }}>
+					<div>Parents Signature: ___________________</div>
+				</div>
 			</div>
 		</div>
 	</Layout>
@@ -299,7 +314,8 @@ export default connect(state => ({
 	diary: state.db.diary,
 	students: state.db.students,
 	classes: state.db.classes,
-	smsOption: state.db.settings.sendSMSOption
+	settings: state.db.settings,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 }), dispatch => ({
 	sendMessage : (text, number) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages ) => dispatch(sendBatchSMS(messages)),
