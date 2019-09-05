@@ -47,6 +47,7 @@ const blankStudent = () : MISStudent => ({
 	// @ts-ignore
 	StartDate: moment(),
 	AdmissionNumber: "",
+	BloodType: "",
 
 	fees: {
 		[v4()]: {
@@ -59,7 +60,8 @@ const blankStudent = () : MISStudent => ({
 	payments: {},
 	attendance: {},
 	section_id: "",
-	tags:{},
+	tags: {},
+	certificates: {},
 	prospective_section_id: ""
 
 })
@@ -431,7 +433,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 	uniqueTags = () => {
 
-		const tags = new Set();
+		const tags = new Set<string>();
 
 		Object.values(this.props.students)
 			.filter(s => s.id && s.Name)
@@ -444,7 +446,7 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	uniqueFeeName = () => {
-		const names = new Set()
+		const names = new Set<string>()
 
 		Object.values(this.props.students)
 			.filter(s => s.id && s.Name)
@@ -483,6 +485,18 @@ class SingleStudent extends Component<propTypes, S> {
 			profile: {
 				...this.state.profile,
 				tags: rest
+			}
+		})
+	}
+
+	removeCertificate = (id: string) => {
+
+		const {[id]: removed, ...rest} = this.state.profile.certificates;
+
+		this.setState({
+			profile: {
+				...this.state.profile,
+				certificates: rest
 			}
 		})
 	}
@@ -567,6 +581,22 @@ class SingleStudent extends Component<propTypes, S> {
 							placeholder="Father CNIC" 
 							disabled={!admin} />
 					</div>: false}
+
+					<div className="row">
+						<label>Blood Type</label>
+						<select {...this.former.super_handle(["BloodType"])}>
+							<option value="">Select Blood Type</option>
+							<option value="A+">A Positive</option>
+							<option value="A-">A Negative</option>
+							<option value="B+">B Positive</option>
+							<option value="B-">B Negative</option>
+							<option value="AB+">AB Positive</option>
+							<option value="AB-">AB Negative</option>
+							<option value="O+">O Positive</option>
+							<option value="O-">O Negative</option>
+						</select>
+					</div>
+
 
 					<div className="divider">Contact Information</div>
 
@@ -690,6 +720,19 @@ class SingleStudent extends Component<propTypes, S> {
 						}
 						</datalist>
 						<div className="button green" style={{ width: "initial", marginLeft:"auto" }} onClick={this.addTag}>+</div>
+					</div>}
+
+					{!prospective && <div className="divider"> Certificates </div>}
+					{!prospective && <div>
+					{
+						Object.entries(this.state.profile.certificates || {})
+							.map(([c_id, cert_info]) => {
+								return <div className="row" key={c_id}>
+									<label>{`${cert_info.type}-${moment(cert_info.date).format("DD-MM-YY")}`}</label>
+									<div className="button red" onClick={() => this.removeCertificate(c_id)}>x</div>
+								</div>
+							})
+					}
 					</div>}
 
 					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }

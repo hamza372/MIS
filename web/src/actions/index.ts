@@ -43,6 +43,17 @@ export const createStudentMerge = (student: MISStudent) => (dispatch: Function) 
 	]))
 }
 
+export const createStudentMerges = (students: MISStudent[]) => (dispatch : Function) => {
+
+	dispatch(createMerges(
+		students.map(s => ({
+			path: ["db", "students", s.id],
+			value: s
+		}))
+	))
+
+}
+
 export const deleteStudent = (student: MISStudent) => (dispatch: Function) => {
 	dispatch(createDeletes([
 		{
@@ -314,6 +325,25 @@ export const markStudent = (student: MISStudent, date: string, status: MISStuden
 			}
 		}
 	]))
+}	
+
+export const markAllStudents = (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"], time = moment.now()) => (dispatch: Function) => {
+
+	const merges = students.reduce((agg, s) => {
+
+		return [
+			...agg, 
+			{
+				path: ["db", "students", s.id, "attendance", date],
+				value: {
+					date,
+					status,
+					time
+				}
+			},
+		]}, [])
+
+	dispatch(createMerges(merges));
 }
 
 export const markFaculty = (faculty: MISTeacher, date: string, status: MISTeacherAttendanceStatus, time = moment.now()) => (dispatch: Function) => {
@@ -679,4 +709,23 @@ export const editPayment = (student: MISStudent, payments: MISStudent["payments"
 		]
 	}, [])
 	dispatch(createMerges(merges))
+}
+
+export const issueCertificate = (type: string, student_id: string, faculty_id: string) => (dispatch: Function) => {
+	const date = moment.now()
+	console.log("IN ISSUE CERTIFCATE",
+		type,
+		faculty_id,
+		date,
+		student_id
+	)
+	
+	dispatch(createMerges([{
+		path: ["db", "students", student_id, "certificates", `${date}`],
+		value: {
+			type,
+			faculty_id,
+			date
+		}
+	}]))
 }

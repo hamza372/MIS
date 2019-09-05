@@ -165,6 +165,10 @@ a.block {
 		width: 100%;
 	}
 
+	.form .row>.button {
+		width: calc(100% - 36px); /* subtract padding + border width */
+	}
+
 	.form .row label {
 		color: #aaa;
 		transition: all .2s ease-out;
@@ -184,6 +188,10 @@ a.block {
 
 		.form .row>* {
 			width: 30%;
+		}
+
+		.form .row>.button {
+			width: initial;
 		}
 		
 		.form .row>*:last-child {
