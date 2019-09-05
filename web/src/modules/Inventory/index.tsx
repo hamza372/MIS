@@ -299,7 +299,9 @@ class Inventory extends Component < propTypes, S > {
 		const { inventory, students} = this.props
 
 		const student_list = Object.values(students).filter(s => s.Name && s.Active)
-		const item_list = Object.entries(inventory).map(([id, item]) => ({ id, ...item}))
+		const item_list = Object.entries(inventory).map(([id, item]) => ({ id, ...item }))
+		
+		const changes = Object.keys(this.mutations).length > 0
 
 		return <Layout history={this.props.history}>
 			{banner.active && <Banner isGood={banner.good} text={banner.text} />}
@@ -342,7 +344,7 @@ class Inventory extends Component < propTypes, S > {
 						}
 
 					</div>
-					{ item_list.length > 0 && <div className="button blue" style={{ marginTop: "5px" }} onClick={() => this.onSave()}> Save </div>}
+					{ item_list.length > 0 && changes && <div className="button blue" style={{ marginTop: "5px" }} onClick={() => this.onSave()}> Save </div>}
 				</div>
 				
 				{ this.state.add_item && <div className="section form">

@@ -790,30 +790,30 @@ export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) 
 	dispatch(createMerges(merges))
 }
 
-export const sellInventoryItem = (sale: MISItemSale, i: MISInventoryItem) => ( dispatch: Function) => {
+export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => ( dispatch: Function) => {
 
 	const curr_date = moment.now()
 	const merges = [
 		{
 			path: ["db", "inventory", sale.item_id, "quantity" ],
-			value: i.quantity - sale.quantity,
+			value: item.quantity - sale.quantity,
 		},
 		{
 			path: ["db", "inventory", sale.item_id, "sales", `${curr_date}` ],
 			value: {
-				cost: i.cost,
+				cost: item.cost,
 				quantity: sale.quantity,
 				date: curr_date,
-				price: i.price,
+				price: item.price,
 				discount: sale.discount
 			}
 		},
 		{
 			path: ["db", "students", sale.student_id, "payments", v4()],
 			value: {
-				amount: (i.price - sale.discount) * sale.quantity,
+				amount: (item.price - sale.discount) * sale.quantity,
 				date: curr_date,
-				fee_name: `${i.name} (${sale.quantity})`,
+				fee_name: `${item.name} (${sale.quantity})`,
 				type: "SUBMITTED"
 			}
 		}

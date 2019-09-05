@@ -23,4 +23,5 @@
 
 	.newtable-row .button {
 		justify-content: center;
+		min-width: 70%;
 	}
