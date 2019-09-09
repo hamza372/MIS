@@ -275,10 +275,11 @@ defmodule Sarkar.Server.Analytics do
 			value ->> 'package_name' as package,
 			value ->> 'city' as City,
 			value ->> 'office' as Office,
-			value ->> 'notes' as Notes
+			value ->> 'notes' as Notes,
+			value ->> 'owner_name' as owner_name
 		FROM mischool_referrals", [])
 
-		csv = [["date", "school_id", "area_manager_name", "agent_name", "type", "package", "city", "office", "notes"] | resp.rows]
+		csv = [["date", "school_id", "area_manager_name", "agent_name", "type", "package", "city", "office", "notes", "owner_name"] | resp.rows]
 			|> CSV.encode
 			|> Enum.join()
 		
