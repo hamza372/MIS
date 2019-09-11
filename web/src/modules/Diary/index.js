@@ -93,8 +93,8 @@ class Diary extends Component {
 	}
 
 	onSave = () => {
+		
 		//Here need to send subjects rather then the whole section's diary
-
 		const diary = Object.entries(this.state.diary[this.state.selected_section_id] || {})
 			.filter(([subject, d]) => 
 				(this.props.diary === undefined) || 
@@ -165,11 +165,29 @@ class Diary extends Component {
 		return curr_date + diary_message.join("\n")
 	}
 
-	selectedSectionStudents = () => {
+	getSelectedSectionStudents = () => {
 		return Object.values(this.props.students)
-							 .filter(s => s.section_id === this.state.selected_section_id && 
-								(s.tags === undefined || !s.tags["PROSPECTIVE"]) && 
-								s.Phone !== undefined && s.Phone !== "")	
+					.filter(s => s.section_id === this.state.selected_section_id && 
+					(s.tags === undefined || !s.tags["PROSPECTIVE"]) && 
+					s.Phone !== undefined && s.Phone !== "")	
+	}
+
+	getFilterCondition = (s) => {
+		
+		const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")]
+
+		switch (this.state.students_filter) {
+			case "absent_students":
+				return curr_attendance ? curr_attendance.status === "ABSENT" : false
+			case "leave_students":
+				return curr_attendance ? curr_attendance.status === "LEAVE" || 
+					curr_attendance.status === "SHORT_LEAVE" || 
+					curr_attendance.status === "SICK_LEAVE" || 
+					curr_attendance.status === "CASUAL_LEAVE" 
+					: false
+			default:
+				return true // if student_filter set to 'all_students'
+		}
 	}
 
 	render() {
@@ -187,38 +205,8 @@ class Diary extends Component {
 			}
 		}
 
-		let selected_students = []
-		
-		if(this.state.students_filter === "all_students") {
-			selected_students = this.selectedSectionStudents();
-			console.log(selected_students)
-		}
-		else if(this.state.students_filter === "absent_students") {
-			selected_students = this.selectedSectionStudents()
-							   .filter( s => {
-									const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")]			
-									// if today's attendance not marked
-									if(curr_attendance === undefined)
-										return false
-									
-									return curr_attendance.status === "ABSENT" 
-							})
-		}
-		else if(this.state.students_filter === "leave_students") {
-			selected_students = this.selectedSectionStudents()
-							   .filter( s => {
-									const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")];		
-									// if today's attendance not marked				
-									if(curr_attendance === undefined)
-										return false
-									
-									return  curr_attendance.status === "LEAVE" || 
-											curr_attendance.status === "SHORT_LEAVE" || 
-											curr_attendance.status === "SICK_LEAVE" || 
-											curr_attendance.status === "CASUAL_LEAVE"
-							})
-		}
-		
+		const selected_students = this.getSelectedSectionStudents().filter( s => this.getFilterCondition(s))
+		console.log(selected_students)
 		const messages = selected_students
 			.reduce((agg,student)=> {
 
@@ -283,7 +271,7 @@ class Diary extends Component {
 						{
 							Array.from(subjects)
 								.map(s => <div className="table row" key={`${this.state.selected_section_id}-${s}`}>
-									<div>{s}</div>
+									<div>{s}:</div>
 									<input 
 										type="text"
 										style={{textAlign: "left"}} 
