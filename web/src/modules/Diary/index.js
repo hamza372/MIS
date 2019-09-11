@@ -165,10 +165,18 @@ class Diary extends Component {
 		return curr_date + diary_message.join("\n")
 	}
 
+	selectedSectionStudents = () => {
+		return Object.values(this.props.students)
+							 .filter(s => s.section_id === this.state.selected_section_id && 
+								(s.tags === undefined || !s.tags["PROSPECTIVE"]) && 
+								s.Phone !== undefined && s.Phone !== "")	
+	}
+
 	render() {
 
-		const { classes, students, sendBatchMessages, settings, schoolLogo } = this.props;
+		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
 
+		// ascending order of classes/sections
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
 
 		const subjects = new Set()
@@ -179,38 +187,39 @@ class Diary extends Component {
 			}
 		}
 
-		let students_arr = new Array()
+		let selected_students = []
 		
 		if(this.state.students_filter === "all_students") {
-			students_arr = Object.values(students)
+			selected_students = this.selectedSectionStudents();
+			console.log(selected_students)
 		}
 		else if(this.state.students_filter === "absent_students") {
-			students_arr = Object.values(students).filter( s => {
-				const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")] 
-				
-				// if today's attendance not marked
-				if(curr_attendance === undefined)
-					return false
-
-				return s.section_id === this.state.selected_section_id && curr_attendance.status === "ABSENT"
-			})
+			selected_students = this.selectedSectionStudents()
+							   .filter( s => {
+									const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")]			
+									// if today's attendance not marked
+									if(curr_attendance === undefined)
+										return false
+									
+									return curr_attendance.status === "ABSENT" 
+							})
 		}
 		else if(this.state.students_filter === "leave_students") {
-			students_arr = Object.values(students).filter( s => {
-				const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")];		
-				
-				// if today's attendance not marked				
-				if(curr_attendance === undefined)
-					return false
-
-				return s.section_id === this.state.selected_section_id && curr_attendance &&
-					    (curr_attendance.status === "LEAVE" || curr_attendance.status === "SHORT_LEAVE" || 
-					   curr_attendance.status === "SICK_LEAVE" || curr_attendance.status === "CASUAL_LEAVE")
-			})
+			selected_students = this.selectedSectionStudents()
+							   .filter( s => {
+									const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")];		
+									// if today's attendance not marked				
+									if(curr_attendance === undefined)
+										return false
+									
+									return  curr_attendance.status === "LEAVE" || 
+											curr_attendance.status === "SHORT_LEAVE" || 
+											curr_attendance.status === "SICK_LEAVE" || 
+											curr_attendance.status === "CASUAL_LEAVE"
+							})
 		}
 		
-		const messages = students_arr
-			.filter(s => s.section_id === this.state.selected_section_id && (s.tags === undefined || !s.tags["PROSPECTIVE"]) && s.Phone !== undefined && s.Phone !== "")
+		const messages = selected_students
 			.reduce((agg,student)=> {
 
 				const index  = agg.findIndex(s => s.number === student.Phone)
@@ -241,10 +250,12 @@ class Diary extends Component {
 			<div className="title">School Diary</div>
 				<div className="form">
 					<div className="no-print divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
+					
 					<div className ="print-only row">
 						<div><b>Date:</b> {moment().format("DD-MMMM-YYYY")}</div>
 						<div><b>Class:</b> {selected_section_name}</div>
 					</div>
+
 					<div className="no-print section">
 						<div className="row">
 							<label>Select Class/Section</label>
