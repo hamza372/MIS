@@ -57,6 +57,11 @@ class Login extends Component {
 			return <Redirect to="/school-login" />
 		}
 
+		if(this.props.auth.faculty_id)
+		{
+			return <Redirect to="/landing" />
+		}
+
 		if(this.props.num_users === 0) {
 			return <Redirect to="/faculty/first" />
 		}
