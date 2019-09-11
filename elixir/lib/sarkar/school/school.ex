@@ -144,7 +144,8 @@ defmodule Sarkar.School do
 									max(date, max_date)
 								}
 							%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
-								IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+								# IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+								# IO.puts "#{school_id}: #{p_key}"
 								# IO.inspect write
 								{
 									agg_db,
