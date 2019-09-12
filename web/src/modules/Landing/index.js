@@ -145,8 +145,7 @@ class Landing extends Component {
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
-									style={{backgroundImage: `url(${cerificate})`}}
-								>
+									style={{backgroundImage: `url(${cerificate})`}}>
 									Certificates
 								</Link> 
 							</div>
@@ -167,6 +166,11 @@ class Landing extends Component {
 						<div className="row">
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
+						<div className="row">
+							<Link to="/families" className="button green-shadow">
+								Families
+							</Link>
+						</div>
 					</div>
 
 					<div className="page">
@@ -181,7 +185,7 @@ class Landing extends Component {
 							<div className="badge-container">
 								<Link
 									to="/diary"
-									className="button red-shadow"
+									className="button purple-shadow"
 									style={{ backgroundImage: `url(${diary})` }}>
 									Diary
 								</Link>
