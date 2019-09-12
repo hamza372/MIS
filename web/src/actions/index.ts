@@ -820,36 +820,22 @@ export const addInventoryItem = (item: MISInventoryItem) => ( dispatch: Function
 			value: expense
 		}
 	]
-
-	console.log("Merges", merge )
-
+	
 	dispatch(createMerges(merge))
 }
 
-export const deleteInventoryItem = (id: string, item: MISInventoryItem) => ( dispatch: Function) => {
-
-	const expense_deletes = []
-
-	if (!moment(item.date).isAfter(moment.now(), "day"))
-	{
-		expense_deletes.push({
-			path: ["db", "expenses", item.expense_id]
-		})
-
-		console.log("Expense is one day old not deleting expense")
-	}
+export const deleteInventoryItem = (id: string) => ( dispatch: Function) => {
 
 	const deletes = [{
 		path: ["db","inventory",id],
 	}]
-
-	dispatch(createDeletes([ ...deletes, ...expense_deletes ]))
+	
+	dispatch(createDeletes(deletes))
 }
 
 export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) => {
 
 	if (merges.length === 0) {
-		console.log("EMPTY")
 		return
 	}
 
@@ -859,6 +845,7 @@ export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) 
 export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => ( dispatch: Function) => {
 
 	const curr_date = moment.now()
+	const fee_id = v4()
 	const merges = [
 		{
 			path: ["db", "inventory", sale.item_id, "quantity" ],
@@ -875,6 +862,25 @@ export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => 
 			}
 		},
 		{
+			path: ["db", "students", sale.student_id, "fees", fee_id],
+			value: {
+				amount: (item.price - sale.discount) * sale.quantity,
+				name: `${item.name} (${sale.quantity})`,
+				period: "SINGLE",
+				type: "FEE"
+			}
+		},
+		{
+			path: ["db", "students", sale.student_id, "payments", fee_id],
+			value: {
+				amount: (item.price - sale.discount) * sale.quantity,
+				date: curr_date,
+				fee_name: `${item.name} (${sale.quantity})`,
+				fee_id,
+				type: "OWED"
+			}
+		},
+		{
 			path: ["db", "students", sale.student_id, "payments", v4()],
 			value: {
 				amount: (item.price - sale.discount) * sale.quantity,
@@ -885,7 +891,5 @@ export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => 
 		}
 	]
 
-	console.log("Iin Sell Item", merges)
-
-	//dispatch(createMerges(merge))
+	dispatch(createMerges(merges))
 }

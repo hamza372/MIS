@@ -13,19 +13,23 @@ import { v4 } from 'node-uuid';
 /**
  * Inventory {
  * 		[id: string]: {
- * 				name: string
-				date: number
-				quantity: number
-				price: number
-				cost: number
-				expense_id: string
+ * 			date: number
+			name: string
+			quantity: number
+			price: number
+			cost: number
+			expense_id: string
+			sales: {
+				[date: string]: {
+					cost: number
+					quantity: number
+					date: number
+					price: number
+					discount: number
+				}
+			}
  * 		}
  * }
- * 
- * 1) adding new expense entry on quantity change if quantity is more than the previous quantity one
- * 2) updating quantity per sale (Done)
- * 3) Should I also the expense entry with item delete
- * 4) Adding payment per sale in student payments and updating items (Done)
  */
 
 interface S {
@@ -57,7 +61,7 @@ interface P {
 	inventory: RootDBState["inventory"]
 	students: RootDBState["students"]
 	addItem: (item: MISInventoryItem) => any
-	deleteItem: (id: string, item: MISInventoryItem) => any
+	deleteItem: (id: string ) => any
 	sellItem: (sale: MISItemSale, item: MISInventoryItem) => any
 	editItem: (merges : MISMerge[]) => any
 }
@@ -76,7 +80,7 @@ class Inventory extends Component < propTypes, S > {
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
-	
+
 		this.state = {
 			item: {
 				name: "",
@@ -128,7 +132,7 @@ class Inventory extends Component < propTypes, S > {
 		}
 
 		this.props.addItem(item)
-		
+
 		this.setState({
 			item: {
 				...this.state.item,
@@ -138,8 +142,21 @@ class Inventory extends Component < propTypes, S > {
 				cost: "0",
 				discount: "0"
 			},
-			add_item: !this.state.add_item
+			add_item: !this.state.add_item,
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved"
+			}
 		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000)
 	}
 
 	sellItem = () => {
@@ -156,7 +173,6 @@ class Inventory extends Component < propTypes, S > {
 			discount: parseFloat(this.state.sale.discount || "0")
 		}
 		
-		console.log("Selling", sale, )
 		this.props.sellItem(sale, this.props.inventory[sale.item_id])
 
 		this.setState({
@@ -166,8 +182,22 @@ class Inventory extends Component < propTypes, S > {
 				quantity: "0",
 				discount: "0",
 			},
-			sell_item: !this.state.sell_item
+			sell_item: !this.state.sell_item,
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved"
+			}
 		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000)
+
 	}
 
 	deleteItem = (id: string) => {
@@ -175,18 +205,33 @@ class Inventory extends Component < propTypes, S > {
 		{
 			return
 		}
-		console.log("Deleting Item", id)
-		const item = this.props.inventory[id]
-		this.props.deleteItem(id, item)
+
+		this.props.deleteItem(id)
+
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Saved"
+			}
+		})
+
+		setTimeout(() => {
+			this.setState({
+				banner: {
+					active: false
+				}
+			})
+		}, 2000);
 
 	}
 
 	onSave = () => {
-		
+
 		const changes = Object.entries(this.mutations)
 			.reduce((agg, [id, curr]) => {
 
-				const curr_item = this.state.edits[id]
+				const curr_item = this.state.edits[id] as any
 
 				const merges = Object.keys(curr)
 					.reduce((agg, curr) => {
@@ -202,27 +247,27 @@ class Inventory extends Component < propTypes, S > {
 							}
 						]
 					}, [])
+				
+				const cost_id = v4()
 
 				const costMerges = Object.keys(curr)
 					.reduce((agg, curr) => {
 
-						//@ts-ignore
-						const addExpenseEntry = curr === "cost" & curr_item.quantity !== this.props.inventory[id].quantity 
-						
-						if (addExpenseEntry) {
+						if (curr === "quantity" && curr_item.quantity > this.props.inventory[id].quantity) {
+
 							return [
 								...agg,
 								{
-									path: ["db", "expenses", v4()],
+									path: ["db", "expenses", cost_id],
 									value: {
 										expense: "MIS_EXPENSE",
-										amount: curr_item.cost,
+										amount: parseFloat(curr_item.cost),
 										label: curr_item.name,
 										type: "PAYMENT_GIVEN",
 										category: "INVENTORY",
 										date: curr_item.date,
 										time: moment.now(),
-										quantity: curr_item.quantity - this.props.inventory[id].quantity,
+										quantity: parseFloat(curr_item.quantity) - this.props.inventory[id].quantity,
 									}
 								}
 							]
@@ -251,8 +296,7 @@ class Inventory extends Component < propTypes, S > {
 			})
 		}, 2000);
 		
-		console.log("CHANGES FROM EIT ITEM", changes)
-		//this.props.editItem(changes)
+		this.props.editItem(changes)
 
 	}
 
@@ -432,7 +476,7 @@ export default connect((state: RootReducerState) => ({
 	students: state.db.students
 }), (dispatch: Function) => ({
 	addItem: (item: MISInventoryItem) => dispatch(addInventoryItem(item)),
-	deleteItem: (id: string, item: MISInventoryItem) => dispatch(deleteInventoryItem(id, item)),
+	deleteItem: (id: string ) => dispatch(deleteInventoryItem(id)),
 	editItem: (merges: MISMerge[]) => dispatch(editInventoryItems(merges)),
 	sellItem: (sale: MISItemSale, item: MISInventoryItem) => dispatch(sellInventoryItem(sale, item))
 }))(Inventory)
