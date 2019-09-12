@@ -43,7 +43,7 @@ const deriveSelectedStudents = (selected_section: string, students: RootDBState[
 	.reduce((agg, curr) => ({...agg, [curr.id]: true}), {})
 
 const getStudentsForSection = (section_id: string, students: RootDBState["students"]) => Object.values(students)
-	.filter(s => s.section_id === section_id)
+	.filter(s => s.Name && s.section_id === section_id)
 
 class Attendance extends Component <propTypes, S> {
 

@@ -115,7 +115,7 @@ class Planner extends Component <propTypes, S> {
 		
 		const dateSheet_message = Object.entries(this.state.dateSheet)
 				.map( ([ subject, {date, time} ]) => {
-					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}`
+					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}( ${moment(date).format("dddd")} )`
 			})
 		return header + dateSheet_message.join("\n") + "\n" + this.state.notes
 	}

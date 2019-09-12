@@ -276,6 +276,7 @@ class FeeAnalytics extends Component {
 		</div>
 		<div className="table row">
 				<label><b>Name</b></label>
+				<label><b>Phone</b></label>
 				<label><b>Amount</b></label>
 		</div>
 		{
@@ -284,6 +285,7 @@ class FeeAnalytics extends Component {
 			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 			.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{ familyId ? familyId : student.Name}</Link>
+					<div>{ student.Phone }</div>
 					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
 				</div>)
 		}
