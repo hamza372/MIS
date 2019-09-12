@@ -34,7 +34,6 @@ defmodule Sarkar.Server.Dashboard do
 		)
 
 		{:ok, req, state}
-		IO.inspect referrals
 	end
 
 	def init(%{bindings: %{type: "school_list"}} = req, state) do

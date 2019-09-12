@@ -1,3 +1,8 @@
 .attendance-analytics .section.table.line label, .attendance-analytics .section.table.line div {
     text-align: center;
 }
+.btn-filter-toggle{
+    justify-content: flex-end ;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
