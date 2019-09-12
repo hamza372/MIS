@@ -24,6 +24,7 @@ import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
 import expense from './icons/Expense/expense.svg'
 import newBadge from "./icons/New/new.svg";
+import family from "./icons/family/family.svg"
 
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'
@@ -145,13 +146,19 @@ class Landing extends Component {
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
-									style={{backgroundImage: `url(${cerificate})`}}
-								>
+									style={{backgroundImage: `url(${cerificate})`}}>
 									Certificates
 								</Link> 
 							</div>
 						}
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+						</div>
+						<div className="row">
+							<Link to="/families"
+								className="button green-shadow"
+								style={{ backgroundImage: `url(${family})`}}>
+								Families
+							</Link>
 						</div>
 					</div>
 
@@ -167,7 +174,7 @@ class Landing extends Component {
 							<div className="badge-container">
 								<Link
 									to="/diary"
-									className="button red-shadow"
+									className="button purple-shadow"
 									style={{ backgroundImage: `url(${diary})` }}>
 									Diary
 								</Link>

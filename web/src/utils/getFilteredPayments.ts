@@ -23,8 +23,8 @@ const getPaymentFilterCondition = (payment: MISStudentPayment, year: string, mon
 	}
 }
 
-export const getFilteredPayments = (student: MISStudent, year: string, month: string) => {
-	return Object.entries(student.payments || {})
+export const getFilteredPayments = (payments: MISStudent['payments'], year: string, month: string) => {
+	return Object.entries(payments || {})
 		.filter(([id,payment]) => getPaymentFilterCondition(payment, year, month))
 		.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 }
