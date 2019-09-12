@@ -98,6 +98,7 @@ class StudentExcelImport extends React.Component<P, S> {
 					return true;
 				}
 				
+				/*
 				const matchingRollNumber = s.RollNumber && Object.values(this.props.students)
 					.find(existing => existing.RollNumber && existing.RollNumber === s.RollNumber)
 
@@ -119,6 +120,7 @@ class StudentExcelImport extends React.Component<P, S> {
 
 					return true;
 				}
+				*/
 
 				return false;
 			})
