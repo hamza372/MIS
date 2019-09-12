@@ -61,6 +61,22 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		}
 	}
 
+	mergedPaymentsForStudent = (student : MISStudent) => {
+		if(student.FamilyID) {
+			const siblings = Object.values(this.props.students)
+				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
+
+			const merged_payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...curr.payments
+			}), {} as { [id: string]: MISStudentPayment})
+
+			return merged_payments
+		}
+
+		return student.payments
+	}
+
 	render() {
 
 		const { students, curr_class, settings} = this.props
@@ -88,12 +104,12 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		
 		const relevant_payments = relevant_students.reduce((agg, s) => {
 			
-			const filteredPayments = getFilteredPayments(s, this.state.year, this.state.month)
+			const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(s), this.state.year, this.state.month)
 
 			const owed = filteredPayments
 				.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
-			const totalOwed = getFilteredPayments(s, "", "")
+			const totalOwed = getFilteredPayments(this.mergedPaymentsForStudent(s), "", "")
 				.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 			
 			return {

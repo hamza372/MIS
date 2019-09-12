@@ -117,6 +117,40 @@ class StudentFees extends Component <propTypes, S> {
 		return this.props.students[id];
 	}
 
+	siblings = () => {
+
+		const student = this.student();
+
+		return Object.values(this.props.students)
+			.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
+
+	}
+
+	mergedPayments = () => {
+
+		const siblings = this.siblings()
+		if(siblings.length > 0) {
+
+			const merged_payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...Object.entries(curr.payments).reduce((agg, [pid, p]) => { 
+					return {
+						...agg,
+						[pid]: {
+							...p,
+							fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`
+						}
+					}
+				}, {} as MISStudent['payments'])
+			}), {} as { [id: string]: MISStudentPayment})
+
+			return merged_payments;
+
+		}
+
+		return this.student().payments
+	}
+
 	newPayment = () => {
 		this.setState({ 
 			payment: {
@@ -187,6 +221,11 @@ class StudentFees extends Component <propTypes, S> {
 		// loop through fees, check if we have added 
 		const owedPayments = checkStudentDuesReturning(this.student());
 		this.props.addMultiplePayments(owedPayments);
+
+		if(this.siblings().length > 0) {
+			console.log('adding sibling payments')
+			this.siblings().forEach(s => this.props.addMultiplePayments(checkStudentDuesReturning(s)))
+		}
 	}
 
 	componentWillReceiveProps(newProps: propTypes) {
@@ -259,7 +298,7 @@ class StudentFees extends Component <propTypes, S> {
 				.map(([id,payment]) => moment(payment.date).format("YYYY"))
 			)]
 			
-		const filteredPayments = getFilteredPayments(this.student(), this.state.year, this.state.month)
+		const filteredPayments = getFilteredPayments(this.mergedPayments(), this.state.year, this.state.month)
 
 		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 		//const curr_month = moment().format("MM/YYYY")
@@ -283,8 +322,6 @@ class StudentFees extends Component <propTypes, S> {
 			</div>
 			<div className="divider">Ledger</div>
 
-					
-			
 			<div className="filter row no-print"  style={{marginBottom:"10px"}}>
 				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
 				

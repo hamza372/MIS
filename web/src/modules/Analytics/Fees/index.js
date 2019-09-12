@@ -97,7 +97,7 @@ class FeeAnalytics extends Component {
 	  this.former = new Former(this, [])
 	}
 
-	calculateDebt = ({SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP}) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
+	calculateDebt = ({ SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP }) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
 
 	componentDidMount() {
 		// first update fees
@@ -168,7 +168,25 @@ class FeeAnalytics extends Component {
 		total_scholarship += debt.SCHOLARSHIP;
 		
 
-		total_student_debts[sid] = { student, debt };
+		if(student.FamilyID) {
+			const existing = total_student_debts[student.FamilyID]
+			if(existing) {
+				total_student_debts[student.FamilyID] = {
+					student,
+					debt: {
+						OWED: existing.debt.OWED + debt.OWED,
+						SUBMITTED: existing.debt.SUBMITTED + debt.SUBMITTED,
+						FORGIVEN: existing.debt.FORGIVEN + debt.FORGIVEN,
+						SCHOLARSHIP: existing.debt.SCHOLARSHIP + debt.SCHOLARSHIP
+					},
+					familyId: student.FamilyID
+				}
+			} else {
+				total_student_debts[student.FamilyID] = { student, debt, familyId: student.FamilyID }
+			}
+		} else {
+			total_student_debts[sid] = { student, debt };
+		}
 
 		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }
 	}
@@ -265,8 +283,8 @@ class FeeAnalytics extends Component {
 			items
 			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))
 			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
-			.map(({ student, debt }) => <div className="table row" key={student.id}>
-					<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
+			.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
+					<Link to={`/student/${student.id}/payment`}>{ familyId ? familyId : student.Name}</Link>
 					<div>{ student.Phone }</div>
 					<div  style={ (-1 * this.calculateDebt(debt)) < 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
 				</div>)
