@@ -206,7 +206,7 @@ class Diary extends Component {
 		}
 
 		const selected_students = this.getSelectedSectionStudents().filter( s => this.getFilterCondition(s))
-		console.log(selected_students)
+		
 		const messages = selected_students
 			.reduce((agg,student)=> {
 
