@@ -9,7 +9,11 @@ import reducer from './reducers'
 
 import Routes from './routes'
 import { saveDB, loadDB } from 'utils/localStorage';
+import { createDb } from './utils/indexedDb'
 import Syncr from 'syncr'
+
+
+const test = createDb()
 
 const debug_host = 'wss://6aaad25d.ngrok.io';
 
