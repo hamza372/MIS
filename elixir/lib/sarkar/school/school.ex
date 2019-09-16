@@ -143,8 +143,14 @@ defmodule Sarkar.School do
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
+<<<<<<< HEAD
 							%{"date" => prev_date, "value" => prev_value} when prev_date >= date ->
 								# IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+=======
+							%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+								# IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
+								# IO.puts "#{school_id}: #{p_key}"
+>>>>>>> bb7ad2d94c2136dc496eb8cf239a7a32709a5459
 								# IO.inspect write
 								{
 									agg_db,

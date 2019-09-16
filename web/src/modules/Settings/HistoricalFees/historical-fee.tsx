@@ -107,6 +107,22 @@ class historicalFee extends Component <propTypes, S > {
 
 		this.props.addHistoricalPayment(payment, this.state.selected_student)
 	}
+
+	mergedPaymentsForStudent = (student : MISStudent) => {
+		if(student.FamilyID) {
+			const siblings = Object.values(this.props.students)
+				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
+
+			const merged_payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...curr.payments
+			}), {} as { [id: string]: MISStudentPayment})
+
+			return merged_payments
+		}
+
+		return student.payments
+	}
 	
 	render() {
 
@@ -119,7 +135,7 @@ class historicalFee extends Component <propTypes, S > {
 			
 		const selected_student = students[this.state.selected_student]
 		
-		let filteredPayments = selected_student ? getFilteredPayments(selected_student, this.state.yearFilter, this.state.monthFilter) : false
+		let filteredPayments = selected_student ? getFilteredPayments(this.mergedPaymentsForStudent(selected_student), this.state.yearFilter, this.state.monthFilter) : false
 		const curr_class_name = this.state.selected_class ? class_Items.find( s => s.id === this.state.selected_class).namespaced_name : "None Selected"
 		
 		const Months = new Set<string>()

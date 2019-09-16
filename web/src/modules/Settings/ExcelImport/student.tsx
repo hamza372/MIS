@@ -98,6 +98,7 @@ class StudentExcelImport extends React.Component<P, S> {
 					return true;
 				}
 				
+				/*
 				const matchingRollNumber = s.RollNumber && Object.values(this.props.students)
 					.find(existing => existing.RollNumber && existing.RollNumber === s.RollNumber)
 
@@ -119,6 +120,7 @@ class StudentExcelImport extends React.Component<P, S> {
 
 					return true;
 				}
+				*/
 
 				return false;
 			})
@@ -278,7 +280,7 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 
 	console.log(studentImportCSV)
 	console.log(lines)
-	
+
 	// note that this is linked to the headers in the template above. see 
 	const students = lines.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
 		const student : MISStudent = {
@@ -306,8 +308,8 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 			payments: { },
 			attendance: { },
 			exams: { },
-			tags: {},
-			certificates: {}
+			tags: { },
+			certificates: { }
 		}
 	
 		return student;

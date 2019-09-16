@@ -134,7 +134,8 @@ interface MISStudent {
 	Notes: string
 	StartDate: number 
 	AdmissionNumber: string
-	BloodType: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
+	BloodType?: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-"
+	FamilyID?: string
 
 	section_id: string
 	prospective_section_id?: string
@@ -155,6 +156,13 @@ interface MISStudent {
 	certificates: {
 		[id: string]: MISCertificate 
 	}
+}
+
+interface MISFamilyInfo { 
+	ManName : string
+	Phone: string
+	ManCNIC: string
+	Address: string
 }
 
 interface MISCertificate {

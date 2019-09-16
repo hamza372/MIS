@@ -6,6 +6,7 @@ defmodule Sarkar.Websocket do
 	end
 
 	def websocket_init(state) do
+		:timer.send_interval(:timer.seconds(30), :gc)
 		{:ok, state}
 	end
 
@@ -39,6 +40,11 @@ defmodule Sarkar.Websocket do
 
 	def websocket_info({:broadcast, json}, state) do
 		{:reply, {:text, Poison.encode!(json)}, state}
+	end
+
+	def websocket_info(:gc, state) do
+		:erlang.garbage_collect(self())
+		{:ok, state}
 	end
 
 	def websocket_info(msg, state) do

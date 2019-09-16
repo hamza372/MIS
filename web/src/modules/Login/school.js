@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
@@ -47,6 +47,11 @@ class SchoolLogin extends Component {
 	}
 
 	render() {
+
+		if(this.props.auth.faculty_id)
+		{
+			return <Redirect to="/landing" />
+		}
 
 		if (!this.props.connected) {
 			return <div>Connecting.....</div>

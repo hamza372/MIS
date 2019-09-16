@@ -1,5 +1,5 @@
 defmodule Sarkar.Server do
-	
+
 	def start_link(_opts) do
 
 		IO.puts "starting server"
@@ -8,8 +8,7 @@ defmodule Sarkar.Server do
 			:http,
 			[{ :port, 8080 }],
 			%{
-				:env => %{ :dispatch => config() },
-				:idle_timeout => :infinity
+				:env => %{ :dispatch => config() }
 			}
 		)
 	end

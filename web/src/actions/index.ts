@@ -346,6 +346,47 @@ export const markAllStudents = (students: MISStudent[], date: string, status: MI
 	dispatch(createMerges(merges));
 }
 
+export const addStudentToFamily = (student : MISStudent, family_id: string) => (dispatch : Function) => {
+
+	dispatch(createMerges([
+		{
+			path: ["db", "students", student.id, "FamilyID"],
+			value: family_id
+		}
+	]))
+}
+
+export const saveFamilyInfo = (siblings: MISStudent[], info: MISFamilyInfo) => (dispatch : Function) => {
+
+	const siblingMerges = siblings.map(s => ([
+		{
+			path: ["db", "students", s.id, "ManName"],
+			value: info.ManName
+		},
+		{
+			path: ["db", "students", s.id, "Phone"],
+			value: info.Phone
+		},
+		{
+			path: ["db", "students", s.id, "ManCNIC"],
+			value: info.ManCNIC
+		},
+		{
+			path: ["db", "students", s.id, "Address"],
+			value: info.Address
+		}
+	]))
+	.reduce((agg, curr) => {
+		return [
+			...agg,
+			...curr
+		]
+	}, [])
+
+	dispatch(createMerges(siblingMerges))
+
+}
+
 export const markFaculty = (faculty: MISTeacher, date: string, status: MISTeacherAttendanceStatus, time = moment.now()) => (dispatch: Function) => {
 	console.log('mark faculty', faculty, 'as', status);
 
@@ -365,13 +406,11 @@ export const undoFacultyAttendance = (faculty: MISTeacher, date: string) => (dis
 	]))
 } 
 
-export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name = "Fee") => (dispatch: Function) => {
-	console.log('add payment', student.Name, 'amount', amount)
+export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name: string = "Fee") => (dispatch: Function) => {
 
 	if(amount === undefined || amount === 0) {
 		return {};
 	}
-
 	dispatch(createMerges([
 		{
 			path: ["db", "students", student.id, "payments", payment_id],
@@ -384,6 +423,7 @@ export const addPayment = (student: MISStudent, payment_id: string, amount: numb
 			}
 		}
 	]))
+
 }
 
 type PaymentAddItem = {
@@ -544,7 +584,7 @@ type FeeAddItem  = MISStudentFee & {
 
 export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
 	
-	//fees is an array of { student, fee_id, amount, type, period, name}
+	// fees is an array of { student, fee_id, amount, type, period, name}
 	
 	const merges = fees.map(f => ({
 		path: ["db","students", f.student.id, "fees", f.fee_id],
@@ -557,6 +597,52 @@ export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
 	}))
 	
 	dispatch(createMerges(merges))
+}
+
+type SingleFeeItem =  MISStudentFee & {
+	student_id: string,
+	fee_id: string
+}
+
+export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
+
+	// student_fee is an object contains MISStudentFee, student_id and fee_id
+	const merges = [{
+			path: ["db", "students", student_fee.student_id, "fees", student_fee.fee_id],
+			value: {
+				amount: student_fee.amount,
+				nane: student_fee.name,
+				period: student_fee.period,
+				type: student_fee.type
+			}
+		}]
+
+	dispatch(createMerges(merges))
+}
+
+type FeeDeleteItem = {
+	[id: string]: {
+		student_id: string
+		paymentIds: string[]
+	}
+}
+
+export const deleteMultipleFees = (students_fees: FeeDeleteItem) => (dispatch: Function) => {
+	
+	// students_fees is an object that contains fee id as key and object { student_id: string, payment_id: [] } as value
+	const deletes = Object.entries(students_fees).reduce((agg, [fee_id, {student_id, paymentIds}]) =>{
+		
+		const pay_deletes = paymentIds.map(pid => ({ path: ["db", "students", student_id, "payments", pid]}))
+		
+		return [
+			...agg, 
+			{
+				path: ["db","students", student_id, "fees", fee_id]
+			},
+			...pay_deletes
+		]}, [])
+
+	dispatch(createDeletes(deletes))
 }
 
 export const createTemplateMerges = (templates: RootDBState["sms_templates"]) => (dispatch: Function) => {

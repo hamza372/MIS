@@ -36,13 +36,37 @@ class printPreview extends Component <propTypes, S>{
 	month = () : string => `${qs.parse(this.props.location.search)["?month"] || ""}`
 	year = () : string => `${qs.parse(this.props.location.search)["year"] || ""}`
 
+	mergedPaymentsForStudent = (student : MISStudent) => {
+		if(student.FamilyID) {
+			const siblings = Object.values(this.props.students)
+				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
+
+			const merged_payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...Object.entries(curr.payments).reduce((agg, [pid, p]) => { 
+					return {
+						...agg,
+						[pid]: {
+							...p,
+							fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`
+						}
+					}
+				}, {} as MISStudent['payments'])
+			}), {} as { [id: string]: MISStudentPayment})
+
+			return merged_payments
+		}
+
+		return student.payments
+	}
+
 	render() {
 
 		const { classes, student, settings } = this.props
 
 		const sections =  getSectionsFromClasses(classes)
 		const curr_class = sections.find(x => x.id === student.section_id ).namespaced_name
-		const filteredPayments = getFilteredPayments(student, this.year(), this.month())
+		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(student), this.year(), this.month())
 
 	return	<div className="student-fees-ledger">
 
@@ -80,5 +104,6 @@ export default connect((state: RootReducerState, { match: { params: { id } } } :
 	classes: state.db.classes,
 	faculty_id: state.auth.faculty_id,
 	student: state.db.students[id],
+	students: state.db.students,
 	settings: state.db.settings,
 }))(withRouter(printPreview))
