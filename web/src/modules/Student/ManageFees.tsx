@@ -96,7 +96,10 @@ class ManageFees extends Component <propTypes,S> {
 					good: true,
 					text: "Bulk fees removed successfully"
 				}
-			})	
+			})
+			
+			setTimeout(() => this.setState({ banner: { active: false } }), 3000);
+			
 		}
 	}
 
@@ -345,7 +348,7 @@ class ManageFees extends Component <propTypes,S> {
 					.map(([key, val]) => 
 						<div className="row" key={key}>
 							<label>{ key }</label>
-							<div className="button red" style={{ padding : "5px 2px" }} onClick={ () => this.delete (val.students_fees) }>Delete</div>
+							<div className="button red" onClick={ () => this.delete (val.students_fees) }>Delete</div>
 						</div>
 					)
 				}

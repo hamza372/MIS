@@ -72,7 +72,7 @@ class Landing extends Component {
 
 		const today_date = moment().format("YYYY-MM-DD");
 
-		let today_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0}
+		let today_attendance = { PRESENT: 0, LEAVE: 0, SICK_LEAVE:0, CASUAL_LEAVE:0, SHORT_LEAVE:0, ABSENT: 0 }
 		let today_payment = 0;
 		let today_payment_students = 0;
 		let today_teacher_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
@@ -256,7 +256,7 @@ class Landing extends Component {
 							</div>
 
 							<div className="box bg-grey">
-								<div>{today_attendance.LEAVE}</div>
+								<div>{today_attendance.LEAVE + today_attendance.SHORT_LEAVE + today_attendance.SICK_LEAVE + today_attendance.CASUAL_LEAVE }</div>
 								<div>Leave</div>
 							</div>
 						</div>

@@ -235,7 +235,7 @@ class Diary extends Component {
 	const selected_section_name  = this.getSelectedSectionName();
 
 	return <Layout history={this.props.history}>
-		<div className="sms-page">
+		<div className="diary">
 		<PrintHeader settings={settings} logo={schoolLogo}/>
 		
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
