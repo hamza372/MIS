@@ -157,12 +157,13 @@ class Diary extends Component {
 			return []
 		}
 		const curr_date = `Date: ${moment().format("DD MMMM YYYY")}\n`
+		const section_name = `Class: ${ this.getSelectedSectionName() }\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
 				.map( ([ subject, { homework }]) => {
 					return `${subject}: ${homework}`
 			})
-		return curr_date + diary_message.join("\n")
+		return curr_date + section_name + diary_message.join("\n")
 	}
 
 	getSelectedSectionStudents = () => {
@@ -189,6 +190,10 @@ class Diary extends Component {
 				return true // if student_filter set to 'all_students'
 		}
 	}
+
+	getSelectedSectionName = () => getSectionsFromClasses(this.props.classes)
+										.filter(s => s.id === this.state.selected_section_id)
+										.map (s => s.namespaced_name)
 
 	render() {
 
@@ -227,7 +232,7 @@ class Diary extends Component {
 				]
 			}, [])
 
-	const selected_section_name  = sortedSections.filter(s => s.id === this.state.selected_section_id).map (s => s.namespaced_name)
+	const selected_section_name  = this.getSelectedSectionName();
 
 	return <Layout history={this.props.history}>
 		<div className="sms-page">
