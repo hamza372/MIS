@@ -154,6 +154,7 @@ class Landing extends Component {
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 						<div className="row">
+                            <img className="new-badge" src={newBadge} alt=""/>
 							<Link to="/families"
 								className="button green-shadow"
 								style={{ backgroundImage: `url(${family})`}}>
@@ -229,7 +230,6 @@ class Landing extends Component {
 							</Link>
 							{
 							(user.Admin || teacher_expense_permission) && <div className="badge-container">
-								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									className="button yellow-shadow"
 									to="/expenses/general"
