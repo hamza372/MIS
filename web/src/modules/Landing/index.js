@@ -142,24 +142,25 @@ class Landing extends Component {
 						</div>
 						<div className="row">
 						{
-							user.Admin && <div className="badge-container">
+							user.Admin && 
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
 									style={{backgroundImage: `url(${cerificate})`}}>
 									Certificates
 								</Link> 
-							</div>
 						}
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 						<div className="row">
-                            <img className="new-badge" src={newBadge} alt=""/>
-							<Link to="/families"
-								className="button green-shadow"
-								style={{ backgroundImage: `url(${family})`}}>
-								Families
-							</Link>
+                            <div className="badge-container">
+                                <img className="new-badge" src={newBadge} alt=""/>
+                                <Link to="/families"
+                                    className="button green-shadow"
+                                    style={{ backgroundImage: `url(${family})`}}>
+                                    Families
+                                </Link>
+                            </div>
 						</div>
 					</div>
 
