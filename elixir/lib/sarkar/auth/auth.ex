@@ -18,8 +18,6 @@ defmodule Sarkar.Auth do
 		#IO.inspect confirm_text
 
 		Sarkar.Store.School.save(id, %{
-			"max_limit" => student_limit
-		}, %{
 			"max_students" => %{
 				"date" => :os.system_time(:millisecond),
 				"value" => student_limit,
