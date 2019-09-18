@@ -156,12 +156,11 @@ class SMSJob : Job() {
                 updateLogText("sending multipart message")
                 smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
             }
+            else {
+                smsManager.sendTextMessage(phoneNumber, null, text, null, null)
+            }
 
-            smsManager.sendTextMessage(phoneNumber, null, text, null, null)
             // updateLogText("message sent")
-
-            smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
-            //Toast.makeText(applicationContext, "Message Sent", Toast.LENGTH_SHORT).show()
         } catch( e: Exception) {
             Log.d(TAG, e.message)
             updateLogText("ERROR ${e.message}")

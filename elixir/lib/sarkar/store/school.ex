@@ -9,7 +9,7 @@ defmodule Sarkar.Store.School do
 	end
 
 	def start_link(_opts) do
-		GenServer.start_link(__MODULE__, {}, name: :school_db)
+		GenServer.start_link(__MODULE__, {}, name: :school_db, spawn_opt: [fullsweep_after: 0])
 	end
 
 	def save(school_id, db) do
