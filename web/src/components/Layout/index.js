@@ -33,9 +33,11 @@ export const PrintHeader = ({settings, logo}) => <div className="print-only scho
 					<div className="address" style={{marginBottom:"4px"}}>{settings.schoolAddress}</div>
 					<div className="phone-number">
 						Tel:{settings.schoolPhoneNumber}</div>
-					<div className="school-code">
+					
+					{ settings.schoolCode && settings.schoolCode !== "" && <div className="school-code">
 						School Code: {settings.schoolCode || "_______"}					
-					</div>
+					</div>}
+
 				</div>
 			</div>
 		</div>

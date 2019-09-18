@@ -28,11 +28,13 @@ defmodule Sarkar.MixProject do
 			{:csv, "~> 2.3"},
 			{:nimble_csv, "~> 0.3"},
 			{:distillery, "~> 2.0"},
-			{:cowboy, "~> 2.2", override: true, manager: :rebar3},
+			{:cowboy, "~> 2.6.3", override: true, manager: :rebar3},
 			{:uuid, "~> 1.1"},
 			{:postgrex, "~>0.13.3"},
 			{:dynamic, github: "ironbay/dynamic", sparse: "elixir"},
-			{:tesla, "~> 1.2.0"}
+			{:tesla, "~> 1.2.0"},
+			{:plug, "~> 1.5.0-rc.0", override: true},
+			{:wobserver, github: "epinault/wobserver"}
 		]
 	end
 end

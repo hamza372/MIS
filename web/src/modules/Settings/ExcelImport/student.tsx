@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 import moment from 'moment';
 import { v4 } from 'node-uuid';
 
+import Former from '../../../utils/former'
+import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
 import downloadCSV from '../../../utils/downloadCSV'
 import { createStudentMerges } from '../../../actions';
 import Banner from '../../../components/Banner'
@@ -15,11 +17,13 @@ interface S {
 		active: boolean
 		good?: boolean
 		text?: string
-	}
+	},
+	selectedSection: string
 }
 
 type P = {
 	students: RootDBState['students']
+	classes: RootDBState['classes']
 	saveStudents: (student : MISStudent[]) => void
 }
 
@@ -41,6 +45,7 @@ const studentCSVHeaders = [
 
 class StudentExcelImport extends React.Component<P, S> {
 
+	former: Former
 	constructor(props : P) {
 		super(props)
 
@@ -51,8 +56,11 @@ class StudentExcelImport extends React.Component<P, S> {
 				active: false,
 				good: false,
 				text: ""
-			}
+			},
+			selectedSection: ""
 		}
+
+		this.former = new Former(this, [])
 	}
 
 	onStudentImportTemplateClick = () => {
@@ -98,6 +106,7 @@ class StudentExcelImport extends React.Component<P, S> {
 					return true;
 				}
 				
+				/*
 				const matchingRollNumber = s.RollNumber && Object.values(this.props.students)
 					.find(existing => existing.RollNumber && existing.RollNumber === s.RollNumber)
 
@@ -119,6 +128,7 @@ class StudentExcelImport extends React.Component<P, S> {
 
 					return true;
 				}
+				*/
 
 				return false;
 			})
@@ -149,7 +159,13 @@ class StudentExcelImport extends React.Component<P, S> {
 
 	onSave = () => {
 		
-		this.props.saveStudents(this.state.importedStudents)
+		const classed_students = this.state.importedStudents
+			.map(s => ({
+				...s,
+				section_id: this.state.selectedSection
+			}))
+
+		this.props.saveStudents(classed_students)
 
 		this.setState({
 			importedStudents: []
@@ -182,6 +198,17 @@ class StudentExcelImport extends React.Component<P, S> {
 				</div>
 
 				{ this.state.loadingStudentImport && <div>Loading student import sheet....</div> }
+
+				{ this.state.importedStudents.length > 0 && <div className="row">
+					<label>Add All Students to Class</label>
+					<select {...this.former.super_handle(["selectedSection"])}>
+						<option value="">Select Class</option>
+						{
+							getSectionsFromClasses(this.props.classes)
+								.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+						}
+					</select>
+				</div>}
 
 				{ this.state.importedStudents.length > 0 && <div className="section">
 					<div className="divider">Student Preview</div>
@@ -278,7 +305,7 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 
 	console.log(studentImportCSV)
 	console.log(lines)
-	
+
 	// note that this is linked to the headers in the template above. see 
 	const students = lines.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
 		const student : MISStudent = {
@@ -306,8 +333,8 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 			payments: { },
 			attendance: { },
 			exams: { },
-			tags: {},
-			certificates: {}
+			tags: { },
+			certificates: { }
 		}
 	
 		return student;
@@ -322,7 +349,8 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 }
 
 export default connect((state : RootReducerState) => ({
-	students: state.db.students
+	students: state.db.students,
+	classes: state.db.classes
 }), (dispatch : Function) => ({
 	saveStudents: (students: MISStudent[]) => dispatch(createStudentMerges(students))
 }))(StudentExcelImport)

@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
+import {connect} from 'react-redux'
 
 import Layout from "components/Layout"
 import logo from './favicon.ico'
@@ -53,6 +55,12 @@ class Front extends Component {
 	}
 
 	render() {
+
+		if(this.props.auth.faculty_id)
+		{
+			return <Redirect to="/landing" />
+		}
+
 		return <Layout history={this.props.history}>
 
 			<div className="mischool-resume">
@@ -476,4 +484,7 @@ class Front extends Component {
 	</Layout>
   }
 }
-export default Front
+
+export default connect(state => ({ 
+	auth: state.auth,
+}))(Front);

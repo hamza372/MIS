@@ -24,6 +24,7 @@ import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
 import expense from './icons/Expense/expense.svg'
 import newBadge from "./icons/New/new.svg";
+import family from "./icons/family/family.svg"
 
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'
@@ -71,7 +72,7 @@ class Landing extends Component {
 
 		const today_date = moment().format("YYYY-MM-DD");
 
-		let today_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0}
+		let today_attendance = { PRESENT: 0, LEAVE: 0, SICK_LEAVE:0, CASUAL_LEAVE:0, SHORT_LEAVE:0, ABSENT: 0 }
 		let today_payment = 0;
 		let today_payment_students = 0;
 		let today_teacher_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
@@ -141,17 +142,25 @@ class Landing extends Component {
 						</div>
 						<div className="row">
 						{
-							user.Admin && <div className="badge-container">
+							user.Admin && 
 								<Link 
 									to="/certificate-menu"
 									className="button purple-shadow"
-									style={{backgroundImage: `url(${cerificate})`}}
-								>
+									style={{backgroundImage: `url(${cerificate})`}}>
 									Certificates
 								</Link> 
-							</div>
 						}
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
+						</div>
+						<div className="row">
+                            <div className="badge-container">
+                                <img className="new-badge" src={newBadge} alt=""/>
+                                <Link to="/families"
+                                    className="button green-shadow"
+                                    style={{ backgroundImage: `url(${family})`}}>
+                                    Families
+                                </Link>
+                            </div>
 						</div>
 					</div>
 
@@ -167,7 +176,7 @@ class Landing extends Component {
 							<div className="badge-container">
 								<Link
 									to="/diary"
-									className="button red-shadow"
+									className="button purple-shadow"
 									style={{ backgroundImage: `url(${diary})` }}>
 									Diary
 								</Link>
@@ -222,7 +231,6 @@ class Landing extends Component {
 							</Link>
 							{
 							(user.Admin || teacher_expense_permission) && <div className="badge-container">
-								<img className="new-badge" src={newBadge} alt=""/>
 								<Link
 									className="button yellow-shadow"
 									to="/expenses/general"
@@ -238,51 +246,67 @@ class Landing extends Component {
 						<div className="title">Daily Statistics</div>
 						<div className="divider">Attendance</div>
 						<div className="row">
-							<div className="box bg-green">
+							<Link 
+								className="box no-underline bg-green" 
+								to = "/analytics/attendance">
 								<div>{today_attendance.PRESENT}</div>
 								<div>Present</div>
-							</div>
+							</Link>
 
-							<div className="box bg-red">
+							<Link 
+								className="box no-underline bg-red"
+								to = "/analytics/attendance">
 								<div>{today_attendance.ABSENT}</div>
 								<div>Absent</div>
-							</div>
+							</Link>
 
-							<div className="box bg-grey">
-								<div>{today_attendance.LEAVE}</div>
+							<Link 
+								className="box no-underline bg-grey"
+								to = "/analytics/attendance">
+								<div>{today_attendance.LEAVE + today_attendance.SHORT_LEAVE + today_attendance.SICK_LEAVE + today_attendance.CASUAL_LEAVE }</div>
 								<div>Leave</div>
-							</div>
+							</Link>
 						</div>
 
 						<div className="divider">Teacher Attendance</div>
 						<div className="row">
-							<div className="box bg-green">
+							<Link 
+								className="box no-underline bg-green" 
+								to = "/analytics/teacher-attendance">
 								<div>{today_teacher_attendance.PRESENT}</div>
 								<div>Present</div>
-							</div>
+							</Link>
 
-							<div className="box bg-red">
+							<Link 
+								className="box no-underline bg-red"
+								to = "/analytics/teacher-attendance">
 								<div>{today_teacher_attendance.ABSENT}</div>
 								<div>Absent</div>
-							</div>
-
-							<div className="box bg-grey">
+							</Link>
+							
+							<Link
+								className="box no-underline bg-grey"
+								to = "/analytics/teacher-attendance">
 								<div>{today_teacher_attendance.LEAVE}</div>
 								<div>Leave</div>
-							</div>
+							</Link>
 						</div>
 
 						<div className="divider">Fee Collection</div>
 						<div className="row">
-							<div className="box bg-blue">
+							<Link
+								className="box no-underline bg-blue"
+								to = "/analytics/fees">
 								<div>{numberWithCommas(today_payment)}</div>
 								<div>Rupees</div>
-							</div>
+							</Link>
 
-							<div className="box bg-green">
+							<Link
+								className="box no-underline bg-green"
+								to = "/analytics/fees">
 								<div>{today_payment_students}</div>
 								<div>Students</div>
-							</div>
+							</Link>
 						</div>
 
 						<div className="divider">Last Backup</div>
