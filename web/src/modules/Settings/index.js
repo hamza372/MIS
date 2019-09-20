@@ -379,6 +379,11 @@ class Settings extends Component {
 					</div>
 
 					<div className="row">
+						<label>School Code (Optional)</label>
+						<input type="text" {...this.former.super_handle(["settings", "schoolCode"])} placeholder="School Code" />
+					</div>
+
+					<div className="row">
 						<label>SMS Option</label>
 						<select {...this.former.super_handle(["settings", "sendSMSOption"])}>
 							<option value="">Select SMS Option</option>

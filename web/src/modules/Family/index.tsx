@@ -67,15 +67,13 @@ class FamilyModule extends React.Component<P, S> {
 			}, {} as Families)
 		
 		const families = Object.entries(reduced)
-			.filter(([fid, f]) => Object.values(f.students).length > 1)
+			.filter(([fid, f]) => Object.values(f.students).length > 0)
 			.reduce((agg, [fid, f]) => {
 				return {
 					...agg,
 					[fid]: f
 				}
 			}, {} as Families)
-		
-		console.log(families)
 
 		return <Layout history={this.props.history}>
 			<div className="family">

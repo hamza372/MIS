@@ -136,16 +136,15 @@ defmodule Sarkar.School do
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
-							%{"date" => prev_date, "value" => prev_value} when prev_date <= date ->
+							%{"date" => prev_date, "value" => prev_value} when prev_date < date ->
 								{
 									Dynamic.put(agg_db, p, value),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
-							%{"date" => prev_date, "value" => prev_value} when prev_date > date ->
+							%{"date" => prev_date, "value" => prev_value} when prev_date >= date ->
 								# IO.puts "#{school_id}: #{prev_date} is more recent than #{date}. current time is #{:os.system_time(:millisecond)}"
-								# IO.puts "#{school_id}: #{p_key}"
 								# IO.inspect write
 								{
 									agg_db,
@@ -173,14 +172,14 @@ defmodule Sarkar.School do
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
-							%{"date" => prev_date} when prev_date <= date ->
+							%{"date" => prev_date} when prev_date < date ->
 								{
 									Dynamic.delete(agg_db, p),
 									Map.put(agg_writes, p_key, write),
 									Map.put(agg_new_writes, p_key, write),
 									max(date, max_date)
 								}
-							%{"date" => prev_date} when prev_date > date ->
+							%{"date" => prev_date} when prev_date >= date ->
 								{
 									agg_db,
 									agg_writes,
