@@ -56,7 +56,7 @@ class Front extends Component {
 
 	render() {
 
-		if(this.props.auth.faculty_id)
+		if(this.props.initialized && this.props.auth.faculty_id)
 		{
 			return <Redirect to="/landing" />
 		}
@@ -487,4 +487,5 @@ class Front extends Component {
 
 export default connect(state => ({ 
 	auth: state.auth,
+	initialized: state.initialized
 }))(Front);

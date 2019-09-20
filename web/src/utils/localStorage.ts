@@ -10,6 +10,7 @@ const defaultTemplates = () => ({
 
 const initState : RootReducerState = {
 	client_id: v4(),
+	initialized: false,
 	queued: { },
 	acceptSnapshot: false,
 	lastSnapshot: 0,
@@ -46,7 +47,7 @@ const initState : RootReducerState = {
 		loading: false,
 		succeed: false,
 		reason: ""
-	}
+	},
 }
 
 export const loadDB = () => {
