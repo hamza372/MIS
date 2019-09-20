@@ -33,7 +33,6 @@ defmodule Sarkar.Store.School do
 			|> Enum.map(fn {_, v} -> v end)
 
 		IO.inspect flattened_db
-
 		
 		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
 		flattened_db_sequence = flattened_db
