@@ -2,6 +2,7 @@ defmodule Sarkar.Store.School do
 	# this module exists to provide sync/restore capabilities for clients
 
 	def save(school_id, writes) do
+
 		flattened_writes = Map.values(writes)
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} -> 
 				[school_id, path, value, date, type, client_id] 
@@ -14,36 +15,88 @@ defmodule Sarkar.Store.School do
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" 
 			end)
 
-			# TODO: THIS DOES NOT HANDLE DELETES
 		flattened_db = Map.values(writes)
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) -> 
 					
-				flat_write = Dynamic.flatten(value)
-					|> Enum.map(fn {p, v} -> [school_id, Enum.join(path ++ p, ","), v, date] end)
-
-				Enum.concat(agg, flat_write)
+				if is_map(value) do
+					flat_write = Dynamic.flatten(value)
+						|> Enum.map(fn {p, v} -> {Enum.join(path ++ p, ","), [type, school_id, path ++ p, v, date]} end)
+					
+					Enum.concat(agg, flat_write)
+				else 
+					[{Enum.join(path, ","), [type, school_id, path, value, date]} | agg]
+					# Enum.concat( agg, [[type, school_id, path, value, date]] )
+				end
 			end)
-			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
+			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
+			|> Enum.into(%{})
+			|> Enum.map(fn {_, v} -> v end)
 
-		gen_value_strings_db = 1..trunc(Enum.count(flattened_db)/4)
-			|> Enum.map(fn i -> 
-				x = (i - 1) * 4 + 1
-				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})" 
+		IO.inspect flattened_db
+
+		
+		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
+		flattened_db_sequence = flattened_db
+			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
+				prev = Enum.at(agg, -1) || %{}
+
+				case Map.get(prev, "type") do
+					^type -> 
+						Enum.drop(agg, -1) ++ [%{
+							"type" => type,
+							"mutations" => Map.get(prev, "mutations") ++ [[school_id, Enum.join(path, ","), value, date]]
+						}]
+					other -> 
+						agg  ++ [%{
+							"type" => type,
+							"mutations" => [
+								[school_id, Enum.join(path, ","), value, date]
+							]
+						}]
+				end
 			end)
 
+		# now just generate the sql queries for each one of these segments
 
-		{:ok} = case Postgrex.query(
-			Sarkar.School.DB,
-			"INSERT INTO flattened_schools (school_id, path, value, time) 
-			VALUES #{Enum.join(gen_value_strings_db, ",")} 
-			ON CONFLICT (school_id, path) DO UPDATE set value = excluded.value, time = excluded.time",
-			flattened_db) do
-				{:ok, resp} -> {:ok}
-				{:error, err} -> 
-					IO.puts "db save failed"
-					IO.inspect err
-					{:err}
-		end
+		results = Postgrex.transaction(Sarkar.School.DB, fn(conn) -> 
+
+			flattened_db_sequence
+			|> Enum.map(fn %{"type" => type, "mutations" => muts} -> 
+				case type do
+					"MERGE" -> 
+						gen_value_strings_db = 1..trunc(Enum.count(muts))
+							|> Enum.map(fn i ->
+								x = (i - 1) * 4 + 1
+								"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})" 
+							end)
+
+						query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+							VALUES #{Enum.join(gen_value_strings_db, ",")}
+							ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+						arguments = muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
+						res = Postgrex.query(conn, query_string, arguments)
+						res
+
+					"DELETE" -> 
+						{query_section, arguments} = muts 
+							|> Enum.with_index()
+							|> Enum.map(fn {[_, path, _, _], index} -> 
+								{ "(path LIKE $#{index + 2})", [path <> "%"] }
+							end)
+							|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
+								[ query | queries ],
+								args ++ arg
+							} end)
+						
+						query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
+						res = Postgrex.query(conn, query_string, [school_id | arguments])
+						res
+				end
+			end)
+		end)
+
+		IO.inspect results
 
 		case Postgrex.query(
 			Sarkar.School.DB,
@@ -102,7 +155,7 @@ defmodule Sarkar.Store.School do
 		case Postgrex.query(
 			Sarkar.School.DB,
 			"SELECT path, value, time, type, client_id FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", 
-			[school_id, last_sync_date]) do
+			[school_id, last_sync_date], timeout: 30000) do
 				{:ok, writes_resp} ->
 					write_formatted = writes_resp.rows
 						|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{

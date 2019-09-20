@@ -20,7 +20,7 @@ defmodule Sarkar.School do
 	# API 
 
 	def sync_changes(school_id, client_id, changes, last_sync_date) do
-		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date}, 15000)
+		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date}, 30000)
 	end
 
 	def get_db(school_id) do

@@ -17,16 +17,16 @@ defmodule Mix.Tasks.Flattened do
 
 	end
 
-	def migrate_to_flattened_schools(school_id) do
+	def migrate_to_flattened_db(school_id) do
 
 		{:ok, res} = Postgrex.query(Sarkar.School.DB, "SELECT path, value, time from writes where school_id=$1 order by time asc", [school_id])
 
-		res.rows 
-		|> Enum.each(fn [path, value, time] -> 
+		# res.rows 
+		# |> Enum.each(fn [path, value, time] -> 
 			# for each write there will be several flattened writes 
 
 
-		end)
+		# end)
 
 
 	end
