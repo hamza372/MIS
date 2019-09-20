@@ -39,7 +39,7 @@ defmodule Mix.Tasks.Flattened do
 			|> Map.values()
 			|> Enum.reduce({[], [], 0}, fn [path, value, time], {combined_args, combined_string, index} -> 
 				{
-					[Enum.join(path, ","), value, time] ++ combined_args,
+					[Enum.join(Enum.drop(path, 1), ","), value, time] ++ combined_args,
 					["($1, $#{index * 3 + 2}, $#{index * 3 + 3}, $#{index * 3 + 4}) " | combined_string],
 					index + 1
 				}
@@ -63,7 +63,8 @@ defmodule Mix.Tasks.Flattened do
 			flattened = Dynamic.flatten(db)
 				|> Enum.map(fn {p, v} -> 
 					Postgrex.query(conn, "INSERT INTO flattened_schools (school_id, path, value, time) 
-						VALUES ($1, $2, $3, $4)", [school_id, Enum.join(p, ","), v, :os.system_time(:millisecond)])
+						VALUES ($1, $2, $3, $4)
+						ON CONFLICT (school_id, path) DO NOTHING", [school_id, Enum.join(p, ","), v, :os.system_time(:millisecond)])
 			end)
 		end, timeout: :infinity)
 

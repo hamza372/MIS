@@ -18,6 +18,7 @@ defmodule Sarkar.Store.School do
 		flattened_db = Map.values(writes)
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) -> 
 					
+				path = Enum.drop(path, 1)
 				if is_map(value) do
 					flat_write = Dynamic.flatten(value)
 						|> Enum.map(fn {p, v} -> {Enum.join(path ++ p, ","), [type, school_id, path ++ p, v, date]} end)
