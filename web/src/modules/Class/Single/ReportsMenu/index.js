@@ -47,6 +47,7 @@ class ClassReportMenu extends Component {
 
 		const relevant_students = Object.values(students)
 			.filter(s => curr_class.sections[s.section_id] !== undefined)
+			.sort((a, b) => (a.RollNumber || 0) - (b.RollNumber || 0))
 			
 		const subjects = new Set()
 		const examSet = new Set()

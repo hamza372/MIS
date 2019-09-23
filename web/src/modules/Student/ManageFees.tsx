@@ -123,7 +123,7 @@ class ManageFees extends Component <propTypes,S> {
 				})
 			}
 		
-		if(this.state.fee_filter === "to_single_student" && this.state.selected_student_id !=="") {
+		if(this.state.fee_filter === "to_single_student" && this.state.selected_student_id !=="" && this.state.selected_section_id !== "") {
 		
 			const student_fee = {
 				student_id: this.state.selected_student_id,
@@ -143,8 +143,8 @@ class ManageFees extends Component <propTypes,S> {
 			})
 		}
 		
-		if(this.state.fee_filter === "to_all_students" || (this.state.fee_filter === "to_single_class" && this.state.selected_section_id !== "")) {
-		
+		if(this.state.fee_filter === "to_all_students" || (this.state.fee_filter === "to_single_class")) {
+
 			const fees = Object.values(students)
 				.filter( s => s.Name && s.Active && this.state.selected_section_id === "" ? true : s.section_id === this.state.selected_section_id)
 				.map(student => {
@@ -179,16 +179,6 @@ class ManageFees extends Component <propTypes,S> {
 			}
 		}
 
-		else {
-			this.setState({
-				banner: {
-					active: true,
-					good: false,
-					text: "Please select Class to Add Fee"
-				}
-			})
-		}
-
 		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
 	}
 
@@ -196,6 +186,15 @@ class ManageFees extends Component <propTypes,S> {
 		return	Object.values(this.props.students)
 					.filter(  s => s.Name && s.Active && s.section_id === this.state.selected_section_id)
 					.sort( (a, b) => a.Name.localeCompare(b.Name))
+	}
+
+	filterCallback = () => {
+		if(this.state.fee_filter === "to_all_students" || this.state.fee_filter === "") {
+			this.setState({
+				selected_section_id: "",
+				selected_student_id: ""
+			})
+		}
 	}
 
 	render() {
@@ -270,7 +269,7 @@ class ManageFees extends Component <propTypes,S> {
 					<div className="section">
 						<div className="row">
 							<label>Add To</label>
-							<select {...this.former.super_handle(["fee_filter"])}>
+							<select {...this.former.super_handle(["fee_filter"] , () => true, () => this.filterCallback() )}>
 								<option value="">Select Students</option>
 								<option value="to_all_students">All Students</option>
 								<option value="to_single_class">Single Class</option>
