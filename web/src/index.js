@@ -12,7 +12,6 @@ import { saveDB, loadDB } from 'utils/localStorage';
 import Syncr from 'syncr'
 
 const debug_host = 'wss://e78e9dd6.ngrok.io';
-// const debug_host = 'ws://localhost:8080';
 
 const host = window.api_url || debug_host;
 

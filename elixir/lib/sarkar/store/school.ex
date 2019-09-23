@@ -3,6 +3,12 @@ defmodule Sarkar.Store.School do
 
 	def save(school_id, writes) do
 
+		save_flattened(school_id, writes)
+		save_writes(school_id, writes)
+
+	end
+
+	def save_writes(school_id, writes) do
 		flattened_writes = Map.values(writes)
 			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} -> 
 				[school_id, path, value, date, type, client_id] 
@@ -15,6 +21,20 @@ defmodule Sarkar.Store.School do
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" 
 			end)
 
+		case Postgrex.query(
+			Sarkar.School.DB,
+			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings_writes, ",")}", 
+			flattened_writes) do
+				{:ok, resp} -> {:ok}
+				{:error, err} -> 
+					IO.puts "write failed"
+					IO.inspect err
+					{:ok}
+		end
+
+	end
+
+	def save_flattened(school_id, writes) do
 		flattened_db = Map.values(writes)
 			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) -> 
 					
@@ -98,16 +118,7 @@ defmodule Sarkar.Store.School do
 
 		IO.inspect results
 
-		case Postgrex.query(
-			Sarkar.School.DB,
-			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings_writes, ",")}", 
-			flattened_writes) do
-				{:ok, resp} -> {:ok}
-				{:error, err} -> 
-					IO.puts "write failed"
-					IO.inspect err
-					{:ok}
-		end
+
 	end
 
 	def load(school_id) do

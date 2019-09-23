@@ -30,8 +30,31 @@ defmodule Mix.Tasks.Flattened do
 	end
 
 	def migrate_to_flattened_db(school_id) do
+		{:ok, res} = Postgrex.query(
+			Sarkar.School.DB, 
+			"SELECT path, value, time, type, client_id from writes where school_id=$1 order by time asc", 
+			[school_id])
 
-		{:ok, res} = Postgrex.query(Sarkar.School.DB, "SELECT path, value, time from writes where school_id=$1 order by time asc", [school_id])
+		writes = res.rows
+		|> Enum.reduce(%{}, fn [path, value, time, type, client_id], collect -> 
+			pkey = Enum.join(path, ",")
+			Map.put(collect, pkey, %{
+				"date" => time,
+				"value" => value,
+				"path" => path,
+				"type" => type,
+				"client_id" => client_id
+			})
+		end)
+
+		Sarkar.Store.School.save_flattened(school_id, writes)
+
+	end
+
+
+	def doesnt_work(school_id) do
+
+		{:ok, res} = Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id from writes where school_id=$1 order by time asc", [school_id])
 
 		{args, query_string, _} = res.rows
 			|> Enum.reduce(%{}, fn [path, value, time], collect -> 
