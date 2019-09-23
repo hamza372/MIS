@@ -1,6 +1,18 @@
 defmodule Mix.Tasks.Flattened do
 	use Mix.Task
 
+	def run (["migrate", "lazy"]) do
+		Application.ensure_all_started(:sarkar)
+
+		{:ok, res} = Postgrex.query(Sarkar.School.DB, "SELECT school_id from backup", [])
+
+		schools = res.rows 
+			|> Enum.map(fn [sid] -> sid end)
+			|> Enum.each(fn sid -> 
+				migrate_to_flattened_lazy(sid)
+			end)
+	end
+
 	def run(["migrate"]) do
 		# query each db out of backup
 		# flatten.... all the way out...
