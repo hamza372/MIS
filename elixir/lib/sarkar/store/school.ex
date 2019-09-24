@@ -53,8 +53,6 @@ defmodule Sarkar.Store.School do
 			|> Enum.into(%{})
 			|> Enum.map(fn {_, v} -> v end)
 
-		IO.inspect flattened_db
-		
 		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
 		flattened_db_sequence = flattened_db
 			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
@@ -95,7 +93,7 @@ defmodule Sarkar.Store.School do
 							ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
 
 						arguments = muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
-						res = Postgrex.query(conn, query_string, arguments)
+						{:ok, res }= Postgrex.query(conn, query_string, arguments)
 						res
 
 					"DELETE" -> 
@@ -110,14 +108,11 @@ defmodule Sarkar.Store.School do
 							} end)
 						
 						query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
-						res = Postgrex.query(conn, query_string, [school_id | arguments])
+						{:ok, res} = Postgrex.query(conn, query_string, [school_id | arguments])
 						res
 				end
 			end)
 		end)
-
-		IO.inspect results
-
 
 	end
 

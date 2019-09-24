@@ -9,6 +9,15 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		{:reply, succeed(resp), state}
 	end
 
+	def handle_action(%{ "type" => "UPDATE_REFERRALS_INFO", "payload" => %{ "school_id" => school_id, "value" => value }}, state) do
+		case Sarkar.Auth.update_referrals_info({ school_id, value}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:err, resp} ->
+				{:reply, fail("Updating Failed"), state}
+		end
+	end
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end

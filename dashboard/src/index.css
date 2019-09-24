@@ -132,6 +132,24 @@ body {
 			display: flex;
 			flex-direction: row;
 		}
+			
+			.newtable-row .newtable-input {
+				width: 100%;
+				text-align: start;
+				background-color: #fafafa;
+				border: none;
+				padding-left: 2px;
+				margin-left: -2px;
+			}
+		
+			.newtable-row .button-cell {
+				justify-content: center;
+			}
+		
+			.newtable-row .button {
+				justify-content: center;
+				min-width: 70%;
+			}
 
 			.newtable-row.heading {
 				font-weight: bold;
@@ -150,7 +168,7 @@ body {
 		.newtable-row :last-child {
 			border-right: none
 		}
-  
+
   @media print {
 	  @page {
 		  size: auto;
