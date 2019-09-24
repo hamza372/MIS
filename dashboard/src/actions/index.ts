@@ -36,6 +36,8 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 	// @ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
 	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	//headers.set('Authorization', 'Basic ' + btoa(`${"cerp"}:${"***REMOVED***"}`))
+	//const END_POINT_URL = "http://localhost:8080/dashboard"
 
 	fetch(`${END_POINT_URL}/school_list`, {
 		headers
@@ -57,6 +59,9 @@ export const REFERRALS_INFO = "REFERRALS_INFO"
 export const getReferralsInfo = () => ( dispatch: Dispatch) => {
 	
 	const headers = new Headers();
+
+	//const END_POINT_URL = "http://localhost:8080/dashboard"
+	//headers.set('Authorization', 'Basic ' + btoa(`${"cerp"}:${"***REMOVED***"}`))
 
 	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
 	//@ts-ignore
