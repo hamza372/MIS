@@ -8,7 +8,6 @@ export const getEndPointResource = ( point:string, school_id: string, start_date
 
 	// @ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
-	//headers.set('Authorization', 'Basic ' + btoa(`${"cerp"}:${"***REMOVED***"}`))
 
 	return fetch(`${END_POINT_URL}${point}?school_id=${school_id}&start_date=${start_date}&end_date=${end_date}`, {
 		headers
