@@ -1,9 +1,11 @@
+.diary .form {
+	width: 80%;
+}
 @media print {
 	@page {
 		size: auto;
 		margin: 4px;
 	}
-
 	.section {
 		border-radius: 4px;
 	}
@@ -15,11 +17,11 @@
 		border: 0px;
 		padding: 0px !important;
 	}
-	.sms-page .section .row {
+	.diary .section .row {
 		border-bottom: 1px solid;
 	}
 }
-.no-print {
+.diary .no-print {
 	width: unset;
 }
 .signature {
