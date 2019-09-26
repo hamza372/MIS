@@ -7,6 +7,7 @@ import { mergeSettings, addLogo } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
+import moment from 'moment'
 //import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
@@ -331,6 +332,18 @@ class Settings extends Component {
 			settings
 		})
 	}
+	onExport = () => {
+		if(!window.confirm("Are you sure, you want to export data to your device?")){
+			return
+		}
+		const db = localStorage.getItem("db")
+		const a = document.createElement("a")
+		const client_id = localStorage.getItem("client_id")
+		
+		a.href = URL.createObjectURL(new Blob([db], {type: "text/json"}))
+		a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
+		a.click()
+	}
 
 
 	render() {
@@ -450,6 +463,13 @@ class Settings extends Component {
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
 					<Link className="button grey" to="/settings/excel-import/students">Import From Excel</Link>
+					{
+						this.props.user.Admin ?
+							<div className="button grey" onClick={() => this.onExport() }>
+								Export to File
+							</div>
+							: false
+					}
 
 					</div>
 					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>

@@ -18,7 +18,8 @@ class StudentMarksContainer extends Component {
 			start: moment().subtract(3, "month"),
 			end: moment.now(),
 			examFilterText: "",
-			subjectFilterText: ""
+			subjectFilterText: "",
+			dateOrSerial: "Date"
 		}
 
 		this.former = new Former(this, []);
@@ -94,9 +95,18 @@ class StudentMarksContainer extends Component {
 								}
 							</select>
 						</div>
+						<div className="row">
+							<label>Show Date/Serial No.</label>
+							<select {...this.former.super_handle(["dateOrSerial"])}>
+								<option value="Date">Date</option>
+								<option value="Serial No.">Serial No.</option>
+							</select>
+						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class} logo={this.props.schoolLogo}/>
+				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate}
+							  endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} 
+							  curr_class={curr_class} logo={this.props.schoolLogo} dateOrSerial = {this.state.dateOrSerial} />
 
 
 				{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.logSms} className="button blue">Send SMS from Local SIM</a> : false }
@@ -129,7 +139,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	const report_arr= [
 		...relevant_exams
 			.sort((a, b) => a.date - b.date)
-			.map(exam => `${exam.subject} ${examFilter === "" ? `- ${exam.name} -` : ""} ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(1)}%)`),
+			.map(exam => `${moment(exam.date).format("MM/DD")} - ${exam.subject} ${examFilter === "" ? `- ${exam.name} -` : ""} ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(1)}%)`),
 		`Total Marks: ${total_score.toFixed(1)}/${max_score.toFixed(1)}`,
 		`Total Percentage: ${(total_score/max_score * 100).toFixed(1)}%`
 		]
@@ -141,11 +151,11 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_arr.join('\n');
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo }) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo, dateOrSerial }) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
-		
+
 	const { total_possible, total_marks } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
@@ -172,7 +182,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		</div>
 		<div className="section table">
 			<div className="table row heading">
-				<label><b>Date</b></label>
+				<label><b>{dateOrSerial}</b></label>
 				<label><b>Subject</b></label>
 				{examFilter === "" ? <label><b>Name</b></label> : false}
 				<label><b>Total</b></label>
@@ -186,8 +196,8 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 				.map(exam_id => exams[exam_id])
 				.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 				.sort((a, b) => a.date - b.date)
-				.map(exam => <div className="table row" key={exam.id}>
-						<div>{moment(exam.date).format("MM/DD")}</div>
+				.map((exam, i) => <div className="table row" key={exam.id}>
+						<div>{ dateOrSerial === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</div>
 						<div>{exam.subject}</div>
 						{examFilter === "" ? <Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
 						<div>{exam.total_score}</div>
@@ -199,7 +209,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 					<div className="table row footing" key={`${student.id}-total-footing`}>
 						<label><b>Total Marks</b></label>
 						<label><b>Out of</b></label>
-						<label><b>Percent</b></label>
+						<label><b>Percentage</b></label>
 					</div>,
 					<div className="table row" key={`${student.id}-total-value`}>
 						<div>{total_marks}</div>
