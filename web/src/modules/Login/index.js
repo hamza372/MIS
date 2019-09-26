@@ -67,8 +67,8 @@ class Login extends Component {
 	}
 
 	render() {
-
-		if (!this.props.initialized) {
+		
+		if (!this.props.initialized && this.props.auth.token !== undefined ) {
 			return <div>Loading Database....</div>
 		}
 		
