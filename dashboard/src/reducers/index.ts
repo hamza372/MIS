@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
 import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF } from '../actions/core'
-import { SCHOOL_INFO } from '../actions/index'
+import { SCHOOL_INFO, REFERRALS_INFO } from '../actions/index'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerState => {
@@ -31,6 +31,14 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 				school_Info: {
 					school_list: action.school_list
 				}
+			}
+		}
+		
+		case REFERRALS_INFO:
+		{
+			return {
+				...state,
+				trials: action.trials
 			}
 		}
 
