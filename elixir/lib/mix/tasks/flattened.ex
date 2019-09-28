@@ -97,9 +97,14 @@ defmodule Mix.Tasks.Flattened do
 		Postgrex.transaction(Sarkar.School.DB, fn conn -> 
 			flattened = Dynamic.flatten(db)
 				|> Enum.map(fn {p, v} -> 
-					Postgrex.query(conn, "INSERT INTO flattened_schools (school_id, path, value, time) 
+					case Postgrex.query(conn, "INSERT INTO flattened_schools (school_id, path, value, time) 
 						VALUES ($1, $2, $3, $4)
-						ON CONFLICT (school_id, path) DO NOTHING", [school_id, Enum.join(p, ","), v, :os.system_time(:millisecond)])
+						ON CONFLICT (school_id, path) DO NOTHING", [school_id, Enum.join(p, ","), v, :os.system_time(:millisecond)]) do
+							{:ok, res} -> ""
+							{:error, err} -> 
+								IO.puts "ERROR"
+								IO.inspect err
+						end
 			end)
 		end, timeout: :infinity)
 
