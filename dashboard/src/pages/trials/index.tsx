@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createSchoolLogin, updateReferralInformation, getReferralsInfo } from '../../actions/index'
+import { createSchoolLogin } from '../../actions/index'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
@@ -9,37 +9,30 @@ import './style.css'
 import moment from 'moment';
 
 interface P {
-	trials: RootReducerState["trials"]
-	getReferralsInfo: () => any
 	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
-	updateReferralInformation: (school_id: string, value: any) => any
 }
 
-const defaultReferralState = () => ({
-	agent_easypaisa_number: "",
-	agent_name: "",
-	area_manager_name: "",
-	association_name: "",
-	city: "",
-	notes: "",
-	office: "",
-	owner_easypaisa_number: "",
-	owner_name: "",
-	package_name: "",
-	school_name: "",
-	type_of_login: "",
-	owner_phone: "",
-	payment_received: false
-})
-
-type EditsRow = TrialsDataRow["value"] & {
+interface DataRow {
+	school_id: string
 	time: number
+	value: {
+		agent_easypaisa_number: string
+		agent_name: string
+		area_manager_name: string
+		association_name: string
+		city: string
+		notes: string
+		office: string
+		owner_easypaisa_number: string
+		owner_name: string
+		package_name: string
+		school_name: string
+		type_of_login: string
+	}
 }
 
 interface S {
-	edits: {
-		[id: string]: EditsRow
-	}
+	data: DataRow[]
 }
 
 interface Routeinfo {
@@ -50,38 +43,40 @@ type propTypes = RouteComponentProps<Routeinfo> & P
 
 
 class Trial extends Component <propTypes, S> {
-
+	
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 
 		this.state = {
-			edits: {}
+			data: []
 		}
-
+	
 		this.former = new Former(this, [])
 	}
 
 	componentDidMount() {
-		this.props.getReferralsInfo()
-	}
 
-	componentWillReceiveProps(newProps: propTypes) {
-		
-		const edits = newProps.trials.reduce((agg, { school_id, time, value }) => {
-			return {
-				...agg,
-				[school_id]: {
-					...defaultReferralState(),
-					...value,
-					time
-				}
-			}
-		}, {})
+		const headers = new Headers();
 
-		this.setState({
-			edits
+		// @ts-ignore
+
+		//Need to update basdhsakjdsakjdkjsahdjksa sadhjakjfkjda ashjasfkjafa ashfjahfjak akfjahfkjasfja sahfsajfhsakjhfsaj
+
+		headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+	
+		fetch('https://mis-socket.metal.fish/dashboard/referrals', {
+			headers
 		})
+			.then(resp => resp.json())
+			.then(resp => {
+				this.setState({
+					data: resp.referrals
+				})
+			})
+			.catch(res => {
+				window.alert("Error Fetching Trial Information!")
+			})
 	}
 
 	getStatus = (date: number) => {
@@ -98,17 +93,11 @@ class Trial extends Component <propTypes, S> {
 		}
 	}
 
-	onSave = (school_id: string) => {
-
-		const { time, ...value } = this.state.edits[school_id]
-
-		this.props.updateReferralInformation(school_id, value)
-		
-	}
-
 	render() {
 
-		const { edits } = this.state
+		console.log("DATA", this.state.data)
+
+		const { data } = this.state
 
  		return <div className="trials page">
 
@@ -122,33 +111,19 @@ class Trial extends Component <propTypes, S> {
 							<div>Status</div>
 							<div>Area Manager</div>
 							<div>Agent</div>
-							<div>Owner Phone</div>
 							<div>Notes</div>
-							<div>Payment</div>
-							<div></div>
 						</div>
 						
 						{
-							Object.entries(edits)
-								.map(([school_id, value]) => {
-									return <div key={school_id} className="newtable-row">
-										<div>{school_id}</div>
-										<div>{value.city}</div>
-										<div>{this.getStatus(value.time)}</div>
-										<div>{value.area_manager_name || "-"}</div>
-										<div>{value.agent_name || "-"}</div>
-										<div>
-											<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id ,"owner_phone"])}/>
-										</div>
-										<div>
-											<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "notes"])}/>
-										</div>
-										<div> 
-											{value.payment_received ? "Received": "Due"}
-										</div>
-										<div style={{ display:"flex", justifyContent:"center"}}>
-											<div className="button save" onClick={() => this.onSave(school_id)}> Save </div>
-										</div>
+							data
+								.map(r => {
+									return <div key={r.school_id} className="newtable-row">
+										<div>{r.school_id}</div>
+										<div>{r.value.city}</div>
+										<div>{this.getStatus(r.time)}</div>
+										<div>{r.value.area_manager_name || "-"}</div>
+										<div>{r.value.agent_name || "-"}</div>
+										<div>{r.value.notes}</div>
 									</div>
 								})
 						}
@@ -159,10 +134,6 @@ class Trial extends Component <propTypes, S> {
 	}
 }
 
-export default connect((state: RootReducerState) => ({
-	trials: state.trials
-}), ( dispatch: Function ) => ({
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
-	updateReferralInformation: (school_id: string, value: any) => dispatch(updateReferralInformation(school_id, value)),
-	getReferralsInfo: () => dispatch(getReferralsInfo())
+export default connect( state => ({}), ( dispatch: Function ) => ({
+	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value))
 }))(Trial)
