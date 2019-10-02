@@ -172,7 +172,8 @@ class Landing extends Component {
                                     style={{ backgroundImage: `url(${family})`}}>
                                     Families
                                 </Link>
-                            </div>
+							</div>
+							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 					</div>
 
