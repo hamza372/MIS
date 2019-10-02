@@ -20,7 +20,20 @@
 
 .expenses .payment-history.section {
 	overflow-x: auto;
+	padding: 5px;
 }
+
+	.expenses .payment-history.section div.newtable-row .button.red{
+		min-width: unset;
+	}
+	.expenses .payment-history.section div.newtable-row .newtable-input {
+		font-family: monospace;
+		font-size: 1em;
+		background-color: unset;
+		height: 30px;
+		line-height: unset;
+	}
+
 
 	.expenses .payment-history.section .table.row {
 		min-width: 600px;

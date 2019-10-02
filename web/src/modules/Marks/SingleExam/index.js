@@ -346,6 +346,7 @@ class SingleExam extends Component {
 										{...this.former.super_handle(["student_marks", student.id, "score"], () => true, () => this.setGrade(student))} 
 										placeholder="Score" />
 										<select {...this.former.super_handle(["student_marks", student.id, "grade"])}>
+											<option value="">Select Grade</option>
 										{
 											Object.entries(this.props.grades)
 												.map(([ grade, percent ]) => {

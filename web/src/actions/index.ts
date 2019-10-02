@@ -406,13 +406,11 @@ export const undoFacultyAttendance = (faculty: MISTeacher, date: string) => (dis
 	]))
 } 
 
-export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name = "Fee") => (dispatch: Function) => {
-	console.log('add payment', student.Name, 'amount', amount)
+export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name: string = "Fee") => (dispatch: Function) => {
 
 	if(amount === undefined || amount === 0) {
 		return {};
 	}
-
 	dispatch(createMerges([
 		{
 			path: ["db", "students", student.id, "payments", payment_id],
@@ -425,6 +423,7 @@ export const addPayment = (student: MISStudent, payment_id: string, amount: numb
 			}
 		}
 	]))
+
 }
 
 type PaymentAddItem = {
@@ -600,10 +599,31 @@ export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
 	dispatch(createMerges(merges))
 }
 
+type SingleFeeItem =  MISStudentFee & {
+	student_id: string,
+	fee_id: string
+}
+
+export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
+
+	// student_fee is an object contains MISStudentFee, student_id and fee_id
+	const merges = [{
+			path: ["db", "students", student_fee.student_id, "fees", student_fee.fee_id],
+			value: {
+				amount: student_fee.amount,
+				nane: student_fee.name,
+				period: student_fee.period,
+				type: student_fee.type
+			}
+		}]
+
+	dispatch(createMerges(merges))
+}
+
 type FeeDeleteItem = {
 	[id: string]: {
 		student_id: string
-		paymentIds: []
+		paymentIds: string[]
 	}
 }
 
@@ -800,7 +820,7 @@ export const addInventoryItem = (item: MISInventoryItem) => ( dispatch: Function
 
 	const expense: MISExpense = {
 		expense: "MIS_EXPENSE",
-		amount: item.cost,
+		amount: item.cost * item.quantity,
 		label: item.name,
 		type: "PAYMENT_GIVEN",
 		category: "INVENTORY",
@@ -843,7 +863,7 @@ export const editInventoryItems = (merges: MISMerge[]) => ( dispatch: Function) 
 }
 
 export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => ( dispatch: Function) => {
-
+	
 	const curr_date = moment.now()
 	const fee_id = v4()
 	const merges = [
@@ -883,7 +903,7 @@ export const sellInventoryItem = (sale: MISItemSale, item: MISInventoryItem) => 
 		{
 			path: ["db", "students", sale.student_id, "payments", v4()],
 			value: {
-				amount: (item.price - sale.discount) * sale.quantity,
+				amount: sale.paid_amount,
 				date: curr_date,
 				fee_name: `${item.name} (${sale.quantity})`,
 				type: "SUBMITTED"

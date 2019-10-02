@@ -197,7 +197,7 @@ class Expenses extends Component <propTypes, S> {
 
 		if(payment.category === "SALARY"){
 
-			this.props.addSalaryExpense( id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date,0,parseFloat(payment.deduction), payment.deduction_reason)
+			this.props.addSalaryExpense( id, parseFloat(payment.amount) - parseFloat(payment.deduction), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date,0,parseFloat(payment.deduction), payment.deduction_reason)
 
 			this.setState({
 				banner: {
@@ -254,7 +254,7 @@ class Expenses extends Component <propTypes, S> {
 					}
 				}
 			}, {})
-
+		
 		this.props.editExpense(filtered_edits)
 
 		this.setState({
@@ -408,54 +408,58 @@ class Expenses extends Component <propTypes, S> {
 					<option value="ACTIVITY">Student Activity</option>
 					<option value="DAILY">Daily</option>
 					<option value="PETTY_CASH">Petty Cash</option>
+					<option value="INVENTORY">Inventory</option>
 				</select>
 			</div>
 
-			<div className="payment-history section">
-				<div className="table row heading">
-					<label><b> Date   </b></label>
-					<label><b> Label  </b></label>
-					<label><b> Category </b></label>
-					<label><b> Quantity</b></label>
-					<label><b> Deductions(Rs) </b></label>
-					<label><b> Amount </b></label>
+			<div className="payment-history section newtable">
+				<div className="newtable-row heading">
+					<div><b> Date   </b></div>
+					<div><b> Label  </b></div>
+					<div><b> Category </b></div>
+					<div><b> Quantity</b></div>
+					<div><b> Amount/item(Rs)</b></div>
+					<div><b> Deductions(Rs) </b></div>
+					<div><b> Total Amount(Rs) </b></div>
 				</div>
 				{
 					filtered_expenses
 					.map( ([id,e]) => {
 						if(e.expense === "SALARY_EXPENSE")
 						{
-							return <div key={id} className={ e.type === "PAYMENT_DUE"? "table row no-print" : "table row"}>
-								<label> {moment(e.date).format("DD-MM-YY")} </label>
-								<label> {e.label}</label>
-								<label> {e.category}</label>
-								<label> {`-`} </label>
-								<label> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
-								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
-									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
-									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-								</div> || <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>}
+							return <div key={id} className={ e.type === "PAYMENT_DUE"? "newtable-row no-print" : "newtable-row"}>
+								<div> {moment(e.date).format("DD-MM-YY")} </div>
+								<div> {e.label}</div>
+								<div> {e.category}</div>
+								<div> - </div>
+								<div> - </div>
+								<div> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </div>
+								{this.state.edits[id] && <div>
+									<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "amount"])} />
+									<div className="button red" onClick={() => this.onDelete(id)}> x </div>
+								</div> || <div> {`${numberWithCommas(e.amount)}`}</div>}
 							</div>
 						}
 						else if (e.expense === "MIS_EXPENSE")
 						{
-							return <div key={id} className="table row">
-								<label> {moment(e.date).format("DD-MM-YY")} </label>
-								<label> {e.label}</label>
-								<label> {e.category}</label>
-								<label> {e.quantity } </label>
-								<label> {`-`} </label>
-								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
-									<input style={{ textAlign: "right", border: "none", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
-									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px"}} onClick={() => this.onDelete(id)} >x</div>
-								</div> || <label> {`${numberWithCommas(e.amount)} Rs`}</label>}
+							return <div key={id} className="newtable-row">
+								<div> {moment(e.date).format("DD-MM-YY")} </div>
+								<div> {e.label}</div>
+								<div> {e.category}</div>
+								<div> {e.quantity} </div>
+								<div> {e.amount/e.quantity} </div>
+								<div> - </div>
+								{ this.state.edits[id] && <div>
+									<input className="newtable-input" type="number" {...this.former.super_handle(["edits", id, "amount"])} />
+									<div className="button red" onClick={() => this.onDelete(id)}> x </div>
+								</div> || <div> {`${numberWithCommas(e.amount)}`}</div>}
 						</div>
 						}
 					})
 				}
 				<div className="table row last">
 					<label><b> Total Paid:</b></label>
-					<div><b>{numberWithCommas(total_filtered_expense)}</b></div>
+					<div><b>Rs {numberWithCommas(total_filtered_expense)}</b></div>
 				</div>
 			</div>
 			<div className="button save" style={{marginTop:"5px"}} onClick={() => this.onSave()}> Save </div>

@@ -46,6 +46,7 @@ interface S {
 		item_id: string
 		quantity: string
 		discount: string
+		paid_amount: string
 	}
 	sell_item: boolean
 	add_item: boolean
@@ -95,6 +96,7 @@ class Inventory extends Component < propTypes, S > {
 				item_id: "",
 				quantity: "0",
 				discount: "0",
+				paid_amount: "0"
 			},
 			edits: JSON.parse(JSON.stringify(props.inventory || {})),
 			sell_item: false,
@@ -169,9 +171,11 @@ class Inventory extends Component < propTypes, S > {
 
 		const sale = {
 			...this.state.sale,
+			paid_amount: parseFloat(this.state.sale.paid_amount || "0"),
 			quantity: parseFloat(this.state.sale.quantity || "0"),
 			discount: parseFloat(this.state.sale.discount || "0")
 		}
+
 		
 		this.props.sellItem(sale, this.props.inventory[sale.item_id])
 
@@ -181,6 +185,7 @@ class Inventory extends Component < propTypes, S > {
 				item_id: "",
 				quantity: "0",
 				discount: "0",
+				paid_amount: "0"
 			},
 			sell_item: !this.state.sell_item,
 			banner: {
@@ -317,6 +322,7 @@ class Inventory extends Component < propTypes, S > {
 					item_id: "",
 					quantity: "0",
 					discount: "0",
+					paid_amount: "0"
 				},
 				sell_item: !this.state.sell_item
 			})	
@@ -444,11 +450,15 @@ class Inventory extends Component < propTypes, S > {
 								})}/>
 					</div>
 					<div className="row">
+						<label> Amount Received </label>
+						<input type="number" placeholder="Amount Received" {...this.former.super_handle(["sale", "paid_amount"])}/>
+					</div>
+					<div className="row">
 						<label> Discount </label>
 						<input type="number" placeholder="Discount" {...this.former.super_handle(["sale", "discount"])}/>
 					</div>
 					 <div> 
-						<label>Price</label>
+						<label>Total Price</label>
 						<label> {(( this.state.sale.item_id ? inventory[this.state.sale.item_id].price : 0) - parseFloat(this.state.sale.discount)) * parseFloat(this.state.sale.quantity)}</label>
 					</div> 
 					<div className="save-delete">

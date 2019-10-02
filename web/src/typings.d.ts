@@ -312,6 +312,7 @@ interface MISItemSale {
 	item_id: string
 	quantity: number
 	discount: number
+	paid_amount: number
 }
 
 interface MISMerge {

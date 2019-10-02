@@ -29,9 +29,6 @@ class MainActivity : AppCompatActivity() {
         val data = intent.data
         val dataString = intent.dataString
 
-
-
-
         permissions()
 
         Log.d(TAG, "HELLOOOO")
