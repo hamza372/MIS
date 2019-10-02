@@ -19,6 +19,18 @@ create table backup (
 	db jsonb
 );
 
+create table flattened_schools (
+	school_id text not null,
+	path text not null,
+	value jsonb not null,
+	time bigint not null,
+	sync_time timestamp default current_timestamp,
+	UNIQUE (school_id, path)
+);
+
+create index school_path_index on flattened_schools (path text_pattern_ops);
+create index on flattened_schools(time);
+
 create table tokens (
 	id text not null,
 	token text not null,

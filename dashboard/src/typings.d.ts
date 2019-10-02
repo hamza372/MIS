@@ -25,6 +25,28 @@ interface RootReducerState {
 	connected: boolean
 	school_Info: {
 		school_list: string[]
+	},
+	trials: TrialsDataRow[]
+}
+
+interface TrialsDataRow {
+	school_id: string
+	time: number
+	value: {
+		agent_easypaisa_number: string
+		agent_name: string
+		area_manager_name: string
+		association_name: string
+		city: string
+		notes: string
+		office: string
+		owner_easypaisa_number: string
+		owner_name: string
+		package_name: string
+		school_name: string
+		type_of_login: string
+		owner_phone: string
+		payment_received: boolean
 	}
 }
 

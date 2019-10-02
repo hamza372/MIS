@@ -18,8 +18,6 @@ defmodule Sarkar.Auth do
 		#IO.inspect confirm_text
 
 		Sarkar.Store.School.save(id, %{
-			"max_limit" => student_limit
-		}, %{
 			"max_students" => %{
 				"date" => :os.system_time(:millisecond),
 				"value" => student_limit,
@@ -84,13 +82,27 @@ defmodule Sarkar.Auth do
 		end
 	end
 
+	def update_referrals_info({ school_id, value}) do
+
+		case Postgrex.query(Sarkar.School.DB,
+		"UPDATE mischool_referrals SET value=$2 WHERE id=$1",
+		[school_id,value]) do
+			{:ok, res} ->
+				{:ok, "updates referral information for #{school_id}"}
+			{:error, err} ->
+				IO.inspect err
+				{:error, "Updating Failed for #{school_id}"}
+		end
+
+	end
+
 	def verify({id, client_id, token}) do
 		case Postgrex.query(Sarkar.School.DB,
 		"SELECT * FROM tokens WHERE id=$1 AND token=$2 AND client_id=$3",
 		[id, hash(token, 12), client_id]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid token"}
 			{:ok, res} -> {:ok, "success"}
-			{:error, err} -> 
+			{:error, err} ->
 				IO.inspect err
 				{:error, "error verifying token"}
 		end
