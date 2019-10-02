@@ -65,4 +65,20 @@
 		min-width: 1rem;
 		margin: 0;
 	}
+
+	.result-stats {
+		margin-bottom: 60px;
+	}
+
+	.result-footer{
+		text-align: start;
+	}
+
+	.result-footer .remarks {
+		margin-bottom: 40px;
+	}
+	
+	.result-footer .signature {
+		margin-bottom: 20px; 
+	}
 }

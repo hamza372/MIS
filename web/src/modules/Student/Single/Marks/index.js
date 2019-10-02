@@ -141,27 +141,49 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_arr.join('\n');
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo }) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo, grades }) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
 		
-	const { total_possible, total_marks } = Object.keys(student.exams || {})
+	const { marks_obtained, total_marks } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 		.reduce((agg, curr) => ({
-			total_possible: agg.total_possible + parseFloat(curr.total_score),
+			marks_obtained: agg.marks_obtained + parseFloat(curr.total_score),
 			total_marks: agg.total_marks + parseFloat(student.exams[curr.id].score)
 		}), {
-			total_possible: 0,
+			marks_obtained: 0,
 			total_marks: 0
 		})
 
+	const getGrade = (total, obtained) => {
+
+		const percent_score = Math.abs(( total / obtained) * 100) || 0
+
+		const sorted_grades = Object.entries(grades).sort((a, b)=> parseFloat(b[1]) - parseFloat(a[1]))
+
+		let prev_grade = 0
+		const highest_grade = sorted_grades[0]
+
+		for( let e of sorted_grades)
+		{
+			if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
+				return highest_grade[0]
+			}
+			else if(prev_grade !== 0 && percent_score <= prev_grade && percent_score >= e[1]){
+				return e[0]
+			}
+			else {
+				prev_grade = parseFloat(e[1])
+			}
+		}
+	}
 
 	return <div className="student-marks">
 		<PrintHeader settings={settings} logo={logo} />
 		
-		<div className="title">{ examFilter === "" ? "Report Card" : examFilter + " Report Card"}</div>
+		<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
 		<div><b>Class:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
 		<div className="student-info">
 			<div className="row">
@@ -198,33 +220,40 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 					</div>),
 					<div className="table row footing" key={`${student.id}-total-footing`}>
 						<label><b>Total Marks</b></label>
-						<label><b>Out of</b></label>
-						<label><b>Percent</b></label>
+						<label><b>Marks Obt.</b></label>
+						<label><b>Percentage</b></label>
 					</div>,
 					<div className="table row" key={`${student.id}-total-value`}>
+						<div>{marks_obtained}</div>
 						<div>{total_marks}</div>
-						<div>{total_possible}</div>
-						<div>{(total_marks/total_possible * 100).toFixed(2)}%</div>
-					</div> 
+						<div>{(total_marks/marks_obtained * 100).toFixed(2)}%</div>
+					</div>
 			]
 		}
 		</div>
-	
-    	<div className="print-only">
+		
+		<div className="result-stats">
+		
+			<div className="row">Grade: <b>{ getGrade( total_marks, marks_obtained) }</b></div>
+			<div className="row">Position: </div>
 
-			<div style={{marginTop: "40px"}}>
-				<div>Principal Comments </div> 
-				<div style={{marginTop: "10px"}}> _______________________________________________________________</div>
-				<div style={{marginTop: "10px"}}> _______________________________________________________________</div>
+		</div>
+
+    	<div className="print-only result-footer">
+
+			<div className="remarks">
+				<div>Principal's Remarks: </div> 
+				<div>_________________________________________________</div>
 			</div>
 
-			<div style={{ marginTop: "40px" }}>
-				<div>Teacher Signature: ___________________</div>
+			<div className="signature">
+				<div>Principal Signature: ________________ </div>
 			</div>
 
-			<div style={{ marginTop: "20px", marginBottom:"80px" }}>
-				<div>Parent Signature: ___________________</div>
+			<div className="signature">
+				<div>Parent Signature: ________________ </div>
 			</div>
+
 		</div> 
 	</div>
 }
@@ -235,6 +264,7 @@ export default connect(state => ({
 	students: state.db.students,
 	exams: state.db.exams,
 	classes: state.db.classes,
+	grades: state.db.settings.exams.grades,
 	settings: state.db.settings,
 	sms_templates: state.db.sms_templates,
 	schoolLogo: state.db.assets ? (state.db.assets.schoolLogo || "") : "" 
