@@ -1,5 +1,5 @@
 import { hash } from '../utils'
-import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
+import { createMerges, createDeletes, createLoginSucceed, createLoginFail, loadDB } from './core'
 import moment from 'moment'
 import {v4} from "node-uuid"
 import Syncr from '../syncr';
@@ -263,9 +263,7 @@ export const createSchoolLogin = (school_id: string, password: string) => (dispa
 			client_id: getState().client_id
 		}
 	})
-	.then(res => {
-		console.log(res)
-		
+	.then(res => {		
 		dispatch(createLoginSucceed(school_id, res.db, res.token))
 	})
 	.catch(err => {

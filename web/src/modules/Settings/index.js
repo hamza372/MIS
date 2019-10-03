@@ -8,6 +8,7 @@ import Former from 'utils/former'
 import Layout from 'components/Layout'
 import Banner from 'components/Banner'
 import moment from 'moment'
+import { openDB } from 'idb'
 //import newBadge from "../Landing/icons/New/new.svg";
 
 import './style.css'
@@ -332,17 +333,44 @@ class Settings extends Component {
 			settings
 		})
 	}
-	onExport = () => {
+	onExport = async () => {
 		if(!window.confirm("Are you sure, you want to export data to your device?")){
 			return
 		}
-		const db = localStorage.getItem("db")
-		const a = document.createElement("a")
-		const client_id = localStorage.getItem("client_id")
-		
-		a.href = URL.createObjectURL(new Blob([db], {type: "text/json"}))
-		a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
-		a.click()
+		try {
+			const db = await openDB('db', 1, {
+				upgrade(db) {
+					db.createObjectStore('root-state')
+				}
+			})
+			
+			if (db) {
+				console.log("Exporting From idb")
+				const state = await db.get('root-state', 'db')
+				const a = document.createElement("a")
+				const client_id = localStorage.getItem("client_id")
+	
+				a.href = URL.createObjectURL(new Blob([state], {type: "text/json"}))
+				a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
+				a.click()
+			}
+			else {
+				const db = localStorage.getItem("db")
+
+				if (db) {
+					console.log("Exporting From ls")
+					const a = document.createElement("a")
+					const client_id = localStorage.getItem("client_id")
+					
+					a.href = URL.createObjectURL(new Blob([db], {type: "text/json"}))
+					a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
+					a.click()
+				}
+			}
+		}
+		catch (err) {
+			console.error("Export", err)
+		}
 	}
 
 
