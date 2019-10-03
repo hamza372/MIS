@@ -109,6 +109,37 @@ export const loadDb = async () => {
 		return undefined
 	}
 }
+
+const checkPersistent = () => {
+	// check and request persistent storage
+	if(navigator.storage && navigator.storage.persist) {
+		navigator.storage.persist()
+			.then(persist => {
+				console.log("PERSIST!!!!", persist)
+			})
+			.catch(err => console.error(err))
+
+		navigator.storage.persisted()
+			.then(persistent => {
+				if(persistent) {
+					console.log('persistent storage activated')
+				}
+				else {
+					console.log('persistent storage denied')
+				}
+			})
+		
+			navigator.storage.estimate()
+				.then(estimate => console.log("ESTIMATE!!", estimate))
+				.catch(err => console.error(err))
+	}
+	else {
+		console.log('no navigator.storage or navigator.storage.persist')
+	}
+}
+
+checkPersistent();
+
 export const saveDb = async (state: RootReducerState) => {
 	
 	const json = JSON.stringify(state)
@@ -121,7 +152,13 @@ export const saveDb = async (state: RootReducerState) => {
 	})
 
 	await db.put('root-state', json, "db")
-	localStorage.setItem('db', json)
+	
+	try {
+		localStorage.setItem('db', json)
+	}
+	catch (err) {
+		console.error("LOCALSTORAGE FAIURE !!!", err )
+	}
 }
 
 const addFacultyID = (state : RootReducerState) => {
