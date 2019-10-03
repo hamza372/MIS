@@ -269,8 +269,15 @@ const rootReducer = (state, action) => {
 				}
 			}
 		}
-
-		case LOGIN_SUCCEED: 
+			
+		case "LOAD_DB":
+		{
+			return {
+				...action.res
+			}
+		}
+			
+		case LOGIN_SUCCEED:
 		{
 			const auth = {
 				...state.auth,

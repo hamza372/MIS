@@ -37,6 +37,7 @@ interface RootDBState {
 
 interface RootReducerState {
 	client_id: string
+	initialized: boolean
 	queued: {
 		[path: string]: {
 			action: {

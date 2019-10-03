@@ -1,5 +1,6 @@
 import { Dispatch, AnyAction } from 'redux'
 import Syncr from '../syncr';
+import { loadDb } from '../utils/indexedDb';
 
 const SYNC = "SYNC"
 const client_type = "mis";
@@ -280,3 +281,13 @@ export const createLoginSucceed = (school_id : string, db: RootReducerState['db'
 	token,
 	db
 })
+
+export const loadDB = () => (dispatch: Function) => {
+
+	loadDb().then(res => {
+		dispatch({
+			type: "LOAD_DB",
+			res
+		})
+	})
+}

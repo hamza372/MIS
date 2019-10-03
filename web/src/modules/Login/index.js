@@ -7,6 +7,7 @@ import Former from 'utils/former'
 import Layout from 'components/Layout'
 
 import './style.css'
+import { openDB } from 'idb'
 
 // login is a different kind of action.
 // first time they do it, no schools are syncd.
@@ -40,9 +41,23 @@ class Login extends Component {
 			}
 		}
 
-		localStorage.removeItem("db");
-		this.props.history.push("/landing")
-		window.location.reload()
+		openDB('db', 1, {
+			upgrade(db) {
+				db.createObjectStore('root-state')
+			}
+		}).then(db => {
+			db.delete('root-state', 'db')
+				.then(res => {
+					this.props.history.push("/landing")
+					window.location.reload()
+				})
+				.catch(err => console.error(err))
+		})
+		.catch(err => console.error(err))
+
+		// localStorage.removeItem("db");
+		// this.props.history.push("/landing")
+		// window.location.reload()
 	}
 
 	componentWillReceiveProps(newProps) {
@@ -52,7 +67,11 @@ class Login extends Component {
 	}
 
 	render() {
-
+		
+		if (!this.props.initialized && this.props.auth.token !== undefined ) {
+			return <div>Loading Database....</div>
+		}
+		
 		if(!this.props.auth.token) {
 			return <Redirect to="/school-login" />
 		}
@@ -95,6 +114,7 @@ class Login extends Component {
 
 export default connect(state => ({ 
 	auth: state.auth,
+	initialized: state.initialized,
 	users: state.db.users,
 	num_users: Object.keys(state.db.users).length,
 	connected: state.connected,
