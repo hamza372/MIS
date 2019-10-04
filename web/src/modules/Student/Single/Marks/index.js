@@ -223,7 +223,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			
 			<div className="section table">
 				<div className="table row heading">
-					<label>Date</label>
+					<label>{dateOrSerial}</label>
 					<label>Subject</label>
 					{examFilter === "" ? <label>Name</label> : false}
 					<label>Total</label>
@@ -237,8 +237,8 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 					.map(exam_id => exams[exam_id])
 					.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 					.sort((a, b) => a.date - b.date)
-					.map(exam => <div className="table row" key={exam.id}>
-							<div>{moment(exam.date).format("MM/DD")}</div>
+					.map((exam, i) => <div className="table row" key={exam.id}>
+							<div>{ dateOrSerial === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</div>
 							<div>{exam.subject}</div>
 							{examFilter === "" ? <Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
 							<div>{exam.total_score}</div>

@@ -110,7 +110,7 @@ class ClassReportMenu extends Component {
 							Array.from(subjects).map(subject => {
 								return <option key={subject} value={subject}>{subject}</option>	
 							})
-						}&nbsp;
+						}
 					</select>
 				</div>
 				<div className="row">
