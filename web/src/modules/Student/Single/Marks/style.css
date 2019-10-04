@@ -3,20 +3,21 @@
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 }
-	.student-marks-container .no-print>* {
-		margin: auto;
-	}
+
+.student-marks-container .no-print>* {
+	margin: auto;
+}
 
 .student-marks {
 	width: 90%;
+	margin: auto;
 	text-align: center;
 }
 
-.student-marks .student-info {
+.student-marks {
 	text-align: left;
-	margin: 10px 0;
+	/* margin: 10px 0; */
 }
 
 .student-marks .table.section {
@@ -31,9 +32,10 @@
 	width: auto;
 	border-bottom: 1px solid #aaa;
 }
-	.student-marks .table.row:last-child {
-		border-bottom: none;
-	}
+
+.student-marks .table.row:last-child {
+	border-bottom: none;
+}
 
 .student-marks .table.row * {
 	flex-wrap: nowrap;
@@ -41,28 +43,80 @@
 	margin: 0 3px;
 	width: 6rem;
 	text-align: left;
+	font-weight: normal;
 }
-	.student-marks .table.row *:last-child {
-		text-align: left;
-	}
 
-	.student-marks .table.row.footing {
-		padding-top: 20px;
-		border-top: 3px solid #222;
-	}
+.student-marks .table.row *:last-child {
+	text-align: left;
+}
+
+.student-marks .table.row.footing {
+	padding-top: 20px;
+	border-top: 3px solid #222;
+}
+
+.student-marks .table.row label {
+	font-weight: bold !important;
+}
+
+.student-info {
+	padding-bottom: 8px;
+}
+
+.student-info .row {
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+	padding-bottom: 2px;
+}
 
 @media print {
 
+	.student-marks {
+		width: 95%;
+	}
+	.result-card {
+		margin: 10mm;
+		padding-bottom: 2rem;
+		border: 4px solid black;
+	}
 	.student-marks .table.row {
 		font-family: 'Courier New', Courier, monospace;
 		font-size: 10pt;
-		line-height: 2em;
+		line-height: 1.5em;
 	}
-
 	.student-marks .table.row * {
 		flex: 1 1 100%;
 		width: initial;
 		min-width: 1rem;
 		margin: 0;
+	}
+	.result-stats {
+		margin-bottom: 40px;
+	}
+	.result-stats.row {
+		margin-bottom: 4px;
+	}
+
+	.remarks {
+		text-align: start;
+		margin-bottom: 40px;
+	}
+
+	.result-footer {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: 100px; 
+	}
+	
+	.result-footer .right {
+		border-top: 1px solid #bebebe;
+		padding: 10px 0px;
+	}
+
+	.result-footer .left {
+		border-top: 1px solid #bebebe;
+		padding: 10px 0px;
 	}
 }
