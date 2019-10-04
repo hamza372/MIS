@@ -64,7 +64,7 @@ export const loadDb = async () => {
 		const serialized = await db.get('root-state', 'db') //|| localStorage.getItem('db')
 		
 		if (!serialized) {
-			return { 
+			return {
 				...initState,
 				initialized: true
 			}
@@ -142,20 +142,24 @@ const checkPersistent = () => {
 
 checkPersistent();
 
-export const saveDb = async (state: RootReducerState) => {
+export const saveDb = (state: RootReducerState) => {
 	
 	const json = JSON.stringify(state)
 	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 	
-	const db = await openDB('db', 1, {
+	openDB('db', 1, {
 		upgrade(db) {
 			db.createObjectStore('root-state')
 		}
 	})
-
-	await db.put('root-state', json, "db")
-	
-	localStorage.setItem("client_id", state.client_id)
+	.then(db => {
+		console.log('putting db')
+		return db.put('root-state', json, "db")
+	})
+	.catch(err => {
+		console.error(err)
+		alert("Error saving database. Please contact helpline")
+	})
 
 	try {
 		localStorage.setItem('db', json)
