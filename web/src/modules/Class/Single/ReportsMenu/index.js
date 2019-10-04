@@ -79,8 +79,8 @@ class ClassReportMenu extends Component {
 
 
 		return <div className="class-report-menu" style={{width: "100%"}}>
-			<div className="title no-print">Print Reports for {this.props.curr_class.name}</div>
-			<div className="form no-print" style={{width: "90%", margin: "auto"}}>
+			<div className="title no-print">Print Result Card for {this.props.curr_class.name}</div>
+			<div className="form no-print">
 				<div className="row">
 					<label>Start Date</label>
 					<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_filters.start).format("YYYY-MM-DD")} placeholder="Start Date" />
@@ -112,13 +112,16 @@ class ClassReportMenu extends Component {
 						}
 					</select>
 				</div>
+
+			</div>
+
+			<div className="table btn-section">
+				{ settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
+				<div className="row print button" onClick={() => window.print()} style={{marginTop: " 10px"}}>Print</div>
 			</div>
 			
 			<div className="class-report" style={{height: "100%"}}>
-			
-			<div className="print button" onClick={() => window.print()}>Print</div>
 
-			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
 			{
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 

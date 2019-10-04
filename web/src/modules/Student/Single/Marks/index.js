@@ -96,11 +96,19 @@ class StudentMarksContainer extends Component {
 						</div>
 					</div>
 				</div>
-				<StudentMarks student={student} exams={exams} settings={settings} startDate={startDate} endDate={endDate} examFilter={this.state.examFilterText} subjectFilter={this.state.subjectFilterText} curr_class={curr_class} logo={this.props.schoolLogo}/>
+				<StudentMarks student={student} 
+					exams={exams} settings={settings} 
+					startDate={startDate} endDate={endDate} 
+					examFilter={this.state.examFilterText} 
+					subjectFilter={this.state.subjectFilterText} 
+					curr_class={curr_class} 
+					logo={this.props.schoolLogo}
+					grades={this.props.grades}/>
 
-
-				{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.logSms} className="button blue">Send SMS from Local SIM</a> : false }
-				<div className="print button" onClick={() => window.print()} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end", }}>Print</div>
+				<div className="table btn-section">
+					{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.logSms} className="row button blue">Send SMS from Local SIM</a> : false }
+					<div className="row print button" onClick={() => window.print()} style={{ marginTop: "10px"}}>Print</div>
+				</div>
 			</div>
 	}
 }
@@ -146,24 +154,25 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	const start = moment(startDate);
 	const end = moment(endDate);
 		
-	const { marks_obtained, total_marks } = Object.keys(student.exams || {})
+	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 		.reduce((agg, curr) => ({
-			marks_obtained: agg.marks_obtained + parseFloat(curr.total_score),
-			total_marks: agg.total_marks + parseFloat(student.exams[curr.id].score)
+			total_marks: agg.total_marks + parseFloat(curr.total_score),
+			marks_obtained: agg.marks_obtained + parseFloat(student.exams[curr.id].score)
 		}), {
-			marks_obtained: 0,
-			total_marks: 0
+			total_marks: 0,
+			marks_obtained: 0
 		})
 
-	const getGrade = (total, obtained) => {
+	const getGrade = (obtained, total) => {
 
-		const percent_score = Math.abs(( total / obtained) * 100) || 0
+		const percent_score = Math.abs(( obtained / total) * 100) || 0
 
 		const sorted_grades = Object.entries(grades).sort((a, b)=> parseFloat(b[1]) - parseFloat(a[1]))
 
 		let prev_grade = 0
+
 		const highest_grade = sorted_grades[0]
 
 		for( let e of sorted_grades)
@@ -180,81 +189,72 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		}
 	}
 
-	return <div className="student-marks">
-		<PrintHeader settings={settings} logo={logo} />
-		
-		<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
-		<div><b>Class:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
-		<div className="student-info">
-			<div className="row">
-				<div className="name"><b>Student Name:</b> {student.Name}</div>
-				<div className="name" style={{ marginLeft: "1em"}}><b>Father Name:</b> {student.ManName}</div>
-				<div style={{ marginLeft: "1em"}}><b>Roll No:</b> {student.RollNumber !== undefined ? student.RollNumber : "______"}</div>
+	return<div className="result-card"> 
+		<div className="student-marks">
+			<PrintHeader settings={settings} logo={logo} />
+			
+			<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
+			<div><b>Class:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
+			<div className="student-info">
+				<div className="row">
+					<div className="name"><b>Student Name:</b> {student.Name}</div>
+					<div className="name" style={{ marginLeft: "1em"}}><b>Father Name:</b> {student.ManName}</div>
+					<div style={{ marginLeft: "1em"}}><b>Roll No:</b> {student.RollNumber !== undefined ? student.RollNumber : "______"}</div>
+				</div>
 			</div>
-		</div>
-		<div className="section table">
-			<div className="table row heading">
-				<label><b>Date</b></label>
-				<label><b>Subject</b></label>
-				{examFilter === "" ? <label><b>Name</b></label> : false}
-				<label><b>Total</b></label>
-				<label><b>Obtained</b></label>
-				<label><b>Percent</b></label>
-				<label><b>Grade</b></label>
-				<label><b>Remarks</b></label>
+			<div className="section table">
+				<div className="table row heading">
+					<label>Date</label>
+					<label style={{width: "10rem"}}>Subject</label>
+					{examFilter === "" ? <label style={{width: "10rem"}}>Name</label> : false}
+					<label>Total</label>
+					<label>Obtained</label>
+					<label>Percent</label>
+					<label>Grade</label>
+					<label style={{width: "10rem"}}>Remarks</label>
+				</div>
+			{
+				[...Object.keys(student.exams || {})
+					.map(exam_id => exams[exam_id])
+					.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
+					.sort((a, b) => a.date - b.date)
+					.map(exam => <div className="table row" key={exam.id}>
+							<div>{moment(exam.date).format("MM/DD")}</div>
+							<div style={{width: "10rem"}}>{exam.subject}</div>
+							{examFilter === "" ? <Link style={{width: "10rem"}} to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
+							<div>{exam.total_score}</div>
+							<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
+							<div>{student.exams[exam.id].grade !== "Absent" ? (student.exams[exam.id].score / exam.total_score * 100).toFixed(2) : "N/A"}</div>
+							<div>{student.exams[exam.id].grade}</div>
+							<div style={{width: "10rem"}}>{student.exams[exam.id].remarks}</div>
+						</div>)
+				]
+			}
 			</div>
-		{
-			[...Object.keys(student.exams || {})
-				.map(exam_id => exams[exam_id])
-				.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
-				.sort((a, b) => a.date - b.date)
-				.map(exam => <div className="table row" key={exam.id}>
-						<div>{moment(exam.date).format("MM/DD")}</div>
-						<div>{exam.subject}</div>
-						{examFilter === "" ? <Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
-						<div>{exam.total_score}</div>
-						<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
-						<div>{student.exams[exam.id].grade !== "Absent" ? (student.exams[exam.id].score / exam.total_score * 100).toFixed(2) : "N/A"}</div>
-						<div>{student.exams[exam.id].grade}</div>
-						<label>{student.exams[exam.id].remarks}</label>
-					</div>),
-					<div className="table row footing" key={`${student.id}-total-footing`}>
-						<label><b>Total Marks</b></label>
-						<label><b>Marks Obt.</b></label>
-						<label><b>Percentage</b></label>
-					</div>,
-					<div className="table row" key={`${student.id}-total-value`}>
-						<div>{marks_obtained}</div>
-						<div>{total_marks}</div>
-						<div>{(total_marks/marks_obtained * 100).toFixed(2)}%</div>
+			
+			<div className="result-stats">
+				<div className="row">Total Marks: <b>{total_marks}</b></div>
+				<div className="row">Marks Obtained: <b>{marks_obtained} / {total_marks}</b></div>
+				<div className="row">Percentage: <b>{(marks_obtained/total_marks * 100).toFixed(2)}%</b></div>
+				<div className="row">Grade: <b>{ getGrade( marks_obtained, total_marks) }</b></div>
+				<div className="row">Position: </div>
+			</div>
+
+			<div className="print-only">
+				<div className="remarks">
+					<div>Comments:</div> 
+					<div>_____________________________________________________________________</div>
+				</div>
+				<div className="result-footer">
+					<div className="left">
+						<div> Teacher Signature</div>
 					</div>
-			]
-		}
+					<div className="right">
+						<div> Principal Signature</div>
+					</div>
+				</div>
+			</div> 
 		</div>
-		
-		<div className="result-stats">
-		
-			<div className="row">Grade: <b>{ getGrade( total_marks, marks_obtained) }</b></div>
-			<div className="row">Position: </div>
-
-		</div>
-
-    	<div className="print-only result-footer">
-
-			<div className="remarks">
-				<div>Principal's Remarks: </div> 
-				<div>_________________________________________________</div>
-			</div>
-
-			<div className="signature">
-				<div>Principal Signature: ________________ </div>
-			</div>
-
-			<div className="signature">
-				<div>Parent Signature: ________________ </div>
-			</div>
-
-		</div> 
 	</div>
 }
 
