@@ -153,7 +153,8 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
-		
+	const section_name= curr_class !==undefined ? student.curr_class.sections[student.section_id].name : "" 
+
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
@@ -194,14 +195,22 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			<PrintHeader settings={settings} logo={logo} />
 			
 			<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
-			<div><b>Class:</b> {curr_class !== undefined ? curr_class.name: "______"} </div>
+			
 			<div className="student-info">
 				<div className="row">
-					<div className="name"><b>Student Name:</b> {student.Name}</div>
-					<div className="name" style={{ marginLeft: "1em"}}><b>Father Name:</b> {student.ManName}</div>
-					<div style={{ marginLeft: "1em"}}><b>Roll No:</b> {student.RollNumber !== undefined ? student.RollNumber : "______"}</div>
+					<div><b>Class:</b> {curr_class !== undefined ? curr_class.name + " " + section_name : "______"}</div>
+					<div><b>Session:</b> {moment().format("YYYY")}</div>
+				</div>
+				<div className="row">
+					<div><b>Admission #:</b> {student.AdmissionNumber}</div>
+					<div><b>Roll #:</b> {student.RollNumber !== undefined && student.RollNumber !== "" ? student.RollNumber : "______"}</div>
+				</div>
+				<div className="row">
+					<div><b>Student Name:</b> {student.Name}</div>
+					<div><b>Father Name:</b> {student.ManName}</div>
 				</div>
 			</div>
+			
 			<div className="section table">
 				<div className="table row heading">
 					<label>Date</label>
@@ -242,7 +251,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 
 			<div className="print-only">
 				<div className="remarks">
-					<div>Comments:</div> 
+					<div>Remarks</div>
 					<div>_____________________________________________________________________</div>
 				</div>
 				<div className="result-footer">
