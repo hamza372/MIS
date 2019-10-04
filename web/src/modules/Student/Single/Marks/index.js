@@ -153,7 +153,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
-	const section_name= curr_class !==undefined ? student.curr_class.sections[student.section_id].name : "" 
+	const section_name= curr_class !==undefined ? curr_class.sections[student.section_id].name : "" 
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
@@ -214,13 +214,13 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			<div className="section table">
 				<div className="table row heading">
 					<label>Date</label>
-					<label style={{width: "10rem"}}>Subject</label>
-					{examFilter === "" ? <label style={{width: "10rem"}}>Name</label> : false}
+					<label>Subject</label>
+					{examFilter === "" ? <label>Name</label> : false}
 					<label>Total</label>
 					<label>Obtained</label>
 					<label>Percent</label>
 					<label>Grade</label>
-					<label style={{width: "10rem"}}>Remarks</label>
+					<label>Remarks</label>
 				</div>
 			{
 				[...Object.keys(student.exams || {})
@@ -229,24 +229,32 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 					.sort((a, b) => a.date - b.date)
 					.map(exam => <div className="table row" key={exam.id}>
 							<div>{moment(exam.date).format("MM/DD")}</div>
-							<div style={{width: "10rem"}}>{exam.subject}</div>
-							{examFilter === "" ? <Link style={{width: "10rem"}} to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
+							<div>{exam.subject}</div>
+							{examFilter === "" ? <Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.name}</Link> : false}
 							<div>{exam.total_score}</div>
 							<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
 							<div>{student.exams[exam.id].grade !== "Absent" ? (student.exams[exam.id].score / exam.total_score * 100).toFixed(2) : "N/A"}</div>
 							<div>{student.exams[exam.id].grade}</div>
-							<div style={{width: "10rem"}}>{student.exams[exam.id].remarks}</div>
-						</div>)
+							<div>{student.exams[exam.id].remarks}</div>
+						</div>),
+						
+						<div className="table row footing" key={`${student.id}-total-footing`}>
+							<label><b>Total Marks</b></label>
+							<label><b>Marks Obtained</b></label>
+							<label><b>Percentage</b></label>
+						</div>,
+						<div className="table row" key={`${student.id}-total-value`}>
+							<div>{total_marks}</div>
+							<div>{marks_obtained}</div>
+							<div>{(marks_obtained/total_marks * 100).toFixed(2)}%</div>
+						</div>
 				]
 			}
 			</div>
 			
 			<div className="result-stats">
-				<div className="row">Total Marks: <b>{total_marks}</b></div>
-				<div className="row">Marks Obtained: <b>{marks_obtained} / {total_marks}</b></div>
-				<div className="row">Percentage: <b>{(marks_obtained/total_marks * 100).toFixed(2)}%</b></div>
-				<div className="row">Grade: <b>{ getGrade( marks_obtained, total_marks) }</b></div>
-				<div className="row">Position: </div>
+				<div className="row">Grade: &nbsp; <b>{ getGrade( marks_obtained, total_marks) }</b></div>
+				<div className="row">Position: __________ </div>
 			</div>
 
 			<div className="print-only">
