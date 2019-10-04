@@ -64,7 +64,10 @@ export const loadDb = async () => {
 		const serialized = await db.get('root-state', 'db') //|| localStorage.getItem('db')
 		
 		if (!serialized) {
-			return initState
+			return { 
+				...initState,
+				initialized: true
+			}
 		}
 
 		const prev: RootReducerState = JSON.parse(serialized)

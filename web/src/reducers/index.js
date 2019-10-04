@@ -273,7 +273,8 @@ const rootReducer = (state, action) => {
 		case "LOAD_DB":
 		{
 			return {
-				...action.res
+				...action.res,
+				connected: state.connected
 			}
 		}
 			

@@ -282,12 +282,44 @@ export const createLoginSucceed = (school_id : string, db: RootReducerState['db'
 	db
 })
 
-export const loadDB = () => (dispatch: Function) => {
+export const loadDB = () => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
 	loadDb().then(res => {
 		dispatch({
 			type: "LOAD_DB",
 			res
 		})
+
+		const state = res;
+		
+		if(syncr.ready && state.auth.school_id && state.auth.token) {
+			syncr
+				.send({
+					type: "VERIFY",
+					client_type: client_type,
+					payload: {
+						school_id: state.auth.school_id,
+						token: state.auth.token,
+						client_id: state.client_id,
+					}
+				})
+				.then(res => {
+					return syncr.send({
+						type: SYNC,
+						client_type: client_type,
+						school_id: state.auth.school_id,
+						payload: state.queued,
+						lastSnapshot: state.lastSnapshot
+					})
+				})
+				.then(resp => {
+					dispatch(resp)
+				})
+				.catch(err => {
+					console.error(err)
+					alert("Authorization Failed. Log out and Log in again.")
+				})
+		}
+
 	})
 }
