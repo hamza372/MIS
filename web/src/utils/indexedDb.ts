@@ -1,5 +1,6 @@
 import { v4 } from 'node-uuid'
-import requestFS from './requestFS'
+
+import { openDB, deleteDB } from 'idb'
 import { defaultExams } from '../modules/Settings';
 
 const defaultTemplates = () => ({
@@ -8,19 +9,19 @@ const defaultTemplates = () => ({
 	result: "Report is ready for $NAME:\n $REPORT"
 })
 
-const initState : RootReducerState = {
+export const initState : RootReducerState = {
 	client_id: v4(),
-	initialized: false,
 	queued: { },
 	acceptSnapshot: false,
 	lastSnapshot: 0,
+	initialized: false,
 	db: {
 		faculty: { },
-		users: { }, // username: passwordhash, permissions, etc.  
+		users: { },
 		students: { },
-		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
+		classes: { },
 		sms_templates: defaultTemplates(),
-		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
+		exams: { },
 		settings: { } as MISSettings,
 		expenses: {},
 		analytics: {
@@ -31,8 +32,6 @@ const initState : RootReducerState = {
 		},
 		max_limit: -1
 	},
-	// this part of the tree i want to obscure.
-	// but will get to that later
 	auth: {
 		school_id: undefined,
 		faculty_id: undefined,
@@ -50,21 +49,34 @@ const initState : RootReducerState = {
 	},
 }
 
-export const loadDB = () => {
+export const loadDb = async () => {
+
+	console.log("Runing Load DB from indexed")
+
 	try {
-		const serialized = localStorage.getItem('db');
-		if (serialized === null) {
-			console.log('null')
-			return initState;
+
+		const db = await openDB('db', 1, {
+			upgrade(db) {
+				db.createObjectStore('root-state')
+			}
+		})
+		
+		const serialized = await db.get('root-state', 'db') //|| localStorage.getItem('db')
+		
+		if (!serialized) {
+			return { 
+				...initState,
+				initialized: true
+			}
 		}
 
-		const prev = JSON.parse(serialized);
+		const prev: RootReducerState = JSON.parse(serialized)
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
-		// but should we make sure that fields that are no longer in the initState db are deleted?
+
 		const merged = {
 			...initState,
 			...prev,
-			client_id: client_id,
+			client_id,
 			db: {
 				...initState.db,
 				...prev.db
@@ -74,62 +86,31 @@ export const loadDB = () => {
 				loading: false,
 				succeed: false,
 				reason: ""
-			}
+			},
+			initialized: true
 		}
-
-		// console.log(merged);
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {
 			try {
 				const next = curr(agg)
-				if(next === undefined) {
-					return agg;
+				if (next === null) {
+					return agg
 				}
-				return next;
+				return next
 			}
-			catch(e) {
-				console.error(e)
-				return agg;
+			catch (err) {
+				console.error(err)
+				return agg
 			}
-		}, merged);
+		}, merged)
 
-		return updatedDB;
+		return updatedDB
+
 	}
-	catch(err) {
+	catch (err) {
 		console.error(err)
-		return undefined;
+		return undefined
 	}
-}
-
-export const saveDB = (db: RootReducerState) => {
-	try {
-		const json = JSON.stringify(db);
-		localStorage.setItem('db', json)
-		localStorage.setItem("client_id", db.client_id)
-	}
-	catch(err) {
-		console.error(err)
-	}
-
-	try {
-		saveDbToFilesystem(db);
-	}
-	catch(e) {
-		console.error(e)
-	}
-
-}
-
-const saveDbToFilesystem = (db: RootReducerState) => {
-
-	requestFS(20)
-		.then((fs: any) => {
-			//console.log('got fs');
-		})
-		.catch((err: any) => {
-			//console.error(err)
-		})
-
 }
 
 const checkPersistent = () => {
@@ -162,14 +143,33 @@ const checkPersistent = () => {
 
 checkPersistent();
 
-// add faculty_id to the auth field if it doesn't exist.
+export const saveDb = async (state: RootReducerState) => {
+	
+	const json = JSON.stringify(state)
+	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
+	
+	const db = await openDB('db', 1, {
+		upgrade(db) {
+			db.createObjectStore('root-state')
+		}
+	})
+
+	await db.put('root-state', json, "db")
+	
+	try {
+		localStorage.setItem('db', json)
+	}
+	catch (err) {
+		console.error("LOCALSTORAGE FAIURE !!!", err )
+	}
+}
+
 const addFacultyID = (state : RootReducerState) => {
 
 	if(state.auth.faculty_id !== undefined) {
 		console.log("not running addFacultyID script")
 		return state;
 	}
-	console.log("running addFacultyID script")
 
 	const faculty = Object.values(state.db.faculty).find(f => f.Name === state.auth.name);
 
@@ -217,8 +217,6 @@ const checkGrades = (state: RootReducerState) => {
 	return state
 }
 
-// this modifies db in case any schema changes have happened
-// which means i should maybe version the client db formally...
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,

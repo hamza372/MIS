@@ -20,7 +20,8 @@ class ClassReportMenu extends Component {
 				end: moment.now(),
 				exam_name: "",
 				examFilterText: "",
-				subjectFilterText: ""
+				subjectFilterText: "",
+				dateOrSerial: "Date"
 			}
 		}
 		this.report_former = new Former(this, ["report_filters"])
@@ -109,7 +110,14 @@ class ClassReportMenu extends Component {
 							Array.from(subjects).map(subject => {
 								return <option key={subject} value={subject}>{subject}</option>	
 							})
-						}
+						}&nbsp;
+					</select>
+				</div>
+				<div className="row">
+					<label>Show Date/Serial No.</label>
+					<select {...this.report_former.super_handle(["dateOrSerial"])}>
+						<option value="Date">Date</option>
+						<option value="Serial No.">Serial No.</option>
 					</select>
 				</div>
 
@@ -137,6 +145,7 @@ class ClassReportMenu extends Component {
 							curr_class={this.props.curr_class}
 							logo={this.props.schoolLogo}
 							grades={this.props.grades}
+							dateOrSerial = {this.state.report_filters.dateOrSerial}
 						/>
 					</div>)
 			}

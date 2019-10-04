@@ -20,7 +20,7 @@ defmodule Sarkar.School do
 	# API 
 
 	def sync_changes(school_id, client_id, changes, last_sync_date) do
-		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date})
+		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date}, 30000)
 	end
 
 	def get_db(school_id) do
@@ -229,7 +229,7 @@ defmodule Sarkar.School do
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
-				Sarkar.Store.School.save(school_id, nextDb, new_writes)
+				Sarkar.Store.School.save(school_id, new_writes)
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
 				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}

@@ -35,8 +35,9 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 
 	// @ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
 
-	fetch('https://mis-socket.metal.fish/dashboard/school_list', {
+	fetch(`${END_POINT_URL}/school_list`, {
 		headers
 	})
 		.then(resp => resp.json())
@@ -50,6 +51,55 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 			window.alert("Error Fetching List!")
 		})
 
+}
+
+export const REFERRALS_INFO = "REFERRALS_INFO"
+export const getReferralsInfo = () => ( dispatch: Dispatch) => {
+	
+	const headers = new Headers();
+
+	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	//@ts-ignore
+	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+
+	fetch(`${END_POINT_URL}/referrals`, {
+		headers
+	})
+		.then(resp => resp.json())
+		.then(resp => {
+			console.log("FETCHED INFO", resp.referrals)
+			dispatch({
+				type: REFERRALS_INFO,
+				trials: resp.referrals
+			})
+		})
+		.catch(err => {
+			window.alert(`Error Fetching Trial Information!\n${err}`)
+		})
+}
+
+export const updateReferralInformation = (school_id: string, value: any) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	
+	const state = getState();
+
+	console.log("In Update action")
+
+	syncr.send({
+		type: "UPDATE_REFERRALS_INFO",
+		client_type: state.auth.client_type,
+		payload: {
+			school_id,
+			value
+		}
+	})
+	.then((res) => {
+		window.alert(`Update Successful\n${res}`)
+		getReferralsInfo()
+	})
+	.catch(() => {
+		window.alert(`Update Information Failed for school ${school_id}`)
+	})
+	
 }
 
 export const createSchoolLogin = (username: string, password: string, limit: number, value: SignUpValue) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {

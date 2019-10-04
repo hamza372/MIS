@@ -11,7 +11,6 @@ defmodule Sarkar.Application do
 			{ Registry, keys: :duplicate, name: Sarkar.ConnectionRegistry },
 			{ Registry, keys: :unique, name: Sarkar.SchoolRegistry },
 			{ DynamicSupervisor, name: Sarkar.SchoolSupervisor, strategy: :one_for_one },
-			Sarkar.Store.School,
 			{
 				Postgrex,
 					name: Sarkar.School.DB,

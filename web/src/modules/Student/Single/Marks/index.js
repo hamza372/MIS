@@ -18,7 +18,8 @@ class StudentMarksContainer extends Component {
 			start: moment().subtract(3, "month"),
 			end: moment.now(),
 			examFilterText: "",
-			subjectFilterText: ""
+			subjectFilterText: "",
+			dateOrSerial: "Date"
 		}
 
 		this.former = new Former(this, []);
@@ -94,6 +95,13 @@ class StudentMarksContainer extends Component {
 								}
 							</select>
 						</div>
+						<div className="row">
+							<label>Show Date/Serial No.</label>
+							<select {...this.former.super_handle(["dateOrSerial"])}>
+								<option value="Date">Date</option>
+								<option value="Serial No.">Serial No.</option>
+							</select>
+						</div>
 					</div>
 				</div>
 				<StudentMarks student={student} 
@@ -103,7 +111,8 @@ class StudentMarksContainer extends Component {
 					subjectFilter={this.state.subjectFilterText} 
 					curr_class={curr_class} 
 					logo={this.props.schoolLogo}
-					grades={this.props.grades}/>
+					grades={this.props.grades}
+					dateOrSerial = {this.state.dateOrSerial}/>
 
 				<div className="table btn-section">
 					{ settings.sendSMSOption === "SIM" ? <a href={url} onClick={this.logSms} className="row button blue">Send SMS from Local SIM</a> : false }
@@ -137,7 +146,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	const report_arr= [
 		...relevant_exams
 			.sort((a, b) => a.date - b.date)
-			.map(exam => `${exam.subject} ${examFilter === "" ? `- ${exam.name} -` : ""} ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(1)}%)`),
+			.map(exam => `${moment(exam.date).format("MM/DD")} - ${exam.subject} ${examFilter === "" ? `- ${exam.name} -` : ""} ${student.exams[exam.id].score}/${exam.total_score} (${(student.exams[exam.id].score / exam.total_score * 100).toFixed(1)}%)`),
 		`Total Marks: ${total_score.toFixed(1)}/${max_score.toFixed(1)}`,
 		`Total Percentage: ${(total_score/max_score * 100).toFixed(1)}%`
 		]
@@ -149,7 +158,7 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_arr.join('\n');
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo, grades }) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo, grades, dateOrSerial }) => {
 	
 	const start = moment(startDate);
 	const end = moment(endDate);
@@ -157,7 +166,8 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.map(exam_id => exams[exam_id])
-		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
+		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" &&
+		 getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 		.reduce((agg, curr) => ({
 			total_marks: agg.total_marks + parseFloat(curr.total_score),
 			marks_obtained: agg.marks_obtained + parseFloat(student.exams[curr.id].score)
