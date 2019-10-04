@@ -10,7 +10,7 @@ const defaultTemplates = () => ({
 })
 
 export const initState : RootReducerState = {
-	client_id: v4(),
+	client_id: localStorage.getItem("client_id") || v4(),
 	queued: { },
 	acceptSnapshot: false,
 	lastSnapshot: 0,
@@ -72,7 +72,6 @@ export const loadDb = async () => {
 
 		const prev: RootReducerState = JSON.parse(serialized)
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
-
 		const merged = {
 			...initState,
 			...prev,
@@ -155,9 +154,9 @@ export const saveDb = async (state: RootReducerState) => {
 	})
 
 	await db.put('root-state', json, "db")
-
-	localStorage.setItem("client_id", state.client_id)
 	
+	localStorage.setItem("client_id", state.client_id)
+
 	try {
 		localStorage.setItem('db', json)
 	}
