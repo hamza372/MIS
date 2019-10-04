@@ -155,6 +155,8 @@ export const saveDb = async (state: RootReducerState) => {
 	})
 
 	await db.put('root-state', json, "db")
+
+	localStorage.setItem("client_id", state.client_id)
 	
 	try {
 		localStorage.setItem('db', json)
