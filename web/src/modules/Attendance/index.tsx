@@ -282,7 +282,7 @@ class Attendance extends Component <propTypes, S> {
 					placeholder="Current Date" />
 				
 				<div className="selectors">
-					<div className="row">
+					<div className="row" style = {{flexWrap : "wrap"}}>
 						<div className="button select-all" onClick={this.selectAllOrNone}>{Object.values(this.state.selected_students).every(x => x) ? "Select None" : "Select All"}</div>
 						<div className="button select-all" onClick={this.selectPresentOrNone}>P</div>
 						<div className="button select-all" onClick={this.selectAbsentOrNone}>A</div>

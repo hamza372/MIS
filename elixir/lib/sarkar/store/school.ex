@@ -1,46 +1,132 @@
 defmodule Sarkar.Store.School do
-	use GenServer
-
 	# this module exists to provide sync/restore capabilities for clients
-	# this is not for data-sharing
 
-	def init(args) do
-		{:ok, args}
+	def save(school_id, writes) do
+
+		save_flattened(school_id, writes)
+		save_writes(school_id, writes)
+
 	end
 
-	def start_link(_opts) do
-		GenServer.start_link(__MODULE__, {}, name: :school_db, spawn_opt: [fullsweep_after: 0])
+	def save_writes(school_id, writes) do
+		flattened_writes = Map.values(writes)
+			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} -> 
+				[school_id, path, value, date, type, client_id] 
+			end)
+			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
+
+		gen_value_strings_writes = Stream.with_index(Map.values(writes), 1)
+			|> Enum.map(fn {w, i} -> 
+				x = (i - 1) * 6 + 1
+				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" 
+			end)
+
+		case Postgrex.query(
+			Sarkar.School.DB,
+			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings_writes, ",")}", 
+			flattened_writes) do
+				{:ok, resp} -> {:ok}
+				{:error, err} -> 
+					IO.puts "write failed"
+					IO.inspect err
+					{:ok}
+		end
+
 	end
 
-	def save(school_id, db) do
-		GenServer.cast(:school_db, {:save, school_id, db})
-	end
+	def save_flattened(school_id, writes) do
+		flattened_db = Map.values(writes)
+			|> Enum.reduce([], fn(%{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id}, agg) -> 
+					
+				path = Enum.drop(path, 1)
+				if is_map(value) do
+					flat_write = Dynamic.flatten(value)
+						|> Enum.map(fn {p, v} -> {Enum.join(path ++ p, ","), [type, school_id, path ++ p, v, date]} end)
+					
+					Enum.concat(agg, flat_write)
+				else 
+					[{Enum.join(path, ","), [type, school_id, path, value, date]} | agg]
+					# Enum.concat( agg, [[type, school_id, path, value, date]] )
+				end
+			end)
+			|> Enum.sort( fn({_, [_, _, _, _, d1]}, {_, [_, _, _, v, d2]} ) -> d1 < d2 end)
+			|> Enum.into(%{})
+			|> Enum.map(fn {_, v} -> v end)
 
-	def save(school_id, db, writes) do
-		GenServer.cast(:school_db, {:save, school_id, db})
-		GenServer.cast(:school_db, {:save_writes, school_id, writes})
+		# array of map %{ type: "MERGE" | "DELETE", mutations: [ [date, value, path, type, client_id] ] }
+		flattened_db_sequence = flattened_db
+			|> Enum.reduce([], fn([type, school_id, path, value, date], agg) ->
+				prev = Enum.at(agg, -1) || %{}
+
+				case Map.get(prev, "type") do
+					^type -> 
+						Enum.drop(agg, -1) ++ [%{
+							"type" => type,
+							"mutations" => Map.get(prev, "mutations") ++ [[school_id, Enum.join(path, ","), value, date]]
+						}]
+					other -> 
+						agg  ++ [%{
+							"type" => type,
+							"mutations" => [
+								[school_id, Enum.join(path, ","), value, date]
+							]
+						}]
+				end
+			end)
+
+		# now just generate the sql queries for each one of these segments
+
+		results = Postgrex.transaction(Sarkar.School.DB, fn(conn) -> 
+
+			flattened_db_sequence
+			|> Enum.map(fn %{"type" => type, "mutations" => muts} -> 
+				case type do
+					"MERGE" -> 
+						gen_value_strings_db = 1..trunc(Enum.count(muts))
+							|> Enum.map(fn i ->
+								x = (i - 1) * 4 + 1
+								"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})" 
+							end)
+
+						query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+							VALUES #{Enum.join(gen_value_strings_db, ",")}
+							ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+						arguments = muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
+						{:ok, res }= Postgrex.query(conn, query_string, arguments)
+						res
+
+					"DELETE" -> 
+						{query_section, arguments} = muts 
+							|> Enum.with_index()
+							|> Enum.map(fn {[_, path, _, _], index} -> 
+								{ "(path LIKE $#{index + 2})", [path <> "%"] }
+							end)
+							|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
+								[ query | queries ],
+								args ++ arg
+							} end)
+						
+						query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
+						{:ok, res} = Postgrex.query(conn, query_string, [school_id | arguments])
+						res
+				end
+			end)
+		end)
+
 	end
 
 	def load(school_id) do
-		GenServer.call(:school_db, {:load, school_id})
-	end
-
-	def get_school_ids() do
-		GenServer.call(:school_db, {:get_school_ids})
-	end
-
-	def get_writes(school_id, last_sync_date) do
-		GenServer.call(:school_db, {:get_writes, school_id, last_sync_date})
-	end
-
-	# modify this to return db + (last 50) writes writes map of path, value, data, type
-	def handle_call({:load, school_id}, _from, state) do
 		case Postgrex.query(
 			Sarkar.School.DB,
-			"SELECT db from backup where school_id=$1", [school_id]) do
-				{:ok, %Postgrex.Result{num_rows: 0}} -> {:reply, {%{}, %{}}, state}
+			"SELECT path, value FROM flattened_schools WHERE school_id=$1 ORDER BY time asc", [school_id]) do
+				{:ok, %Postgrex.Result{num_rows: 0}} -> {%{}, %{}}
 				{:ok, resp} ->
-					[[db]] = resp.rows
+					inflated = resp.rows
+					|> Enum.reduce(%{}, fn([p, v], agg) -> 
+						path = String.split(p, ",")
+						Dynamic.put(agg, path, v)
+					end)
 
 					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
 						{:ok, writes_resp} ->
@@ -51,20 +137,31 @@ defmodule Sarkar.Store.School do
 								|> Enum.reverse
 								|> Enum.into(%{})
 
-							{:reply, {db, write_formatted}, state}
-						{:error, err} -> {:reply, {:error, err}, state} 
+							{inflated, write_formatted}
+						{:error, err} -> {:error, err} 
 					end
 				{:error, err} ->
 					IO.inspect err
-					{:reply, {:error, err}, state}
+					{:error, err}
 		end
 	end
 
-	def handle_call({:get_writes, school_id, last_sync_date}, _from, state) do
+	def get_school_ids() do
+		case Postgrex.query(
+			Sarkar.School.DB,
+			"SELECT school_id from flattened_schools", []) do
+				{:ok, resp} -> 
+					schools = Enum.map(resp.rows, fn([ school ]) -> school end)
+					{:ok, schools}
+				{:error, err} -> {:error, err}
+		end
+	end
+
+	def get_writes(school_id, last_sync_date) do
 		case Postgrex.query(
 			Sarkar.School.DB,
 			"SELECT path, value, time, type, client_id FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", 
-			[school_id, last_sync_date]) do
+			[school_id, last_sync_date], timeout: 30000) do
 				{:ok, writes_resp} ->
 					write_formatted = writes_resp.rows
 						|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
@@ -73,64 +170,9 @@ defmodule Sarkar.Store.School do
 						|> Enum.reverse
 						|> Enum.into(%{})
 					
-					{:reply, {:ok, write_formatted}, state}
+					{:ok, write_formatted}
 
-				{:error, err} -> {:reply, {:error, err}, state}
+				{:error, err} -> {:error, err}
 		end
-	end
-
-	def handle_call({:get_school_ids}, _from, state) do
-		case Postgrex.query(
-			Sarkar.School.DB,
-			"SELECT school_id from backup", []) do
-				{:ok, resp} -> 
-					schools = Enum.map(resp.rows, fn([ school ]) -> school end)
-					{:reply, {:ok, schools}, state}
-				{:error, err} -> {:reply, {:error, err}, state}
-		end
-	end
-
-	def handle_cast({:save, school_id, db}, state) when db == %{} do
-		# ignore empty db save
-		{:noreply, state}
-	end
-
-	def handle_cast({:save, school_id, db}, state) do
-
-		case Postgrex.query(
-			Sarkar.School.DB,
-			"INSERT INTO backup (school_id, db) VALUES ($1, $2) ON CONFLICT (school_id) DO UPDATE SET db=$2",
-			[school_id, db]) do
-				{:ok, resp} -> {:noreply, state}
-				{:error, err} -> 
-					IO.puts "write failed"
-					IO.inspect err 
-					{:noreply, state}
-		end
-	end
-
-	def handle_cast({:save_writes, school_id, writes}, state) do
-
-		gen_value_strings = Stream.with_index(Map.values(writes), 1)
-			|> Enum.map(fn {w, i} -> 
-				x = (i - 1) * 6 + 1
-				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" end)
-
-		flattened_writes = Map.values(writes)
-			|> Enum.map(fn %{"date" => date, "value" => value, "path" => path, "type" => type, "client_id" => client_id} -> 
-				[school_id, path, value, date, type, client_id] 
-			end)
-			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
-
-		case Postgrex.query(
-			Sarkar.School.DB,
-			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings, ",")}", 
-			flattened_writes) do
-				{:ok, resp} -> {:noreply, state}
-				{:error, err} -> 
-					IO.puts "write failed"
-					IO.inspect err
-					{:noreply, state}
-			end
 	end
 end

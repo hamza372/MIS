@@ -7,6 +7,34 @@ defmodule Sarkar.Server.Analytics do
 		
 	end
 
+	def init(%{bindings: %{type: "devices.csv"}} = req, state) do
+
+		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
+		"SELECT school_id, client_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
+		FROM writes
+		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
+		GROUP BY school_id, client_id, date 
+		ORDER BY date desc",
+		[]) do
+				{:ok, resp} -> {:ok, resp.rows}
+				{:error, err} -> {:error, err}
+		end
+
+		csv = [ ["school_id", "client_id", "date", "writes"] | data ]
+		|> CSV.encode
+		|> Enum.join()
+
+		req = :cowboy_req.reply(
+			200,
+			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
+			csv,
+			req
+		)
+
+		{:ok, req, state}
+
+	end
+
 	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
 
 		{:ok, data} = case Postgrex.query(Sarkar.School.DB,

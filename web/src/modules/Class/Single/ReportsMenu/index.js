@@ -20,7 +20,8 @@ class ClassReportMenu extends Component {
 				end: moment.now(),
 				exam_name: "",
 				examFilterText: "",
-				subjectFilterText: ""
+				subjectFilterText: "",
+				dateOrSerial: "Date"
 			}
 		}
 		this.report_former = new Former(this, ["report_filters"])
@@ -79,8 +80,8 @@ class ClassReportMenu extends Component {
 
 
 		return <div className="class-report-menu" style={{width: "100%"}}>
-			<div className="title no-print">Print Reports for {this.props.curr_class.name}</div>
-			<div className="form no-print" style={{width: "90%", margin: "auto"}}>
+			<div className="title no-print">Print Result Card for {this.props.curr_class.name}</div>
+			<div className="form no-print">
 				<div className="row">
 					<label>Start Date</label>
 					<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_filters.start).format("YYYY-MM-DD")} placeholder="Start Date" />
@@ -112,13 +113,23 @@ class ClassReportMenu extends Component {
 						}
 					</select>
 				</div>
+				<div className="row">
+					<label>Show Date/Serial No.</label>
+					<select {...this.report_former.super_handle(["dateOrSerial"])}>
+						<option value="Date">Date</option>
+						<option value="Serial No.">Serial No.</option>
+					</select>
+				</div>
+
+			</div>
+
+			<div className="table btn-section">
+				{ settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
+				<div className="row print button" onClick={() => window.print()} style={{marginTop: " 10px"}}>Print</div>
 			</div>
 			
 			<div className="class-report" style={{height: "100%"}}>
-			
-			<div className="print button" onClick={() => window.print()}>Print</div>
 
-			{ settings.sendSMSOption === "SIM" ? <a className="button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
 			{
 				//TODO: put in total marks, grade, signature, and remarks.
 				relevant_students.map(s => 
@@ -133,6 +144,8 @@ class ClassReportMenu extends Component {
 							subjectFilter={this.state.report_filters.subjectFilterText} 
 							curr_class={this.props.curr_class}
 							logo={this.props.schoolLogo}
+							grades={this.props.grades}
+							dateOrSerial = {this.state.report_filters.dateOrSerial}
 						/>
 					</div>)
 			}
@@ -150,6 +163,7 @@ export default connect((state, { match: { params: { id } } }) => ({
 	 students: state.db.students,
 	 settings: state.db.settings,
 	 exams: state.db.exams,
+	 grades: state.db.settings.exams.grades,
 	 schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 	 sms_templates: state.db.sms_templates
 }), dispatch => ({

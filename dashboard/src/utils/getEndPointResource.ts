@@ -1,5 +1,5 @@
 
-//const END_POINT_URL = "https://localhost:8080/dashboard/"
+//const END_POINT_URL = "http://localhost:8080/dashboard/"
 const END_POINT_URL = "https://mis-socket.metal.fish/dashboard/"
 
 export const getEndPointResource = ( point:string, school_id: string, start_date: number, end_date: number) => {
