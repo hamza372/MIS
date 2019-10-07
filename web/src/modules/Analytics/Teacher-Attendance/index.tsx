@@ -44,10 +44,10 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}: ChartData) => {
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
 				data={Object.entries(monthly_attendance)
-					.sort(([month,], [m2,]) => month.localeCompare(m2))
+					.sort(([month,], [m2,]) => moment(month).isBefore(m2) ? 1 : 0)
 					.map(([month, { PRESENT, LEAVE, ABSENT }]) => {
 							
-						const percent = (1 - ABSENT / (PRESENT + LEAVE)) * 100
+						const percent = ( ABSENT / (ABSENT + PRESENT + LEAVE) * 100)
 							return { month, PRESENT, LEAVE, ABSENT, percent: isFinite(percent) ? percent : 1 }
 						})}>
 
@@ -75,7 +75,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}: TableData) =>{
 				</div>
 				{
 					[...Object.entries(monthly_attendance)
-						.sort(([month, ], [m2, ]) => month.localeCompare(m2))
+						.sort(([month, ], [m2, ]) => moment(month).isBefore(m2) ? 1 : 0)
 						.map(([month, {PRESENT, LEAVE, ABSENT} ]) =>
 						
 							<div className="table row" key={Math.random()}>
@@ -83,7 +83,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}: TableData) =>{
 								<div style={{ backgroundColor: "#93d0c5"}}>{PRESENT}</div>
 								<div style={{ backgroundColor: "#fc6171"}}>{ABSENT}</div>
 								<div style={{ backgroundColor: "#e0e0e0"}}>{LEAVE}</div>
-								<div style={{ backgroundColor: "#bedcff"}}>{ isFinite( Math.round((ABSENT / (PRESENT + LEAVE )) * 100)) ? Math.round((ABSENT / (PRESENT + LEAVE )) * 100) : "0"}%</div>
+								<div style={{ backgroundColor: "#bedcff"}}>{(ABSENT / (ABSENT + PRESENT + LEAVE) * 100) ? (ABSENT / (ABSENT + PRESENT + LEAVE) * 100).toFixed(2) : "0"}%</div>
 							</div>
 						),
 						<div className="table row footing" style={{borderTop: '1.5px solid #333'}} key={Math.random()}>   
@@ -91,7 +91,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}: TableData) =>{
 							<label style={{ backgroundColor: "#93d0c5"}}><b>{totals.PRESENT}</b></label>
 							<label style={{ backgroundColor: "#fc6171"}}><b>{totals.ABSENT}</b></label>
 							<label style={{ backgroundColor: "#e0e0e0"}}><b>{totals.LEAVE}</b></label>
-							<label style={{ backgroundColor: "#bedcff"}}><b>{Math.round((1 - totals.ABSENT / (totals.PRESENT + totals.LEAVE)) * 100)}%</b></label>
+							<label style={{ backgroundColor: "#bedcff"}}><b>{(totals.ABSENT / (totals.ABSENT + totals.PRESENT + totals.LEAVE) * 100).toFixed(2)}%</b></label>
 						</div>
 					]
 				}
@@ -200,12 +200,12 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 			<div>{totals.ABSENT}</div>
 		</div>
 		<div className="table row">
-			<label>Total Present</label>
+			<label>Total Leave</label>
 			<div>{totals.LEAVE}</div>
 		</div>
 		<div className="table row">
 			<label>Absentee Percent</label>
-			<div>{(totals.ABSENT/totals.PRESENT * 100).toFixed(2)}%</div>
+			<div>{ (totals.ABSENT / (totals.ABSENT + totals.PRESENT + totals.LEAVE) * 100).toFixed(2)}%</div>
 		</div>
 
 		<div className="divider">Monthly Attendance</div>
