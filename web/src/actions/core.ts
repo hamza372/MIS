@@ -53,7 +53,14 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 
 	syncr.send(payload)
 		.then(dispatch)
-		.catch(err => dispatch(QueueUp(new_merges)))
+		.catch(err => {
+
+			dispatch(QueueUp(new_merges))
+
+			if(err !== "timeout") {
+				alert("Syncing Error: " + err)
+			}
+		})
 }
 
 export const SMS = "SMS"
@@ -164,7 +171,13 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 		payload: rationalized_deletes
 	})
 	.then(dispatch)
-	.catch((err : Error) => dispatch(QueueUp(payload)))
+	.catch(err => {
+		dispatch(QueueUp(payload))
+
+		if(err !== "timeout") {
+			alert("Syncing Error: " + err)
+		}
+	})
 
 }
 
