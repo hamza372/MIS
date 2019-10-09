@@ -44,7 +44,7 @@ const MonthlyAttendanceChart = ({monthly_attendance, filter}: ChartData) => {
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
 				data={Object.entries(monthly_attendance)
-					.sort(([month,], [m2,]) => moment(month).isBefore(m2) ? 1 : 0)
+					.sort(([d1 ], [d2, ]) => moment(d1, "MM/YYYY").unix() - moment(d2, "MM/YYYY").unix())
 					.map(([month, { PRESENT, LEAVE, ABSENT }]) => {
 							
 						const percent = ( ABSENT / (ABSENT + PRESENT + LEAVE) * 100)
@@ -75,7 +75,7 @@ const MonthlyAttendanceTable = ({monthly_attendance, totals}: TableData) =>{
 				</div>
 				{
 					[...Object.entries(monthly_attendance)
-						.sort(([month, ], [m2, ]) => moment(month).isBefore(m2) ? 1 : 0)
+						.sort(([d1 ], [d2, ]) => moment(d1, "MM/YYYY").unix() - moment(d2, "MM/YYYY").unix())
 						.map(([month, {PRESENT, LEAVE, ABSENT} ]) =>
 						
 							<div className="table row" key={Math.random()}>

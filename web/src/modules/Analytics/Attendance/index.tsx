@@ -34,6 +34,7 @@ interface ChartData {
 		[id: string]: Attendance
 	}
 	filter: Filter
+	date_format: string
 }
 
 interface TableData {
@@ -48,17 +49,18 @@ interface TableData {
 		SHORT_LEAVE: number;
 		CASUAL_LEAVE: number;
 	}
+	date_format: string
 }
 
-const AttendanceChart = ({attendance, filter}: ChartData) => {		
+const AttendanceChart = ({attendance, filter, date_format}: ChartData) => {		
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
 						data={Object.entries(attendance)
-						.sort(([month, ], [m2, ]) => moment(month).isBefore(m2) ? 1 : 0)
-						.map(([month, { PRESENT, LEAVE, ABSENT, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE }]) => ({
-							month, PRESENT, LEAVE: (LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE), ABSENT, 
-							percent: (ABSENT / ( ABSENT + PRESENT + LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE) * 100).toFixed(2)
-						}))}>
+							.sort(([d1 ], [d2, ]) => moment(d1, date_format).unix() - moment(d2, date_format).unix())
+							.map(([month, { PRESENT, LEAVE, ABSENT, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE }]) => ({
+								month, PRESENT, LEAVE: (LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE), ABSENT, 
+								percent: (ABSENT / ( ABSENT + PRESENT + LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE) * 100).toFixed(2)
+							}))}>
 
 						<XAxis dataKey="month"/>
 						<YAxis />
@@ -73,7 +75,7 @@ const AttendanceChart = ({attendance, filter}: ChartData) => {
 			</ResponsiveContainer>
 }
 
-const AttendanceTable = ({attendance, totals}: TableData) =>{
+const AttendanceTable = ({attendance, totals, date_format}: TableData) =>{
 	return <div className="section table line" style={{margin: "20px 0", backgroundColor:"#c2bbbb21" }}>
 				<div className="table row heading">
 					<label style={{ backgroundColor: "#efecec"}}><b>Date</b></label>
@@ -84,10 +86,10 @@ const AttendanceTable = ({attendance, totals}: TableData) =>{
 				</div>
 				{
 					[...Object.entries(attendance)
-						.sort(([month, ], [m2, ]) => moment(month).isBefore(m2) ? 1 : 0)
+						.sort(([d1 ], [d2, ]) => moment(d1, date_format).unix() - moment(d2, date_format).unix())
 						.map(([month, {PRESENT, LEAVE, ABSENT, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE} ]) =>
 						
-							<div className="table row">
+							<div className="table row" key={month}>
 								<div style={{ backgroundColor: "#efecec"}}>{month }</div>
 								<div style={{ backgroundColor: "#93d0c5"}}>{PRESENT}</div>
 								<div style={{ backgroundColor: "#fc6171"}}>{ABSENT}</div>
@@ -157,7 +159,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			},
 			classFilter: "",
 			selected_section_id: "",
-			selected_period: period !== "" ? period[0] : "Monthly",
+			selected_period: period !== "" ? period.toString() : "Monthly",
 			start_date: start_date,
 			end_date: end_date,
 			isStudentAttendanceFilter: false,
@@ -185,7 +187,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		this.setState({
 			start_date: moment(start_date, "MM-DD-YYYY").unix() * 1000,
 			end_date: moment(end_date, 'MM-DD-YYYY').unix() * 1000,
-			selected_period: period[0]
+			selected_period: period.toString()
 		})
 		
 	}
@@ -200,7 +202,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		const temp_ed = moment(this.state.end_date).format("YYYY-MM-DD")
 
 		let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 };
-		let attendance : {[id: string]: Attendance } = { } // [mm/yyyy]: { present / absent / leave }
+		let attendance : {[id: string]: Attendance } = { } // [mm/yyyy] || [dd/mm/yyyy]: { present / absent / leave }
 		let student_attendance : {[id: string]: StudentAttendance } = { } // [id]: { absents, presents, leaves }
 
 		for(let [sid, student] of Object.entries(students)){
@@ -240,6 +242,8 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 				(student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
 			)
 			.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
+
+		const date_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
 		return <div className="attendance-analytics">
 
@@ -311,6 +315,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			<AttendanceChart
 				attendance = { attendance }
 				filter = { this.state.chartFilter }
+				date_format = { date_format }
 			/>
 		</div>
 
@@ -351,6 +356,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		<AttendanceTable
 			attendance={attendance}
 			totals={totals}
+			date_format = { date_format }
 		/>
 
 		<div className="divider">Student Attendance</div>
@@ -377,7 +383,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			</div>
 			{
 				items
-					.map(([ sid, { student, PRESENT, ABSENT, LEAVE } ]) => <div className="table row">
+					.map(([ sid, { student, PRESENT, ABSENT, LEAVE } ]) => <div className="table row" key={sid}>
 						<Link to={`/student/${sid}/attendance`}>{student.Name}</Link>
 						<div>{student.Phone}</div> 
 						<div style={ ABSENT === 0 ? { color:"#5ecdb9" } : { color:"#fc6171" }}>{ABSENT}</div>
