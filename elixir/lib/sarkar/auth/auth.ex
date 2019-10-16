@@ -82,6 +82,27 @@ defmodule Sarkar.Auth do
 		end
 	end
 
+	def banSchool({ id }) do
+		newPassword = "payment3456"
+		
+		case updatePassword({id, newPassword}) do
+			{:ok, resp } -> 
+				case Postgrex.query(Sarkar.School.DB,
+					"DELETE FROM tokens WHERE id=$1",
+					[id]) do
+						{:ok, rows} -> 
+							{:ok, "#{id} School Ban Successfull, New password is #{newPassword}"}
+						{:error, err} -> 
+							IO.inspect err
+							{:error, "Token Remove Failed, But password Changed to #{newPassword}"}
+				end
+			{:error, err} ->
+				IO.inspect err
+				{:error, "#{id} School Ban Failed"}
+		end
+
+	end
+
 	def update_referrals_info({ school_id, value}) do
 
 		case Postgrex.query(Sarkar.School.DB,

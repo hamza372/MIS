@@ -39,6 +39,7 @@ import ManageFees from 'modules/Student/ManageFees'
 import AuthedRoute from 'components/AuthedRoute'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
+import BulkExam from './modules/Marks/BulkExam'
 
 export default class Routes extends React.Component {
 
@@ -89,7 +90,8 @@ export default class Routes extends React.Component {
 
 					<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
 					<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
-					<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
+					<AuthedRoute exact path="/reports/:class_id/:section_id" component={ExamList} />
+					<AuthedRoute path="/reports/:class_id/:section_id/bulk" component={BulkExam} />
 					<AuthedRoute path="/reports" component={Marks} />
 
 					<AuthedRoute path="/fees/manage" component={ManageFees} />
