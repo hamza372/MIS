@@ -61,11 +61,37 @@ export const loadDb = async () => {
 				db.createObjectStore('root-state')
 			}
 		})
-		
-		const serialized = await db.get('root-state', 'db') //|| localStorage.getItem('db')
-		
+
+		const localData = localStorage.getItem('db')
+
+		let serialized = await db.get('root-state', 'db')
+
+		if (!serialized && localData) {
+			
+			console.log("Tranferring Local Data to IDB")
+			
+			db.put('root-state', localData, 'db')
+				.then((res) => {
+					console.log("CREATING BACKUP")
+					try {
+						localStorage.setItem('backup', localData)
+					}
+					catch (err) {
+						console.error("BACK UP TO LOCALSTORAGE FAIURE !!!", err )
+					}
+				})
+				.catch((err) => {
+					console.error("ERROR WHILE TRANFERING LOCAL DATA TO IDB", err)
+				})
+			
+			serialized = await db.get('root-state', 'db')
+
+		} else {
+			console.log("Not Tranferring Local Data to IDB")
+		}
+
 		if (!serialized) {
-			return { 
+			return {
 				...initState,
 				initialized: true
 			}
@@ -143,27 +169,24 @@ const checkPersistent = () => {
 
 checkPersistent();
 
-export const saveDb = async (state: RootReducerState) => {
+export const saveDb = (state: RootReducerState) => {
 	
 	const json = JSON.stringify(state)
 	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 	
-	const db = await openDB('db', 1, {
+	openDB('db', 1, {
 		upgrade(db) {
 			db.createObjectStore('root-state')
 		}
 	})
-
-	await db.put('root-state', json, "db")
-	
-	localStorage.setItem("client_id", state.client_id)
-
-	try {
-		localStorage.setItem('db', json)
-	}
-	catch (err) {
-		console.error("LOCALSTORAGE FAIURE !!!", err )
-	}
+	.then(db => {
+		console.log('putting db')
+		return db.put('root-state', json, "db")
+	})
+	.catch(err => {
+		console.error(err)
+		alert("Error saving database. Please contact helpline")
+	})
 }
 
 const addFacultyID = (state : RootReducerState) => {
