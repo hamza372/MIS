@@ -333,6 +333,7 @@ class SingleExam extends Component {
 						// 	.filter(([id, student]) => student.section_id === this.section_id())
 						Object.keys(this.state.exam.student_marks || {})
 							.map(xid => this.props.students[xid])
+							.sort((a, b) => (a.RollNumber !== undefined && b.RollNumber !== undefined) ? (parseFloat(a.RollNumber) - parseFloat(b.RollNumber)) : -1 )
 							.map(student => (
 								<div className="section" key={student.id}>
 									
@@ -366,6 +367,7 @@ class SingleExam extends Component {
 											<option value="Fail">Fail</option>
 											<option value="Better">Better</option>
 											<option value="Shown Improvement">Shown Improvement</option>
+											<option value="Absent"> Absent</option>
 										</select>
 									</div>
 							</div>

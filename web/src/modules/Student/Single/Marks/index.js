@@ -77,7 +77,9 @@ class StudentMarksContainer extends Component {
 							<select {...this.former.super_handle(["examFilterText"])}> 
 								<option value="">Select Exam</option>
 								{
-									Array.from(examSet).map(exam => {
+									Array.from(examSet)
+										.sort((a, b) => a.localeCompare(b))
+										.map(exam => {
 										return <option key={exam} value={exam}>{exam}</option>	
 									})
 								}
@@ -89,7 +91,9 @@ class StudentMarksContainer extends Component {
 							<select {...this.former.super_handle(["subjectFilterText"])}> 
 								<option value="">Select Subject</option>
 								{
-									Array.from(subjectSet).map(subject => {
+									Array.from(subjectSet)
+										.sort((a, b) => a.localeCompare(b))
+										.map(subject => {
 										return <option key={subject} value={subject}>{subject}</option>	
 									})
 								}
@@ -236,7 +240,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 				[...Object.keys(student.exams || {})
 					.map(exam_id => exams[exam_id])
 					.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
-					.sort((a, b) => a.date - b.date)
+					.sort((a, b) => examFilter === "" ? (a.date - b.date) : a.subject.localeCompare(b.subject))
 					.map((exam, i) => <div className="table row" key={exam.id}>
 							<div>{ dateOrSerial === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</div>
 							<div>{exam.subject}</div>

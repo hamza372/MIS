@@ -96,7 +96,9 @@ class ClassReportMenu extends Component {
 					<select {...this.report_former.super_handle(["examFilterText"])}> 
 						<option value="">Select Exam</option>
 						{
-							Array.from(examSet).map(exam => {
+							Array.from(examSet)
+								.sort((a, b) => a.localeCompare(b))
+								.map(exam => {
 								return <option key={exam} value={exam}>{exam}</option>	
 							})
 						}
@@ -107,7 +109,9 @@ class ClassReportMenu extends Component {
 					<select {...this.report_former.super_handle(["subjectFilterText"])}> 
 						<option value="">Select Subject</option>
 						{
-							Array.from(subjects).map(subject => {
+							Array.from(subjects)
+								.sort((a, b) => a.localeCompare(b))
+								.map(subject => {
 								return <option key={subject} value={subject}>{subject}</option>	
 							})
 						}
