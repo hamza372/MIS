@@ -272,21 +272,21 @@ class Landing extends Component {
 						<div className="row">
 							<Link 
 								className="box no-underline bg-green" 
-								to = "/analytics/teacher-attendance">
+								to = {`/analytics/teacher-attendance?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`}>
 								<div>{today_teacher_attendance.PRESENT}</div>
 								<div>Present</div>
 							</Link>
 
 							<Link 
 								className="box no-underline bg-red"
-								to = "/analytics/teacher-attendance">
+								to = {`/analytics/teacher-attendance?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`}>
 								<div>{today_teacher_attendance.ABSENT}</div>
 								<div>Absent</div>
 							</Link>
 							
 							<Link
 								className="box no-underline bg-grey"
-								to = "/analytics/teacher-attendance">
+								to = {`/analytics/teacher-attendance?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`}>
 								<div>{today_teacher_attendance.LEAVE}</div>
 								<div>Leave</div>
 							</Link>
