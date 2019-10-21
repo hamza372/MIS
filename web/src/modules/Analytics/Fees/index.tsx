@@ -76,7 +76,7 @@ const FeesTable = (props: TableProps) => {
 	const total = props.total_debts;
 	const payments = props.payments;
 
-	return <div className="section table" style={{margin: "20px 0", backgroundColor:"#c2bbbb21", overflowX: "scroll" }}>
+	return <div className="section no-print table" style={{margin: "20px 0", backgroundColor:"#c2bbbb21", overflowX: "scroll" }}>
 			<div className="table row heading">
 				<label style={{ backgroundColor: "#efecec", textAlign:"center" }}> <b> Date     </b></label>
 				<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}> <b> Total    </b> </label>
