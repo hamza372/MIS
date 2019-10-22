@@ -220,11 +220,19 @@ class StudentFees extends Component <propTypes, S> {
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		const owedPayments = checkStudentDuesReturning(this.student());
-		this.props.addMultiplePayments(owedPayments);
-
+		
+		if (owedPayments.length > 0) {
+			this.props.addMultiplePayments(owedPayments);
+		}
+		
 		if(this.siblings().length > 0) {
 			console.log('adding sibling payments')
-			this.siblings().forEach(s => this.props.addMultiplePayments(checkStudentDuesReturning(s)))
+			this.siblings().forEach(s => {
+				const student_payments = checkStudentDuesReturning(s)
+				if (student_payments.length > 0) {
+					this.props.addMultiplePayments(student_payments)
+				}
+			})
 		}
 	}
 
