@@ -26,6 +26,9 @@ interface RouteInfo {
 
 type propTypes = RouteComponentProps<RouteInfo> & P
 
+type TD = MISExam & {
+	obtained_marks: MISStudentExam
+}
 
 class BulkExam extends Component<propTypes, S> {
 
@@ -51,17 +54,56 @@ class BulkExam extends Component<propTypes, S> {
 		const { class_id, section_id } = this.props.match.params
 		const { start_date, end_date } = this.state
 
-		const curr_section = classes[class_id].sections[section_id]
-
 		console.log("Start Date", moment(start_date).format("MM-DD-YYYY"))
 		console.log("End Date", moment(end_date).format("MM-DD-YYYY"))
 
 		const relevant_students = Object.values(students)
-			.filter(s => s.Name && s.section_id === section_id)
-
+			.filter(s => s.Name && s.exams && s.section_id === section_id)
+		console.log("relebant students",relevant_students)
 		const relevant_exams = Object.values(exams)
-			.filter(e => e.class_id === class_id && e.section_id === section_id)
+			.filter(e => e.class_id === class_id && e.section_id === section_id && this.isSameOrBetween(start_date, end_date, e.date))
+		const Subjects = new Set()
+		const tableData = relevant_students
+			.reduce((agg, curr) => {
 
+				const s_exams = Object.entries(curr.exams)
+					.filter(([e_id, e]) => exams[e_id].class_id === class_id && exams[e_id].section_id === section_id && this.isSameOrBetween(start_date, end_date, exams[e_id].date))
+					.map(([e_id, e]) => {
+						
+						const curr_exam = exams[e_id]
+						Subjects.add(curr_exam.name + "-" + curr_exam.subject + "("+ curr_exam.total_score +")" + "-" + moment(curr_exam.date).format("DD/MM/YY"))
+						
+						return {
+							...curr_exam,
+							obtained_marks: e
+						}
+					})
+				
+				return [
+					...agg,
+					{
+						Name: curr.Name,
+						id: curr.id,
+						exams: s_exams
+					}
+				]
+			}, [] as { Name: string, id: string, exams: TD[] }[])
+		
+		console.log("TableData",tableData)
+
+		// const tableDataTwo = tableData.map(e => {
+		// 	const subjectsLength = Array.from(Subjects).length
+			
+		// 	if (subjectsLength > e.exams.length) {
+		// 		let stopper = subjectsLength - e.exams.length
+		// 		for (let count = 0; count < stopper; count++) {
+		// 			e.exams = [ ...e.exams, { absent: true}]
+					
+		// 		}
+		// 	}
+
+		// 	return {}
+		// })
 		console.log("FILTERES EXAMS", relevant_exams)
 		
 		return <Layout history={this.props.history}>
@@ -70,7 +112,7 @@ class BulkExam extends Component<propTypes, S> {
 				
 				<div className="title">Bulk Exam</div>
 				
-				<div className="form">
+				<div className="form no-print">
 					<div className="row">
 						<label> Start Date </label>
 						<input onChange={this.former.handle(["start_date"])} type="date" value={moment(this.state.start_date).format("YYYY-MM-DD")}/>
@@ -82,6 +124,7 @@ class BulkExam extends Component<propTypes, S> {
 					<div className="row">
 						<label> Exam </label>
 						<select>
+							<option value=""> Select</option>
 							{
 								relevant_exams
 									.map(e => <option value={e.id}> { `${e.name} (${moment(e.date).format("DD-MM-YY")})` } </option>)
@@ -89,7 +132,31 @@ class BulkExam extends Component<propTypes, S> {
 						</select>
 					</div>
 				</div>
-				<div className="section" >
+				<div className="section newtable">
+					<div className="newtable-row heading">
+						<div>Student</div>
+						{
+							Array.from(Subjects)
+								.map(s => <div> {s} </div>)
+						}
+					</div>
+					{
+						tableData
+							.filter( s => s.exams.length !== 0)
+							.map((s, index) => {
+								return <div className="newtable-row">
+									{/* <div>{index + 1}</div> */}
+									<div>{s.Name}</div>
+									{
+										s.exams
+											.map(e => {
+												return <div> {`${e.obtained_marks.score} / ${e.total_score}`} </div>
+											})
+									}
+								</div>
+							})
+					}
+
 
 				</div>
 			</div>

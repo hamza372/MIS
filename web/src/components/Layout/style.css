@@ -52,6 +52,56 @@ a.block {
 .no-print {
 	width: 100%;
 }
+.newtable {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow-x: auto;
+}
+
+	.newtable-row {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+	}
+
+		.newtable-row.heading {
+			font-weight: bold;
+			background-color: #f0f0f0;
+		}
+
+		.newtable-row div {  /* Cell*/
+			width: 20%;
+			padding: 5px;
+			border-bottom: 1px solid #e7e7e7;
+			min-width: 90px;
+			border-right: 1px solid #e7e7e7;
+			overflow-x: auto;
+			display: flex;
+			align-items: center;
+		}
+
+			.newtable-row .newtable-input {
+				width: 100%;
+				text-align: start;
+				background-color: #fafafa;
+				border: none;
+				padding-left: 2px;
+				margin-left: -2px;
+			}
+		
+			.newtable-row .button-cell {
+				justify-content: center;
+			}
+		
+			.newtable-row .button {
+				justify-content: center;
+				min-width: 70%;
+			}
+
+	.newtable-row :last-child {
+		border-right: none
+	}
 
 @media print {
 	@page {
