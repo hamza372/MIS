@@ -56,7 +56,9 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		for (let s of relevant_students){
 
 			const owedPayments = checkStudentDuesReturning(s);
-			this.props.addMultiplePayments(owedPayments);
+			if (owedPayments.length > 0) {
+				this.props.addMultiplePayments(owedPayments);
+			}
 	
 		}
 	}
