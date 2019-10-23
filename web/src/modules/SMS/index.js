@@ -209,7 +209,7 @@ class SMS extends Component {
 					<div className="divider">Send Message</div>
 					<div className="section">
 						<div className="row"> 
-						<label>Send By</label>		
+						<label>Send to</label>		
 							<select onChange={this.sendMessageFilter} value={this.state.smsFilter}>
 									<option value="" disabled>Select</option>
 									<option value="to_single_student">Single Student</option>

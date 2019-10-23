@@ -5,12 +5,13 @@ import { connect } from 'react-redux'
 import Layout from '../../../components/Layout';
 
 import './style.css'
-import moment from 'moment'
+import moment, { min } from 'moment'
 import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
 import { addHistoricalPayment } from '../../../actions';
 import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
 import getFilteredPayments from '../../../utils/getFilteredPayments';
 import Banner from '../../../components/Banner';
+
 
 export type historicalPayment = {
 	date: number
@@ -30,8 +31,8 @@ interface  P {
 interface S {
 	banner: {
 		active: boolean
-		good: boolean
-		text: string
+		good?: boolean
+		text?: string
 	}
 	fee : {
 		date: number
@@ -40,10 +41,10 @@ interface S {
 		amount_paid: string
 		amount_forgiven: string
 	},
-	selected_class: string
-	selected_student: string
-	monthFilter: string
-	yearFilter: string
+	selected_section_id: string
+	selected_student_id: string
+	month_filter: string
+	year_filter: string
 }
 
 interface RouteInfo {
@@ -71,41 +72,58 @@ class historicalFee extends Component <propTypes, S > {
 				amount_paid: "0",
 				amount_forgiven: "0"
 			},
-			selected_class: "",
-			selected_student: "",
-			monthFilter: "",
-			yearFilter: ""
+			selected_section_id: "",
+			selected_student_id: "",
+			month_filter: "",
+			year_filter: ""
 		}
 		this.former = new former(this, [])
 	}
 
 	save = () => {
 		
-		const payment = {
-			...this.state.fee,
-			amount_owed: parseFloat(this.state.fee.amount_owed) || 0,
-			amount_paid: parseFloat(this.state.fee.amount_paid) || 0,
-			amount_forgiven: parseFloat(this.state.fee.amount_forgiven) || 0
-		}
+		const amount_owed = parseFloat(this.state.fee.amount_owed) || 0
+		const amount_paid = parseFloat(this.state.fee.amount_paid) || 0
+		const amount_forgiven =  parseFloat(this.state.fee.amount_forgiven) || 0
 
-		this.setState({
-			banner: {
-				active: true,
-				good: true,
-				text: "Entry Added!"
-			}
-		})
-
-		setTimeout(() => {
-			this.setState({
+		if(amount_owed === 0){
+			setTimeout(() => { this.setState({ banner: { active: false } }) }, 3000);
+			return this.setState({
 				banner: {
-					...this.state.banner,
-					active: false
+					active: true,
+					good: false,
+					text: "Please add Owed Amount!"
 				}
 			})
-		}, 1500);
+		}
 
-		this.props.addHistoricalPayment(payment, this.state.selected_student)
+		const payment = {
+			...this.state.fee,
+			amount_owed: amount_owed,
+			amount_paid: amount_paid,
+			amount_forgiven: amount_forgiven
+		}
+
+        if(window.confirm("Are you sure you want to Add Historical Fee?")){
+			
+			this.setState({
+				banner: {
+					active: true,
+					good: true,
+					text: "Entry Added!"
+				}
+			})
+
+			this.props.addHistoricalPayment(payment, this.state.selected_student_id)
+
+			setTimeout(() => { this.setState({ banner: { active: false } }) }, 3000);
+		}
+	}
+
+	getSelectedSectionStudents = ()  => {
+		return	Object.values(this.props.students)
+					.filter(  s => s.Name && s.Active && this.state.selected_section_id !=="" && s.section_id === this.state.selected_section_id)
+					.sort( (a, b) => a.Name.localeCompare(b.Name))
 	}
 
 	mergedPaymentsForStudent = (student : MISStudent) => {
@@ -128,26 +146,23 @@ class historicalFee extends Component <propTypes, S > {
 
 		const { students, classes, settings } = this.props
 
-		const class_Items = getSectionsFromClasses(classes)
+		const sorted_sections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
 
-		const student_items = Object.values(students)
-			.filter(s => s.Name && this.state.selected_class !== "" ? s.section_id === this.state.selected_class : true)
-			
-		const selected_student = students[this.state.selected_student]
+		const selected_student = students[this.state.selected_student_id]
 		
-		let filteredPayments = selected_student ? getFilteredPayments(this.mergedPaymentsForStudent(selected_student), this.state.yearFilter, this.state.monthFilter) : false
-		const curr_class_name = this.state.selected_class ? class_Items.find( s => s.id === this.state.selected_class).namespaced_name : "None Selected"
+		// get payments against the selected student
+		let filteredPayments = selected_student && selected_student.Name ? 
+			getFilteredPayments(this.mergedPaymentsForStudent(selected_student), this.state.year_filter, this.state.month_filter) : false
+		
+		// get current selected class name
+		const curr_class_name = this.state.selected_section_id ? 
+			sorted_sections.find( s => s && s.id === this.state.selected_section_id)
+			.namespaced_name : "None Selected"
 		
 		const Months = new Set<string>()
 		const Years = new Set<string>()
 
-		if(selected_student){
-
-			if(this.state.selected_class && selected_student.section_id !== this.state.selected_class){
-				this.setState({
-					selected_student: ""
-				})
-			}
+		if(selected_student && selected_student.Name){
 
 			Object.entries(selected_student.payments || {})
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
@@ -158,6 +173,12 @@ class historicalFee extends Component <propTypes, S > {
 				)
 		}
 
+		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+		
+		// Sorting payments Months names using index of sample array
+		// To avoid sort function negative result (0-1 => -1), added 1 so indexOf("January") will be 0 to 1 and indexOf("February") will be 1 to 2	
+		const sorted_months = Array.from(Months).sort((a,b) => months.indexOf(a) + 1 - months.indexOf(b) + 1)
+	
 		return <Layout history={this.props.history}>
 			<div className="historical-fees form">
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -166,25 +187,26 @@ class historicalFee extends Component <propTypes, S > {
 				<div className="section">
 					<div className="row">
 						<label> Class</label>
-						<select {...this.former.super_handle(["selected_class"])}>
+						<select {...this.former.super_handle(["selected_section_id"])}>
 							<option value="">Select Class</option>
 							{
-								class_Items.map(c => <option value={c.id} key={c.id}>{c.namespaced_name}</option>)
+								sorted_sections.map(c => <option value={c.id} key={c.id}>{c.namespaced_name}</option>)
 							}
 						</select>
 					</div>
 					<div className="row">
 						<label> Student</label>
-						<select {...this.former.super_handle(["selected_student"])}>
+						<select {...this.former.super_handle(["selected_student_id"])}>
 							<option value="">Select Student</option>
 							{
-								student_items.map(s => <option key={s.id} value={s.id}>{s.Name}</option>)
+								this.getSelectedSectionStudents()
+									.map(s => <option key={s.id} value={s.id}>{s.Name}</option>)
 							}
 						</select>
 					</div>
 				</div>
 
-				{ this.state.selected_student && <div className="section">
+				{ this.state.selected_student_id && this.state.selected_section_id !=="" && <div className="section">
 					<div className="row">
 						<label> Date </label>
 						<input
@@ -209,18 +231,18 @@ class historicalFee extends Component <propTypes, S > {
 						<label> Amount Forgiven </label>
 						<input type="number" {...this.former.super_handle(["fee", "amount_forgiven"])}/>
 					</div>
-					<div className="button blue" onClick={() => this.save()}> Add Fee</div>
+					<div className="button blue" onClick={() => this.save()}> Add Historical Fee</div>
 				</div>}
-				{selected_student && <div className="section">
+				{selected_student && selected_student.Name && this.state.selected_section_id !=="" && <div className="section">
 					<div className="row">
-						<select {...this.former.super_handle(["monthFilter"])}>
+						<select {...this.former.super_handle(["month_filter"])}>
 							<option value=""> Select Month</option>
 							{
-								Array.from(Months)
+								sorted_months
 									.map(m => <option key={m} value={m}>{m}</option>)
 							}
 						</select>
-						<select {...this.former.super_handle(["yearFilter"])}>
+						<select {...this.former.super_handle(["year_filter"])}>
 							<option value=""> Year</option>
 							{
 								Array.from(Years)
@@ -231,7 +253,7 @@ class historicalFee extends Component <propTypes, S > {
 				</div>}
 			</div>
 			
-			{ filteredPayments && <div style={{width: "80%", margin: "0px auto"}}>
+			{ filteredPayments && this.state.selected_section_id !=="" && <div style={{width: "80%", margin: "0px auto"}}>
 				<StudentLedgerPage 
 					payments = {filteredPayments}
 					settings = {settings}

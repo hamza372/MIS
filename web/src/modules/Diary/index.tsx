@@ -1,34 +1,71 @@
 import React, { Component } from 'react'
-import Layout from 'components/Layout'
-import {PrintHeader} from 'components/Layout'
+import Layout from '../../components/Layout'
+import {PrintHeader} from '../../components/Layout'
 import {connect} from 'react-redux'
-import { sendSMS, sendBatchSMS } from 'actions/core'
-import { logSms, addDiary } from 'actions'
-import Banner from 'components/Banner'
-import { smsIntentLink } from 'utils/intent'
-import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
-import former from 'utils/former'
+import { sendSMS, sendBatchSMS } from '../../actions/core'
+import { logSms, addDiary } from '../../actions'
+import Banner from '../../components/Banner'
+import { smsIntentLink } from '../../utils/intent'
+import {getSectionsFromClasses} from '../../utils/getSectionsFromClasses'
+import { RouteComponentProps } from 'react-router-dom'
+import former from '../../utils/former'
 import moment from 'moment'
 
 import './style.css'
 
+interface P {
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	faculty_id: string,
+	diary: RootDBState["diary"],
 
-/** Structure of Diary
- * diary:{
- *    section_id:{
- *        subject: { homework: ""},
- *        ...
- *    },
- *    ...
- * }
- */
+	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => any,
+	sendMessage: (text: string, number: string) => any,
+	sendBatchMessages: (messages: MISSms[]) => any,
+	logSms: (history: MISSMSHistory) => any
+}
+
+interface S {
+	banner: {
+		active: boolean,
+		good?: boolean,
+		text?: string
+	},
+	selected_date: number,
+	selected_section_id: string,
+	students_filter: string,
+	diary: MISDiary["date"]
+}
+
+type propTypes = RouteComponentProps & P
 	  
-class Diary extends Component {
-	constructor(props) {
+class Diary extends Component <propTypes,S> {
+
+	former: former
+	constructor(props: propTypes) {
 		super(props)
 
-		const curr_date = moment().format("DD/MM/YYYY")
-		const diary = Object.values(this.props.classes)
+		const curr_date = moment().format("DD-MM-YYYY")	
+		const diary = this.props.diary && this.props.diary[curr_date] ? { ...this.getDiaryTemplate(), ...JSON.parse(JSON.stringify(this.props.diary[curr_date]))} : this.getDiaryTemplate()
+		this.state = {
+			banner: {
+				active: false,
+				good: true,
+				text: "Saved!"
+			},
+			selected_date: moment.now(),
+			selected_section_id: "",
+			students_filter: "all_students",
+			diary
+		}
+
+		this.former = new former(this, [])
+	}
+
+	getDiaryTemplate = () => {
+		return Object.values(this.props.classes)
 			.reduce((agg, c) => {
 				
 				const sectionObj =  Object.keys(c.subjects)
@@ -51,22 +88,9 @@ class Diary extends Component {
 
 				return {...agg, ...obj}
 			}, {})
-
-		this.state = {
-			banner: {
-				active: false,
-				good: true,
-				text: "Saved!"
-			},
-			selected_section_id: "",
-			students_filter: "all_students",
-			diary: props.diary && moment(props.diary.date).format("DD/MM/YYYY") === curr_date ? JSON.parse(JSON.stringify(props.diary)) : diary
-		}
-
-		this.former = new former(this, [])
 	}
 	
-	logSms = (messages) => {
+	logSms = (messages: MISSms[]) => {
 
 		if(messages.length === 0){
 			console.log("No Messaged to Log")
@@ -83,55 +107,61 @@ class Diary extends Component {
 		this.props.logSms(historyObj)
 	}
 
-	componentWillReceiveProps(newProps) {
+	diaryFilterCallback = () => {
+		
+		const curr_date = moment(this.state.selected_date).format("DD-MM-YYYY")
+		
+		// get selected date diary from previous props, else empty diary
+		const selected_date_diary = this.props.diary && this.props.diary[curr_date] ? 
+			JSON.parse(JSON.stringify(this.props.diary[curr_date])): this.getDiaryTemplate()
+		// updating the diary state
+		this.setState({
+			diary: selected_date_diary
+		})
+	}
 
-		const curr_date = moment().format("DD/MM/YYYY")
+
+	componentWillReceiveProps(nextProps: propTypes) {
+
+		const curr_date = moment(this.state.selected_date).format("DD-MM-YYYY")
+		
+		// check diary in selected date diary nextProps and get, otherwise look for previous props else empty diary
+		const selected_date_diary = nextProps.diary && nextProps.diary[curr_date] ?
+			JSON.parse(JSON.stringify(nextProps.diary[curr_date])) :
+				this.props.diary && this.props.diary[curr_date] ? JSON.parse(JSON.stringify(this.props.diary[curr_date])) : this.getDiaryTemplate()
 
 		this.setState({
-			diary: newProps.diary && moment(newProps.diary.date).format("DD/MM/YYYY") === curr_date ? JSON.parse(JSON.stringify(newProps.diary)) : JSON.parse(JSON.stringify(this.props.diary))
+			diary: selected_date_diary
 		})
 	}
 
 	onSave = () => {
-		
-		//Here need to send subjects rather then the whole section's diary
-		const diary = Object.entries(this.state.diary[this.state.selected_section_id] || {})
-			.filter(([subject, d]) => 
-				(this.props.diary === undefined) || 
-				(this.props.diary[this.state.selected_section_id] === undefined) ||
-				(this.props.diary[this.state.selected_section_id][subject] === undefined) ||
-				d.homework !== this.props.diary[this.state.selected_section_id][subject].homework
-			)
-			.reduce((agg, [s, diary]) => {
 
+		const curr_date = moment(this.state.selected_date).format("DD-MM-YYYY")
+
+		// console.log(this.props.diary)
+
+		// return;
+
+		// Here need to save modified section subjects for selected date rather then the whole section's diary
+		const diary = Object.entries(this.state.diary[this.state.selected_section_id])
+			.filter(([subject, { homework }]) => {
+				
+				return this.props.diary[curr_date] && 
+					this.props.diary[curr_date][this.state.selected_section_id] ? 
+					this.props.diary[curr_date][this.state.selected_section_id][subject].homework !== homework : true
+				
+			})
+			.reduce((agg, [subject, homework]) => {
 				return {
 					...agg,
-					[s]: diary
+					[subject]: homework
 				}
 
 			}, {})
 
-		if(diary === undefined) {
-			this.setState({
-				banner: {
-					active: true,
-					good: false,
-					text: "No Diary Saved"
-				}
-			})
-
-			setTimeout(() => {
-				this.setState({
-					banner: {
-						active: false
-					}
-				})
-			}, 1000);
-
-			return;
-		}
-
-		this.props.addDiary(diary, this.state.selected_section_id)
+		// adding diary
+		this.props.addDiary(curr_date, this.state.selected_section_id, diary)
 
 		this.setState({
 			banner: {
@@ -150,13 +180,13 @@ class Diary extends Component {
 		}, 1000);
 	}
 	
-	diaryString = () => {
-		
-		if(this.state.selected_section_id === "" || this.state.diary[this.state.selected_section_id] === undefined ){
+	diaryString = (): string | [] => {
+
+		if(this.state.selected_section_id === "" || this.state.diary[this.state.selected_section_id] === undefined ) {
 			console.log("Not running diary")
 			return []
 		}
-		const curr_date = `Date: ${moment().format("DD MMMM YYYY")}\n`
+		const curr_date = `Date: ${moment(this.state.selected_date).format("DD MMMM YYYY")}\n`
 		const section_name = `Class: ${ this.getSelectedSectionName() }\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
@@ -173,9 +203,9 @@ class Diary extends Component {
 					s.Phone !== undefined && s.Phone !== "")	
 	}
 
-	getFilterCondition = (s) => {
+	getFilterCondition = (s: MISStudent) => {
 		
-		const curr_attendance = s.attendance[moment(this.state.date).format("YYYY-MM-DD")]
+		const curr_attendance = s.attendance[moment(this.state.selected_date).format("YYYY-MM-DD")]
 
 		switch (this.state.students_filter) {
 			case "absent_students":
@@ -192,13 +222,13 @@ class Diary extends Component {
 	}
 
 	getSelectedSectionName = () => getSectionsFromClasses(this.props.classes)
-										.filter(s => s.id === this.state.selected_section_id)
-										.map (s => s.namespaced_name)
+		.filter(s => s.id === this.state.selected_section_id)
+		.map (s => s.namespaced_name)[0]
 
 	render() {
 
 		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
-
+		
 		// ascending order of classes/sections
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
 
@@ -242,14 +272,22 @@ class Diary extends Component {
 
 			<div className="title">School Diary</div>
 				<div className="form">
-					<div className="no-print divider">Send Diary for {moment().format("DD-MMMM-YYYY")}</div>
+					<div className="no-print divider">Send Diary for {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
 					
 					<div className ="print-only row">
-						<div><b>Date:</b> {moment().format("DD-MMMM-YYYY")}</div>
+						<div><b>Date:</b> {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
 						<div><b>Class:</b> {selected_section_name}</div>
 					</div>
 
 					<div className="no-print section">
+						<div className="row">
+							<label>Diary Date</label>
+							<input 	type="date" 
+									onChange={this.former.handle(["selected_date"], () => true, () => this.diaryFilterCallback())} 
+									value={moment(this.state.selected_date).format("YYYY-MM-DD")} 
+									placeholder="Diary Date"/>
+						</div>
+
 						<div className="row">
 							<label>Select Class/Section</label>
 							<select {...this.former.super_handle(["selected_section_id"])}>
@@ -261,7 +299,7 @@ class Diary extends Component {
 						</div>
 						{
 							this.state.selected_section_id !== "" && <div className="no-print row">
-								<label>Send diary to</label>
+								<label>Send Diary to</label>
 								<select {...this.former.super_handle(["students_filter"])}>
 									<option value="" disabled>Select Students</option>
 									<option value="all_students"> All students</option>
@@ -275,7 +313,7 @@ class Diary extends Component {
 					this.state.selected_section_id !== "" && <div className="section">
 						{
 							Array.from(subjects)
-								.map(s => <div className="table row" key={`${this.state.selected_section_id}-${s}`}>
+								.map((s: any) => <div className="table row" key={`${this.state.selected_section_id}-${s}`}>
 									<div>{s}:</div>
 									<input 
 										type="text"
@@ -294,7 +332,8 @@ class Diary extends Component {
 					subjects.size === 0 ? false : settings.sendSMSOption === "SIM" ?
 						<div className ="row"> 
 						<a 
-							className="button blue"
+							className="button blue mb"
+							style={{marginBottom: "12px" }}
 							href={smsIntentLink({
 								messages,
 								return_link: window.location.href 
@@ -304,7 +343,7 @@ class Diary extends Component {
 							<div className="button" onClick={() => window.print()}>Print</div>
 						</div>
 							 :
-						<div className="button" onClick={() => sendBatchMessages(messages)} style={{width: "20%"}}>Send</div>
+						<div className="row button" onClick={() => sendBatchMessages(messages)} style={{width: "20%"}}>Send</div>
 				}
 				
 			</div>
@@ -321,16 +360,16 @@ class Diary extends Component {
 	</Layout>
   }
 }
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	faculty_id: state.auth.faculty_id,
 	diary: state.db.diary,
 	students: state.db.students,
 	classes: state.db.classes,
-	settings: state.db.settings,
+	settings: state.db.settings,	
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
-}), dispatch => ({
-	sendMessage : (text, number) => dispatch(sendSMS(text, number)),
-	sendBatchMessages: (messages ) => dispatch(sendBatchSMS(messages)),
-	logSms: (faculty_id, history) => dispatch(logSms(faculty_id, history)),
-	addDiary: (section_diary, section_id) => dispatch(addDiary(section_diary, section_id))
+}), (dispatch: Function) => ({
+	sendMessage : (text:string, number: string) => dispatch(sendSMS(text, number)),
+	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages)),
+	logSms: (history: MISSMSHistory) => dispatch(logSms(history)),
+	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => dispatch(addDiary(date, section_id, diary))
 	}))(Diary);

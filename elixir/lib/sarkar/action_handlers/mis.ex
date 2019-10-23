@@ -54,7 +54,7 @@ defmodule Sarkar.ActionHandler.Mis do
 		IO.inspect type
 		IO.inspect payload
 		IO.inspect state
-		{:ok, state}
+		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end
 
 	# def handle_action(%{type: "CREATE_SCHOOL", payload: %{school_id: school_id, password: password}}, state) do

@@ -38,10 +38,11 @@ class ToSingleStudent extends Component {
 		<div>
 
 			<div className="row">
-				<label>Name</label>
+				<label>Select Student</label>
 				<datalist id="student-list">
 					{[	...Object.entries(students)
-						.filter(([id, student]) => (student.tags === undefined || !student.tags["PROSPECTIVE"]) && student.Phone)
+						.filter(([id, student]) => (student && student.tags === undefined || !student.tags["PROSPECTIVE"]) && student.Phone)
+						.sort(([, a], [, b]) => a.Name.localeCompare(b.Name))
 						.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
 					]}
 				</datalist>

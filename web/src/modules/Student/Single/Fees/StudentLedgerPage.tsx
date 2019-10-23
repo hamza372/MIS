@@ -42,11 +42,11 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 				</div>
 				<div className="row info">
 					<label> Adm # :</label>
-					<div>{student.RollNumber}</div>
+					<div>{student.AdmissionNumber}</div>
 				</div>
 				<div className="row info">
 					<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}> {owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
-					<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}>{`${numberWithCommas(Math.abs(totalOwed))} Rs`}</div>
+					<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}>{`Rs. ${numberWithCommas(Math.abs(totalOwed))}`}</div>
 				</div>
 
 			<div className="divider">Payment Information</div>
