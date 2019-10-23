@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
+import 'core-js/features/object'
+
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import reducer from './reducers'
@@ -12,7 +14,7 @@ import { saveDb, initState } from './utils/indexedDb'
 import { loadDB } from './actions/core'
 import Syncr from 'syncr'
 
-const debug_host = 'wss://cd5ee336.ngrok.io';
+const debug_host = 'wss://12313afc.ngrok.io';
 
 const host = window.api_url || debug_host;
 

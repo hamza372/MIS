@@ -174,6 +174,7 @@ checkPersistent();
 export const saveDb = (state: RootReducerState) => {
 
 	console.log("SAVING IDB-START", moment.now())
+
 	const json = JSON.stringify(state)
 	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 	

@@ -137,10 +137,11 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 
 	const start = moment(startDate)
 	const end = moment(endDate)
-
+	
 	const relevant_exams = Object.keys(student.exams || {})
-			.map(exam_id => exams[exam_id])
-			.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
+		.filter(exam_id => exams[exam_id])
+		.map(exam_id => exams[exam_id])
+		.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 	
 	const { total_score, max_score } = relevant_exams.reduce((agg, exam) => ({ 
 		total_score: agg.total_score + parseFloat(student.exams[exam.id].score, 10), 
@@ -169,6 +170,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	const section_name = curr_class !== undefined ? curr_class.sections[student.section_id].name : "" 
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
+		.filter(exam_id => exams[exam_id])
 		.map(exam_id => exams[exam_id])
 		.filter(exam => moment(exam.date).isBetween(start, end) && student.exams[exam.id].grade !== "Absent" &&
 		 getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
@@ -238,6 +240,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 				</div>
 			{
 				[...Object.keys(student.exams || {})
+					.filter(exam_id => exams[exam_id])
 					.map(exam_id => exams[exam_id])
 					.filter(exam => moment(exam.date).isBetween(start, end) && getReportFilterCondition(examFilter, exam.name, subjectFilter, exam.subject ))
 					.sort((a, b) => examFilter === "" ? (a.date - b.date) : a.subject.localeCompare(b.subject))
