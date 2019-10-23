@@ -68,14 +68,15 @@ export const loadDb = async () => {
 		let serialized = await db.get('root-state', 'db')
 
 		if (!serialized && localData) {
-			
+
 			console.log("Tranferring Local Data to IDB")
-			
+
 			db.put('root-state', localData, 'db')
 				.then((res) => {
 					console.log("CREATING BACKUP")
 					try {
 						localStorage.setItem('backup', localData)
+						localStorage.removeItem('db')
 					}
 					catch (err) {
 						console.error("BACK UP TO LOCALSTORAGE FAIURE !!!", err )

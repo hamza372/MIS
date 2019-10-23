@@ -57,7 +57,7 @@ export const createMerges= (merges : Merge[]) => (dispatch : (a: any) => any, ge
 
 			dispatch(QueueUp(new_merges))
 
-			if(err !== "timeout") {
+			if( state.connected && err !== "timeout") {
 				alert("Syncing Error: " + err)
 			}
 		})
@@ -174,7 +174,7 @@ export const createDeletes = (paths : Delete[]) => (dispatch : Dispatch<AnyActio
 	.catch(err => {
 		dispatch(QueueUp(payload))
 
-		if(err !== "timeout") {
+		if( state.connected && err !== "timeout") {
 			alert("Syncing Error: " + err)
 		}
 	})

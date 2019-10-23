@@ -224,15 +224,21 @@ class StudentFees extends Component <propTypes, S> {
 		if (owedPayments.length > 0) {
 			this.props.addMultiplePayments(owedPayments);
 		}
-		
-		if(this.siblings().length > 0) {
-			console.log('adding sibling payments')
-			this.siblings().forEach(s => {
-				const student_payments = checkStudentDuesReturning(s)
-				if (student_payments.length > 0) {
-					this.props.addMultiplePayments(student_payments)
-				}
-			})
+
+		if (this.siblings().length > 0) {
+			const sibling_payments = this.siblings()
+				.reduce((agg, curr) => {
+					const curr_student_payments = checkStudentDuesReturning(curr)
+					if (curr_student_payments.length > 0) {
+						return [
+							...agg,
+							...curr_student_payments
+						]
+					}
+					return agg
+				}, [])
+
+			this.props.addMultiplePayments(sibling_payments)
 		}
 	}
 

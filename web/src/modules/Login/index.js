@@ -75,7 +75,10 @@ class Login extends Component {
 
 			db.delete('root-state', 'db')
 				.then(res => {
-					localStorage.removeItem("db");
+					
+					if (localStorage.getItem('db')){
+						localStorage.removeItem("db")
+					}
 					this.props.history.push("/landing")
 					window.location.reload()
 				})
