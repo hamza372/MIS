@@ -338,7 +338,7 @@ class SingleExam extends Component {
 								<div className="section" key={student.id}>
 									
 									<div className="remove row">
-										<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link> ({student.RollNumber ? student.RollNumber : ""})</label>
+										<label>{student.RollNumber ? student.RollNumber : ""} <Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
 										<div className="button red" onClick={() => this.removeStudent(student)}>x</div>
 									</div>
 
