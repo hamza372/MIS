@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { PrintHeader } from 'components/Layout'
+import moment from 'moment';
 
 import './style.css'
 
@@ -13,12 +14,15 @@ class StudentAttendance extends Component {
 
 		const attendance = student.attendance || {};
 
-		console.log(attendance);
-
-		const { PRESENT: num_present, ABSENT: num_absent, LEAVE: num_leave } = Object.values(attendance).reduce((agg, curr) => {
-			agg[curr.status] += 1;
-			return agg;
-		}, {PRESENT: 0, ABSENT: 0, LEAVE: 0})
+		const { PRESENT: num_present, ABSENT: num_absent, 
+				LEAVE: num_leave, SICK_LEAVE: num_sick_leave,
+				SHORT_LEAVE: num_short_leave, CASUAL_LEAVE: num_casual_leave  
+			} = Object.values(attendance).reduce((agg, curr) => {
+					agg[curr.status] += 1;
+					return agg;
+			}, {PRESENT: 0, ABSENT: 0, LEAVE: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0})
+		
+		const total_leave_count = num_leave + num_sick_leave + num_short_leave + num_casual_leave
 
 		return <div className="student-attendance" style={{margin: "0"}}>
 
@@ -37,11 +41,11 @@ class StudentAttendance extends Component {
 			</div>
 			<div className="row">
 				<label>Days on Leave:</label>
-				<div>{num_leave}</div>
+				<div>{total_leave_count}</div>
 			</div>
 			<div className="row">
-				<label>Percentage:</label>
-				<div>{(num_present / (num_absent + num_present) * 100).toFixed(2)}%</div>
+				<label>Present Percentage:</label>
+				<div>{(num_present / (num_absent + num_present + total_leave_count) * 100).toFixed(2)}%</div>
 			</div>
 			<div className="row">
 				<div className="print button" onClick={() => window.print()}>Print</div>
@@ -50,12 +54,11 @@ class StudentAttendance extends Component {
 			<div className="divider">Record</div>
 			<div className="section">
 			{ Object.values(attendance)
-				.map(
-					rec => <div className="row" key={rec.date}>
-						<label>{rec.date}</label>
+				.map(rec => <div className="row" key={rec.date}>
+						<label>{moment(rec.date).format("DD-MM-YYYY")}</label>
 						<div>{rec.status}</div>
-					</div>
-			)}
+					</div>)
+			}
 			</div>
 		</div>
 	}
