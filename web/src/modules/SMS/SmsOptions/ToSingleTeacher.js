@@ -43,6 +43,7 @@ class ToSingleTeacher extends Component {
 					[<option key="abcd" value="" disabled>Select a Teacher</option>,
 					...Object.entries(teachers)
 					.filter(([id, teacher]) => teacher.Phone)
+					.sort(([, a], [, b]) => a.Name.localeCompare(b.Name))
 					.map(([id, teacher]) => <option key={id} value={teacher.Phone}>{teacher.Name}</option>)
 					]
 				}

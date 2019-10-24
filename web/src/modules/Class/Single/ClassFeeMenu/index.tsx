@@ -50,15 +50,23 @@ class ClassFeeMenu extends Component <propTypes, S> {
 
 	componentDidMount(){
 		//loop through fees to check if we have added
-		const relevant_students = Object.values(this.props.students)
-		.filter(s => this.props.curr_class.sections[s.section_id] !== undefined)
 
-		for (let s of relevant_students){
+		const class_payments = Object.values(this.props.students)
+			.filter(s => s.Name && this.props.curr_class.sections[s.section_id] !== undefined)
+			.reduce((agg, s) => {
+				const owedPayments = checkStudentDuesReturning(s)
 
-			const owedPayments = checkStudentDuesReturning(s);
-			this.props.addMultiplePayments(owedPayments);
-	
-		}
+				if (owedPayments.length > 0) {
+					return [
+						...agg,
+						...owedPayments
+					]
+				}
+				return agg
+			}, [])
+		
+		this.props.addMultiplePayments(class_payments)
+
 	}
 
 	mergedPaymentsForStudent = (student : MISStudent) => {

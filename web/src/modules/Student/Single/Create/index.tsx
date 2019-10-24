@@ -92,6 +92,7 @@ interface S {
 	edit: {
 		[id: string]: boolean
 	}
+	show_hide_fee: boolean
 }
 
 interface RouteInfo {
@@ -126,7 +127,8 @@ class SingleStudent extends Component<propTypes, S> {
 				text: "Saved!"
 			},
 			new_tag: "",
-			edit: {}
+			edit: {},
+			show_hide_fee: true
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -775,7 +777,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<div className="button green" style={{ width: "initial", marginLeft:"auto" }} onClick={this.addTag}>+</div>
 					</div>}
 
-					{!prospective && <div className="divider"> Certificates </div>}
+					{!prospective && Object.keys(this.state.profile.certificates || {}).length > 0 && <div className="divider"> Certificates </div>}
 					{!prospective && <div>
 						{
 							Object.entries(this.state.profile.certificates || {})
@@ -787,9 +789,15 @@ class SingleStudent extends Component<propTypes, S> {
 								})
 						}
 					</div>}
+					
+					<div className="no-print row">
+						<div className="button grey" onClick={ () => this.setState({show_hide_fee: !this.state.show_hide_fee})}>
+							{this.state.show_hide_fee ? "Hide" : "Show"} Payments Section
+						</div>
+					</div>
 
-					{(admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
-					{(admin || this.props.permissions.fee.teacher) && !prospective ?
+					{this.state.show_hide_fee && (admin || this.props.permissions.fee.teacher) && !prospective ? <div className="divider">Payment</div> : false }
+					{this.state.show_hide_fee && (admin || this.props.permissions.fee.teacher) && !prospective ?
 						Object.entries(this.state.profile.fees).map(([id, fee]) => {
 							const editable = this.state.edit[id] || this.isNew()
 
@@ -841,7 +849,7 @@ class SingleStudent extends Component<propTypes, S> {
 							</div>
 						})
 					: false }
-					{ admin && !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
+					{ this.state.show_hide_fee && admin && !prospective ? <div className="button green" onClick={this.addFee}>Add Additional Fee or Scholarship</div> : false }
 					{ !admin ? false : <div className="save-delete">
 						{!this.isNew()? <div className="button red" onClick={this.onDelete}>Delete</div> : false}
 						<div className="button blue" onClick={this.onSave}>Save</div>

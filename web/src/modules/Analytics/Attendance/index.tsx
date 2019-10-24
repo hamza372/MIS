@@ -56,7 +56,7 @@ const AttendanceChart = ({attendance, filter, date_format}: ChartData) => {
 		return <ResponsiveContainer width="100%" height={200}>
 					<LineChart 
 						data={Object.entries(attendance)
-							.sort(([d1 ], [d2, ]) => moment(d1, date_format).unix() - moment(d2, date_format).unix())
+							.sort(([d1 ], [d2, ]) => moment(d1, date_format).diff(moment(d2, date_format)))
 							.map(([month, { PRESENT, LEAVE, ABSENT, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE }]) => ({
 								month, PRESENT, LEAVE: (LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE), ABSENT, 
 								percent: (ABSENT / ( ABSENT + PRESENT + LEAVE + CASUAL_LEAVE + SHORT_LEAVE + SICK_LEAVE) * 100).toFixed(2)
@@ -86,7 +86,7 @@ const AttendanceTable = ({attendance, totals, date_format}: TableData) =>{
 				</div>
 				{
 					[...Object.entries(attendance)
-						.sort(([d1 ], [d2, ]) => moment(d1, date_format).unix() - moment(d2, date_format).unix())
+						.sort(([d1 ], [d2, ]) => moment(d1, date_format).diff(moment(d2, date_format)))
 						.map(([month, {PRESENT, LEAVE, ABSENT, CASUAL_LEAVE, SHORT_LEAVE, SICK_LEAVE} ]) =>
 						
 							<div className="table row" key={month}>
@@ -169,10 +169,14 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 
 	onStateChange = () => {
 
-		this.props.history.push({
-			pathname: '/analytics/attendance',
-			search: `?start_date=${moment(this.state.start_date).format("MM-DD-YYYY")}&end_date=${moment(this.state.end_date).format("MM-DD-YYYY")}&period=${this.state.selected_period}`
-		})
+		const start_date = moment(this.state.start_date).format("MM-DD-YYYY")
+		const end_date = moment(this.state.end_date).format("MM-DD-YYYY")
+		const period = this.state.selected_period
+
+		const url = '/analytics/attendance'
+		const params = `start_date=${start_date}&end_date=${end_date}&period=${period}`
+
+		window.history.replaceState(this.state, "Attendance Analytics", `${url}?${params}`)
 
 	}
 
@@ -180,14 +184,19 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 
 		const parsed_query = queryString.parse(nextProps.location.search);
 
-		const start_date = parsed_query["?start_date"] || ""
-		const end_date = parsed_query["end_date"] || ""
+		const sd_param = parsed_query["?start_date"] || ""
+		const ed_param = parsed_query["end_date"] || ""
 		const period = parsed_query["period"] || ""
 
+		// set defaults if params are not passed
+		const start_date =  sd_param !== "" ? moment(sd_param, "MM-DD-YYYY").unix() * 1000 : moment().subtract(1,'year').unix() * 1000
+		const end_date = ed_param !=="" ? moment(ed_param, "MM-DD-YYYY").unix() * 1000 : moment().unix() * 1000
+		const selected_period = period !=="" ? period.toString() : ""
+		
 		this.setState({
-			start_date: moment(start_date, "MM-DD-YYYY").unix() * 1000,
-			end_date: moment(end_date, 'MM-DD-YYYY').unix() * 1000,
-			selected_period: period.toString()
+			start_date,
+			end_date,
+			selected_period
 		})
 		
 	}
@@ -200,6 +209,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		const selected_section = this.state.selected_section_id;
 		const temp_sd = moment(this.state.start_date).format("YYYY-MM-DD")
 		const temp_ed = moment(this.state.end_date).format("YYYY-MM-DD")
+		const period_format = this.state.selected_period === 'Monthly' ? 'MM/YYYY' : 'DD/MM/YYYY'
 
 		let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 };
 		let attendance : {[id: string]: Attendance } = { } // [mm/yyyy] || [dd/mm/yyyy]: { present / absent / leave }
@@ -226,7 +236,6 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 				totals[record.status] += 1;
 				attendance_status_count[record.status] += 1;
 
-				const period_format = this.state.selected_period === 'Monthly' ? 'MM/YYYY' : 'DD/MM/YYYY'
 				const period_key = moment(date).format(period_format);
 				const m_status = attendance[period_key] || { PRESENT: 0, LEAVE: 0, ABSENT: 0, SHORT_LEAVE:0 , CASUAL_LEAVE: 0, SICK_LEAVE:0 }
 				m_status[record.status] += 1;
@@ -242,8 +251,6 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 				(student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()))
 			)
 			.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
-
-		const date_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
 		return <div className="attendance-analytics">
 
@@ -315,7 +322,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			<AttendanceChart
 				attendance = { attendance }
 				filter = { this.state.chartFilter }
-				date_format = { date_format }
+				date_format = { period_format }
 			/>
 		</div>
 
@@ -356,7 +363,7 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		<AttendanceTable
 			attendance={attendance}
 			totals={totals}
-			date_format = { date_format }
+			date_format = { period_format}
 		/>
 
 		<div className="divider">Student Attendance</div>

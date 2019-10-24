@@ -7,7 +7,7 @@
 
 First run the database using docker.
 
-`docker run --name sarkar-db -e POSTGRES_PASSWORD=[password] -v /docker/sarkar/db:var/lib/postgresql/data -p 5432:5432 --restart=always -d postgres:10.5`
+`docker run --name sarkar-db -e POSTGRES_PASSWORD=[password] -v /docker/sarkar/db:/var/lib/postgresql/data -p 5432:5432 --restart=always -d postgres:10.5`
 
 After running this once, you shouldn't need to run this again. 
 

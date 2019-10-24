@@ -60,6 +60,7 @@ class ToSingleClass extends Component {
 									{
 										[<option key="abcd" value="" disabled>Select Section</option>,
 										...Object.entries(getSectionsFromClasses(classes))
+										.sort(([, a], [, b]) => (a.classYear || 0) - (b.classYear || 0))
 										.map(([id, C]) => <option key={id} value={C.id}>{C.namespaced_name}</option>)
 										]
 									}
