@@ -14,11 +14,7 @@ import { saveDb, initState } from './utils/indexedDb'
 import { loadDB } from './actions/core'
 import Syncr from 'syncr'
 
-<<<<<<< HEAD
 const debug_host = 'wss://7bbae877.ngrok.io';
-=======
-const debug_host = 'wss://12313afc.ngrok.io';
->>>>>>> cd98b768cb8bcfb9d949a0bf30aca397ee7b91a9
 
 const host = window.api_url || debug_host;
 
