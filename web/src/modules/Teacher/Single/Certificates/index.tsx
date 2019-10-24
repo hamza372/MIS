@@ -101,29 +101,29 @@ const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =>
 		</div>
 
 		<div className="body">
-			<div className="para">
+			<div className="para" contentEditable={true}>
 				This is to certify that <span className="emphasize">{curr_teacher.Name}</span>, 
 				{` ${getGenderSpecificText("son/daughter", gender)}`} of <span className="emphasize">{curr_teacher.ManName ? curr_teacher.ManName : "________________"}</span>, has
 				worked as a teacher of the following subjects in our school from <b style={{textDecoration:"underline"}}>{`${moment(curr_teacher.HireDate).format("DD-MM-YYYY")} `}</b>
 				to <b style={{textDecoration:"underline"}}>{moment(curr_date).format("DD-MM-YYYY")} </b>
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Subjects: </label>
 				<div/>
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Class: </label>
 				<div/>
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Remarks: </label>
 				<div/>
 			</div>
 
-			<div className="para">
+			<div className="para" contentEditable={true}>
 			We found {getGenderSpecificText("him/her", gender)} responsible, enthusiastic and hardworking during {getGenderSpecificText("his/her", gender)} tenure. {capitalize(getGenderSpecificText("he/she", gender))} can prove to be an asset for any organization. We wish {getGenderSpecificText("him/her", gender)} success in {`${getGenderSpecificText("his/her", gender)} `} 
 			future endeavours.
 			</div>
@@ -154,28 +154,28 @@ const PerformanceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =
 		</div>
 
 		<div className="body">
-			<div className="para">
+			<div className="para" contentEditable={true}>
 				This certificate is awarded to <span className="emphasize">{curr_teacher.Name}</span>, 
 				{` ${getGenderSpecificText("son/daughter", gender)}`} of <span className="emphasize">{curr_teacher.ManName ? curr_teacher.ManName : "________________"}</span> to acknowledge {`${getGenderSpecificText("his/her", gender)} `}
 				outstanding performance in his work as the teacher of the following subjects in our school.
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Subjects: </label>
 				<div/>
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Class: </label>
 				<div/>
 			</div>
 
-			<div className="cert-row">
+			<div className="cert-row" contentEditable={true}>
 				<label>Remarks: </label>
 				<div/>
 			</div>
 
-			<div className="para">
+			<div className="para" contentEditable={true}>
 			We found {getGenderSpecificText("him/her", gender)} responsible, enthusiastic and hardworking and we hope {getGenderSpecificText("he/she", gender)} will keep up this good work during {getGenderSpecificText("his/her", gender)} tenure. 
 			</div>
 

@@ -2,6 +2,7 @@ import { v4 } from 'node-uuid'
 
 import { openDB, deleteDB } from 'idb'
 import { defaultExams } from '../modules/Settings';
+import moment from 'moment';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -67,14 +68,15 @@ export const loadDb = async () => {
 		let serialized = await db.get('root-state', 'db')
 
 		if (!serialized && localData) {
-			
+
 			console.log("Tranferring Local Data to IDB")
-			
+
 			db.put('root-state', localData, 'db')
 				.then((res) => {
 					console.log("CREATING BACKUP")
 					try {
 						localStorage.setItem('backup', localData)
+						localStorage.removeItem('db')
 					}
 					catch (err) {
 						console.error("BACK UP TO LOCALSTORAGE FAIURE !!!", err )
@@ -170,7 +172,9 @@ const checkPersistent = () => {
 checkPersistent();
 
 export const saveDb = (state: RootReducerState) => {
-	
+
+	console.log("SAVING IDB-START", moment.now())
+
 	const json = JSON.stringify(state)
 	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 	
@@ -181,7 +185,8 @@ export const saveDb = (state: RootReducerState) => {
 	})
 	.then(db => {
 		console.log('putting db')
-		return db.put('root-state', json, "db")
+		db.put('root-state', json, "db")
+		console.log("SAVING IDB-END", moment.now())
 	})
 	.catch(err => {
 		console.error(err)

@@ -21,8 +21,14 @@ class SchoolLogin extends Component {
 	}
 
 	onLogin = () => {
-		console.log(this.state)
 		this.props.login(this.state.school, this.state.password);
+	}
+
+	handleKeyDown = (e) => {
+		// check 'enter' key pressed
+		if(e.keyCode === 13) {
+			this.onLogin()
+		}
 	}
 
 	componentWillReceiveProps(newProps) {
@@ -67,7 +73,7 @@ class SchoolLogin extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="password" {...this.former.super_handle(["password"])} placeholder="Password" />
+						<input type="password" {...this.former.super_handle(["password"])} onKeyDown={this.handleKeyDown} placeholder="Password" />
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>

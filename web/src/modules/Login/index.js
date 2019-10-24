@@ -32,10 +32,17 @@ class Login extends Component {
 		this.props.login(this.state.login)
 	}
 
+	handleKeyDown = (e) => {
+		// check 'enter' key pressed
+		if(e.keyCode === 13) {
+			this.onLogin()
+		}
+	}
+
 	onSwitchSchool = () => {
 
 		if(this.props.unsyncd_changes > 0) {
-			const res = window.confirm(`You have ${this.props.unsyncd_changes} pending changes. If you switch schools, this data will be lost. Are you sure you want to continue?`);
+			const res = window.confirm(`You have ${this.props.unsyncd_changes} pending changes. Please Export Db to file before Switching School. If you switch schools without exporting, this data will be lost. Are you sure you want to continue?`);
 			if(!res) {
 				return;
 			}
@@ -46,9 +53,32 @@ class Login extends Component {
 				db.createObjectStore('root-state')
 			}
 		}).then(db => {
+			db.get('root-state', "db")
+				.then(res => {
+					try {
+						localStorage.setItem('backup', res)
+					}
+					catch {
+						console.log("Backup to LocalStorage Failed (on SwitchSchool)")
+						if (this.props.unsyncd_changes > 0) {
+							try {
+								console.log("Backing up unsynced to localstorage")
+								const db = JSON.parse(res)
+								localStorage.setItem("backup-queued", JSON.stringify(db.queued))
+							}
+							catch {
+								console.log("Backup of unsynced to localstorage failed")
+							}
+						}
+					}
+				})
+
 			db.delete('root-state', 'db')
 				.then(res => {
-					localStorage.removeItem("db");
+					
+					if (localStorage.getItem('db')){
+						localStorage.removeItem("db")
+					}
 					this.props.history.push("/landing")
 					window.location.reload()
 				})
@@ -101,7 +131,7 @@ class Login extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" autoCapitalize="off"/>
+						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" autoCapitalize="off" onKeyDown={this.handleKeyDown}/>
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>
