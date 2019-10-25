@@ -323,8 +323,6 @@ class RemoveFeesComponent extends React.Component<RemoveProps, RemoveState> {
 			loading: true,
 			reduced_fees: {}
 		}
-
-
 	}
 
 	componentDidMount() {
