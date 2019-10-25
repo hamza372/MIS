@@ -22,7 +22,7 @@ export default function checkMultipleStudentsDuesReturning(students: MISStudent[
 			const dues = checkStudentDuesReturning(students[i]);
 			i += 1;
 
-			payments.concat(dues)
+			payments = payments.concat(dues)
 
 			setTimeout(checkNextStudent, 0)
 		}
