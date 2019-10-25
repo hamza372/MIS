@@ -7,6 +7,7 @@ import { addMultiplePayments } from '../../../actions'
 import { PrintHeader } from '../../../components/Layout'
 import Former from '../../../utils/former'
 import { checkStudentDuesReturning } from '../../../utils/checkStudentDues'
+import checkDuesAsync from '../../../utils/calculateDuesAsync'
 import { numberWithCommas } from '../../../utils/numberWithCommas'
 import { getSectionsFromClasses } from '../../../utils/getSectionsFromClasses'
 
@@ -191,30 +192,16 @@ class FeeAnalytics extends Component<propTypes, S> {
 	componentDidMount() {
 		// first update fees
 		const { students, addPayments } = this.props
-		const s1 = new Date().getTime();
 
-		const checkingDues : number[] = []
-
-		const nextPayments = Object.values(students)
-			.reduce((agg, student) => {
-				const start = new Date().getTime()
-				const dues = checkStudentDuesReturning(student)
-				const elapsed = new Date().getTime() - start;
-				checkingDues.push(elapsed);
-
-				return [...agg, ...dues]
-			}, []);
-
-		const s2 = new Date().getTime();
-
-		console.log("checking student dues time: ", s2 - s1, "milliseconds")
-
-		if(nextPayments.length > 0) {
-			const s3 = new Date().getTime()
-			addPayments(nextPayments)
-			const s4 = new Date().getTime()
-			console.log("saving nextPayments: ", s4 - s3, "milliseconds")
-		}
+		const s1 = new Date().getTime()
+		console.log('computing dues')
+		checkDuesAsync(Object.values(students))
+			.then(nextPayments => {
+				console.log('done computing dues', (new Date().getTime()) - s1)
+				if(nextPayments.length > 0) {
+					addPayments(nextPayments)
+				}
+			})
 	}
 
 	onStateChange = () => {
