@@ -130,12 +130,29 @@ interface S {
 	start_date: number,
 	end_date: number,
 	isStudentAttendanceFilter: boolean,
+
+	loading: boolean
+	totals: {
+		PRESENT: number
+		LEAVE: number
+		ABSENT: number
+		SICK_LEAVE: number
+		SHORT_LEAVE: number 
+		CASUAL_LEAVE: number
+	}
+	attendance: {
+		[id: string]: Attendance
+	}
+	student_attendance: {
+		[id: string]: StudentAttendance
+	}
 }
 
 type propTypes = RouteComponentProps & P
 	
 class AttendanceAnalytics extends Component < propTypes, S > {
 
+	background_calculation: NodeJS.Timeout
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
@@ -163,8 +180,26 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			start_date: start_date,
 			end_date: end_date,
 			isStudentAttendanceFilter: false,
+
+			loading: true,
+			totals: {
+				PRESENT: 0,
+				LEAVE: 0,
+				ABSENT: 0,
+				SICK_LEAVE: 0,
+				SHORT_LEAVE: 0,
+				CASUAL_LEAVE: 0
+			},
+			attendance: {},
+			student_attendance: {}
+
 		}
-	  	this.former = new Former(this, [])
+
+		this.former = new Former(this, [])
+	}
+
+	componentDidMount() {
+		this.calculate()
 	}
 
 	onStateChange = () => {
@@ -198,13 +233,19 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			end_date,
 			selected_period
 		})
+
+		this.calculate()
 		
 	}
 
-	render()
-	{
-		const { students, classes, settings, schoolLogo } = this.props
-		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
+	calculate = () => {
+
+		const { students } = this.props
+		const students_list = Object.values(students)
+
+		let i = 0;
+
+		clearTimeout(this.background_calculation)
 
 		const selected_section = this.state.selected_section_id;
 		const temp_sd = moment(this.state.start_date).format("YYYY-MM-DD")
@@ -215,14 +256,34 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 		let attendance : {[id: string]: Attendance } = { } // [mm/yyyy] || [dd/mm/yyyy]: { present / absent / leave }
 		let student_attendance : {[id: string]: StudentAttendance } = { } // [id]: { absents, presents, leaves }
 
-		for(let [sid, student] of Object.entries(students)){
-			
-			
-			if( selected_section !=="" && student.section_id !== selected_section)
-				continue
+		const reducify = () => {
+
+			console.log('processing student ', i)
+
+			if(i >= students_list.length) {
+				// done
+				this.setState({
+					loading: false,
+					totals,
+					attendance,
+					student_attendance
+				})
+
+				return
+			}
+
+			const student = students_list[i]
+			const sid = student.id;
+			i += 1
+
+			if( selected_section !=="" && student.section_id !== selected_section) {
+				this.background_calculation = setTimeout(reducify, 0)
+				return
+			}
 			
 			if(student.Name === undefined || student.attendance === undefined ) {
-				continue;
+				this.background_calculation = setTimeout(reducify, 0)
+				return
 			}
 
 			let attendance_status_count = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 }
@@ -241,8 +302,25 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 				m_status[record.status] += 1;
 				attendance[period_key] = m_status;
 			}
+
 			student_attendance[sid] = {student, ...attendance_status_count}
+
+			this.background_calculation = setTimeout(reducify, 0)
+
 		}
+
+		this.background_calculation = setTimeout(reducify, 0)
+
+	}
+
+	render()
+	{
+		const { students, classes, settings, schoolLogo } = this.props
+		const { student_attendance, totals, attendance } = this.state;
+
+		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
+
+		const period_format = this.state.selected_period === 'Monthly' ? 'MM/YYYY' : 'DD/MM/YYYY'
 
 		const items = Object.entries(student_attendance)
 			.filter(([ sid, { student } ]) => 
@@ -252,12 +330,15 @@ class AttendanceAnalytics extends Component < propTypes, S > {
 			)
 			.sort(([, { ABSENT: a1 }], [, {ABSENT: a2}]) => a2 - a1)
 
+
 		return <div className="attendance-analytics">
 
 		<PrintHeader 
 			settings={settings} 
 			logo={schoolLogo}
 		/>
+
+		{ this.state.loading && <div>Calculating...</div> }
 
 		<div className="table row">
 			<label>Total Present</label>
