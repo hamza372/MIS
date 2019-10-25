@@ -102,6 +102,8 @@ interface S {
 	selected_period: string
 	start_date: number,
 	end_date: number,
+
+	loading: boolean
 }
 
 interface routeInfo {
@@ -113,6 +115,8 @@ type propTypes = RouteComponentProps<routeInfo> & P
 class ExpenseAnalytics extends Component<propTypes, S> {
 
 	former: Former
+	background_calculation: NodeJS.Timeout
+
 	constructor(props: propTypes) {
 		super(props)
 
@@ -135,6 +139,7 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 			end_date,
 			is_payment_filter: false,
 			selected_period: period !== "" ? period.toString() : "Monthly",
+			loading: true
 		}
 		this.former = new Former(this, [])
 	}
@@ -171,6 +176,27 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 			end_date,
 			selected_period
 		})
+
+		this.calculate()
+	}
+
+	calculate = () => {
+
+		let i = 0;
+		clearTimeout(this.background_calculation)
+
+		this.setState({
+			loading: true
+		})
+
+		const reducify = () => {
+
+			// do work
+
+		}
+
+		this.background_calculation = setTimeout(reducify, 0)
+
 	}
 
 	render() {
