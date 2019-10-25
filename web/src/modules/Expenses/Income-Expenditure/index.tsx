@@ -134,16 +134,16 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			{
 				total_income += i.amount
 
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)){
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
 					total_monthly_income += i.amount
 				}
 			}
 			else if(i.type === "PAYMENT_GIVEN")
 			{
-				total_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
+				total_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				
 				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i) && ( this.state.categoryFilter !== "" ? this.state.categoryFilter === i.category: true)){
-					total_monthly_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
+					total_monthly_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				}
 			}
 		})

@@ -52,8 +52,12 @@ class ClassFeeMenu extends Component <propTypes, S> {
 		//loop through fees to check if we have added
 
 		const class_payments = Object.values(this.props.students)
-			.filter(s => s.Name && this.props.curr_class.sections[s.section_id] !== undefined)
 			.reduce((agg, s) => {
+
+				if(!s.Name || this.props.curr_class.sections[s.section_id] === undefined) {
+					return agg;
+				}
+
 				const owedPayments = checkStudentDuesReturning(s)
 
 				if (owedPayments.length > 0) {
@@ -62,6 +66,7 @@ class ClassFeeMenu extends Component <propTypes, S> {
 						...owedPayments
 					]
 				}
+
 				return agg
 			}, [])
 		

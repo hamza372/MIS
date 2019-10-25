@@ -1,5 +1,4 @@
 import { connected, disconnected } from '../actions/core'
-import { Action } from 'redux'
 import sleep from '../utils/sleep'
 import { v4 } from 'node-uuid'
 
