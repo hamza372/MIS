@@ -78,7 +78,7 @@ interface ChartProps {
 				<label style={{ backgroundColor: "#efecec" }}><b>Total</b></label>
 				<label style={{ backgroundColor: "#bedcff" }}><b>{numberWithCommas(total_income)}</b></label>
 				<label style={{ backgroundColor: "#e0e0e0" }}><b>{numberWithCommas(total_expense)}</b></label>
-				<label style={{ backgroundColor: "#93d0c5" }}><b>{numberWithCommas(total_income - total_expense)}</b></label>
+				<label style={{ backgroundColor: "#93d0c5" }}><b>{numberWithCommas( Math.round(total_income - total_expense))}</b></label>
 			</div>
 		</div> 
 	}
@@ -98,6 +98,9 @@ interface S {
 		expense: boolean
 		profit: boolean
 	}
+	collective_obj: { [month: string]: { income: number, expense: number } }
+	total_income: number
+	total_expense: number
 	is_payment_filter: boolean
 	selected_period: string
 	start_date: number,
@@ -135,6 +138,9 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 				expense: true,
 				profit: true
 			},
+			collective_obj: {},
+			total_income: 0,
+			total_expense: 0,
 			start_date,
 			end_date,
 			is_payment_filter: false,
@@ -146,6 +152,10 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 
 	calculateDebt = ({SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP}:{ SUBMITTED: number, FORGIVEN: number, OWED : number, SCHOLARSHIP : number}) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
 
+	componentDidMount() {
+		this.calculate()
+	}
+	
 	onStateChange = () => {
 
 		const start_date = moment(this.state.start_date).format("MM-DD-YYYY")
@@ -183,90 +193,114 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 	calculate = () => {
 
 		let i = 0;
+		let j = 0;
+
 		clearTimeout(this.background_calculation)
 
 		this.setState({
 			loading: true
 		})
+		
+		const collective_obj: { [month: string]: { income: number, expense: number } } = {}
+		
+		let total_income = 0;
+		let total_expense = 0;;
+
+		const { students, expenses } = this.props
+
+		const student_list = Object.values(students)
+		const expense_list = Object.values(expenses)
+
+		const s_length = student_list.length
+		const e_length = expense_list.length
+
+		const period_format = this.state.selected_period === "Daily" ? "DD/MM/YY" : "MM/YYYY"
+		
+		const start_date = moment(this.state.start_date)
+		const end_date = moment(this.state.end_date)
 
 		const reducify = () => {
 
-			// do work
+			if ( i >= s_length && j >= e_length) {
+				return this.setState({
+					loading: false,
+					collective_obj,
+					total_income,
+					total_expense
+				})
+			}
 
+			if (i < s_length) {
+	
+				const student = student_list[i];
+				i += 1;
+			
+				for (let pid in student.payments || {}) {
+					
+					const payment = student.payments[pid]
+					const inc_month = moment(payment.date).format(period_format)
+					
+					if (payment.type === "SUBMITTED"
+						&& moment(payment.date).isSameOrAfter(start_date)
+						&& moment(payment.date).isSameOrBefore(end_date))
+					{
+						collective_obj[inc_month] = collective_obj[inc_month] ?
+							{
+								income: collective_obj[inc_month].income + payment.amount,
+								expense: collective_obj[inc_month].expense
+							} : {
+								income: payment.amount,
+								expense: 0
+							}
+
+						total_income += payment.amount
+					}
+				}
+			}
+
+			if (j < e_length) {
+				
+				const expense = expense_list[j]
+				j += 1;
+
+				if (expense.type === "PAYMENT_GIVEN"
+					&& moment(expense.date).isSameOrAfter(start_date)
+					&& moment(expense.date).isSameOrBefore(end_date))
+				{
+					const inc_month = moment(expense.date).format(period_format)
+					const curr_amount = typeof(expense.amount) === "string" ? parseFloat(expense.amount) : expense.amount
+					
+					collective_obj[inc_month] = collective_obj[inc_month] ?
+						{
+							income: collective_obj[inc_month].income,
+							expense: collective_obj[inc_month].expense + curr_amount
+						} : {
+							income: 0,
+							expense: expense.amount
+						}
+
+					total_expense += curr_amount
+				}
+			}
+			this.background_calculation = setTimeout(reducify, 0)
 		}
 
 		this.background_calculation = setTimeout(reducify, 0)
-
 	}
 
 	render() {
 
-	const {students, expenses ,settings, schoolLogo} = this.props
+	const { settings, schoolLogo} = this.props
 
-	const students_payments = Object.entries(students)
-		.filter(([id, s]) => s.Name)
-		.reduce((prev,[id, s]) => {
-
-			const curr_pay = Object.entries(s.payments)
-				.filter(([, curr]) => curr.type === "SUBMITTED")
-				.reduce((prev, [id, curr]) => {
-					return {
-						...prev,
-						[id]: curr
-					}
-				}, {})
-			
-			return {
-				...prev,
-				...curr_pay
-			}
-		}, {} as { [id:string]: MISStudentPayment })
-	
-	const filtered_expense = Object.entries(expenses)
-		.filter(([id,e]) => e.type === "PAYMENT_GIVEN")
-		.reduce((agg, [id, curr]) => {
-			return {
-				...agg,
-				[id]: curr
-			}
-		}, {} as { [id:string]: MISExpense | MISSalaryExpense})
-
-	const income_exp = {...students_payments, ...filtered_expense}
-
-	let total_income = 0
-	let total_expense = 0
-
-	const temp_sd = moment(this.state.start_date)
-	const temp_ed = moment(this.state.end_date)
 	const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
-
-	const collective_obj = Object.values(income_exp)
-		.filter( curr => moment(curr.date).isSameOrAfter(temp_sd) && moment(curr.date).isSameOrBefore(temp_ed))
-		.reduce((agg, curr) => {
-			const pay_month = moment(curr.date).format(period_format)
-
-			let inc_amount = agg[pay_month] && agg[pay_month].income || 0
-			let exp_amount = agg[pay_month] && agg[pay_month].expense || 0
-
-			if(curr.type === "SUBMITTED"){
-				total_income += curr.amount
-				inc_amount += curr.amount
-			}
-			else if(curr.type === "PAYMENT_GIVEN"){
-				total_expense += curr.amount - (curr.expense === "SALARY_EXPENSE" ? curr.deduction: 0)
-				exp_amount += curr.amount- (curr.expense === "SALARY_EXPENSE" ? curr.deduction: 0)
-			}
-			agg[pay_month] = { income: inc_amount, expense: exp_amount}
-			
-			return agg
-
-		}, {} as { [month: string]: { income: number, expense: number}})
 
 	return <div className="expense-analytics">
 
 		<PrintHeader 
 			settings={settings}
-			logo={schoolLogo}/>
+			logo={schoolLogo} />
+		
+		{ this.state.loading && <div> Calculating... </div> }
 
 		<div className="divider">Payments over Time</div>
 
@@ -300,7 +334,7 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 
 		<div className="no-print">
 		<ExpenseChart 
-			collective_obj={collective_obj}
+			collective_obj={this.state.collective_obj}
 			chartFilter={this.state.chartFilter}
 			date_format={period_format}/>
 		</div>
@@ -329,9 +363,9 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 			</div>
 		</div>
 		<ExpenseTable 
-			collective_obj={collective_obj}
-			total_income={total_income}
-			total_expense={total_expense}
+			collective_obj={this.state.collective_obj}
+			total_income={this.state.total_income}
+			total_expense={this.state.total_expense}
 			date_format={period_format}/>
 			
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
