@@ -155,7 +155,19 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 	componentDidMount() {
 		this.calculate()
 	}
-	
+
+	shouldComponentUpdate(nextProps : P, nextState : S) {
+		const { start_date, end_date, selected_period } = this.state
+
+		if ( start_date !== nextState.start_date
+			|| end_date !== nextState.end_date
+			|| selected_period !== nextState.selected_period
+		) {
+			this.calculate()
+		}
+		return true
+	}
+
 	onStateChange = () => {
 
 		const start_date = moment(this.state.start_date).format("MM-DD-YYYY")
