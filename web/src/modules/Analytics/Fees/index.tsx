@@ -241,7 +241,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 		const params = `start_date=${start_date}&end_date=${end_date}&period=${period}`
 
 		window.history.replaceState(this.state, "Fee Analytics", `${url}?${params}`)
-		
+		this.calculate()
 	}
 
 	componentWillReceiveProps(nextProps: propTypes) {

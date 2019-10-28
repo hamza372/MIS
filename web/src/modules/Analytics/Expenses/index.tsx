@@ -156,20 +156,7 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 		this.calculate()
 	}
 
-	shouldComponentUpdate(nextProps : P, nextState : S) {
-		const { start_date, end_date, selected_period } = this.state
-
-		if ( start_date !== nextState.start_date
-			|| end_date !== nextState.end_date
-			|| selected_period !== nextState.selected_period
-		) {
-			this.calculate()
-		}
-		return true
-	}
-
 	onStateChange = () => {
-
 		const start_date = moment(this.state.start_date).format("MM-DD-YYYY")
 		const end_date = moment(this.state.end_date).format("MM-DD-YYYY")
 		const period = this.state.selected_period
@@ -178,9 +165,10 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 		const params = `start_date=${start_date}&end_date=${end_date}&period=${period}`
 
 		window.history.replaceState(this.state, "Fee Analytics", `${url}?${params}`)
+		this.calculate()
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) { 
+	componentWillReceiveProps(nextProps : propTypes) {
 
 		const parsed_query = queryString.parse(nextProps.location.search);
 
