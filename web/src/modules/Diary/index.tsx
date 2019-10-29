@@ -47,8 +47,22 @@ class Diary extends Component <propTypes,S> {
 	constructor(props: propTypes) {
 		super(props)
 
-		const curr_date = moment().format("DD-MM-YYYY")	
-		const diary = this.props.diary && this.props.diary[curr_date] ? { ...this.getDiaryTemplate(), ...JSON.parse(JSON.stringify(this.props.diary[curr_date]))} : this.getDiaryTemplate()
+		const curr_date = moment().format("DD-MM-YYYY")
+
+		const propsDiary = this.props.diary && this.props.diary[curr_date] ? JSON.parse(JSON.stringify(this.props.diary[curr_date])) : undefined
+
+		const diary = propsDiary ? {...Object.entries(this.getDiaryTemplate())
+			.reduce((agg, [sec_id, diary]) => {
+				return {
+					...agg,
+					[sec_id]: {
+						...diary,
+						...propsDiary[sec_id]
+					}
+				}
+			}, {})
+		} : this.getDiaryTemplate()
+
 		this.state = {
 			banner: {
 				active: false,
@@ -129,9 +143,9 @@ class Diary extends Component <propTypes,S> {
 		const selected_date_diary = nextProps.diary && nextProps.diary[curr_date] ?
 			JSON.parse(JSON.stringify(nextProps.diary[curr_date])) :
 				this.props.diary && this.props.diary[curr_date] ? JSON.parse(JSON.stringify(this.props.diary[curr_date])) : this.getDiaryTemplate()
-
+		
 		this.setState({
-			diary: selected_date_diary
+			diary: { ...this.state.diary ,  ...selected_date_diary }
 		})
 	}
 
@@ -139,17 +153,15 @@ class Diary extends Component <propTypes,S> {
 
 		const curr_date = moment(this.state.selected_date).format("DD-MM-YYYY")
 
-		// console.log(this.props.diary)
-
-		// return;
-
 		// Here need to save modified section subjects for selected date rather then the whole section's diary
 		const diary = Object.entries(this.state.diary[this.state.selected_section_id])
 			.filter(([subject, { homework }]) => {
 				
-				return this.props.diary[curr_date] && 
-					this.props.diary[curr_date][this.state.selected_section_id] ? 
-					this.props.diary[curr_date][this.state.selected_section_id][subject].homework !== homework : true
+				return this.props.diary[curr_date] && this.props.diary[curr_date][this.state.selected_section_id] ? 
+						this.props.diary[curr_date][this.state.selected_section_id][subject] ?
+							this.props.diary[curr_date][this.state.selected_section_id][subject].homework !== homework
+						: true
+					: homework !== ""
 				
 			})
 			.reduce((agg, [subject, homework]) => {
@@ -159,7 +171,6 @@ class Diary extends Component <propTypes,S> {
 				}
 
 			}, {})
-
 		// adding diary
 		this.props.addDiary(curr_date, this.state.selected_section_id, diary)
 
