@@ -132,7 +132,7 @@ const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =>
 
 		<div className="footer">
 			<div className="left">
-				<div> Issuance Date</div>
+				<div>Date of Issue</div>
 			</div>
 			<div className="right">
 				<div> Principal Signature</div>
@@ -183,7 +183,7 @@ const PerformanceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =
 
 		<div className="footer">
 			<div className="left">
-				<div> Issuance Date</div>
+				<div>Date of Issue</div>
 			</div>
 			<div className="right">
 				<div> Principal Signature</div>

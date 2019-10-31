@@ -19,7 +19,8 @@ defmodule Sarkar.Application do
 					password: System.get_env("POSTGRES_PASS") || "postgres",
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
-					types: Sarkar.PostgrexTypes
+					types: Sarkar.PostgrexTypes,
+					pool_size: 10
 			},
 			Sarkar.Server
 		]

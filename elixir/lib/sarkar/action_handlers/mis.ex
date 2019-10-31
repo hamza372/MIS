@@ -32,7 +32,7 @@ defmodule Sarkar.ActionHandler.Mis do
 				register_connection(school_id, client_id)
 				{:reply, succeed(), %{school_id: school_id, client_id: client_id}}
 			{:error, msg} ->
-				IO.inspect msg
+				IO.puts "#{school_id} has error #{msg}"
 				{:reply, fail(), state}
 		end
 	end
@@ -48,6 +48,14 @@ defmodule Sarkar.ActionHandler.Mis do
 		IO.inspect payload
 		{:reply, succeed(), state}
 	end 
+
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "school_id" => school_id}, state) do
+
+		changes = payload |> Map.keys |> Enum.count 
+		IO.puts "school #{school_id} has not authenticated the connection, and is trying to make #{changes} changes."
+
+		{:reply, fail("Please update your mischool app to the latest version."), state}
+	end
 
 	def handle_action(%{"type" => type, "payload" => payload}, state) do
 		IO.puts "it is likely you have not authenticated. no handler exists for this combination of state and message"
