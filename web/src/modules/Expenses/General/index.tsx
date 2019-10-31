@@ -374,7 +374,7 @@ class Expenses extends Component <propTypes, S> {
 
 			<div className="table row">
 				<label>Total Expense:</label>
-				<div>{numberWithCommas(total_expense)}</div>
+				<div>Rs. {numberWithCommas(total_expense)}</div>
 			</div>
 
 			<div className="divider">Ledger</div>
@@ -434,7 +434,7 @@ class Expenses extends Component <propTypes, S> {
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-								</div> || <label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>}
+								</div> || <label>{numberWithCommas(e.amount - e.deduction)}</label>}
 							</div>
 						}
 						else if (e.expense === "MIS_EXPENSE")
@@ -448,14 +448,14 @@ class Expenses extends Component <propTypes, S> {
 								{ this.state.edits[id] && <div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px"}} onClick={() => this.onDelete(id)} >x</div>
-								</div> || <label> {`${numberWithCommas(e.amount)} Rs`}</label>}
+								</div> || <label>{numberWithCommas(e.amount)}</label>}
 						</div>
 						}
 					})
 				}
 				<div className="table row last">
 					<label><b> Total Paid:</b></label>
-					<div><b>{numberWithCommas(total_filtered_expense)}</b></div>
+					<div><b>Rs. {numberWithCommas(total_filtered_expense)}</b></div>
 				</div>
 			</div>
 			<div className="button save" style={{marginTop:"5px"}} onClick={() => this.onSave()}> Save </div>

@@ -324,12 +324,12 @@ class StudentFees extends Component <propTypes, S> {
 			<div className="divider">Payment Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
-				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
+				<div>Rs. {Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
 			</div>
 
 			<div className="table row">
 				<label>Total One-Time Fees:</label>
-				<div>{
+				<div>Rs. {
 					Object.values(this.student().fees)
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
@@ -384,7 +384,7 @@ class StudentFees extends Component <propTypes, S> {
 				}
 				<div className="table row last">
 					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-					<div style={style}><b>{numberWithCommas(Math.abs(owed))}</b></div>
+					<div style={style}><b>Rs. {numberWithCommas(Math.abs(owed))}</b></div>
 				</div>
 			</div>
 			<div className="form">
@@ -399,7 +399,7 @@ class StudentFees extends Component <propTypes, S> {
 					<div className="row">
 						<label>Type</label>
 						<select {...this.Former.super_handle(["payment", "type"])}>
-							<option value="SUBMITTED">Payed</option>
+							<option value="SUBMITTED">Paid</option>
 							<option value="FORGIVEN">Need Scholarship</option>
 						</select>
 					</div>

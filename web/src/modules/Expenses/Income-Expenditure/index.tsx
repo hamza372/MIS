@@ -158,17 +158,17 @@ class IncomeExpenditure extends Component <propTypes, S> {
 		
 		<div className="table row">
 			<label>Total Income:</label>
-			<div><b>{numberWithCommas(total_income)}</b></div>
+			<div><b>Rs. {numberWithCommas(total_income)}</b></div>
 		</div>
 		
 		<div className="table row">
 			<label>Total Expense:</label>
-				<div><b>{numberWithCommas(total_expense)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_expense)}</b></div>
 		</div>
 
 		<div className="table row">
 			<label>Profit:</label>
-			<div><b>{numberWithCommas(total_income-total_expense)}</b></div>
+			<div><b>Rs. {numberWithCommas(total_income-total_expense)}</b></div>
 		</div>
 
 		<div className="divider">Ledger</div>
@@ -228,15 +228,15 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			}
 			<div className="table row last">
 				<label><b>Income</b></label>
-				<div><b>{numberWithCommas(total_monthly_income)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_monthly_income)}</b></div>
 			</div>
 			<div className="table row last">
 				<label><b>Expense</b></label>
-				<div><b>{numberWithCommas(total_monthly_expense)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_monthly_expense)}</b></div>
 			</div>
 			<div className="table row last">
 				<label><b>Profit</b></label>
-				<div><b>{numberWithCommas(total_monthly_income - total_monthly_expense)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_monthly_income - total_monthly_expense)}</b></div>
 			</div>
 		</div>
 

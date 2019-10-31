@@ -44,11 +44,11 @@ class FeeMenu extends Component <propTypes, S> {
 
 		return <Layout history={this.props.history}>
 			<div className="reports-menu">
-				<div className="title">Fee</div>
+				<div className="title">Fee Menu</div>
 
 				<div className="form" style={{ width: "90%" }}>
 					<div className="row">
-						<label>View Reports For</label>
+						<label>View Fees For</label>
 						<select {...this.Former.super_handle(["fee_for"])}>
 							<option value="CLASS">Class</option>
 							<option value="STUDENT">Student</option>
