@@ -53,9 +53,9 @@ class ClassReportMenu extends Component {
 		const subjects = new Set()
 		const examSet = new Set()
 		
-		for(let s of relevant_students)
+		for(const s of relevant_students)
 		{
-			for(let e of Object.values(exams))
+			for(const e of Object.values(exams))
 			{ 
 				if(e.section_id === s.section_id){
 					subjects.add(e.subject)

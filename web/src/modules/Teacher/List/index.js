@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import List from 'components/List'
 import Title from 'components/Title'
-import { LayoutWrap } from '../../../components/Layout';
+import { LayoutWrap } from 'components/Layout';
  
 const TeacherItem = (T) => 
 	<Link key={T.id} to={`/faculty/${T.id}/${T.forwardTo}`}>

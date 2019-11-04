@@ -3,44 +3,44 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import queryString from 'querystring'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { PrintHeader } from '../../../components/Layout'
-import Former from "../../../utils/former"
+import { PrintHeader } from 'components/Layout'
+import Former from "utils/former"
 
 import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'recharts'
 
 interface Attendance {
-	PRESENT: number
-	ABSENT: number
-	LEAVE: number
+	PRESENT: number;
+	ABSENT: number;
+	LEAVE: number;
 }
 
 type TAttendance = Attendance & { teacher: MISTeacher}
 
 interface Filter {
-		present: boolean
-		absent: boolean
-		leave: boolean
-		percentage: boolean
+		present: boolean;
+		absent: boolean;
+		leave: boolean;
+		percentage: boolean;
 }
 
 interface ChartData {
 	attendance: {
-		[id: string]: Attendance
-	}
-	filter: Filter
-	date_format: string
+		[id: string]: Attendance;
+	};
+	filter: Filter;
+	date_format: string;
 }
 
 interface TableData {
 	attendance: {
-		[id: string]: Attendance
-	}
+		[id: string]: Attendance;
+	};
 	totals: {
 		PRESENT: number;
 		LEAVE: number;
 		ABSENT: number;
-	}
-	date_format: string
+	};
+	date_format: string;
 }
 
 const AttendanceChart = ({attendance, filter, date_format}: ChartData) => {		
@@ -100,25 +100,25 @@ const AttendanceTable = ({attendance, totals, date_format}: TableData) =>{
 }
 
 interface P {
-	teachers: RootDBState["faculty"]
-	settings: RootDBState["settings"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	teachers: RootDBState["faculty"];
+	settings: RootDBState["settings"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
 }
 
 interface S {
-	filterText: string
+	filterText: string;
 	chartFilter: {
-		present: boolean
-		absent: boolean
-		leave: boolean
-		percentage: boolean
-	},
-	classFilter: string
-	is_attendance_filter: boolean
-	selected_faculty_id: string,
-	selected_period: string
-	start_date: number,
-	end_date: number,
+		present: boolean;
+		absent: boolean;
+		leave: boolean;
+		percentage: boolean;
+	};
+	classFilter: string;
+	is_attendance_filter: boolean;
+	selected_faculty_id: string;
+	selected_period: string;
+	start_date: number;
+	end_date: number;
 }
 
 type propTypes = RouteComponentProps & P
@@ -182,7 +182,7 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 		window.history.replaceState(this.state, "Fee Analytics", `${url}?${params}`)
 	}
 
-	componentWillReceiveProps(nextProps : propTypes) { 
+	componentWillReceiveProps(nextProps: propTypes) { 
 
 		const parsed_query = queryString.parse(nextProps.location.search);
 
@@ -207,15 +207,15 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 	{
 		const { teachers, settings, schoolLogo } = this.props
 
-		let totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0 };
-		let attendance : {[id: string]: Attendance } = { }
-		let teacher_attendance : {[id: string]: TAttendance } = { }
+		const totals = { PRESENT: 0, LEAVE: 0, ABSENT: 0 };
+		const attendance: {[id: string]: Attendance } = { }
+		const teacher_attendance: {[id: string]: TAttendance } = { }
 
 		const temp_sd = moment(this.state.start_date).format("YYYY-MM-DD")
 		const temp_ed = moment(this.state.end_date).format("YYYY-MM-DD")
 		const period_format = this.state.selected_period === 'Monthly' ? 'MM/YYYY' : 'DD/MM/YYYY'
 
-		for(let [tid, teacher] of Object.entries(teachers)) {
+		for(const [tid, teacher] of Object.entries(teachers)) {
 	
 			if( this.state.selected_faculty_id !=="" && tid !== this.state.selected_faculty_id)
 				continue
@@ -224,9 +224,9 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 				continue;
 			}
 
-			let t_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
+			const t_record = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 
-			for(let [date, record] of Object.entries(teacher.attendance)) {
+			for(const [date, record] of Object.entries(teacher.attendance)) {
 
 				if(!( moment(date).isSameOrAfter(temp_sd) && moment(date).isSameOrBefore(temp_ed) )){
 					continue
@@ -397,7 +397,7 @@ class TeacherAttendanceAnalytics extends Component < propTypes, S > {
 	</div>
 	}
 }
-export default connect((state : RootReducerState ) =>({
+export default connect((state: RootReducerState ) =>({
 	teachers: state.db.faculty,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""

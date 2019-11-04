@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps, Route, Link} from 'react-router-dom'
+import { withRouter, RouteComponentProps, Route } from 'react-router-dom'
 
-import Layout from '../../../components/Layout'
+import Layout from 'components/Layout'
 import Students from './student'
 
 interface S {
@@ -13,7 +13,7 @@ type P = RouteComponentProps
 
 class ExcelImport extends React.Component<P, S> {
 
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props)
 
 		this.state = {
@@ -22,7 +22,7 @@ class ExcelImport extends React.Component<P, S> {
 
 	render() {
 
-		const loc = this.props.location.pathname.split('/').slice(-1).pop();
+		// const loc = this.props.location.pathname.split('/').slice(-1).pop();
 
 		return <Layout history={this.props.history}>
 			<div className="excel-import">
@@ -41,6 +41,6 @@ class ExcelImport extends React.Component<P, S> {
 	}
 }
 
-export default connect((state : RootReducerState) => ({
-}), (dispatch : Function) => ({
+export default connect((state: RootReducerState) => ({
+}), (dispatch: Function) => ({
 }))(withRouter(ExcelImport))

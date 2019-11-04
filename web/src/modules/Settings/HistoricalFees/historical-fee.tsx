@@ -1,50 +1,50 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
-import former from '../../../utils/former';
+import former from 'utils/former';
 import { connect } from 'react-redux'
-import Layout from '../../../components/Layout';
+import Layout from 'components/Layout';
 
 import './style.css'
-import moment, { min } from 'moment'
-import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
-import { addHistoricalPayment } from '../../../actions';
-import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
-import getFilteredPayments from '../../../utils/getFilteredPayments';
-import Banner from '../../../components/Banner';
+import moment from 'moment'
+import getSectionsFromClasses from 'utils/getSectionsFromClasses';
+import { addHistoricalPayment } from 'actions';
+import { StudentLedgerPage } from 'modules/Student/Single/Fees/StudentLedgerPage';
+import getFilteredPayments from 'utils/getFilteredPayments';
+import Banner from 'components/Banner';
 
 
 export type historicalPayment = {
-	date: number
-	name: string
-	amount_owed: number
-	amount_paid: number
-	amount_forgiven: number
+	date: number;
+	name: string;
+	amount_owed: number;
+	amount_paid: number;
+	amount_forgiven: number;
 }
 
 interface  P {
-	students: RootDBState["students"]
-	classes: RootDBState["classes"]
-	settings: RootDBState["settings"]
-	addHistoricalPayment: (payments: historicalPayment, student_id: string) => any
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];
+	settings: RootDBState["settings"];
+	addHistoricalPayment: (payments: historicalPayment, student_id: string) => any;
 }
 
 interface S {
 	banner: {
-		active: boolean
-		good?: boolean
-		text?: string
-	}
-	fee : {
-		date: number
-		name: string
-		amount_owed: string
-		amount_paid: string
-		amount_forgiven: string
-	},
-	selected_section_id: string
-	selected_student_id: string
-	month_filter: string
-	year_filter: string
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
+	fee: {
+		date: number;
+		name: string;
+		amount_owed: string;
+		amount_paid: string;
+		amount_forgiven: string;
+	};
+	selected_section_id: string;
+	selected_student_id: string;
+	month_filter: string;
+	year_filter: string;
 }
 
 interface RouteInfo {
@@ -126,7 +126,7 @@ class historicalFee extends Component <propTypes, S > {
 					.sort( (a, b) => a.Name.localeCompare(b.Name))
 	}
 
-	mergedPaymentsForStudent = (student : MISStudent) => {
+	mergedPaymentsForStudent = (student: MISStudent) => {
 		if(student.FamilyID) {
 			const siblings = Object.values(this.props.students)
 				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
@@ -151,7 +151,7 @@ class historicalFee extends Component <propTypes, S > {
 		const selected_student = students[this.state.selected_student_id]
 		
 		// get payments against the selected student
-		let filteredPayments = selected_student && selected_student.Name ? 
+		const filteredPayments = selected_student && selected_student.Name ? 
 			getFilteredPayments(this.mergedPaymentsForStudent(selected_student), this.state.year_filter, this.state.month_filter) : false
 		
 		// get current selected class name
@@ -166,7 +166,7 @@ class historicalFee extends Component <propTypes, S > {
 
 			Object.entries(selected_student.payments || {})
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
-				.map(([id, payment]) => { 
+				.forEach(([, payment]) => { 
 					Months.add(moment(payment.date).format("MMMM"))
 					Years.add(moment(payment.date).format("YYYY"))
 					}

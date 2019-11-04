@@ -45,7 +45,7 @@ class StudentMarksContainer extends Component {
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
-		for(let [e_id, e] of Object.entries(exams)){
+		for(const [e_id, e] of Object.entries(exams)){
 			if(student.exams !== undefined && student.exams[e_id] !== undefined)
 			{
 				examSet.add(e.name)
@@ -192,7 +192,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 
 		const highest_grade = sorted_grades[0]
 
-		for( let e of sorted_grades)
+		for( const e of sorted_grades)
 		{
 			if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
 				return highest_grade[0]

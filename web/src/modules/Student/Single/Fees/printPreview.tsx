@@ -2,16 +2,16 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import qs from 'querystring'
-import { getSectionsFromClasses } from '../../../../utils/getSectionsFromClasses';
-import { getFilteredPayments } from '../../../../utils/getFilteredPayments'
+import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
+import { getFilteredPayments } from 'utils/getFilteredPayments'
 import { StudentLedgerPage } from './StudentLedgerPage';
 
 interface P {
-	classes: RootDBState["classes"]
-	student: MISStudent
-	faculty_id: RootReducerState["auth"]["faculty_id"]
-	students: RootDBState["students"]
-	settings: RootDBState["settings"]
+	classes: RootDBState["classes"];
+	student: MISStudent;
+	faculty_id: RootReducerState["auth"]["faculty_id"];
+	students: RootDBState["students"];
+	settings: RootDBState["settings"];
 }
 
 interface S {
@@ -19,7 +19,7 @@ interface S {
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
@@ -33,10 +33,10 @@ class printPreview extends Component <propTypes, S>{
 		}
 	}
 
-	month = () : string => `${qs.parse(this.props.location.search)["?month"] || ""}`
-	year = () : string => `${qs.parse(this.props.location.search)["year"] || ""}`
+	month = (): string => `${qs.parse(this.props.location.search)["?month"] || ""}`
+	year = (): string => `${qs.parse(this.props.location.search)["year"] || ""}`
 
-	mergedPaymentsForStudent = (student : MISStudent) => {
+	mergedPaymentsForStudent = (student: MISStudent) => {
 		if(student.FamilyID) {
 			const siblings = Object.values(this.props.students)
 				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
@@ -100,7 +100,7 @@ class printPreview extends Component <propTypes, S>{
 	
   }
 }
-export default connect((state: RootReducerState, { match: { params: { id } } } : { match: { params: { id: string}}}) => ({
+export default connect((state: RootReducerState, { match: { params: { id } } }: { match: { params: { id: string}}}) => ({
 	classes: state.db.classes,
 	faculty_id: state.auth.faculty_id,
 	student: state.db.students[id],

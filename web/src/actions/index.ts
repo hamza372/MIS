@@ -1,9 +1,9 @@
-import { hash } from '../utils'
-import { createMerges, createDeletes, createLoginSucceed, createLoginFail, loadDB } from './core'
+import { hash } from 'utils'
+import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
 import moment from 'moment'
 import {v4} from "node-uuid"
-import Syncr from '../syncr';
-import { historicalPayment } from '../modules/Settings/HistoricalFees/historical-fee';
+import Syncr from 'syncr';
+import { historicalPayment } from 'modules/Settings/HistoricalFees/historical-fee';
 
 const client_type = "mis";
 
@@ -43,7 +43,7 @@ export const createStudentMerge = (student: MISStudent) => (dispatch: Function) 
 	]))
 }
 
-export const createStudentMerges = (students: MISStudent[]) => (dispatch : Function) => {
+export const createStudentMerges = (students: MISStudent[]) => (dispatch: Function) => {
 
 	dispatch(createMerges(
 		students.map(s => ({
@@ -75,8 +75,8 @@ export const deleteFaculty = (faculty_id: string) => (dispatch: Function, getSta
 
 	const deletes = []
 
-	for(let c of Object.values(state.db.classes)){
-		for(let s_id of Object.keys(c.sections)){
+	for(const c of Object.values(state.db.classes)){
+		for(const s_id of Object.keys(c.sections)){
 			if(c.sections[s_id].faculty_id !== undefined && c.sections[s_id].faculty_id === faculty_id){
 				deletes.push({
 					path:["db", "classes", c.id, "sections", s_id, "faculty_id" ]
@@ -98,19 +98,19 @@ export const deleteFaculty = (faculty_id: string) => (dispatch: Function, getSta
 
 type PromotionMap = {
 	[student_id: string]: {
-		current: string
-		next: string
-	}
+		current: string;
+		next: string;
+	};
 }
 
 type Section = {
-	id: string
-	class_id: string
-	namespaced_name: string
-	className: string
-	classYear: number
-	name: string
-	faculty_id?: string
+	id: string;
+	class_id: string;
+	namespaced_name: string;
+	className: string;
+	classYear: number;
+	name: string;
+	faculty_id?: string;
 }
 
 export const promoteStudents = (promotion_map: PromotionMap, section_metadata: Section[]) => (dispatch: Function) => {
@@ -198,14 +198,14 @@ export const SIGN_UP_SUCCEED = "SIGN_UP_SUCCEED"
 export const SIGN_UP_FAILED = "SIGN_UP_FAILED"
 
 type Profile = {
-	name: string
-	phone: string
-	city: string
-	schoolName: string
-	packageName: "Free-Trial" | "Taleem-1" | "Taleem-2" | "Taleem-3"
+	name: string;
+	phone: string;
+	city: string;
+	schoolName: string;
+	packageName: "Free-Trial" | "Taleem-1" | "Taleem-2" | "Taleem-3";
   }
 
-export const createSignUp = (profile: Profile) => (dispatch: Function, getState: () =>RootReducerState, syncr: Syncr) => {
+export const createSignUp = (profile: Profile) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
 	// dispatch action to say you are loading/sending the sign up
 	dispatch({
@@ -344,7 +344,7 @@ export const markAllStudents = (students: MISStudent[], date: string, status: MI
 	dispatch(createMerges(merges));
 }
 
-export const addStudentToFamily = (student : MISStudent, family_id: string) => (dispatch : Function) => {
+export const addStudentToFamily = (student: MISStudent, family_id: string) => (dispatch: Function) => {
 
 	dispatch(createMerges([
 		{
@@ -354,7 +354,7 @@ export const addStudentToFamily = (student : MISStudent, family_id: string) => (
 	]))
 }
 
-export const saveFamilyInfo = (siblings: MISStudent[], info: MISFamilyInfo) => (dispatch : Function) => {
+export const saveFamilyInfo = (siblings: MISStudent[], info: MISFamilyInfo) => (dispatch: Function) => {
 
 	const siblingMerges = siblings.map(s => ([
 		{
@@ -404,7 +404,7 @@ export const undoFacultyAttendance = (faculty: MISTeacher, date: string) => (dis
 	]))
 } 
 
-export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name: string = "Fee") => (dispatch: Function) => {
+export const addPayment = (student: MISStudent, payment_id: string, amount: number, date = moment.now(), type: MISStudentPayment['type'] = "SUBMITTED", fee_id: string = undefined, fee_name = "Fee") => (dispatch: Function) => {
 
 	if(amount === undefined || amount === 0) {
 		return {};
@@ -425,8 +425,8 @@ export const addPayment = (student: MISStudent, payment_id: string, amount: numb
 }
 
 type PaymentAddItem = {
-	student: MISStudent
-	payment_id: string
+	student: MISStudent;
+	payment_id: string;
 } & MISStudentPayment
 
 export const addMultiplePayments = (payments: PaymentAddItem[]) => (dispatch: Function) => {
@@ -539,7 +539,7 @@ export const addSalaryExpense = (id: string, amount: number, label: string, type
 }
 
 interface ExpenseEditItem {
-	[id: string]: { amount: number }
+	[id: string]: { amount: number };
 }
 
 export const editExpense = (expenses: ExpenseEditItem) => (dispatch: Function, getState: () => RootReducerState) => {
@@ -576,8 +576,8 @@ export const deleteExpense = (id: string) => (dispatch: Function) => {
 }
 
 type FeeAddItem  = MISStudentFee & {
-	student: MISStudent 
-	fee_id: string
+	student: MISStudent; 
+	fee_id: string;
 }
 
 export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
@@ -598,8 +598,8 @@ export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
 }
 
 type SingleFeeItem =  MISStudentFee & {
-	student_id: string,
-	fee_id: string
+	student_id: string;
+	fee_id: string;
 }
 
 export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
@@ -620,9 +620,9 @@ export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
 
 type FeeDeleteItem = {
 	[id: string]: {
-		student_id: string
-		paymentIds: string[]
-	}
+		student_id: string;
+		paymentIds: string[];
+	};
 }
 
 export const deleteMultipleFees = (students_fees: FeeDeleteItem) => (dispatch: Function) => {
@@ -655,8 +655,8 @@ export const createTemplateMerges = (templates: RootDBState["sms_templates"]) =>
 
 type Exam = MISExam & {
 	student_marks: {
-		[id: string]: MISStudentExam
-	}
+		[id: string]: MISStudentExam;
+	};
 }
 export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (dispatch: Function) => {
 
@@ -749,7 +749,7 @@ export const addLogo = (logo_string: string) => (dispatch: Function) => {
 	]))
 }
 
-export const addDiary = (date: string, section_id:string, diary: MISDiary["section_id"]) => (dispatch: Function) => {
+export const addDiary = (date: string, section_id: string, diary: MISDiary["section_id"]) => (dispatch: Function) => {
 
 	const merges = Object.entries(diary)
 		.map(([subject, homework]) => ({

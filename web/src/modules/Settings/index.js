@@ -9,7 +9,7 @@ import Layout from 'components/Layout'
 import Banner from 'components/Banner'
 import moment from 'moment'
 import { openDB } from 'idb'
-//import newBadge from "../Landing/icons/New/new.svg";
+//import newBadge from "Landing/icons/New/new.svg";
 
 import './style.css'
 
@@ -306,8 +306,8 @@ class Settings extends Component {
 
 	logoHandler = (e) => {
 
-		var file = e.target.files[0];
-		var reader = new FileReader();
+		const file = e.target.files[0];
+		const reader = new FileReader();
 		
 		reader.onloadend = () => {
 			this.setState({

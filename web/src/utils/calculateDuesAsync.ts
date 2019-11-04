@@ -5,9 +5,34 @@ type payment = {
 	payment_id: string;
 } & MISStudentPayment
 
-// i want this function wrapped in comlink
 
-export function checkStudentDuesReturning(student: MISStudent): payment[] {
+export default function checkMultipleStudentsDuesReturning(students: MISStudent[]): Promise<payment[]> {
+
+	return new Promise((resolve, reject) => {
+		let i = 0;
+		let payments: payment[] = [];
+
+		const checkNextStudent = () => {
+
+			if(i >= students.length) {
+				// we are done calculating dues
+				return resolve(payments)
+			}
+
+			const dues = checkStudentDuesReturning(students[i]);
+			i += 1;
+
+			payments = payments.concat(dues)
+
+			setTimeout(checkNextStudent, 0)
+		}
+
+		setTimeout(checkNextStudent, 0)
+	})
+
+}
+
+function checkStudentDuesReturning(student: MISStudent): payment[] {
 	const curr = moment().format("MM/YYYY")
 
 	const payments: payment[] = []

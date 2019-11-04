@@ -11,7 +11,7 @@ import {PrintHeader} from 'components/Layout';
 
 import './style.css'
 import getStudentLimt from 'utils/getStudentLimit';
-import { LayoutWrap } from '../../../components/Layout';
+import { LayoutWrap } from 'components/Layout';
 
 const StudentItem = (S) => {
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";

@@ -1,4 +1,4 @@
-export const getFeeLabel = (payment: MISStudentPayment) : string => {
+export const getFeeLabel = (payment: MISStudentPayment): string => {
 	
 	switch (payment.type) {
 		case "SUBMITTED":

@@ -1,35 +1,33 @@
 import React, { Component } from 'react'
 import { RouteComponentProps } from 'react-router';
-import Former from '../../../utils/former';
+import Former from 'utils/former';
 import { connect } from 'react-redux';
-import numberWithCommas from '../../../utils/numberWithCommas';
+import numberWithCommas from 'utils/numberWithCommas';
 import moment from 'moment'
-import Banner from '../../../components/Banner';
-import { PrintHeader } from '../../../components/Layout';
-
-import '../style.css'
+import Banner from 'components/Banner';
+import { PrintHeader } from 'components/Layout';
 
 interface P {
-	teachers: RootDBState["faculty"]
-	expenses: RootDBState["expenses"]
-	settings: RootDBState["settings"]
-	students: RootDBState["students"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	teachers: RootDBState["faculty"];
+	expenses: RootDBState["expenses"];
+	settings: RootDBState["settings"];
+	students: RootDBState["students"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
 }
 
 interface S {
 	banner: {
-		active: boolean
-		good: boolean
-		text: string
-	}
-	monthFilter: string
-	yearFilter: string
-	categoryFilter: string
+		active: boolean;
+		good: boolean;
+		text: string;
+	};
+	monthFilter: string;
+	yearFilter: string;
+	categoryFilter: string;
 }
 
 interface Routeinfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P
@@ -96,7 +94,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 					...curr_pay
 					}
 
-			}, {} as { [id:string]: MISStudentPayment })
+			}, {} as { [id: string]: MISStudentPayment })
 
 		const filtered_expense = Object.entries(expenses)
 			.filter(([id,e]) => e.type === "PAYMENT_GIVEN")
@@ -107,14 +105,14 @@ class IncomeExpenditure extends Component <propTypes, S> {
 					[id]: curr
 				}
 
-			}, {} as { [id:string]: MISExpense | MISSalaryExpense})
+			}, {} as { [id: string]: MISExpense | MISSalaryExpense})
 
 		const income_exp = {...stu_payments, ...filtered_expense}
 
-		let Months  = new Set([])
-		let Years = new Set([])
+		const Months  = new Set([])
+		const Years = new Set([])
 
-		for(let s of Object.values(income_exp)){
+		for(const s of Object.values(income_exp)){
 			Months.add(moment(s.date).format("MMMM"))
 			Years.add(moment(s.date).format("YYYY"))
 		}
@@ -134,16 +132,16 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			{
 				total_income += i.amount
 
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)){
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
 					total_monthly_income += i.amount
 				}
 			}
 			else if(i.type === "PAYMENT_GIVEN")
 			{
-				total_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
+				total_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				
 				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i) && ( this.state.categoryFilter !== "" ? this.state.categoryFilter === i.category: true)){
-					total_monthly_expense += i.amount - (i.expense === "SALARY_EXPENSE" && i.deduction || 0)
+					total_monthly_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				}
 			}
 		})
@@ -220,7 +218,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 					return <div key={id} className="table row">
 						<label> { moment(e.date).format("DD-MM-YY")} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
-						<label> { e.type === "PAYMENT_GIVEN" ? e.category : e.type === "SUBMITTED" && e.fee_name || "-"}</label>
+						<label> { e.type === "PAYMENT_GIVEN" ? e.category : (e.type === "SUBMITTED" && e.fee_name) || "-"}</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.expense === "MIS_EXPENSE" && e.quantity : "1"} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? -1 * (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
 					</div>

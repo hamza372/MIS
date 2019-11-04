@@ -1,5 +1,5 @@
-import { connected, disconnected } from '../actions/core'
-import sleep from '../utils/sleep'
+import { connected, disconnected } from 'actions/core'
+import sleep from 'utils/sleep'
 import { v4 } from 'uuid'
 
 export default class Syncr {

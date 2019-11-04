@@ -1,18 +1,18 @@
 import React from 'react'
-import { PrintHeader } from "../../../../components/Layout";
-import numberWithCommas from "../../../../utils/numberWithCommas";
+import { PrintHeader } from "components/Layout";
+import numberWithCommas from "utils/numberWithCommas";
 import moment from "moment";
-import getFeeLabel from "../../../../utils/getFeeLabel";
+import getFeeLabel from "utils/getFeeLabel";
 
 
 interface StudentLedgerPageProp {
-	payments: [string, MISStudentPayment][] 
-	student: MISStudent
-	class_name: string
-	settings: RootDBState["settings"]
+	payments: [string, MISStudentPayment][]; 
+	student: MISStudent;
+	class_name: string;
+	settings: RootDBState["settings"];
 }
 
-export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name }) => {
+export const StudentLedgerPage: React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name }) => {
 
 	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 

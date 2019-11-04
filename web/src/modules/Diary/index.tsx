@@ -1,42 +1,42 @@
 import React, { Component } from 'react'
-import Layout from '../../components/Layout'
-import {PrintHeader} from '../../components/Layout'
+import Layout from 'components/Layout'
+import {PrintHeader} from 'components/Layout'
 import {connect} from 'react-redux'
-import { sendSMS, sendBatchSMS } from '../../actions/core'
-import { logSms, addDiary } from '../../actions'
-import Banner from '../../components/Banner'
-import { smsIntentLink } from '../../utils/intent'
-import {getSectionsFromClasses} from '../../utils/getSectionsFromClasses'
+import { sendSMS, sendBatchSMS } from 'actions/core'
+import { logSms, addDiary } from 'actions'
+import Banner from 'components/Banner'
+import { smsIntentLink } from 'utils/intent'
+import {getSectionsFromClasses} from 'utils/getSectionsFromClasses'
 import { RouteComponentProps } from 'react-router-dom'
-import former from '../../utils/former'
+import former from 'utils/former'
 import moment from 'moment'
 
 import './style.css'
 
 interface P {
-	students: RootDBState["students"]
-	classes: RootDBState["classes"]
-	settings: RootDBState["settings"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
-	faculty_id: string,
-	diary: RootDBState["diary"],
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];
+	settings: RootDBState["settings"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	faculty_id: string;
+	diary: RootDBState["diary"];
 
-	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => any,
-	sendMessage: (text: string, number: string) => any,
-	sendBatchMessages: (messages: MISSms[]) => any,
-	logSms: (history: MISSMSHistory) => any
+	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => any;
+	sendMessage: (text: string, number: string) => any;
+	sendBatchMessages: (messages: MISSms[]) => any;
+	logSms: (history: MISSMSHistory) => any;
 }
 
 interface S {
 	banner: {
-		active: boolean,
-		good?: boolean,
-		text?: string
-	},
-	selected_date: number,
-	selected_section_id: string,
-	students_filter: string,
-	diary: MISDiary["date"]
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
+	selected_date: number;
+	selected_section_id: string;
+	students_filter: string;
+	diary: MISDiary["date"];
 }
 
 type propTypes = RouteComponentProps & P
@@ -245,7 +245,7 @@ class Diary extends Component <propTypes,S> {
 
 		const subjects = new Set()
 		
-		for(let c of Object.values(classes)){
+		for(const c of Object.values(classes)){
 			if(this.state.selected_section_id !== "" && c.sections[this.state.selected_section_id] !== undefined){
 				Object.keys(c.subjects).forEach(s => subjects.add(s))
 			}
@@ -379,7 +379,7 @@ export default connect((state: RootReducerState) => ({
 	settings: state.db.settings,	
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
 }), (dispatch: Function) => ({
-	sendMessage : (text:string, number: string) => dispatch(sendSMS(text, number)),
+	sendMessage : (text: string, number: string) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages)),
 	logSms: (history: MISSMSHistory) => dispatch(logSms(history)),
 	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => dispatch(addDiary(date, section_id, diary))

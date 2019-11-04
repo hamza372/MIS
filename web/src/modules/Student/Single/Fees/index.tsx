@@ -4,17 +4,17 @@ import { withRouter, RouteComponentProps, Link } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
 
-import former from '../../../.../../../utils/former';
+import former from 'utils/former';
 
-import { PrintHeader } from '../../../../components/Layout'
-import Banner from '../../../../components/Banner'
-import { addMultiplePayments, addPayment, logSms, editPayment } from '../../../../actions'
-import { sendSMS } from '../../../../actions/core'
-import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
-import { smsIntentLink } from '../../../../utils/intent'
-import { numberWithCommas } from '../../../../utils/numberWithCommas'
-import { getFeeLabel } from '../../../../utils/getFeeLabel'
-import { getFilteredPayments } from '../../../../utils/getFilteredPayments'
+import { PrintHeader } from 'components/Layout'
+import Banner from 'components/Banner'
+import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
+import { sendSMS } from 'actions/core'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import { smsIntentLink } from 'utils/intent'
+import { numberWithCommas } from 'utils/numberWithCommas'
+import { getFeeLabel } from 'utils/getFeeLabel'
+import { getFilteredPayments } from 'utils/getFilteredPayments'
 
 import './style.css'
 
@@ -31,44 +31,44 @@ import './style.css'
 */
 
 type payment = {
-	student: MISStudent
-	payment_id: string
+	student: MISStudent;
+	payment_id: string;
 } & MISStudentPayment
 
 interface P {
-	faculty_id: RootReducerState["auth"]["faculty_id"]
-	students: RootDBState["students"]
-	connected: RootReducerState["connected"]
-	settings: RootDBState["settings"]
-	feeSMSTemplate: RootDBState["sms_templates"]["fee"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
-	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id?: string, fee_name?: string) => any
-	addMultiplePayments: (payments: payment[] ) => any
-	sendSMS: (text: string, number: string) => any
-	logSms: (history: any) => any
-	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => any
+	faculty_id: RootReducerState["auth"]["faculty_id"];
+	students: RootDBState["students"];
+	connected: RootReducerState["connected"];
+	settings: RootDBState["settings"];
+	feeSMSTemplate: RootDBState["sms_templates"]["fee"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id?: string, fee_name?: string) => any;
+	addMultiplePayments: (payments: payment[] ) => any;
+	sendSMS: (text: string, number: string) => any;
+	logSms: (history: any) => any;
+	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => any;
 }
 
 interface S {
 	banner: {
-		active: boolean
-		good: boolean
-		text: string
-	}
+		active: boolean;
+		good: boolean;
+		text: string;
+	};
 	payment: {
-		active: boolean
-		amount: string
-		type: "SUBMITTED" | "FORGIVEN"
-		sendSMS?: boolean
-	}
-	month: string
-	year: string
-	edits: MISStudent["payments"]
+		active: boolean;
+		amount: string;
+		type: "SUBMITTED" | "FORGIVEN";
+		sendSMS?: boolean;
+	};
+	month: string;
+	year: string;
+	edits: MISStudent["payments"];
 
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
@@ -169,7 +169,7 @@ class StudentFees extends Component <propTypes, S> {
 		}
 
 		const id = v4();
-		const payment : MISStudentPayment = {
+		const payment: MISStudentPayment = {
 			amount: parseFloat(this.state.payment.amount),
 			type: this.state.payment.type,
 			date: new Date().getTime()
@@ -426,7 +426,7 @@ export default connect((state: RootReducerState) => ({
 	settings: state.db.settings,
 	feeSMSTemplate: (state.db.sms_templates || {} as RootDBState["sms_templates"]).fee || "",
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "" 
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id: string, fee_name: string) => dispatch(addPayment(student, id, amount, date, type, fee_id, fee_name)),
 	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text: string, number: string) => dispatch(sendSMS(text, number)),

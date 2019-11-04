@@ -2,21 +2,21 @@ import React, { Component } from 'react'
 import { Route, Link, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import Layout from '../../components/Layout'
+import Layout from 'components/Layout'
 
-import Expenses from '../../modules/Expenses/General';
-import IncomeExpenditure from '../../modules/Expenses/Income-Expenditure'
+import Expenses from 'modules/Expenses/General';
+import IncomeExpenditure from 'modules/Expenses/Income-Expenditure'
 
 import './style.css'
 
 
 interface P {
-	user: MISTeacher,
-	permissions: RootDBState["settings"]["permissions"]
+	user: MISTeacher;
+	permissions: RootDBState["settings"]["permissions"];
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps <RouteInfo> & P

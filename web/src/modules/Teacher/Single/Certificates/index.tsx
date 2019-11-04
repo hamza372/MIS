@@ -2,25 +2,25 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 
-import Former from '../../../../utils/former';
-import { PrintHeader } from '../../../../components/Layout';
-import { capitalize } from '../../../../utils/capitalize'
-import { getGenderSpecificText } from '../../../../utils/getGenderSpecificText'
+import Former from 'utils/former';
+import { PrintHeader } from 'components/Layout';
+import { capitalize } from 'utils/capitalize'
+import { getGenderSpecificText } from 'utils/getGenderSpecificText'
 import moment from 'moment';
 
 interface P {
-	students: RootDBState['students']
-	teachers: RootDBState["faculty"]
-	settings: RootDBState["settings"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	students: RootDBState['students'];
+	teachers: RootDBState["faculty"];
+	settings: RootDBState["settings"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
 }
 
 interface S {
-	selectedCertificate: string
+	selectedCertificate: string;
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps < RouteInfo > & P
@@ -37,7 +37,7 @@ class TeacherCertificates extends Component < propTypes, S > {
 		this.former = new Former( this, [] )
 	}
 
-	teacher = () : MISTeacher => {
+	teacher = (): MISTeacher => {
 		const id = this.props.match.params.id
 		return this.props.teachers[id]
 	}
@@ -76,7 +76,7 @@ class TeacherCertificates extends Component < propTypes, S > {
 	}
 }
 
-export default connect ((state : RootReducerState) => ({
+export default connect ((state: RootReducerState) => ({
 	students: state.db.students,
 	teachers: state.db.faculty,
 	settings: state.db.settings,
@@ -84,13 +84,13 @@ export default connect ((state : RootReducerState) => ({
 }))(TeacherCertificates)
 
 interface CertificateProps {
-	curr_teacher: MISTeacher
+	curr_teacher: MISTeacher;
 }
 
 
 const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) => {
 
-	const curr_date : number = new Date().getTime()
+	const curr_date: number = new Date().getTime()
 	const gender = curr_teacher.Gender
 
 	return <div className="certificate-page">
@@ -143,7 +143,6 @@ const ExperienceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) =>
 
 const PerformanceCertificate: React.FC <CertificateProps> = ({ curr_teacher }) => {
 
-	const curr_date : number = new Date().getTime()
 	const gender = curr_teacher.Gender
 
 	return <div className="certificate-page">

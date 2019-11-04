@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts'
-import { getEndPointResource } from '../../../utils/getEndPointResource';
+import { getEndPointResource } from 'utils/getEndPointResource';
 
-import '../style.css'
+import 'style.css'
 import moment from 'moment'
 
 interface P {

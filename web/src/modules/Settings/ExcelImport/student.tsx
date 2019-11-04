@@ -3,28 +3,28 @@ import { connect } from 'react-redux'
 import moment from 'moment';
 import { v4 } from 'node-uuid';
 
-import Former from '../../../utils/former'
-import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
-import downloadCSV from '../../../utils/downloadCSV'
-import { createStudentMerges } from '../../../actions';
-import Banner from '../../../components/Banner'
+import Former from 'utils/former'
+import getSectionsFromClasses from 'utils/getSectionsFromClasses';
+import downloadCSV from 'utils/downloadCSV'
+import { createStudentMerges } from 'actions';
+import Banner from 'components/Banner'
 
 interface S {
 
-	importedStudents: MISStudent[]
-	loadingStudentImport: boolean
+	importedStudents: MISStudent[];
+	loadingStudentImport: boolean;
 	banner: {
-		active: boolean
-		good?: boolean
-		text?: string
-	},
-	selectedSection: string
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
+	selectedSection: string;
 }
 
 type P = {
-	students: RootDBState['students']
-	classes: RootDBState['classes']
-	saveStudents: (student : MISStudent[]) => void
+	students: RootDBState['students'];
+	classes: RootDBState['classes'];
+	saveStudents: (student: MISStudent[]) => void;
 }
 
 const studentCSVHeaders = [
@@ -46,7 +46,7 @@ const studentCSVHeaders = [
 class StudentExcelImport extends React.Component<P, S> {
 
 	former: Former
-	constructor(props : P) {
+	constructor(props: P) {
 		super(props)
 
 		this.state = {
@@ -68,7 +68,7 @@ class StudentExcelImport extends React.Component<P, S> {
 		downloadCSV([studentCSVHeaders], "student-import-template")
 	}
 
-	importStudentData = (e : ChangeEvent<HTMLInputElement>) => {
+	importStudentData = (e: ChangeEvent<HTMLInputElement>) => {
 		
 		const file = e.target.files[0]
 		if(file === undefined) {
@@ -175,7 +175,7 @@ class StudentExcelImport extends React.Component<P, S> {
 
 	render() {
 
-		let student = this.state.importedStudents[0]
+		const student = this.state.importedStudents[0]
 
 		const banner = this.state.banner
 
@@ -295,7 +295,7 @@ class StudentExcelImport extends React.Component<P, S> {
 	}
 }
 
-const convertCSVToStudents = (studentImportCSV : string ) => {
+const convertCSVToStudents = (studentImportCSV: string ) => {
 
 	// naive csv parse, will break on commas.
 	const lines = studentImportCSV.split('\n')
@@ -308,14 +308,14 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 
 	// note that this is linked to the headers in the template above. see 
 	const students = lines.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
-		const student : MISStudent = {
+		const student: MISStudent = {
 			id: v4(),
 			Name,
 			RollNumber,
 			BForm,
-			Gender: Gender.toLowerCase() == "m" ? "male" : ( Gender.toLowerCase() == "f" ? "female" : ""),
+			Gender: Gender.toLowerCase() === "m" ? "male" : ( Gender.toLowerCase() === "f" ? "female" : ""),
 			Phone,
-			Active: Active.toLowerCase() == "y" || Active.toLowerCase() == "yes" || Active.toLowerCase() == "true" || Active.toLowerCase() == "",
+			Active: Active.toLowerCase() === "y" || Active.toLowerCase() === "yes" || Active.toLowerCase() === "true" || Active.toLowerCase() === "",
 			ManCNIC,
 			ManName,
 			Birthdate,
@@ -348,9 +348,9 @@ const convertCSVToStudents = (studentImportCSV : string ) => {
 	
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	saveStudents: (students: MISStudent[]) => dispatch(createStudentMerges(students))
 }))(StudentExcelImport)

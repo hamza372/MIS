@@ -5,7 +5,7 @@ import moment from 'moment'
 
 import { createLogout } from 'actions'
 import Layout from 'components/Layout'
-import { numberWithCommas } from '../../utils/numberWithCommas'
+import { numberWithCommas } from 'utils/numberWithCommas'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
@@ -76,10 +76,10 @@ class Landing extends Component {
 
 		const today_date = moment().format("YYYY-MM-DD");
 
-		let today_attendance = { PRESENT: 0, LEAVE: 0, SICK_LEAVE:0, CASUAL_LEAVE:0, SHORT_LEAVE:0, ABSENT: 0 }
+		const today_attendance = { PRESENT: 0, LEAVE: 0, SICK_LEAVE:0, CASUAL_LEAVE:0, SHORT_LEAVE:0, ABSENT: 0 }
 		let today_payment = 0;
 		let today_payment_students = 0;
-		let today_teacher_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
+		const today_teacher_attendance = { PRESENT: 0, LEAVE: 0, ABSENT: 0 }
 		
 		const setupPage = permissions && permissions.setupPage ? permissions.setupPage.teacher : true
 		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
@@ -87,7 +87,7 @@ class Landing extends Component {
 		const teacher_expense_permission = permissions && permissions.expense ? permissions.expense.teacher : true;
 
 
-		for(let student of Object.values(students)) {
+		for(const student of Object.values(students)) {
 
 			const record = (student.attendance || {})[today_date];
 			if(record) {
@@ -105,7 +105,7 @@ class Landing extends Component {
 			today_payment += additional_payment;
 		}
 
-		for(let teacher of Object.values(faculty)) {
+		for(const teacher of Object.values(faculty)) {
 			const record = (teacher.attendance || {})[today_date];
 
 			if(record === undefined) {

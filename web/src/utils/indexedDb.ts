@@ -1,8 +1,7 @@
 import { v4 } from 'node-uuid'
 
-import { openDB, deleteDB } from 'idb'
-import { defaultExams } from '../modules/Settings';
-import moment from 'moment';
+import { openDB } from 'idb'
+import { defaultExams } from 'modules/Settings';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -10,7 +9,7 @@ const defaultTemplates = () => ({
 	result: "Report is ready for $NAME:\n $REPORT"
 })
 
-export const initState : RootReducerState = {
+export const initState: RootReducerState = {
 	client_id: localStorage.getItem("client_id") || v4(),
 	queued: { },
 	acceptSnapshot: false,
@@ -53,7 +52,7 @@ export const initState : RootReducerState = {
 
 export const loadDb = async () => {
 
-	console.log("Runing Load DB from indexed")
+	//console.log("Runing Load DB from indexed")
 
 	try {
 
@@ -89,7 +88,7 @@ export const loadDb = async () => {
 			serialized = await db.get('root-state', 'db')
 
 		} else {
-			console.log("Not Tranferring Local Data to IDB")
+			// console.log("Not Tranferring Local Data to IDB")
 		}
 
 		if (!serialized) {
@@ -146,7 +145,7 @@ const checkPersistent = () => {
 	if(navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist()
 			.then(persist => {
-				console.log("PERSIST!!!!", persist)
+				//console.log("PERSIST!!!!", persist)
 			})
 			.catch(err => console.error(err))
 
@@ -161,7 +160,9 @@ const checkPersistent = () => {
 			})
 		
 			navigator.storage.estimate()
-				.then(estimate => console.log("ESTIMATE!!", estimate))
+				.then(estimate => {
+					//console.log("ESTIMATE!!", estimate)
+				})
 				.catch(err => console.error(err))
 	}
 	else {
@@ -173,10 +174,11 @@ checkPersistent();
 
 export const saveDb = (state: RootReducerState) => {
 
-	console.log("SAVING IDB-START", moment.now())
+	const s1 = new Date().getTime();
+	console.log("SAVING IDB-START")
 
 	const json = JSON.stringify(state)
-	console.log("IN SAVE DB FUNCTION INDEXED DB", state)
+	// console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 	
 	openDB('db', 1, {
 		upgrade(db) {
@@ -184,9 +186,10 @@ export const saveDb = (state: RootReducerState) => {
 		}
 	})
 	.then(db => {
-		console.log('putting db')
+		// console.log('putting db')
 		db.put('root-state', json, "db")
-		console.log("SAVING IDB-END", moment.now())
+		const s2 = new Date().getTime()
+		console.log("SAVING IDB-END", s2 - s1, "milliseconds");
 	})
 	.catch(err => {
 		console.error(err)
@@ -194,10 +197,10 @@ export const saveDb = (state: RootReducerState) => {
 	})
 }
 
-const addFacultyID = (state : RootReducerState) => {
+const addFacultyID = (state: RootReducerState) => {
 
 	if(state.auth.faculty_id !== undefined) {
-		console.log("not running addFacultyID script")
+		//console.log("not running addFacultyID script")
 		return state;
 	}
 
@@ -214,7 +217,7 @@ const checkPermissions = (state: RootReducerState) => {
 
 	if( permission.dailyStats !== undefined && permission.fee !== undefined &&
 		permission.setupPage !== undefined && permission.expense !== undefined ) {
-		console.log("NOT Running Permission Scripts")
+		// console.log("NOT Running Permission Scripts")
 		return state
 	}
 	console.log("Running Permissions Scripts");
@@ -234,7 +237,7 @@ const checkPermissions = (state: RootReducerState) => {
 
 const checkGrades = (state: RootReducerState) => {
 	if(state.db.settings.exams){
-		console.log("Not Running Grades Script")
+		// console.log("Not Running Grades Script")
 		return state
 	}
 
