@@ -62,34 +62,53 @@ class BulkExam extends Component<propTypes, S> {
 		console.log("relebant students",relevant_students)
 		const relevant_exams = Object.values(exams)
 			.filter(e => e.class_id === class_id && e.section_id === section_id && this.isSameOrBetween(start_date, end_date, e.date))
+		console.log("relevant exams", relevant_exams)
 		const Subjects = new Set()
+		
 		const tableData = relevant_students
 			.reduce((agg, curr) => {
 
-				const s_exams = Object.entries(curr.exams)
-					.filter(([e_id, e]) => exams[e_id].class_id === class_id && exams[e_id].section_id === section_id && this.isSameOrBetween(start_date, end_date, exams[e_id].date))
+				let new_exams: TD[] = []
+				console.log(curr.Name)
+				for (let e of relevant_exams) {
+					console.log("EXAM_id", e.id)
+					if (curr.exams[e.id]) {
+						new_exams.push({
+							...exams[e.id],
+							obtained_marks: curr.exams[e.id]
+						})
+					} else {
+						console.log("MISSING EXAM",exams[e.id])
+						new_exams.push({
+							...exams[e.id],
+							obtained_marks: { score: 0, remarks: "", grade:""}
+						})
+					}
+				}
+
+				const s_exams = Object.entries(relevant_exams)
 					.map(([e_id, e]) => {
-						
-						const curr_exam = exams[e_id]
-						Subjects.add(curr_exam.name + "-" + curr_exam.subject + "("+ curr_exam.total_score +")" + "-" + moment(curr_exam.date).format("DD/MM/YY"))
-						
+					
+						Subjects.add(e.name + "-" + e.subject + "(" + e.total_score + ")" + "-" + moment(e.date).format("DD/MM/YY"))
+					
 						return {
-							...curr_exam,
+							...e,
 							obtained_marks: e
 						}
 					})
-				
+
+
 				return [
 					...agg,
 					{
 						Name: curr.Name,
 						id: curr.id,
-						exams: s_exams
+						exams: new_exams
 					}
 				]
 			}, [] as { Name: string, id: string, exams: TD[] }[])
 		
-		console.log("TableData",tableData)
+		console.log("TableData", tableData)
 
 		// const tableDataTwo = tableData.map(e => {
 		// 	const subjectsLength = Array.from(Subjects).length
