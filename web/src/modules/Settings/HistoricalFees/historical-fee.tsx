@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import Layout from 'components/Layout';
 
 import './style.css'
-import moment, { min } from 'moment'
+import moment from 'moment'
 import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
 import { addHistoricalPayment } from '../../../actions';
 import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
@@ -254,6 +254,7 @@ class historicalFee extends Component <propTypes, S > {
 					settings = {settings}
 					student = {selected_student}
 					class_name = {curr_class_name}
+					voucherNo = {777}
 				/>
 			</div>}
 
