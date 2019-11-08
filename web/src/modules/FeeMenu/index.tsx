@@ -1,28 +1,28 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import Layout from '../../components/Layout'
-import { StudentList } from '../../modules/Student/List'
-import { ClassListModule } from '../../modules/Class/List'
+import Layout from 'components/Layout'
+import { StudentList } from 'modules/Student/List'
+import { ClassListModule } from 'modules/Class/List'
 
-import former from '../../utils/former'
+import former from 'utils/former'
 import { RouteComponentProps } from 'react-router';
 
 // give option to select student list or class list, with forwardTo ---> reports.
 // need to give this a route 
 
 interface P {
-	students: RootDBState["students"],
-	classes: RootDBState["classes"]
-	settings: RootDBState["settings"]
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];
+	settings: RootDBState["settings"];
 }
 
 interface S {
-	fee_for: string
+	fee_for: string;
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P

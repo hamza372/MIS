@@ -5,19 +5,20 @@ import { Link } from 'react-router-dom'
 import { LayoutWrap } from 'components/Layout'
 import List from 'components/List'
 import qs from 'query-string'
+import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 
 
-const ClassItem = (C) => 
-	<Link key={C.id} to={`/class/${C.id}/${C.forwardTo}`} className="">
-		{C.name}
+const ClassItem = (section) => 
+	<Link key={section.id} to={`/class/${section.class_id}/${section.id}/${section.forwardTo}`} className="">
+		{section.namespaced_name}
 	</Link>
 
 export const ClassListModule = ({ classes, forwardTo }) => {
 
-	const items = Object.values(classes)
+	const items = getSectionsFromClasses(classes)
 		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
-		.map(c => ({...c, forwardTo}))
+		.map(section => ({...section, forwardTo}))
 	
 	let create = '/class/new'
 
@@ -29,14 +30,14 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 	}
 		
 	return <div className="class-module">
-		<div className="title">Classes</div>
+		<div className="title">Classes/Sections</div>
 		
 		<List
 			items={items}
 			Component={ClassItem}
 			create={create} 
 			createText={"Add new Class"} 
-			toLabel={C => C.name} 
+			toLabel={section => section.name} 
 			/>
 	</div>
 }

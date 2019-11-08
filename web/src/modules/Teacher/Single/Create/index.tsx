@@ -6,22 +6,22 @@ import { Redirect, RouteComponentProps } from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
-import { createFacultyMerge, deleteFaculty } from '../../../../actions'
-import { hash } from '../../../../utils'
-import Hyphenator from '../../../../utils/Hyphenator'
+import { createFacultyMerge, deleteFaculty } from 'actions'
+import { hash } from 'utils'
+import Hyphenator from 'utils/Hyphenator'
 
 
 
-import Banner from '../../../../components/Banner'
-import checkCompulsoryFields from '../../../../utils/checkCompulsoryFields'
+import Banner from 'components/Banner'
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
 import './style.css'
-import Former from '../../../../utils/former';
+import Former from 'utils/former';
 
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
 
-const blankTeacher = (isFirst = false) : MISTeacher => ({
+const blankTeacher = (isFirst = false): MISTeacher => ({
 	id: v4(),
 	Name: "",
 	CNIC: "",
@@ -49,24 +49,24 @@ const blankTeacher = (isFirst = false) : MISTeacher => ({
 // should be a dropdown of choices. not just teacher or admin.
 
 interface P {
-	faculty: RootDBState['faculty'],
-	user: MISTeacher
-	save: (teacher: MISTeacher) => any
-	delete: (faculty_id : string) => any
+	faculty: RootDBState['faculty'];
+	user: MISTeacher;
+	save: (teacher: MISTeacher) => any;
+	delete: (faculty_id: string) => any;
 }
 
 interface S {
-	profile: MISTeacher
-	redirect: false | string
-	banner : {
-		active: boolean
-		good?: boolean
-		text?: string
-	}
+	profile: MISTeacher;
+	redirect: false | string;
+	banner: {
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -188,7 +188,7 @@ class CreateTeacher extends Component<propTypes, S> {
 		}, 1000);
 	}
 
-	componentWillReceiveProps( newProps : propTypes ) {
+	componentWillReceiveProps( newProps: propTypes ) {
 		// this means every time teacher upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
@@ -340,10 +340,10 @@ class CreateTeacher extends Component<propTypes, S> {
 	}
 }
 
-export default connect((state : RootReducerState ) => ({
+export default connect((state: RootReducerState ) => ({
 	faculty: state.db.faculty,
 	user: state.db.faculty[state.auth.faculty_id]
-}) , (dispatch : Function) => ({
+}) , (dispatch: Function) => ({
 	save: (teacher: MISTeacher) => dispatch(createFacultyMerge(teacher)),
-	delete: (faculty_id : string) => dispatch(deleteFaculty(faculty_id))
+	delete: (faculty_id: string) => dispatch(deleteFaculty(faculty_id))
  }))(CreateTeacher);

@@ -9,7 +9,7 @@ import Exams from './Exams';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 import './style.css'
-import { schoolInfo } from '../../actions';
+import { schoolInfo } from 'actions';
 import Expense from './Expense';
 import SMS from './SMS';
 import Diary from './Diary';

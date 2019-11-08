@@ -3,61 +3,64 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router';
 import { v4 } from 'node-uuid'
 import moment from 'moment'
-import Banner from '../../components/Banner'
-import Layout from '../../components/Layout'
-import former from "../../utils/former"
-import getSectionsFromClasses from '../../utils/getSectionsFromClasses'
-import { addMultipleFees, addFee, deleteMultipleFees } from '../../actions'
-interface  P {
-	students: RootDBState["students"]
-    classes: RootDBState["classes"]   
+import Banner from 'components/Banner'
+import Layout from 'components/Layout'
+import former from "utils/former"
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import { addMultipleFees, addFee, deleteMultipleFees } from 'actions'
 
-    addMultipleFees: (fees: FeeAddItem[]) => any,
-	addFee: (fee: FeeSingleItem) => any,
-    deleteMultipleFees: (students_fees: FeeDeleteMap) => any,
+interface  P {
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];   
+
+	addMultipleFees: (fees: FeeAddItem[]) => any;
+	addFee: (fee: FeeSingleItem) => any;
+	deleteMultipleFees: (students_fees: FeeDeleteMap) => any;
 }
 
 interface S {
 	banner: {
-		active: boolean
-		good?: boolean
-		text?: string
-    }
-	fee : MISStudentFee
-	selected_section_id: string
-	selected_student_id: string
-	fee_filter: string
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
+
+	fee: MISStudentFee;
+	selected_section_id: string;
+	selected_student_id: string;
+	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | "";
 }
 
 interface FeeDeleteMap {
 	[id: string]: {
-		student_id: string
-		paymentIds: string[]
-	}
+		student_id: string;
+		paymentIds: string[];
+	};
 }
 
 type FeeAddItem = MISStudentFee & {
-	student: MISStudent 
-	fee_id: string
+	student: MISStudent; 
+	fee_id: string;
 }
 
 type FeeSingleItem = MISStudentFee & {
-    student_id: string
-    fee_id: string
+	student_id: string;
+	fee_id: string;
 }
 
 type ReducedFeeMap = { 
-	[id:string]: {
-		count: number
-		students_fees: FeeDeleteMap 
-	}
+	[id: string]: {
+		count: number;
+		students_fees: FeeDeleteMap; 
+	};
 }
 
 type propTypes = RouteComponentProps & P
 
 class ManageFees extends Component <propTypes,S> {
-    
-    former: former
+
+	former: former
+
 	constructor(props: propTypes) {
 		super(props);
 
@@ -203,60 +206,8 @@ class ManageFees extends Component <propTypes,S> {
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => ( a.classYear || 0 ) - ( b.classYear || 0 ));
 
 		const fee_undo_students =  this.state.fee_filter === "to_all_students" ? 
-										Object.values(this.props.students): 
+										Object.values(this.props.students) : 
 										this.getSelectedSectionStudents();
-
-		const reduced_fees = fee_undo_students
-			.filter(x => x.Name && x.fees && x.payments)
-			.reduce((agg, curr) => {
-				
-				const fees = curr.fees;
-				const curr_payments = curr.payments
-		
-				Object.entries(fees)
-					.forEach(([fee_id, fee]) => {
-
-						// if the fee id is empty string, just return
-						if(fee_id === "") return;
-
-						const fee_key = `${fee.name}-${fee.period}-${fee.type}-${fee.amount}`
-						const curr_date = moment().format("MM/YYYY")
-
-						const paymentIds = Object.entries(curr_payments)
-							.filter(([payment_id, payment]) => payment && 
-								payment.type === "OWED" &&
-								moment(payment.date).format("MM/YYYY") === curr_date &&
-								payment.fee_id === fee_id
-							)
-							.map(([pid, ]) => pid)
-
-						if(agg[fee_key]) {
-							agg[fee_key] = {
-								count: agg[fee_key].count + 1,
-								students_fees: {
-									...agg[fee_key].students_fees,
-									[fee_id]: {
-										student_id: curr.id,
-										paymentIds: paymentIds
-									}
-								}
-							}
-						} else {
-							agg[fee_key] = {
-								count: 1,
-								students_fees: {
-									[fee_id]: {
-										student_id: curr.id,
-										paymentIds: paymentIds
-									}
-								}
-							}
-						}
-					})
-
-				return agg;
-
-			}, {} as ReducedFeeMap )
 		
 		return <Layout history={this.props.history}>
 			<div className="form sms-page">
@@ -329,29 +280,7 @@ class ManageFees extends Component <propTypes,S> {
 				</div>
 
 				<div className="divider">Recent Added Fees</div>
-				<div className="section form">
-				{ Object.entries(reduced_fees)
-					.filter(([k, val]) => {
-						if(this.state.fee_filter === "to_all_students") {
-							// get size of all students
-							const total_students = Object.values(this.props.students).length
-							return val.count > .9 * total_students;
-						}
-						else if(this.state.fee_filter === "to_single_class" && this.state.selected_section_id !== "") {
-							// get size of class with section_id this.state.selected_section_id
-							const size_of_class = Object.values(this.props.students).filter( s => s.section_id === this.state.selected_section_id).length;
-							return val.count > .9 * size_of_class
-						}
-					})
-					.sort(([a, ], [b, ]) => a.localeCompare(b))
-					.map(([key, val]) => 
-						<div className="row" key={key}>
-							<label>{ key }</label>
-							<div className="button red" onClick={ () => this.delete (val.students_fees) }>Delete</div>
-						</div>
-					)
-				}
-				</div>
+				<RemoveFeesComponent students={fee_undo_students} fee_filter={this.state.fee_filter} selected_section_id={this.state.selected_section_id} selected_student_id={this.state.selected_student_id} delete={this.delete} />
 
 			</div>
 		</Layout>
@@ -360,9 +289,183 @@ class ManageFees extends Component <propTypes,S> {
 
 export default connect(( state: RootReducerState) => ({
 	students: state.db.students,
-    classes: state.db.classes,
+	classes: state.db.classes,
 }), (dispatch: Function) => ({
 	addMultipleFees: (fees: FeeAddItem[]) => dispatch(addMultipleFees(fees)),
 	addFee: (fee: FeeSingleItem) => dispatch(addFee(fee)),
 	deleteMultipleFees: (students_fees: FeeDeleteMap) => dispatch(deleteMultipleFees(students_fees))
 }))(ManageFees);
+
+
+interface RemoveProps {
+	students: MISStudent[];
+	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | "";
+	selected_section_id: string;
+	selected_student_id: string;
+	delete: (students_fees: FeeDeleteMap) => void;
+}
+
+interface RemoveState {
+
+	loading: boolean;
+	reduced_fees: ReducedFeeMap;
+
+}
+
+class RemoveFeesComponent extends React.PureComponent<RemoveProps, RemoveState> {
+
+	background_calculation: NodeJS.Timeout
+
+	constructor(props: RemoveProps) {
+		super(props);
+
+		this.state = {
+			loading: true,
+			reduced_fees: {}
+		}
+	}
+
+	componentDidMount() {
+		this.calculate()
+	}
+
+	componentWillReceiveProps(nextProps: RemoveProps) {
+		setTimeout(this.calculate, 0)
+	}
+
+	calculate = () => {
+
+		const s1 = new Date().getTime();
+		console.log('STARTING REDUCE')
+
+		const { students } = this.props
+
+		this.setState({ loading: true, reduced_fees: {} })
+		if(this.background_calculation) {
+			clearTimeout(this.background_calculation)
+		}
+
+		let i = 0;
+		const agg: ReducedFeeMap = {}
+
+		const reducify = () => {
+			if(i >= students.length) {
+				// we are done with the calculation
+
+				const s2 = new Date().getTime();
+				console.log("done reducing", s2 - s1)
+				return this.setState({
+					loading: false,
+					reduced_fees: agg
+				})
+			}
+
+			const curr = students[i];
+			i += 1;
+			console.log('computing student', i)
+
+			if(!curr.Name || !curr.fees || !curr.payments) {
+				this.background_calculation = setTimeout(reducify, 0)
+				return
+			}
+				
+			const fees = curr.fees;
+			const curr_payments = curr.payments
+
+			Object.entries(fees)
+				.forEach(([fee_id, fee]) => {
+
+					// if the fee id is empty string, just return
+					if(fee_id === "") return;
+
+					const fee_key = `${fee.name}-${fee.period}-${fee.type}-${fee.amount}`
+					const curr_date = moment().format("MM/YYYY")
+
+					const paymentIds = Object.entries(curr_payments)
+						.reduce((agg2, [payment_id, payment]) => {
+							if(!payment || payment.type !== "OWED" || payment.fee_id !== fee_id || 
+								moment(payment.date).format("MM/YYYY") !== curr_date) {
+								return agg2;
+							}
+
+							agg2.push(payment_id)
+							return agg2;
+						}, [])
+
+
+					if(agg[fee_key]) {
+						agg[fee_key] = {
+							count: agg[fee_key].count + 1,
+							students_fees: {
+								...agg[fee_key].students_fees,
+								[fee_id]: {
+									student_id: curr.id,
+									paymentIds: paymentIds
+								}
+							}
+						}
+					} else {
+						agg[fee_key] = {
+							count: 1,
+							students_fees: {
+								[fee_id]: {
+									student_id: curr.id,
+									paymentIds: paymentIds
+								}
+							}
+						}
+					}
+				})
+
+				this.background_calculation = setTimeout(reducify, 0)
+		}
+
+		reducify()
+
+	}
+
+	shouldComponentUpdate(nextProps: RemoveProps, nextState: RemoveState) {
+
+		// check if the students changed
+
+
+		return true;
+	}
+
+	render() {
+
+		if(this.state.loading) {
+			return <div>Loading...</div>
+		}
+
+		const reduced_fees = this.state.reduced_fees;
+
+		return <div className="section form">
+			{ Object.entries(reduced_fees)
+				.filter(([, val]) => {
+					if(this.props.fee_filter === "to_all_students") {
+						// get size of all students
+						const total_students = Object.values(this.props.students).length
+						return val.count > .9 * total_students;
+					}
+
+					else if(this.props.fee_filter === "to_single_class" && this.props.selected_section_id !== "") {
+						// get size of class with section_id this.state.selected_section_id
+						const size_of_class = Object.values(this.props.students).filter( s => s.section_id === this.props.selected_section_id).length;
+						return val.count > .9 * size_of_class
+					}
+
+					return false;
+				})
+				.sort(([a, ], [b, ]) => a.localeCompare(b))
+				.map(([key, val]) => 
+					<div className="row" key={key}>
+						<label>{ key }</label>
+						<div className="button red" onClick={ () => this.props.delete (val.students_fees) }>Delete</div>
+					</div>
+				)
+			}
+			</div>
+	}
+
+}

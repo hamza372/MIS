@@ -17,6 +17,25 @@ defmodule Sarkar.School do
 			name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
 	end
 
+	def init_trial (school_id) do
+		curr_time = :os.system_time(:millisecond)
+
+		sync_changes(school_id, "backend", %{
+			"db,package_info" => %{
+				"date" => curr_time,
+				"action" => %{
+					"path" => ["db","package_info"],
+					"type" => "MERGE",
+					"value" => %{
+						"paid" => false,
+						"trial_period" => 15,
+						"date" => curr_time
+					}
+				}
+			}
+		},curr_time)
+	end
+
 	# API 
 
 	def sync_changes(school_id, client_id, changes, last_sync_date) do

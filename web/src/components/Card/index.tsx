@@ -1,31 +1,31 @@
 import React,{Component} from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import Former from '../../utils/former'
+import Former from 'utils/former'
 
 import './style.css'
 
 interface P {
-	items: Array<any>
-	Component: Function
-	create: string
-	createText: string
-	toLabel: Function
+	items: Array<any>;
+	Component: Function;
+	create: string;
+	createText: string;
+	toLabel: Function;
 }
 
 interface S {
-	filterText: string
+	filterText: string;
 }
 
 interface Routeinfo {
-	id : string
+	id: string;
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P
 
 export default class Card extends Component <propTypes, S> {
 
-	former : Former
-	constructor(props : propTypes) {
+	former: Former
+	constructor(props: propTypes) {
 		super(props)
 		this.state = {
 			filterText : ""
@@ -33,11 +33,11 @@ export default class Card extends Component <propTypes, S> {
 		this.former = new Former(this, [])
 	}
 	
-	onChange = (e : any) => {
+	onChange = (e: any) => {
 		this.setState({filterText:e.target.value});
 	}
 	
-	create = ({ to , text} : { to: string, text: string} ) => {
+	create = ({ to , text}: { to: string; text: string} ) => {
 		return <Link className="button blue" to={to}>{text}</Link>
 	}
 

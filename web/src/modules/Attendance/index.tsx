@@ -2,39 +2,39 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link, RouteComponentProps } from 'react-router-dom'
 
-import getSectionsFromClasses from '../../utils/getSectionsFromClasses'
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 
-import { smsIntentLink } from '../../utils/intent'
-import Layout from '../../components/Layout'
-import { markStudent, markAllStudents, logSms } from '../../actions'
+import { smsIntentLink } from 'utils/intent'
+import Layout from 'components/Layout'
+import { markStudent, markAllStudents, logSms } from 'actions'
 
 import moment from 'moment'
-import Former from '../../utils/former'
+import Former from 'utils/former'
 
 import './style.css'
 
 interface P {
-	current_faculty: MISTeacher
-	students: RootDBState["students"]
-	classes: RootDBState["classes"]
-	settings: RootDBState["settings"]
-	connected: RootReducerState["connected"]
-	attendance_message_template: RootDBState["sms_templates"]["attendance"]
-	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any
-	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) => any
+	current_faculty: MISTeacher;
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];
+	settings: RootDBState["settings"];
+	connected: RootReducerState["connected"];
+	attendance_message_template: RootDBState["sms_templates"]["attendance"];
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any;
+	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) => any;
 
-	logSms: (history: any) => any
+	logSms: (history: any) => any;
 }
 
 interface S {
-	date: number
-	sending: boolean
-	selected_section: string
-	selected_students: { [id: string]: boolean }
+	date: number;
+	sending: boolean;
+	selected_section: string;
+	selected_students: { [id: string]: boolean };
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -48,7 +48,7 @@ const getStudentsForSection = (section_id: string, students: RootDBState["studen
 class Attendance extends Component <propTypes, S> {
 
 	Former: Former
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		// by default, the class selected should be one owned by the user.
@@ -73,7 +73,7 @@ class Attendance extends Component <propTypes, S> {
 		this.props.markStudent(student, moment(this.state.date).format("YYYY-MM-DD"), status);
 	}
 
-	sendBatchSMS = (messages : MISSms[]) => {
+	sendBatchSMS = (messages: MISSms[]) => {
 		if(messages.length === 0){
 			console.log("No Messages to Log")
 			return
@@ -207,7 +207,7 @@ class Attendance extends Component <propTypes, S> {
 		})
 	}
 
-	onSectionChange = (e : any) => {
+	onSectionChange = (e: any) => {
 		const newSectionId = e.target.value;
 
 		this.setState({
@@ -222,9 +222,9 @@ class Attendance extends Component <propTypes, S> {
 			.map(id => this.props.students[id])
 	}
 
-	getLeaveStatus = (s : string) : boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
+	getLeaveStatus = (s: string): boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
 
-	markLeave = (e: { target: { value: any; }; }, x: MISStudent) => {
+	markLeave = (e: { target: { value: any } }, x: MISStudent) => {
 		const status = e.target.value
 		
 		if (status === "") {
@@ -342,7 +342,7 @@ export default connect((state: RootReducerState) => ({
 	settings: state.db.settings,
 	connected: state.connected,
 		attendance_message_template: (state.db.sms_templates || {} as RootDBState["sms_templates"]).attendance || "",
-}), (dispatch : Function) => ({
+}), (dispatch: Function) => ({
 	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) =>dispatch(markAllStudents(students, date, status)),
 	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => dispatch(markStudent(student, date, status)),
 	logSms: (history: any) => dispatch(logSms(history))

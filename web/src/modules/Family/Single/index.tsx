@@ -1,30 +1,30 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Layout from '../../../components/Layout';
+import Layout from 'components/Layout';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom'
 import Dynamic from '@ironbay/dynamic'
 
-import Former from '../../../utils/former';
-import Dropdown from '../../../components/Dropdown';
-import { addStudentToFamily, saveFamilyInfo } from '../../../actions';
-import Hyphenator from '../../../utils/Hyphenator';
+import Former from 'utils/former';
+import Dropdown from 'components/Dropdown';
+import { addStudentToFamily, saveFamilyInfo } from 'actions';
+import Hyphenator from 'utils/Hyphenator';
 
 type P = {
-	students: RootDBState['students']
-	addStudentToFamily: (s : MISStudent, famId: string) => void
-	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void
+	students: RootDBState['students'];
+	addStudentToFamily: (s: MISStudent, famId: string) => void;
+	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void;
 } & RouteComponentProps<RouteInfo>
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 interface S {
-	Phone: string
-	ManName: string
-	ManCNIC: string
-	Address: string
+	Phone: string;
+	ManName: string;
+	ManCNIC: string;
+	Address: string;
 }
 
 class SingleFamily extends React.Component<P, S> {
@@ -36,10 +36,10 @@ class SingleFamily extends React.Component<P, S> {
 		const siblings = this.siblings()
 
 		this.state = {
-			Phone: (siblings.find(s => s.Phone != "") || { Phone: ""}).Phone,
-			ManName: (siblings.find(s => s.ManName!= "") || { ManName: ""}).ManName,
-			ManCNIC: (siblings.find(s => s.ManCNIC != "") || { ManCNIC: ""}).ManCNIC,
-			Address: (siblings.find(s => s.Address != "") || { Address: ""}).Address
+			Phone: (siblings.find(s => s.Phone !== "") || { Phone: ""}).Phone,
+			ManName: (siblings.find(s => s.ManName!== "") || { ManName: ""}).ManName,
+			ManCNIC: (siblings.find(s => s.ManCNIC !== "") || { ManCNIC: ""}).ManCNIC,
+			Address: (siblings.find(s => s.Address !== "") || { Address: ""}).Address
 		}
 
 		this.former = new Former(this, [])
@@ -61,7 +61,7 @@ class SingleFamily extends React.Component<P, S> {
 		this.props.addStudentToFamily(student, this.props.match.params.id)
 	}
 
-	addHyphens = (path : string[]) => () => {
+	addHyphens = (path: string[]) => () => {
 		
 		const str = Dynamic.get(this.state, path) as string;
 		this.setState(Dynamic.put(this.state, path, Hyphenator(str)) as S)
@@ -146,9 +146,9 @@ class SingleFamily extends React.Component<P, S> {
 						<div>Add Sibling</div>
 						<Dropdown
 							items={Object.values(this.props.students)}
-							toLabel={(s : MISStudent) => s.Name}
+							toLabel={(s: MISStudent) => s.Name}
 							onSelect={this.addStudent}
-							toKey={(s : MISStudent) => s.id}
+							toKey={(s: MISStudent) => s.id}
 							placeholder="Student Name" />
 					</div>
 
@@ -161,9 +161,9 @@ class SingleFamily extends React.Component<P, S> {
 	}
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	students: state.db.students
-}), (dispatch : Function) => ({
-	addStudentToFamily: (s : MISStudent, famId: string) => dispatch(addStudentToFamily(s, famId)),
+}), (dispatch: Function) => ({
+	addStudentToFamily: (s: MISStudent, famId: string) => dispatch(addStudentToFamily(s, famId)),
 	saveFamilyInfo: (siblings: MISStudent[], info: MISFamilyInfo) => dispatch(saveFamilyInfo(siblings, info))
 }))(SingleFamily)

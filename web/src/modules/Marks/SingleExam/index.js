@@ -239,7 +239,7 @@ class SingleExam extends Component {
 			let prev_grade = 0
 			const highest_grade = sorted_grades[0]
 
-			for( let e of sorted_grades)
+			for( const e of sorted_grades)
 			{
 				if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
 					return highest_grade[0]

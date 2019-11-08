@@ -1,0 +1,76 @@
+@media print { 
+    
+    .print-table {
+        width: 100%;
+        margin: auto;
+    }
+    .print-table table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border-radius: 2%;
+        white-space: nowrap;
+        margin-bottom: 2cm;
+    }
+    .print-table table caption {
+        font-size: 1.5em;
+        margin: .5em 0 .75em;
+    }
+    .print-table table tr {
+        background-color: white;
+        border: 1px solid black;
+        padding: .35em;
+        line-height: 0.5;
+    }
+    .print-table table th,
+    .print-table table td {
+        padding: .625em;
+        text-align: left;
+        border: 1px solid black;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .print-table table th {
+        font-size: .85em;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .row-sr {
+        width: 10%;
+    }
+    .row-roll {
+        width: 14%;
+    }
+    .row-amount {
+        width: 16%;
+    }
+    .row-class {
+        width: 16%;
+    }
+    .row-phone {
+        width: 20%
+    }
+    .row-name {
+        width: 24%;
+    }
+
+    .row-quantity {
+        width: 15% !important;
+    }
+    .row-date {
+        width: 15% !important;
+    }
+    .row-deduction {
+        width: 15% !important;
+    }
+    .row-amount {
+        width: 15% !important;
+    }
+    .row-category {
+        width: 20% !important;
+    }
+    .row-label {
+        width: 20% !important;
+    }
+}

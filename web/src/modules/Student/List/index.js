@@ -1,17 +1,16 @@
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import qs from 'query-string'
+import qs from 'querystring'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Former from 'utils/former'
-
+import getStudentLimt from 'utils/getStudentLimit';
+import { LayoutWrap } from 'components/Layout';
+import { StudentPrintableList } from 'components/Printable/Student/list';
+import {chunkify} from 'utils/chunkify'
 import Card from 'components/Card'
-import Title from 'components/Title';
-import {PrintHeader} from 'components/Layout';
 
 import './style.css'
-import getStudentLimt from 'utils/getStudentLimit';
-import { LayoutWrap } from '../../../components/Layout';
 
 const StudentItem = (S) => {
 	const cname = S.relevant_section ? S.relevant_section.className : "no class";
@@ -39,7 +38,7 @@ const StudentItem = (S) => {
 						{
 							 tags
 							 .filter(t => t !== "FINISHED_SCHOOL") 
-							 .map(t => <div className="tag"> {t}</div>) 
+							 .map((t, i) => <div className="tag" key={i}> {t}</div>) 
 						}
 						</div>
 					}
@@ -138,9 +137,10 @@ export class StudentList extends Component {
 
 	render (){
 		
-		const { classes, students, settings, forwardTo, schoolLogo, max_limit } = this.props
+		const { classes, students, settings, forwardTo, max_limit } = this.props
 
-		const sections = getSectionsFromClasses(classes)	
+		const sections = getSectionsFromClasses(classes) 
+		const chunkSize = 32 // students per table on printsheet
 	
 		let items = Object.entries(students)
 		.filter(([, s]) => s.id && s.Name && (forwardTo === "prospective-student" || this.getListFilterCondition(s)) ) // hiding the error for now.... need to build reporting mechanism
@@ -158,7 +158,7 @@ export class StudentList extends Component {
 		let create = '/student/new' 
 		let createText = "Add new Student"
 		
-		if(forwardTo === 'marks' || forwardTo === 'certificates'){
+		if(forwardTo === 'marks' || forwardTo === 'certificates') {
 			create = '';
 		}
 	
@@ -166,12 +166,11 @@ export class StudentList extends Component {
 			create = ''
 		}
 	
-		if(forwardTo === "prospective-student"){
+		if(forwardTo === "prospective-student") {
 			create = "/student/prospective-student/new"
 			createText = "New Prospective Student"
 			items = items.filter(s => (s.tags !== undefined ) && (s.tags["PROSPECTIVE"]))
-		}
-		else{
+		} else {
 			items = items.filter(s => (s.tags === undefined || !s.tags["PROSPECTIVE"]))
 		}
 	
@@ -181,42 +180,49 @@ export class StudentList extends Component {
 		}
 		
 		return <div className="student-list">
-			<PrintHeader settings={settings} logo={schoolLogo} />
-			<Title className="title">Students</Title>
+			<div className="title no-print">All Students</div>
+			<div className="no-print">
+				<Card
+					items = {items}
+					Component = {StudentItem}
+					create = {create}
+					createText = {createText}
+					toLabel = {toLabel}>
 
-			<Card
-				items = {items}
-				Component = {StudentItem}
-				create = {create}
-				createText = {createText}
-				toLabel = {toLabel}>
-
-				{forwardTo !== "prospective-student" && <div className="row filter-container">
-					<div className="row checkbox-container">
-						<div className="checkbox">
-							<input type="checkbox" {...this.former.super_handle(["showActiveStudent"])} style={{height:"20px"}}/>
-								Active
+					{forwardTo !== "prospective-student" && <div className="row filter-container no-print">
+						<div className="row checkbox-container">
+							<div className="checkbox">
+								<input type="checkbox" {...this.former.super_handle(["showActiveStudent"])} style={{height:"20px"}}/>
+									Active
+							</div>
+							<div className="checkbox">
+								<input type="checkbox" {...this.former.super_handle(["showInactiveStudent"])} style={{height:"20px"}} />
+									InActive
+							</div>
 						</div>
-						<div className="checkbox">
-							<input type="checkbox" {...this.former.super_handle(["showInactiveStudent"])} style={{height:"20px"}} />
-								InActive
-						</div>
-					</div>
+						<select className="list-select" {...this.former.super_handle(["tag"])}>
+							<option value="">Select Tag</option>
+							{
+								[...this.uniqueTags(students).keys()]
+									.filter(tag => tag !== "PROSPECTIVE" && ( this.state.showActiveStudent && 
+										!this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true ))
+									.map(tag => <option key={tag} value={tag}> {tag} </option>)
+							}
+						</select>
+					</div>}
+				</Card>
+			</div>
+							
+			{	// for first table, Sr. no will start from 1,
+				// for other tables, Sr. no will start from chunkSize * index
+				// here's "index" representing table number
 
-					<select className="list-select" {...this.former.super_handle(["tag"])}>
-						<option value="">Select Tag</option>
-						{
-							[...this.uniqueTags(students).keys()]
-							.filter(tag => tag !== "PROSPECTIVE" && 
-								( this.state.showActiveStudent && !this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true )
-							)
-							.map(tag => <option key={tag} value={tag}> {tag} </option>)
-						}
-					</select>
-				</div>}
-
-			</Card>
-
+				chunkify(items, chunkSize)
+					.map((chunkItems, index) => <StudentPrintableList students={chunkItems} key={index} 
+						chunkSize={ index === 0 ? 0 : chunkSize * index }
+						schoolName={ settings.schoolName }/>)
+			}
+			
 			<div className="print button" onClick={() => window.print()}>Print</div>
 		</div>
 	}

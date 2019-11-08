@@ -56,18 +56,22 @@ class Login extends Component {
 			db.get('root-state', "db")
 				.then(res => {
 					try {
-						localStorage.setItem('backup', res)
+						console.log("BACKING UP TO IDB")
+						if (localStorage.getItem('backup')) {
+							localStorage.removeItem('backup')
+						}
+						db.put('root-state',res,'backup')
 					}
 					catch {
 						console.log("Backup to LocalStorage Failed (on SwitchSchool)")
 						if (this.props.unsyncd_changes > 0) {
 							try {
-								console.log("Backing up unsynced to localstorage")
-								const db = JSON.parse(res)
-								localStorage.setItem("backup-queued", JSON.stringify(db.queued))
+								console.log("Backing up unsynced to IDB")
+								const state = JSON.parse(res)
+								db.put('root-state', JSON.stringify(state.queued), "backup-queued")
 							}
 							catch {
-								console.log("Backup of unsynced to localstorage failed")
+								console.log("Backup of unsynced to IDB failed")
 							}
 						}
 					}

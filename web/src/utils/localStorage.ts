@@ -1,6 +1,7 @@
 import { v4 } from 'node-uuid'
 import requestFS from './requestFS'
 import { defaultExams } from '../modules/Settings';
+import moment from "moment"
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -8,7 +9,7 @@ const defaultTemplates = () => ({
 	result: "Report is ready for $NAME:\n $REPORT"
 })
 
-const initState : RootReducerState = {
+const initState: RootReducerState = {
 	client_id: v4(),
 	initialized: false,
 	queued: { },
@@ -28,6 +29,11 @@ const initState : RootReducerState = {
 		},
 		assets:{
 			schoolLogo:""
+		},
+		package_info: {
+			date: -1,
+			trial_period: 15,
+			paid: false
 		},
 		max_limit: -1,
 		diary: {} as MISDiary
@@ -164,7 +170,7 @@ const checkPersistent = () => {
 checkPersistent();
 
 // add faculty_id to the auth field if it doesn't exist.
-const addFacultyID = (state : RootReducerState) => {
+const addFacultyID = (state: RootReducerState) => {
 
 	if(state.auth.faculty_id !== undefined) {
 		console.log("not running addFacultyID script")

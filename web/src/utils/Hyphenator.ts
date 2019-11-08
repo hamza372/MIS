@@ -1,5 +1,5 @@
 
-const Hyphenator = (str : string) : string => {
+const Hyphenator = (str: string): string => {
 	
 	if(str.length <= 15)
 	{	

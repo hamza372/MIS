@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 const AuthedRoute = ({ component, school_id, name, token, initialized, ...rest }) => {
 
 	if (!initialized) {
-		console.log("THIS IS NOT INITIALIZED")
 		return <div>Loading Database....</div>
 	}
 

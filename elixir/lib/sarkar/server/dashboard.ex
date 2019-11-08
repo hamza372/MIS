@@ -39,13 +39,73 @@ defmodule Sarkar.Server.Dashboard do
 	def init(%{bindings: %{type: "school_list"}} = req, state) do
 		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
 		"SELECT
-			school_id
-		FROM backup",[])
+			DISTINCT school_id
+		FROM flattened_schools",[])
 
 		school_list = resp.rows
 			|> Enum.map(fn [row] -> row end)
 
 		json_resp = Poison.encode!(%{"school_list" => school_list})
+
+		req = :cowboy_req.reply(
+			200, 
+			headers(),
+			json_resp,
+			req
+		)
+
+		{:ok, req, state}
+	end
+
+	def init(%{bindings: %{type: "school_info"}, qs: query_string} = req, state) do
+
+		decoded_params = URI.decode_query(query_string)
+
+		school_id = Map.get(decoded_params, "school_id")
+
+		{:ok, student_limit} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				value
+			FROM flattened_schools
+			WHERE school_id=$1 AND path=$2",
+			[school_id,"max_limit"]
+		)
+
+		{:ok, package_info} = Postgrex.query(Sarkar.School.DB,
+			"SELECT
+				value,
+				path
+			FROM flattened_schools
+			WHERE school_id=$1 AND path LIKE $2",
+			[school_id,"package_info%"]
+		)
+
+		max_limit = case length(student_limit.rows) do
+			0 ->
+				%{"max_limit" => -1}
+			_ ->
+				[ [amount] ] = student_limit.rows
+				%{ "max_limit" => amount }
+		end
+
+		trial_info = case length(package_info.rows) do
+			0 ->
+				%{ "date" => -1, "paid" => false, "trial_period" => 15 }
+			_ -> 
+				package_info.rows
+				|> Enum.reduce(%{},fn ([value, path], acc) -> 
+					key = path
+						|> String.split(",")
+						|> List.last()
+					Map.put(acc, key, value)
+				end
+				)
+		end
+
+		json_resp = Poison.encode!(%{ 
+				"trial_info" => trial_info,
+				"student_info" => max_limit 
+			})
 
 		req = :cowboy_req.reply(
 			200, 

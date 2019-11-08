@@ -9,7 +9,7 @@ import Layout from 'components/Layout'
 import Banner from 'components/Banner'
 import moment from 'moment'
 import { openDB } from 'idb'
-//import newBadge from "../Landing/icons/New/new.svg";
+//import newBadge from "Landing/icons/New/new.svg";
 
 import './style.css'
 
@@ -37,6 +37,8 @@ const defaultSettings = {
 	schoolName: "",
 	schoolAddress: "",
 	schoolPhoneNumber: "",
+	schoolCode: "",
+	vouchersPerPage: "1",
 	sendSMSOption: "SIM", // API
 	permissions: defaultPermissions,
 	devices: {},
@@ -81,6 +83,7 @@ class Settings extends Component {
 				grade: "",
 				percent: ""
 			}
+
 		}
 
 		this.former = new Former(this, [])
@@ -306,8 +309,8 @@ class Settings extends Component {
 
 	logoHandler = (e) => {
 
-		var file = e.target.files[0];
-		var reader = new FileReader();
+		const file = e.target.files[0];
+		const reader = new FileReader();
 		
 		reader.onloadend = () => {
 			this.setState({
@@ -424,6 +427,15 @@ class Settings extends Component {
 					<div className="row">
 						<label>School Code (Optional)</label>
 						<input type="text" {...this.former.super_handle(["settings", "schoolCode"])} placeholder="School Code" />
+					</div>
+
+					<div className="row">
+						<label>Fee Vouchers per Page</label>
+						<select {...this.former.super_handle(["settings", "vouchersPerPage"])}>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+						</select>
 					</div>
 
 					<div className="row">

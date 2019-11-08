@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import getSectionsFromClasses  from '../../../utils/getSectionsFromClasses';
-import Layout from '../../../components/Layout'
-import List from '../../../components/List'
+import getSectionsFromClasses  from 'utils/getSectionsFromClasses';
+import Layout from 'components/Layout'
+import List from 'components/List'
 
 interface P {
-	classes: RootDBState["classes"]
+	classes: RootDBState["classes"];
 }
 
 interface S {
@@ -14,17 +14,17 @@ interface S {
 }
 
 interface RouteInfo {
-	id : string
+	id: string;
 }
 
 interface AugmentedSection {
-	id: string
-	class_id: string
-	namespaced_name: string
-	className: string
-	classYear: number
-	name: string
-	faculty_id?: string
+	id: string;
+	class_id: string;
+	namespaced_name: string;
+	className: string;
+	classYear: number;
+	name: string;
+	faculty_id?: string;
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -57,7 +57,7 @@ class PlannerList extends Component <propTypes, S> {
 					Component={ClassItem}
 					create={create}
 					createText={"Date Sheet"}
-					toLabel={(C : AugmentedSection) => C.namespaced_name} 
+					toLabel={(C: AugmentedSection) => C.namespaced_name} 
 				/>
 
 			</div>

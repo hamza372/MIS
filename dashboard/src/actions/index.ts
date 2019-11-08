@@ -1,5 +1,6 @@
-import Syncr from '../syncr'
+import Syncr from 'syncr'
 import { createLoginSucceed } from './core';
+import moment from 'moment';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -35,9 +36,10 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 
 	// @ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
-	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	// @ts-ignore
+	const END_POINT_URL = window.api_url || "mis-socket.metal.fish"
 
-	fetch(`${END_POINT_URL}/school_list`, {
+	fetch(`https://${END_POINT_URL}/dashboard/school_list`, {
 		headers
 	})
 		.then(resp => resp.json())
@@ -53,16 +55,68 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 
 }
 
+export const updateSchoolInfo = (school_id: string, student_limit: number, paid: boolean, date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	const merges = [
+		{
+			"db,package_info": {
+				"date": moment.now(),
+				"action": {
+					"path": ["db", "package_info"],
+					"type": "MERGE",
+					"value": {
+						"paid": paid,
+						"trial_period": 15,
+						"date": date
+					}
+				}
+			}
+		},
+		{
+			"db,max_limit": {
+				"date": moment.now(),
+				"action": {
+					"path": ["db", "max_limit"],
+					"type": "MERGE",
+					"value": student_limit
+				}
+			}
+		
+		}
+	]
+
+	syncr.send({
+		type: "UPDATE_SCHOOL_INFO",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			school_id,
+			merges
+		}
+	})
+	.then((res: {token: string, sync_state: SyncState }) => {
+		alert(res)
+		window.location.reload()
+	})
+	.catch(res => {
+		console.error(res)
+		alert("School Info Update Fail" + JSON.stringify(res))
+	})
+}
+
 export const REFERRALS_INFO = "REFERRALS_INFO"
 export const getReferralsInfo = () => ( dispatch: Dispatch) => {
 	
 	const headers = new Headers();
 
-	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	// @ts-ignore
+	const END_POINT_URL = window.api_url || "mis-socket.metal.fish"
 	//@ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
 
-	fetch(`${END_POINT_URL}/referrals`, {
+	fetch(`https://${END_POINT_URL}/dashboard/referrals`, {
 		headers
 	})
 		.then(resp => resp.json())

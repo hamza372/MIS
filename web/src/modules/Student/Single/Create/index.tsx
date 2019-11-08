@@ -6,21 +6,21 @@ import { Redirect, RouteComponentProps, Link} from 'react-router-dom';
 import Dynamic from '@ironbay/dynamic'
 
 
-import getSectionsFromClasses from '../../../../utils/getSectionsFromClasses'
-import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
 
-import checkCompulsoryFields from '../../../../utils/checkCompulsoryFields'
-import getStudentLimit from '../../../../utils/getStudentLimit'
+import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import getStudentLimit from 'utils/getStudentLimit'
 
-import Hyphenator from '../../../../utils/Hyphenator'
+import Hyphenator from 'utils/Hyphenator'
 
-import { createStudentMerge, deleteStudent } from '../../../../actions'
+import { createStudentMerge, deleteStudent } from 'actions'
 
-import Banner from '../../../../components/Banner'
-import Former from '../../../../utils/former'
+import Banner from 'components/Banner'
+import Former from 'utils/former'
 
 import './style.css'
-import { PrintHeader } from '../../../../components/Layout';
+import { PrintHeader } from 'components/Layout';
 
 // this page will have all the profile info for a student.
 // all this data will be editable.
@@ -29,7 +29,7 @@ import { PrintHeader } from '../../../../components/Layout';
 // I have an object with a bunch of fields
 // text and date input, dropdowns....
 
-const blankStudent = () : MISStudent => ({
+const blankStudent = (): MISStudent => ({
 	id: v4(),
 	Name: "",
 	RollNumber: "",
@@ -69,34 +69,34 @@ const blankStudent = () : MISStudent => ({
 // should be a dropdown of choices. not just teacher or admin.
 
 interface P {
-	students: RootDBState['students']
-	classes: RootDBState['classes'],
-	settings: RootDBState["settings"],
-	logo: RootDBState["assets"]["schoolLogo"]
-	permissions: RootDBState['settings']['permissions'],
-	max_limit: RootDBState['max_limit']
-	user: MISTeacher
-	save: (student : MISStudent) => any
-	delete: (student : MISStudent) => any
+	students: RootDBState['students'];
+	classes: RootDBState['classes'];
+	settings: RootDBState["settings"];
+	logo: RootDBState["assets"]["schoolLogo"];
+	permissions: RootDBState['settings']['permissions'];
+	max_limit: RootDBState['max_limit'];
+	user: MISTeacher;
+	save: (student: MISStudent) => any;
+	delete: (student: MISStudent) => any;
 }
 
 interface S {
-	profile: MISStudent
-	redirect: false | string
+	profile: MISStudent;
+	redirect: false | string;
 	banner: {
-		active: boolean
-		good?: boolean
-		text?: string
-	}
-	new_tag: string
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
+	new_tag: string;
 	edit: {
-		[id: string]: boolean
-	}
-	show_hide_fee: boolean
+		[id: string]: boolean;
+	};
+	show_hide_fee: boolean;
 }
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -106,7 +106,7 @@ class SingleStudent extends Component<propTypes, S> {
 	former: Former
 	siblings: MISStudent[]
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props);
 
 		const id = props.match.params.id;
@@ -176,7 +176,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 		// verify 
 
-		let compulsory_paths = [ ["Name"] ];
+		const compulsory_paths = [ ["Name"] ];
 		if(student.Active) {
 			compulsory_paths.push(["section_id"])
 		} else {
@@ -200,7 +200,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 		if(!this.isProspective()){
 
-			for(let student of Object.values(this.props.students))
+			for(const student of Object.values(this.props.students))
 			{
 				const RollNumber = student.section_id === this.state.profile.section_id && student.RollNumber !== undefined
 					&& student.id !== this.state.profile.id 
@@ -224,7 +224,7 @@ class SingleStudent extends Component<propTypes, S> {
 				}
 			}
 
-			for(let fee of Object.values(this.state.profile.fees)) {
+			for(const fee of Object.values(this.state.profile.fees)) {
 				//console.log('fees', fee)
 
 				if(fee.type === "" || fee.amount === "" || fee.name === "" || fee.period === "") {
@@ -254,7 +254,7 @@ class SingleStudent extends Component<propTypes, S> {
 				student.payments = payments;
 			}
 			
-			for(let p_id of Object.keys(student.payments)) {
+			for(const p_id of Object.keys(student.payments)) {
 				
 				const current_payment = student.payments[p_id];
 				const corresponding_fees = student.fees[current_payment.fee_id]
@@ -381,7 +381,7 @@ class SingleStudent extends Component<propTypes, S> {
 		})
 	}
 
-	removeFee = (id : string) => () => {
+	removeFee = (id: string) => () => {
 
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
@@ -399,7 +399,7 @@ class SingleStudent extends Component<propTypes, S> {
 		})
 	}
 
-	componentWillReceiveProps(newProps : propTypes) {
+	componentWillReceiveProps(newProps: propTypes) {
 		// this means every time students upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
@@ -417,7 +417,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 	}
 
-	addHyphens = (path : string[]) => () => {
+	addHyphens = (path: string[]) => () => {
 		
 		const str = Dynamic.get(this.state, path) as string;
 		this.setState(Dynamic.put(this.state, path, Hyphenator(str)) as S)
@@ -501,7 +501,7 @@ class SingleStudent extends Component<propTypes, S> {
 		})
 	}
 
-	removeTag = (tag : string) => () => {
+	removeTag = (tag: string) => () => {
 
 		const {[tag]: removed, ...rest} = this.state.profile.tags;
 
@@ -551,7 +551,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<label>Full Name</label>
 						<input type="text" 
 							{ ...this.former.super_handle_flex(["Name"], { 
-									styles: (val : any) => { return val === "" ? { borderColor : "#fc6171" } : {} } 
+									styles: (val: any) => { return val === "" ? { borderColor : "#fc6171" } : {} } 
 								})
 							} 
 							placeholder="Full Name" 
@@ -689,7 +689,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<select 
 							{...this.former.super_handle_flex(
 								["section_id"], 
-								{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} })
+								{ styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {} })
 							} 
 							disabled={!admin}>
 
@@ -707,7 +707,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<select 
 							{...this.former.super_handle_flex(
 								["prospective_section_id"], 
-								{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} }
+								{ styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {} }
 							)} 
 							disabled={!admin}>
 
@@ -832,7 +832,7 @@ class SingleStudent extends Component<propTypes, S> {
 									<label>Amount</label>
 									<input type="number" {...this.former.super_handle_flex(
 											["fees", id, "amount"],
-											{ styles: (val : string) => val === "" ? { borderColor : "#fc6171" } : {} })
+											{ styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {} })
 										}
 										placeholder="Amount"
 										disabled={!admin || !editable}/>
@@ -864,14 +864,14 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 }
 
-export default connect((state : RootReducerState) => ({
+export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
 	logo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 	permissions: state.db.settings.permissions,
 	max_limit: state.db.max_limit || -1 ,
-	user: state.db.faculty[state.auth.faculty_id] }), (dispatch : Function) => ({ 
-	save: (student : MISStudent) => dispatch(createStudentMerge(student)),
-	delete: (student : MISStudent) => dispatch(deleteStudent(student)),
+	user: state.db.faculty[state.auth.faculty_id] }), (dispatch: Function) => ({ 
+	save: (student: MISStudent) => dispatch(createStudentMerge(student)),
+	delete: (student: MISStudent) => dispatch(deleteStudent(student)),
  }))(SingleStudent);

@@ -1,17 +1,17 @@
 import React from 'react'
-import { PrintHeader } from "../../../../components/Layout";
-import numberWithCommas from "../../../../utils/numberWithCommas";
+import { PrintHeader } from "components/Layout";
+import numberWithCommas from "utils/numberWithCommas";
 import moment from "moment";
-import getFeeLabel from "../../../../utils/getFeeLabel";
+import getFeeLabel from "utils/getFeeLabel";
 
 interface LedgerPageProp {
-	relevant_payments: { [id: string]: { filteredPayments : [string, MISStudentPayment][], owed: number, totalOwed: number }}
-	settings: RootDBState["settings"]
-	students: RootDBState["students"]
-	curr_class: MISClass
+	relevant_payments: { [id: string]: { filteredPayments: [string, MISStudentPayment][]; owed: number; totalOwed: number }};
+	settings: RootDBState["settings"];
+	students: RootDBState["students"];
+	curr_class: MISClass;
 }
 
-export const LedgerPage : React.SFC < LedgerPageProp > = ({ relevant_payments, students, settings, curr_class }) => {
+export const LedgerPage: React.SFC < LedgerPageProp > = ({ relevant_payments, students, settings, curr_class }) => {
 
 	return <div className="payment-history">
 	{

@@ -1,8 +1,8 @@
 import React from 'react'
-import { PrintHeader } from "../../../../components/Layout";
-import numberWithCommas from "../../../../utils/numberWithCommas";
+import { PrintHeader } from "components/Layout";
+import numberWithCommas from "utils/numberWithCommas";
 import moment from "moment";
-import getFeeLabel from "../../../../utils/getFeeLabel";
+import getFeeLabel from "utils/getFeeLabel";
 
 
 interface StudentLedgerPageProp {
@@ -17,9 +17,11 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 
 	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
+	/*
 	const totalOwed = Object.entries(student.payments || {})
 		.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 		.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+	*/
  
 	return <div className="payment-history section print-page" >
 			<PrintHeader settings={settings} logo={""}/>

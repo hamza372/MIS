@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { createLogin } from '../../actions'
+import { createLogin } from 'actions'
 
 import former from 'former'
 

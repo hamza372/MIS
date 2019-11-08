@@ -61,8 +61,8 @@ export const deleteFaculty = (faculty_id) => (dispatch, getState) => {
 
 	const deletes = []
 
-	for(let c of Object.values(state.db.classes)){
-		for(let s_id of Object.keys(c.sections)){
+	for(const c of Object.values(state.db.classes)){
+		for(const s_id of Object.keys(c.sections)){
 			if(c.sections[s_id].faculty_id !== undefined && c.sections[s_id].faculty_id === faculty_id){
 				deletes.push({
 					path:["db", "classes", c.id, "sections", s_id, "faculty_id" ]

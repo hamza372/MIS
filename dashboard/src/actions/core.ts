@@ -1,5 +1,5 @@
 import { Dispatch, AnyAction } from 'redux'
-import Syncr from '../syncr';
+import Syncr from 'syncr';
 
 const SYNC = "SYNC"
 

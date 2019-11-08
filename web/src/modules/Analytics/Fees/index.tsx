@@ -3,35 +3,36 @@ import { Link, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
 import queryString from 'querystring'
-import { addMultiplePayments } from '../../../actions'
-import { PrintHeader } from '../../../components/Layout'
-import Former from '../../../utils/former'
-import { checkStudentDuesReturning } from '../../../utils/checkStudentDues'
-import { numberWithCommas } from '../../../utils/numberWithCommas'
-import { getSectionsFromClasses } from '../../../utils/getSectionsFromClasses'
+import { addMultiplePayments } from 'actions'
+import Former from 'utils/former'
+import checkDuesAsync from 'utils/calculateDuesAsync'
+import { numberWithCommas } from 'utils/numberWithCommas'
+import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
+import { chunkify } from 'utils/chunkify'
+import { OutstandingFeePrintableList } from 'components/Printable/Fee/list'
 
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts'
 
 interface Filters {
-	total : boolean
-	paid: boolean
-	forgiven: boolean
-	pending: boolean
+	total: boolean;
+	paid: boolean;
+	forgiven: boolean;
+	pending: boolean;
 }
 
 interface Payment {
-	SUBMITTED: number
-	SCHOLARSHIP: number
-	OWED: number
-	FORGIVEN: number
+	SUBMITTED: number;
+	SCHOLARSHIP: number;
+	OWED: number;
+	FORGIVEN: number;
 }
 
 interface ChartProps {
 	payments: {
-		[is: string]: Payment
-	}
-	filter: Filters
-	date_format: string
+		[is: string]: Payment;
+	};
+	filter: Filters;
+	date_format: string;
 }
 
 const FeesChart = (props: ChartProps) => {
@@ -60,15 +61,15 @@ const FeesChart = (props: ChartProps) => {
 
 interface TableProps {
 	payments: {
-		[id: string]: Payment
-	}
+		[id: string]: Payment;
+	};
 	total_debts: {
-		PAID: number
-		SCHOLARSHIP: number
-		OWED: number
-		FORGIVEN: number
-	}
-	date_format: string
+		PAID: number;
+		SCHOLARSHIP: number;
+		OWED: number;
+		FORGIVEN: number;
+	};
+	date_format: string;
 }
 
 const FeesTable = (props: TableProps) => {
@@ -113,26 +114,37 @@ const FeesTable = (props: TableProps) => {
 }
 
 type PaymentAddItem = {
-	student: MISStudent
-	payment_id: string
+	student: MISStudent;
+	payment_id: string;
 } & MISStudentPayment
 
 interface P {
-	students: RootDBState["students"]
-	classes: RootDBState["classes"]
-	settings: RootDBState["settings"]
-	schoolLogo: RootDBState["assets"]["schoolLogo"]
-	addPayments: (payments: PaymentAddItem[]) => void,
+	students: RootDBState["students"];
+	classes: RootDBState["classes"];
+	settings: RootDBState["settings"];
+	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	addPayments: (payments: PaymentAddItem[]) => void;
 }
 
 interface S {
-	filterText: string
-	chartFilter: Filters
-	classFilter: string
-	is_fee_filter: boolean
-	selected_period: string
-	start_date: number
-	end_date: number
+	filterText: string;
+	chartFilter: Filters;
+	classFilter: string;
+	is_fee_filter: boolean;
+	selected_period: string;
+	start_date: number;
+	end_date: number;
+
+	loading: boolean;
+	payments: ChartProps["payments"];
+	total_student_debts: StudentDebtMap;
+	total_debts: {
+		PAID: number;
+		OWED: number;
+		FORGIVEN: number;
+		SCHOLARSHIP: number;
+	};
+
 }
 
 interface routeInfo {
@@ -141,14 +153,14 @@ interface routeInfo {
 
 type StudentDebtMap = {
 	[id: string]: {
-		student: MISStudent
-		debt: Payment
-		familyId?: string
-	} 
+		student: MISStudent;
+		debt: Payment;
+		familyId?: string;
+	}; 
 }
 
 type PaymentSingleMap = {
-	[id: string]: Payment
+	[id: string]: Payment;
 }
 
 type propTypes = RouteComponentProps<routeInfo> & P
@@ -156,6 +168,8 @@ type propTypes = RouteComponentProps<routeInfo> & P
 class FeeAnalytics extends Component<propTypes, S> {
 
 	former: Former
+	background_calculation: NodeJS.Timeout
+
 	constructor(props: propTypes) {
 	  	super(props)
 	
@@ -181,22 +195,40 @@ class FeeAnalytics extends Component<propTypes, S> {
 			selected_period: period !== "" ? period.toString() : "Monthly",
 			start_date,
 			end_date,
+
+			loading: true,
+			payments: {},
+			total_student_debts: {},
+			total_debts: {
+				PAID: 0,
+				OWED: 0,
+				FORGIVEN: 0,
+				SCHOLARSHIP: 0
+			}
 		}
 
-	  this.former = new Former(this, [])
+		this.former = new Former(this, [])
 	}
+
 
 	calculateDebt = ({ SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP }: Payment) => SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED;
 
 	componentDidMount() {
 		// first update fees
 		const { students, addPayments } = this.props
-		const nextPayments = Object.values(students)
-			.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
 
-		if(nextPayments.length > 0) {
-			addPayments(nextPayments)
-		}
+		const s1 = new Date().getTime()
+		console.log('computing dues')
+		checkDuesAsync(Object.values(students))
+			.then(nextPayments => {
+				console.log('done computing dues', (new Date().getTime()) - s1)
+				if(nextPayments.length > 0) {
+					addPayments(nextPayments)
+				}
+			})
+
+		this.calculate()
+		
 	}
 
 	onStateChange = () => {
@@ -209,7 +241,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 		const params = `start_date=${start_date}&end_date=${end_date}&period=${period}`
 
 		window.history.replaceState(this.state, "Fee Analytics", `${url}?${params}`)
-		
+		this.calculate()
 	}
 
 	componentWillReceiveProps(nextProps: propTypes) {
@@ -232,15 +264,134 @@ class FeeAnalytics extends Component<propTypes, S> {
 		})
 
 		const { students, addPayments } = nextProps
-		const nextPayments = Object.values(students)
-		.reduce((agg, student) => ([...agg, ...checkStudentDuesReturning(student)]), []);
+		checkDuesAsync(Object.values(students))
+			.then(nextPayments => {
+				if(nextPayments.length > 0) {
+					addPayments(nextPayments)
+				}
+			})
+		
+		this.calculate()
 
-		if(nextPayments.length > 0) {
-			addPayments(nextPayments)
-		}
 	}
-	
-  render() {
+
+	calculate = () => {
+
+		const s1 = new Date().getTime();
+		console.log("calculating...")
+
+		let i = 0;
+
+		clearTimeout(this.background_calculation)
+		this.setState({
+			loading: true
+		})
+
+		let total_paid = 0;
+		let total_owed = 0;
+		let total_forgiven = 0;
+		let total_scholarship = 0;
+		const payments = {} as ChartProps["payments"];
+		const total_student_debts = {} as StudentDebtMap;
+		let total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }; //Need a default otherwise throws an error when logged in for the first time
+		
+		const temp_sd = moment(this.state.start_date)
+		const temp_ed = moment(this.state.end_date)
+		const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
+
+		const { students } = this.props
+
+		const student_list = Object.values(students)
+
+		const reducify = () => {
+
+			// in loop
+			if(i >= student_list.length) {
+				// we're done
+				const s2 = new Date().getTime()
+				console.log("DONE CALCULATING", s2 - s1)
+				return this.setState({
+					loading: false,
+					payments,
+					total_student_debts,
+					total_debts
+				})
+			}
+
+			const student = student_list[i];
+			const sid = student.id;
+
+			i += 1;
+			console.log('processing student', i)
+
+			const debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
+			
+			for(const pid in student.payments || {}) {
+				const payment = student.payments[pid];
+
+				if(!( moment(payment.date).isSameOrAfter(temp_sd) && moment(payment.date).isSameOrBefore(temp_ed) )){
+					continue
+				}
+
+				// some payment.amount has type string
+				// @ts-ignore 
+				const amount =  typeof(payment.amount) === "string" ? parseFloat(payment.amount) : payment.amount
+				
+				const period_key = moment(payment.date).format(period_format);
+				const period_debt = payments[period_key] || { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
+				
+				// for 'scholarship', payment has also type OWED and negative amount
+				if(amount < 0) {
+					const new_amount = Math.abs(amount)
+					debt["SCHOLARSHIP"] += new_amount
+					period_debt["SCHOLARSHIP"] += new_amount
+				} else {
+					debt[payment.type] += amount
+					period_debt[payment.type] += amount
+				}
+
+				payments[period_key] = period_debt;
+
+			}
+
+			total_paid += debt.SUBMITTED;
+			total_owed += debt.OWED;
+			total_forgiven += debt.FORGIVEN; 	
+			total_scholarship += debt.SCHOLARSHIP;
+
+			if(student.FamilyID) {
+				const existing = total_student_debts[student.FamilyID]
+				if(existing) {
+					total_student_debts[student.FamilyID] = {
+						student,
+						debt: {
+							OWED: existing.debt.OWED + debt.OWED,
+							SUBMITTED: existing.debt.SUBMITTED + debt.SUBMITTED,
+							FORGIVEN: existing.debt.FORGIVEN + debt.FORGIVEN,
+							SCHOLARSHIP: existing.debt.SCHOLARSHIP + debt.SCHOLARSHIP
+						},
+						familyId: student.FamilyID
+					}
+				} else {
+					total_student_debts[student.FamilyID] = { student, debt, familyId: student.FamilyID }
+				}
+			} else {
+				total_student_debts[sid] = { student, debt };
+			}
+
+			total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }
+
+			this.background_calculation = setTimeout(reducify, 0);
+
+		}
+
+		this.background_calculation = setTimeout(reducify, 0)
+
+	}
+
+	render() {
+
+	const chunkSize = 32
 
 	// first make sure all students payments have been calculated... (this is for dues)
 
@@ -248,95 +399,18 @@ class FeeAnalytics extends Component<propTypes, S> {
 	// who owes it, and how much
 	// graph of paid vs due per month.
 
-	const {students, settings, schoolLogo} = this.props
-
-	let total_paid = 0;
-	let total_owed = 0;
-	let total_forgiven = 0;
-	let total_scholarship = 0;
-	let payments = {} as ChartProps["payments"];
-	let total_student_debts = {} as StudentDebtMap;
-	let total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }; //Need a default otherwise throws an error when logged in for the first time
-	
-	const temp_sd = moment(this.state.start_date)
-	const temp_ed = moment(this.state.end_date)
 	const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
-	for(let sid in students) {
-		const student = students[sid];
-
-		let debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
-		
-		for(let pid in student.payments || {}) {
-			const payment = student.payments[pid];
-
-			if(!( moment(payment.date).isSameOrAfter(temp_sd) && moment(payment.date).isSameOrBefore(temp_ed) )){
-				continue
-			}
-
-			// some payment.amount has type string
-			// @ts-ignore 
-			const amount =  typeof(payment.amount) === "string" ? parseFloat(payment.amount) : payment.amount
-			
-			const period_key = moment(payment.date).format(period_format);
-			const period_debt = payments[period_key] || { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
-			
-			// for 'scholarship', payment has also type OWED and negative amount
-			if(amount < 0) {
-				const new_amount = Math.abs(amount)
-				debt["SCHOLARSHIP"] += new_amount
-				period_debt["SCHOLARSHIP"] += new_amount
-			} else {
-				debt[payment.type] += amount
-				period_debt[payment.type] += amount
-			}
-
-			payments[period_key] = period_debt;
-
-		}
-
-		total_paid += debt.SUBMITTED;
-		total_owed += debt.OWED;
-		total_forgiven += debt.FORGIVEN; 	
-		total_scholarship += debt.SCHOLARSHIP;
-		
-
-		if(student.FamilyID) {
-			const existing = total_student_debts[student.FamilyID]
-			if(existing) {
-				total_student_debts[student.FamilyID] = {
-					student,
-					debt: {
-						OWED: existing.debt.OWED + debt.OWED,
-						SUBMITTED: existing.debt.SUBMITTED + debt.SUBMITTED,
-						FORGIVEN: existing.debt.FORGIVEN + debt.FORGIVEN,
-						SCHOLARSHIP: existing.debt.SCHOLARSHIP + debt.SCHOLARSHIP
-					},
-					familyId: student.FamilyID
-				}
-			} else {
-				total_student_debts[student.FamilyID] = { student, debt, familyId: student.FamilyID }
-			}
-		} else {
-			total_student_debts[sid] = { student, debt };
-		}
-
-		total_debts = { PAID: total_paid, OWED: total_owed, FORGIVEN: total_forgiven, SCHOLARSHIP: total_scholarship }
-	}
-
-	const items = Object.values(total_student_debts)
+	const items = Object.values(this.state.total_student_debts)
 		.filter(({student, debt}) => (student.id && student.Name) &&
 			(this.state.classFilter === "" || student.section_id === this.state.classFilter ) &&
 			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase())
 		)
+		.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 
 	const sections = Object.values(getSectionsFromClasses(this.props.classes))
-	
-	return <div className="fees-analytics">
 
-		<PrintHeader 
-			settings={settings} 
-			logo={schoolLogo}/>
+	return <div className="fees-analytics">
 		
 		<div className="no-print" style={{ marginRight:"10px" }}>
 			<div className="divider">Payments over Time</div>
@@ -370,7 +444,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 			</div>}
 
 			<FeesChart 
-				payments={payments} 
+				payments={this.state.payments} 
 				filter={this.state.chartFilter}
 				date_format={period_format}/>
 		</div>
@@ -412,12 +486,12 @@ class FeeAnalytics extends Component<propTypes, S> {
 		</div>
 
 		<FeesTable 
-			payments={payments} 
-			total_debts={total_debts}
+			payments={this.state.payments} 
+			total_debts={this.state.total_debts}
 			date_format={period_format}/>
 
-		<div className="divider">Students with Payments Outstanding</div>
-		<div className="section">
+		<div className="divider no-print">Students with Payments Outstanding</div>
+		<div className="section no-print">
 		
 		<div className="no-print row">
 			<input
@@ -442,10 +516,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 				<label><b>Amount</b></label>
 		</div>
 		{
-			items
-			.filter(({ student, debt }) => (student.tags === undefined ) || (!student.tags["PROSPECTIVE"]))
-			.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
-			.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
+			items.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
 					<Link to={`/student/${student.id}/payment`}>{ familyId ? familyId : student.Name}</Link>
 					<div>{ student.Phone }</div>
 					<div  style={ this.calculateDebt(debt) >= 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
@@ -453,6 +524,16 @@ class FeeAnalytics extends Component<propTypes, S> {
 		}
 		<div className="print button" onClick={() => window.print()} style={{ marginTop: "10px" }}>Print</div>
 		</div>
+
+		{	// for first table, Sr. no will start from 1,
+			// for other tables, Sr. no will start from chunkSize * index
+			// here's "index" representing table (chunk) no.
+			chunkify(items, chunkSize)
+				.map((itemsChunk: any, index: number) => <OutstandingFeePrintableList items={ itemsChunk }
+					chunkSize={ index === 0 ? 0 : chunkSize * index }
+					schoolName={ this.props.settings.schoolName }
+					sections={ sections }/>)
+		}
 
 	</div>
   }
