@@ -10,9 +10,10 @@ interface StudentLedgerPageProp {
 	student: MISStudent
 	class_name: string
 	settings: RootDBState["settings"]
+	voucherNo: number
 }
 
-export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name }) => {
+export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name, voucherNo }) => {
 
 	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
@@ -46,7 +47,7 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 				</div>
 				<div className="row info">
 					<label> Voucher no:</label>
-					<div>{ Math.floor(100000 + Math.random() * 900000)}</div>
+					<div>{voucherNo}</div>
 				</div>
 
 			<div className="divider">Payment Information</div>
