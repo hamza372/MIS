@@ -36,9 +36,10 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 
 	// @ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
-	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	// @ts-ignore
+	const END_POINT_URL = window.api_url || "mis-socket.metal.fish"
 
-	fetch(`${END_POINT_URL}/school_list`, {
+	fetch(`https://${END_POINT_URL}/dashboard/school_list`, {
 		headers
 	})
 		.then(resp => resp.json())
@@ -110,11 +111,12 @@ export const getReferralsInfo = () => ( dispatch: Dispatch) => {
 	
 	const headers = new Headers();
 
-	const END_POINT_URL = "https://mis-socket.metal.fish/dashboard"
+	// @ts-ignore
+	const END_POINT_URL = window.api_url || "mis-socket.metal.fish"
 	//@ts-ignore
 	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
 
-	fetch(`${END_POINT_URL}/referrals`, {
+	fetch(`https://${END_POINT_URL}/dashboard/referrals`, {
 		headers
 	})
 		.then(resp => resp.json())
