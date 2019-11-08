@@ -1,13 +1,16 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router';
 import Former from 'utils/former';
 import { connect } from 'react-redux';
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import numberWithCommas from 'utils/numberWithCommas';
-import { addExpense, addSalaryExpense, deleteExpense, editExpense } from 'actions'
-import moment from 'moment'
+import { addExpense, addSalaryExpense, deleteExpense, editExpense } from 'actions';
+import moment from 'moment';
 import Banner from 'components/Banner';
-import { PrintHeader } from 'components/Layout';
+import chunkify from 'utils/chunkify';
+import { GeneralExpensePrintableList } from 'components/Printable/Expense/General/list';
+
+import '../style.css';
 
 interface P {
 	teachers: RootDBState["faculty"];
@@ -328,10 +331,12 @@ class Expenses extends Component<propTypes, S> {
 
 	render() {
 
-		const { expenses, teachers, settings, schoolLogo } = this.props
+		const { expenses, teachers, settings } = this.props
 
-		const Months = new Set([])
-		const Years = new Set([])
+		const chunkSize = 32 // records per table
+
+		let Months  = new Set([])
+		let Years = new Set([])
 
 		for (const e of Object.values(expenses)) {
 			Months.add(moment(e.date).format("MMMM"))
@@ -353,23 +358,23 @@ class Expenses extends Component<propTypes, S> {
 			}, 0)
 
 		const filtered_expenses = Object.entries(expenses)
-			.filter(([, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) && (this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category : true))
-			.sort(([, a], [, b]) => a.date - b.date)
+			.filter(([id, e]) => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) && 
+				(this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category: true) &&
+				e.type !== 'PAYMENT_DUE')
+			.sort(([,a],[,b]) => a.date - b.date)
 
 		return <div className="expenses">
 
 			{this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
 
-			<PrintHeader settings={settings} logo={schoolLogo} />
-
-			<div className="divider">Expense Information</div>
+			<div className="divider no-print">Expense Information</div>
 
 			<div className="table row">
 				<label>Total Expense:</label>
 				<div>Rs. {numberWithCommas(total_expense)}</div>
 			</div>
 
-			<div className="divider">Ledger</div>
+			<div className="divider no-print">Ledger</div>
 
 			<div className="filter row no-print" style={{ marginBottom: "10px", flexWrap: "wrap" }}>
 				<select {...this.former.super_handle(["monthFilter"])}>
@@ -403,7 +408,7 @@ class Expenses extends Component<propTypes, S> {
 				</select>
 			</div>
 
-			<div className="payment-history section">
+			<div className="payment-history no-print section">
 				<div className="table row heading">
 					<label><b> Date   </b></label>
 					<label><b> Label  </b></label>
@@ -414,21 +419,23 @@ class Expenses extends Component<propTypes, S> {
 				</div>
 				{
 					filtered_expenses
-						.map(([id, e]) => {
-							if (e.expense === "SALARY_EXPENSE") {
-								return <div key={id} className={e.type === "PAYMENT_DUE" ? "table row no-print" : "table row"}>
-									<label> {moment(e.date).format("DD-MM-YY")} </label>
-									<label> {e.label}</label>
-									<label> {e.category}</label>
-									<label> {`-`} </label>
-									<label> {`${e.deduction}`}{e.deduction_reason ? `(${e.deduction_reason})` : ""} </label>
-									{(this.state.edits[id] && <div className="row" style={{ color: "rgb(94, 205, 185)", justifyContent: "space-between" }}>
-										<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%" }} type="number" {...this.former.super_handle(["edits", id, "amount"])} />
-										<div className="button red" style={{ padding: "0px", textAlign: "center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-									</div>) || <label>{numberWithCommas(e.amount - e.deduction)}</label>}
-								</div>
-							}
-
+					.map(([id, e]) => {
+						if(e.expense === "SALARY_EXPENSE")
+						{
+							return <div key={id} className={ e.type === "PAYMENT_DUE" ? "table row no-print" : "table row"}>
+								<label> {moment(e.date).format("DD-MM-YY")} </label>
+								<label> {e.label}</label>
+								<label> {e.category}</label>
+								<label> {`-`} </label>
+								<label> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
+								{ this.state.edits[id] !== undefined ? (<div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
+									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
+									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
+								</div>) : (<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>)}
+							</div>
+						}
+						else if (e.expense === "MIS_EXPENSE")
+						{
 							return <div key={id} className="table row">
 								<label> {moment(e.date).format("DD-MM-YY")} </label>
 								<label> {e.label}</label>
@@ -439,10 +446,13 @@ class Expenses extends Component<propTypes, S> {
 									(this.state.edits[id] && <div className="row" style={{ color: "rgb(94, 205, 185)", justifyContent: "space-between" }}>
 										<input style={{ textAlign: "right", border: "none", width: "70%" }} type="number" {...this.former.super_handle(["edits", id, "amount"])} />
 										<div className="button red" style={{ padding: "0px", textAlign: "center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-									</div>) || <label>{numberWithCommas(e.amount)}</label>}
+									</div>) || <label>{numberWithCommas(e.amount)}</label>
+								}
 							</div>
-						})
-				}
+						}
+						return null
+				})
+			}
 				<div className="table row last">
 					<label><b> Total Paid:</b></label>
 					<div><b>Rs. {numberWithCommas(total_filtered_expense)}</b></div>
@@ -479,12 +489,12 @@ class Expenses extends Component<propTypes, S> {
 						</select>
 					</div>
 
-					{this.state.payment.category === "SALARY" && <div className="row">
-						<label> Teacher </label>
-						<select onChange={(e) => this.onTeacherSelect(e)}>
-							<option value=""> SELECT</option>
-							{
-								Object.values(teachers)
+					{ this.state.payment.category === "SALARY" && <div className="row">
+							<label> Teacher </label>
+							<select onChange={(e) => this.onTeacherSelect(e)}>
+								<option value=""> SELECT</option>
+								{
+									Object.values(teachers)
 									.sort((a, b) => a.Name.localeCompare(b.Name))
 									.map(t => {
 										return <option key={t.id} value={t.id}> {t.Name} </option>
@@ -517,7 +527,16 @@ class Expenses extends Component<propTypes, S> {
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div>
 				}
-				<div className="print button" style={{ marginTop: "5px" }} onClick={() => window.print()}> Print </div>
+
+				{
+					chunkify(filtered_expenses, chunkSize)
+						.map((itemsChunk: any, index: number) => <GeneralExpensePrintableList key={index}
+							items={itemsChunk}
+							chunkSize={index === 0 ? 0 : chunkSize * index}
+							schoolName={settings.schoolName}/>)
+				}
+
+				<div className="print button" style={{marginTop:"5px"}} onClick={() => window.print()}> Print </div>
 			</div>
 		</div>
 	}

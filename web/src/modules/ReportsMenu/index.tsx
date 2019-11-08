@@ -53,12 +53,12 @@ class ReportsMenu extends Component <propTypes, S> {
 							<option value="CLASS">Class</option>
 							<option value="STUDENT">Student</option>
 						</select>
-					</div>
-				</div>
-
-				<div className="sub-list" style={{width: "100%"}}>
-				{ this.state.report_for === "CLASS" ? 
-					<ClassListModule {...this.props} forwardTo="report-menu" /> : <StudentList {...this.props} forwardTo="marks" /> }
+						</div>
+						
+						<div className="sub-list" style={{width: "100%"}}>
+						{ this.state.report_for === "CLASS" ? 
+						<ClassListModule {...this.props} forwardTo="report-menu" /> : <StudentList {...this.props} forwardTo="marks" /> }
+						</div>
 				</div>
 
 			</div>
