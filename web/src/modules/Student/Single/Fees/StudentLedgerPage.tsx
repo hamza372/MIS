@@ -19,7 +19,7 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 	const totalOwed = Object.entries(student.payments || {})
 		.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 		.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-
+ 
 	return <div className="payment-history section print-page" >
 			<PrintHeader settings={settings} logo={""}/>
 
@@ -33,7 +33,7 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 					<div>{student.ManName}</div>
 				</div>
 				<div className="row info">
-					<label> Class Name:</label>
+					<label>Class:</label>
 					<div>{class_name}</div>
 				</div>
 				<div className="row info">
@@ -41,12 +41,12 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 					<div>{student.RollNumber}</div>
 				</div>
 				<div className="row info">
-					<label> Adm # :</label>
+					<label> Adm #:</label>
 					<div>{student.AdmissionNumber}</div>
 				</div>
 				<div className="row info">
-					<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}> {owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
-					<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}>{`Rs. ${numberWithCommas(Math.abs(totalOwed))}`}</div>
+					<label> Voucher no:</label>
+					<div>{ Math.floor(100000 + Math.random() * 900000)}</div>
 				</div>
 
 			<div className="divider">Payment Information</div>
