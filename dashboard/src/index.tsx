@@ -12,15 +12,15 @@ import reducer from './reducers'
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
-//const debug_url = "wss://mis-socket.metal.fish/ws"
+//const debug_url = "wss://mis-socket.metal.fish"
 
-const debug_url = "wss://3cfbb43e.ngrok.io/ws"
+const debug_url = "3cfbb43e.ngrok.io"
 
 //@ts-ignore
 const host = window.api_url || debug_url;
 
 const initial_state = loadDB()
-const syncr = new Syncr(host, msg => store.dispatch(msg))
+const syncr = new Syncr(`wss://${host}/ws`, msg => store.dispatch(msg))
 //@ts-ignore
 const store : Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
 
