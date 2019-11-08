@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { hash } from 'utils'
 import moment from 'moment'
 
-import { createLogout } from 'actions'
+import { createLogout, resetTrial, markPurchased } from 'actions'
 import Layout from 'components/Layout'
 import { numberWithCommas } from 'utils/numberWithCommas'
 
@@ -47,13 +48,31 @@ class Landing extends Component {
 		}
 	}
 
-
+	//They will still be able to access other components if they typed their Url e.g /attendance.
+	//Need to do something about that ..
 	componentDidMount() {
-		const container = document.querySelector(".landing .horizontal-scroll-container");
 
+		const { paid, trial_period, date } = this.props.package_info
+		
+		const container = document.querySelector(".landing .horizontal-scroll-container");
 		container.onscroll = () => this.setState({ scroll: container.scrollLeft })
 		container.scrollTo(window.innerWidth, 0)
 
+		const daysPassesSinceTrial = moment().diff(date, "days")
+
+		if ( date !== -1 && !paid && daysPassesSinceTrial > trial_period + 1) {
+
+			const word = window.prompt(`Your Trial has ended (${daysPassesSinceTrial - trial_period} days).Please Enter Purchase or Reset Code or Contact Help Line at.(+923481112004)`,"")
+
+			this.checkMagicWord(word)
+				.then(accepted => {
+					if (accepted) {
+						window.alert("ACCEPTED")
+					} else {
+						window.location.reload()
+					}
+				})
+		}
 
 		this.setState({
 			scroll: container.scrollLeft
@@ -68,9 +87,69 @@ class Landing extends Component {
 		return `/analytics/${stats_type}?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`
 	}
 
+	checkMagicWord = async (word) => {
+
+		const { date } = this.props.package_info
+
+		if (date === -1) {
+			return false
+		}
+
+		const reset_password = await hash(`reset-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
+			.then(res => res.substr(0,4).toLowerCase())
+
+		const purchase_password = await hash(`buy-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
+			.then(res => res.substr(0, 4).toLowerCase())
+		
+		if (word === reset_password)
+		{
+			this.props.resetTrial()
+			return true
+		}
+
+		if (word === purchase_password)
+		{
+			this.props.markPurchased()
+			return true
+		}
+
+		console.log("WRONG CODE")
+		return false
+
+	}
+
+	askForPassword = () => {
+
+		const word = window.prompt("Please Enter Purchase or Reset Code.", "")
+
+		if (word) {
+			this.checkMagicWord(word)
+				.then(accepted => {
+					if (accepted) {
+						window.alert("ACCEPTED")
+					} else {
+						window.alert("WRONG CODE")
+					}
+				})
+		}
+	}
+
+	getTrialWarningMessage = () => {
+		
+		const { trial_period, date } = this.props.package_info
+		const daysPassedSinceTrial = moment().diff(date, "days")
+
+		if (daysPassedSinceTrial <= trial_period) {
+			return `Trial ${trial_period - daysPassedSinceTrial} day(s) left`
+		}
+		
+		return "Trial Period Ended, Please Contact helpline or You will not be able to use MISchool."
+
+	}
+
 	render() {
 
-		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions } = this.props;
+		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions, package_info } = this.props;
 
 		const current_page = Math.floor(this.state.scroll / window.innerWidth);
 
@@ -125,6 +204,10 @@ class Landing extends Component {
 
 		return <Layout history={this.props.history}>
 			<div className="landing">
+				{!package_info.paid && package_info.date !== -1 && <div onClick={() => this.askForPassword()} className="trial-bar">
+					{ this.getTrialWarningMessage()}
+				</div>}
+				
 				<div className="horizontal-scroll-container">
 
 					<div className="page">
@@ -157,14 +240,14 @@ class Landing extends Component {
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 						<div className="row">
-                            <div className="badge-container">
-                                <img className="new-badge" src={newBadge} alt=""/>
-                                <Link to="/families"
-                                    className="button green-shadow"
-                                    style={{ backgroundImage: `url(${family})`}}>
-                                    Families
-                                </Link>
-                            </div>
+							<div className="badge-container">
+								<img className="new-badge" src={newBadge} alt=""/>
+								<Link to="/families"
+									className="button green-shadow"
+									style={{ backgroundImage: `url(${family})`}}>
+									Families
+								</Link>
+							</div>
 						</div>
 					</div>
 
@@ -342,13 +425,16 @@ class Landing extends Component {
 
 
 export default connect(state => ({ 
-		user: state.db.faculty[state.auth.faculty_id],
-		students: state.db.students,
-		faculty: state.db.faculty,
-		permissions: state.db.settings.permissions,
-		lastSnapshot: state.lastSnapshot,
-		unsyncd: Object.keys(state.queued).length
-	}), 
-	dispatch => ({
-		logout: () => dispatch(createLogout())
-	}))(Landing)
+	user: state.db.faculty[state.auth.faculty_id],
+	students: state.db.students,
+	faculty: state.db.faculty,
+	permissions: state.db.settings.permissions,
+	lastSnapshot: state.lastSnapshot,
+	unsyncd: Object.keys(state.queued).length,
+	package_info: state.db.package_info || { date: -1, trial_period: 15, paid: false}, //If package info is undefined
+	school_id: state.auth.school_id
+}), dispatch => ({
+	resetTrial: () => dispatch(resetTrial()),
+	markPurchased: () => dispatch(markPurchased()),
+	logout: () => dispatch(createLogout())
+}))(Landing)

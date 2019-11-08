@@ -26,14 +26,19 @@ interface RootDBState {
 	};
 	analytics: {
 		sms_history: {
-			[id: string]: MISSMSHistory;
-		};
-	};
-	assets: {
-		schoolLogo: string;
-	};
-	max_limit: number;
-	diary: MISDiary;
+			[id: string]: MISSMSHistory
+		}
+	}
+	assets : {
+		schoolLogo : string
+	}
+	max_limit: number
+	package_info: {
+		date: number
+		trial_period: number
+		paid: boolean
+	}
+	diary : MISDiary
 }
 
 interface RootReducerState {

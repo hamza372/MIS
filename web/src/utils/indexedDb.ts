@@ -31,6 +31,11 @@ export const initState: RootReducerState = {
 			schoolLogo:""
 		},
 		max_limit: -1,
+		package_info: {
+			date: -1,
+			trial_period: 15,
+			paid: false
+		},
 		diary: {} as MISDiary
 	},
 	auth: {

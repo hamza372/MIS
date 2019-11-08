@@ -18,6 +18,22 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		end
 	end
 
+	def handle_action(%{"type" => "UPDATE_SCHOOL_INFO",  "payload" => %{"school_id" => school_id, "merges" => merges}}, state) do
+		
+		case Registry.lookup(Sarkar.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
+		end
+
+		merges
+			|> Enum.map( fn (merge) -> 
+				Sarkar.School.sync_changes(school_id,"backend", merge, :os.system_time(:millisecond))
+			end)
+		
+			{:reply, succeed("Successful"), state}
+
+	end
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end

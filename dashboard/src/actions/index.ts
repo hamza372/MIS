@@ -1,5 +1,6 @@
 import Syncr from 'syncr'
 import { createLoginSucceed } from './core';
+import moment from 'moment';
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
@@ -51,6 +52,57 @@ export const schoolInfo = () => (dispatch: Dispatch) => {
 			window.alert("Error Fetching List!")
 		})
 
+}
+
+export const updateSchoolInfo = (school_id: string, student_limit: number, paid: boolean, date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
+	const merges = [
+		{
+			"db,package_info": {
+				"date": moment.now(),
+				"action": {
+					"path": ["db", "package_info"],
+					"type": "MERGE",
+					"value": {
+						"paid": paid,
+						"trial_period": 15,
+						"date": date
+					}
+				}
+			}
+		},
+		{
+			"db,max_limit": {
+				"date": moment.now(),
+				"action": {
+					"path": ["db", "max_limit"],
+					"type": "MERGE",
+					"value": student_limit
+				}
+			}
+		
+		}
+	]
+
+	syncr.send({
+		type: "UPDATE_SCHOOL_INFO",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		id: state.auth.id,
+		payload: {
+			school_id,
+			merges
+		}
+	})
+	.then((res: {token: string, sync_state: SyncState }) => {
+		alert(res)
+		window.location.reload()
+	})
+	.catch(res => {
+		console.error(res)
+		alert("School Info Update Fail" + JSON.stringify(res))
+	})
 }
 
 export const REFERRALS_INFO = "REFERRALS_INFO"

@@ -1,7 +1,7 @@
 defmodule Sarkar.Auth do
 
 	def create({id, password}) do
-		case Postgrex.query(Sarkar.School.DB,
+		{:ok, confirm_text } = case Postgrex.query(Sarkar.School.DB,
 			"INSERT INTO auth (id, password) values ($1, $2)", 
 			[id, hash(password, 52)]) do
 				{:ok, res} -> 
@@ -10,6 +10,11 @@ defmodule Sarkar.Auth do
 					IO.inspect err
 					{:error, "creation failed"}
 		end
+
+		start_school(id)
+		Sarkar.School.init_trial(id)
+
+		{:ok, confirm_text}
 	end
 
 	def create({id, password, "mischool", student_limit}) do
@@ -118,6 +123,13 @@ defmodule Sarkar.Auth do
 			{:error, err} -> 
 				IO.inspect err
 				{:error, "error generating token"}
+		end
+	end
+
+	defp start_school(school_id) do
+		case Registry.lookup(Sarkar.SchoolRegistry, school_id) do
+			[{_, _}] -> {:ok}
+			[] -> DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
 		end
 	end
 

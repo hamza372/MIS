@@ -13,3 +13,15 @@ export const getEndPointResource = ( point:string, school_id: string, start_date
 		headers
 	})
 }
+
+export const getEndPointResourceTrial = ( point:string, school_id: string) => {
+	
+	const headers = new Headers();
+
+	// @ts-ignore
+	headers.set('Authorization', 'Basic ' + btoa(`${window.username}:${window.password}`))
+
+	return fetch(`${END_POINT_URL}${point}?school_id=${school_id}`, {
+		headers
+	})
+}

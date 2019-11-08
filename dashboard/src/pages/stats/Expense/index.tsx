@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, Bar, BarChart } from 'recharts'
 
-import 'style.css'
 import { getEndPointResource } from 'utils/getEndPointResource';
 import moment from 'moment'
 
