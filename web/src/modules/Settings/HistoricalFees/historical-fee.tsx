@@ -5,12 +5,13 @@ import { connect } from 'react-redux'
 import Layout from 'components/Layout';
 
 import './style.css'
-import moment from 'moment'
-import getSectionsFromClasses from 'utils/getSectionsFromClasses';
-import { addHistoricalPayment } from 'actions';
-import { StudentLedgerPage } from 'modules/Student/Single/Fees/StudentLedgerPage';
-import getFilteredPayments from 'utils/getFilteredPayments';
-import Banner from 'components/Banner';
+import moment, { min } from 'moment'
+import getSectionsFromClasses from '../../../utils/getSectionsFromClasses';
+import { addHistoricalPayment } from '../../../actions';
+import { StudentLedgerPage } from '../../Student/Single/Fees/StudentLedgerPage';
+import getFilteredPayments from '../../../utils/getFilteredPayments';
+import { sortYearMonths } from '../../../utils/sortUtils'
+import Banner from '../../../components/Banner';
 
 
 export type historicalPayment = {
@@ -173,12 +174,6 @@ class historicalFee extends Component <propTypes, S > {
 				)
 		}
 
-		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-		
-		// Sorting payments Months names using index of sample array
-		// To avoid sort function negative result (0-1 => -1), added 1 so indexOf("January") will be 0 to 1 and indexOf("February") will be 1 to 2	
-		const sorted_months = Array.from(Months).sort((a,b) => months.indexOf(a) + 1 - months.indexOf(b) + 1)
-	
 		return <Layout history={this.props.history}>
 			<div className="historical-fees form">
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -238,7 +233,7 @@ class historicalFee extends Component <propTypes, S > {
 						<select {...this.former.super_handle(["month_filter"])}>
 							<option value=""> Select Month</option>
 							{
-								sorted_months
+								sortYearMonths(Months)
 									.map(m => <option key={m} value={m}>{m}</option>)
 							}
 						</select>

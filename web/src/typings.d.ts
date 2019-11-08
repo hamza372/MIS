@@ -77,12 +77,13 @@ interface MISSMSHistory {
 
 
 interface MISSettings {
-	shareData: boolean;
-	schoolName: string;
-	schoolAddress: string;
-	schoolPhoneNumber: string;
-	schoolPhoneNumber: string;
-	sendSMSOption: "SIM" | "API";
+	shareData: boolean
+	schoolName: string
+	schoolAddress: string
+	schoolPhoneNumber: string
+	schoolCode: string
+	vouchersPerPage: string
+	sendSMSOption: "SIM" | "API"
 	permissions: {
 		fee: { teacher: boolean };
 		dailyStats: { teacher: boolean };

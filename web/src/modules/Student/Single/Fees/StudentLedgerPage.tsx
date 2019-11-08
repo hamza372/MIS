@@ -33,7 +33,7 @@ export const StudentLedgerPage: React.SFC < StudentLedgerPageProp > = ({ payment
 					<div>{student.ManName}</div>
 				</div>
 				<div className="row info">
-					<label> Class Name:</label>
+					<label> Class:</label>
 					<div>{class_name}</div>
 				</div>
 				<div className="row info">

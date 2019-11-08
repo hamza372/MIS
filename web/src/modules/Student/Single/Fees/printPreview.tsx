@@ -67,37 +67,21 @@ class printPreview extends Component <propTypes, S>{
 		const sections =  getSectionsFromClasses(classes)
 		const curr_class = sections.find(x => x.id === student.section_id ).namespaced_name
 		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(student), this.year(), this.month())
+		
+		let vouchers  = [];
+		
+		for (let i = 0; i <parseInt(settings.vouchersPerPage || "1"); i++) {
+			vouchers.push(<StudentLedgerPage key={i} 
+				payments = {filteredPayments} 
+				settings = {settings}
+				student = {student}
+				class_name = {curr_class}/>)		
+		}
 
 	return	<div className="student-fees-ledger">
-
 				<div className="print button" style={{marginBottom:"10px"}} onClick={() => window.print()}>Print</div>
-
- 			 	<div className="voucher-row">
-				<StudentLedgerPage 
-					payments = {filteredPayments} 
-					settings = {settings}
-					student = {student}
-					class_name = {curr_class}
-				/>
-
-				<div className="row print-voucher">
-					<StudentLedgerPage 
-						payments = {filteredPayments} 
-						settings = {settings}
-						student = {student}
-						class_name = {curr_class}
-					/>
-					<StudentLedgerPage 
-						payments = {filteredPayments} 
-						settings = {settings}
-						student = {student}
-						class_name = {curr_class}
-				/>
-
-				</div>
+				<div className="voucher-row">{vouchers}</div>
 			</div>
-		</div>
-	
   }
 }
 export default connect((state: RootReducerState, { match: { params: { id } } }: { match: { params: { id: string}}}) => ({
