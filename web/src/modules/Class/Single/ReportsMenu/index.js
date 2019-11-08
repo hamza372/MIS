@@ -5,6 +5,7 @@ import Former from 'utils/former'
 import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { smsIntentLink } from 'utils/intent'
 import { logSms } from 'actions'
+import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
 
 
 import './style.css'
@@ -28,7 +29,7 @@ class ClassReportMenu extends Component {
 	}
 
 	logSms = (messages) => {
-		if(messages.length === 0){
+		if (messages.length === 0) {
 			console.log("No Message to Log")
 			return
 		}
@@ -38,26 +39,26 @@ class ClassReportMenu extends Component {
 			type: "EXAM",
 			count: messages.length
 		}
-	
+
 		this.props.logSms(historyObj)
 	}
 
 	render() {
 
-		const { students, exams, curr_class, settings, sms_templates } = this.props
+		const { students, exams, classes, settings, sms_templates } = this.props
+
+		const curr_section = getSectionsFromClasses(classes).filter( section  => section.id === this.props.curr_section_id)[0]
 
 		const relevant_students = Object.values(students)
-			.filter(s => curr_class.sections[s.section_id] !== undefined)
+			.filter(s => s.section_id !== undefined && s.section_id === this.props.curr_section_id)
 			.sort((a, b) => (a.RollNumber || 0) - (b.RollNumber || 0))
-			
+
 		const subjects = new Set()
 		const examSet = new Set()
-		
-		for(const s of relevant_students)
-		{
-			for(const e of Object.values(exams))
-			{ 
-				if(e.section_id === s.section_id){
+
+		for (const s of relevant_students) {
+			for (const e of Object.values(exams)) {
+				if (e.section_id === s.section_id) {
 					subjects.add(e.subject)
 					examSet.add(e.name)
 				}
@@ -72,15 +73,15 @@ class ClassReportMenu extends Component {
 					.replace(/\$NAME/g, student.Name)
 					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilterText))
 			}))
-				
+
 		const url = smsIntentLink({
 			messages,
 			return_link: window.location.href
 		})
 
 
-		return <div className="class-report-menu" style={{width: "100%"}}>
-			<div className="title no-print">Print Result Card for {this.props.curr_class.name}</div>
+		return <div className="class-report-menu" style={{ width: "100%" }}>
+			<div className="title no-print">Print Result Card for {curr_section.namespaced_name}</div>
 			<div className="form no-print">
 				<div className="row">
 					<label>Start Date</label>
@@ -93,27 +94,27 @@ class ClassReportMenu extends Component {
 
 				<div className="row">
 					<label>Exam Name</label>
-					<select {...this.report_former.super_handle(["examFilterText"])}> 
+					<select {...this.report_former.super_handle(["examFilterText"])}>
 						<option value="">Select Exam</option>
 						{
 							Array.from(examSet)
 								.sort((a, b) => a.localeCompare(b))
 								.map(exam => {
-								return <option key={exam} value={exam}>{exam}</option>	
-							})
+									return <option key={exam} value={exam}>{exam}</option>
+								})
 						}
 					</select>
-				</div> 
+				</div>
 				<div className="row">
 					<label>Subject Name</label>
-					<select {...this.report_former.super_handle(["subjectFilterText"])}> 
+					<select {...this.report_former.super_handle(["subjectFilterText"])}>
 						<option value="">Select Subject</option>
 						{
 							Array.from(subjects)
 								.sort((a, b) => a.localeCompare(b))
 								.map(subject => {
-								return <option key={subject} value={subject}>{subject}</option>	
-							})
+									return <option key={subject} value={subject}>{subject}</option>
+								})
 						}
 					</select>
 				</div>
@@ -128,48 +129,49 @@ class ClassReportMenu extends Component {
 			</div>
 
 			<div className="table btn-section">
-				{ settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)}  href={url}>Send Reports using SMS</a> : false }
-				<div className="row print button" onClick={() => window.print()} style={{marginTop: " 10px"}}>Print</div>
+				{settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
+				<div className="row print button" onClick={() => window.print()} style={{ marginTop: " 10px" }}>Print</div>
 			</div>
-			
-			<div className="class-report" style={{height: "100%"}}>
 
-			{
-				//TODO: put in total marks, grade, signature, and remarks.
-				relevant_students.map(s => 
-					<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
-						<StudentMarks 
-							student={s} 
-							exams={this.props.exams} 
-							settings={this.props.settings} 
-							startDate={this.state.report_filters.start} 
-							endDate={this.state.report_filters.end} 
-							examFilter={this.state.report_filters.examFilterText} 
-							subjectFilter={this.state.report_filters.subjectFilterText} 
-							curr_class={this.props.curr_class}
-							logo={this.props.schoolLogo}
-							grades={this.props.grades}
-							dateOrSerial = {this.state.report_filters.dateOrSerial}
-						/>
-					</div>)
-			}
-			
+			<div className="class-report" style={{ height: "100%" }}>
+
+				{
+					//TODO: put in total marks, grade, signature, and remarks.
+					relevant_students.map(s =>
+						<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
+							<StudentMarks
+								student={s}
+								exams={this.props.exams}
+								settings={this.props.settings}
+								startDate={this.state.report_filters.start}
+								endDate={this.state.report_filters.end}
+								examFilter={this.state.report_filters.examFilterText}
+								subjectFilter={this.state.report_filters.subjectFilterText}
+								curr_section={curr_section}
+								logo={this.props.schoolLogo}
+								grades={this.props.grades}
+								dateOrSerial={this.state.report_filters.dateOrSerial}
+							/>
+						</div>)
+				}
+
 			</div>
 
 		</div>
 	}
 }
- 
-export default connect((state, { match: { params: { id } } }) => ({
-	 curr_class: state.db.classes[id],
-	 faculty_id: state.auth.faculty_id,
-	 classes : state.db.classes,
-	 students: state.db.students,
-	 settings: state.db.settings,
-	 exams: state.db.exams,
-	 grades: state.db.settings.exams.grades,
-	 schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
-	 sms_templates: state.db.sms_templates
+
+export default connect((state, { match: { params: { class_id, section_id } } }) => ({
+	curr_class_id: class_id,
+	curr_section_id: section_id,
+	faculty_id: state.auth.faculty_id,
+	classes: state.db.classes,
+	students: state.db.students,
+	settings: state.db.settings,
+	exams: state.db.exams,
+	grades: state.db.settings.exams.grades,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
+	sms_templates: state.db.sms_templates
 }), dispatch => ({
 	logSms: (history) => dispatch(logSms(history))
 }))(ClassReportMenu)

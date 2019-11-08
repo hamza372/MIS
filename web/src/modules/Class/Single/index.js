@@ -23,12 +23,12 @@ return <Layout history={props.history}>
 			{loc === "new" || isPrintPage ? false : 
 				setupPage ? <div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "red" : false}`} to="profile" replace={true}>Profile</Link>
-					<Link className={`button ${loc === "report-menu" ? "purple" : false}`} to="report-menu" replace={true}>Reports</Link>
+					<Link className={`button ${loc === "report-menu" ? "purple" : false}`} to="report-menu" replace={true}>Result Cards</Link>
 				</div> : false}
 
 			<Route path="/class/new" component={Create} />
 			<Route path="/class/:id/profile" component={Create} />
-			<Route path="/class/:id/report-menu" component={ReportMenu} />
+			<Route path="/class/:class_id/:section_id/report-menu" component={ReportMenu} />
 			<Route path="/class/:id/fee-menu" component={FeeMenu} />
 
 		</div>

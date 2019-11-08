@@ -7,6 +7,7 @@ import { smsIntentLink } from 'utils/intent'
 
 import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
+import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import './style.css'
 
@@ -41,7 +42,10 @@ class StudentMarksContainer extends Component {
 		const {match, students, settings, sms_templates, exams, classes } = this.props;
 		const id = match.params.id;
 		const student = students[id];
-		const curr_class = Object.values(classes).find(c => c.sections[student.section_id]!== undefined)		
+
+		const curr_section = getSectionsFromClasses(classes)
+			.filter(section => student.section_id !== undefined && student.section_id === section.id)[0]
+		
 		const subjectSet = new Set(); 
 		const examSet = new Set();   
 
@@ -113,7 +117,7 @@ class StudentMarksContainer extends Component {
 					startDate={startDate} endDate={endDate} 
 					examFilter={this.state.examFilterText} 
 					subjectFilter={this.state.subjectFilterText} 
-					curr_class={curr_class} 
+					curr_section={curr_section} 
 					logo={this.props.schoolLogo}
 					grades={this.props.grades}
 					dateOrSerial = {this.state.dateOrSerial}/>
@@ -163,11 +167,10 @@ export const reportStringForStudent = (student, exams, startDate=0, endDate=mome
 	return report_arr.join('\n');
 }
 
-export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_class, logo, grades, dateOrSerial }) => {
+export const StudentMarks = ({student, exams, settings, startDate=0, endDate=moment.now(), examFilter, subjectFilter, curr_section, logo, grades, dateOrSerial }) => {
 	
 	const start = moment(startDate);
-	const end = moment(endDate);
-	const section_name = curr_class !== undefined ? curr_class.sections[student.section_id].name : "" 
+	const end = moment(endDate); 
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.filter(exam_id => exams[exam_id])
@@ -214,7 +217,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			
 			<div className="student-info">
 				<div className="row">
-					<div><b>Class:</b> {curr_class !== undefined ? curr_class.name + " " + section_name === 'DEFAULT' ? "" : section_name : "______"}</div>
+					<div><b>Class:</b> {curr_section.namespaced_name}</div>
 					<div><b>Session:</b> {moment().format("YYYY")}</div>
 				</div>
 				<div className="row">
