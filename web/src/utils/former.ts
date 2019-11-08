@@ -19,7 +19,7 @@ export default class Former {
 			const value = this._getValue(e);
 			const full_path = [...this.base_path, ...path]
 			if(validate(value)) {
-				this._component.setState((state : any) => Dynamic.put(state, full_path, value));
+				this._component.setState((state : any) => Dynamic.put(state, full_path, value), cb);
 			}
 		}
 	}

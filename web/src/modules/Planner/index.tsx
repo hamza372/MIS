@@ -257,7 +257,8 @@ class Planner extends Component <propTypes, S> {
 					<datalist id="subjects">
 					{
 						[...this.uniqueSubjects().keys()]
-						.map(subj => <option key={subj} value={subj} />)
+						.sort((a: any, b: any) => a.localeCompare(b))
+						.map((subj: any) => <option value={subj} />)
 					}
 					</datalist>
 					<div className="button green" onClick={() => this.addSubject()}> + </div>

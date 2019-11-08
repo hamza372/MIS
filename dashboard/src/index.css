@@ -132,7 +132,10 @@ body {
 			display: flex;
 			flex-direction: row;
 		}
-			
+			.newtable-row div.serial{
+				min-width: 30px;
+				width: fit-content;
+			}
 			.newtable-row .newtable-input {
 				width: 100%;
 				text-align: start;

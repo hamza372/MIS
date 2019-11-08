@@ -29,7 +29,8 @@ const initState : RootReducerState = {
 		assets:{
 			schoolLogo:""
 		},
-		max_limit: -1
+		max_limit: -1,
+		diary: {} as MISDiary
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later

@@ -220,11 +220,25 @@ class StudentFees extends Component <propTypes, S> {
 	componentDidMount() {
 		// loop through fees, check if we have added 
 		const owedPayments = checkStudentDuesReturning(this.student());
-		this.props.addMultiplePayments(owedPayments);
+		
+		if (owedPayments.length > 0) {
+			this.props.addMultiplePayments(owedPayments);
+		}
 
-		if(this.siblings().length > 0) {
-			console.log('adding sibling payments')
-			this.siblings().forEach(s => this.props.addMultiplePayments(checkStudentDuesReturning(s)))
+		if (this.siblings().length > 0) {
+			const sibling_payments = this.siblings()
+				.reduce((agg, curr) => {
+					const curr_student_payments = checkStudentDuesReturning(curr)
+					if (curr_student_payments.length > 0) {
+						return [
+							...agg,
+							...curr_student_payments
+						]
+					}
+					return agg
+				}, [])
+
+			this.props.addMultiplePayments(sibling_payments)
 		}
 	}
 
@@ -310,12 +324,12 @@ class StudentFees extends Component <propTypes, S> {
 			<div className="divider">Payment Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
-				<div>{Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
+				<div>Rs. {Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
 			</div>
 
 			<div className="table row">
 				<label>Total One-Time Fees:</label>
-				<div>{
+				<div>Rs. {
 					Object.values(this.student().fees)
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
@@ -370,7 +384,7 @@ class StudentFees extends Component <propTypes, S> {
 				}
 				<div className="table row last">
 					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-					<div style={style}><b>{numberWithCommas(Math.abs(owed))}</b></div>
+					<div style={style}><b>Rs. {numberWithCommas(Math.abs(owed))}</b></div>
 				</div>
 			</div>
 			<div className="form">
@@ -385,7 +399,7 @@ class StudentFees extends Component <propTypes, S> {
 					<div className="row">
 						<label>Type</label>
 						<select {...this.Former.super_handle(["payment", "type"])}>
-							<option value="SUBMITTED">Payed</option>
+							<option value="SUBMITTED">Paid</option>
 							<option value="FORGIVEN">Need Scholarship</option>
 						</select>
 					</div>

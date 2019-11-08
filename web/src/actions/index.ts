@@ -749,32 +749,16 @@ export const addLogo = (logo_string: string) => (dispatch: Function) => {
 	]))
 }
 
-interface SectionDiary {
-	[subject: string]: {
-		homework: string
-	}
-}
+export const addDiary = (date: string, section_id:string, diary: MISDiary["section_id"]) => (dispatch: Function) => {
 
-export const addDiary = (section_diary: SectionDiary, section_id: string) => (dispatch: Function) => {
-
-	//diary is an object of subject: { homework: ""}
-
-	if (section_id === undefined) {
-		return
-	}
-
-	const merges = Object.entries(section_diary)
-		.map(([s, diary]) => ({
-			path: ["db", "diary", section_id, s],
-			value: diary
+	const merges = Object.entries(diary)
+		.map(([subject, homework]) => ({
+			path: ["db", "diary", date, section_id, subject],
+			value: homework
 		}))
 
-	dispatch(createMerges([...merges,
-		{
-			path: ["db", "diary", "date"],
-			value: new Date().getTime()
-		}
-	]))
+	dispatch(createMerges(merges))
+
 }
 
 export const editPayment = (student: MISStudent, payments: MISStudent["payments"]) => (dispatch: Function) => {

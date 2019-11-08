@@ -18,6 +18,7 @@ defmodule Sarkar.Server do
 			{:_, [
 				{"/ws", Sarkar.Websocket, []},
 				{"/", Sarkar.Server.OK, []},
+				{"/utils/:method", Sarkar.Server.Utils, []},
 				{"/analytics/:type", Sarkar.Server.Analytics, []},
 				{"/dashboard/:type", Sarkar.Server.Dashboard, []}
 			]}
@@ -33,6 +34,19 @@ end
 defmodule Sarkar.Server.OK do
 	def init(req, state) do
 		req = :cowboy_req.reply(200, req)
+		{:ok, req, state}
+	end
+end
+
+defmodule Sarkar.Server.Utils do
+	def init(%{bindings: %{method: "clear"}} = req, state) do
+		req = :cowboy_req.reply(
+			200,
+			%{"Clear-Site-Data" => "cache"},
+			"ok",
+			req
+		)
+
 		{:ok, req, state}
 	end
 end

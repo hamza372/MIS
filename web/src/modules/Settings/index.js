@@ -343,19 +343,21 @@ class Settings extends Component {
 					db.createObjectStore('root-state')
 				}
 			})
+
+			const IdbData = await db.get('root-state','db')
 			
-			if (db) {
+			if (IdbData) {
 				console.log("Exporting From idb")
-				const state = await db.get('root-state', 'db')
+				
 				const a = document.createElement("a")
 				const client_id = localStorage.getItem("client_id")
 	
-				a.href = URL.createObjectURL(new Blob([state], {type: "text/json"}))
-				a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
+				a.href = URL.createObjectURL(new Blob([IdbData], {type: "text/json"}))
+				a.download = `mischool_export_idb_${client_id}_${moment().format("DD-MM-YYYY")}.json`
 				a.click()
 			}
 			else {
-				const db = localStorage.getItem("db")
+				const db = localStorage.getItem("backup")
 
 				if (db) {
 					console.log("Exporting From ls")

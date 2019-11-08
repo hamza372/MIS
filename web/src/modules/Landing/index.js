@@ -64,6 +64,10 @@ class Landing extends Component {
 		window.onscroll = {}
 	}
 
+	getDailyStatsRoute = (stats_type) => {
+		return `/analytics/${stats_type}?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`
+	}
+
 	render() {
 
 		const { logout, user, students, faculty, lastSnapshot, unsyncd, permissions } = this.props;
@@ -248,21 +252,21 @@ class Landing extends Component {
 						<div className="row">
 							<Link 
 								className="box no-underline bg-green" 
-								to = "/analytics/attendance">
+								to = {this.getDailyStatsRoute('attendance')}>
 								<div>{today_attendance.PRESENT}</div>
 								<div>Present</div>
 							</Link>
 
 							<Link 
 								className="box no-underline bg-red"
-								to = "/analytics/attendance">
+								to = {this.getDailyStatsRoute('attendance')}>
 								<div>{today_attendance.ABSENT}</div>
 								<div>Absent</div>
 							</Link>
 
 							<Link 
 								className="box no-underline bg-grey"
-								to = "/analytics/attendance">
+								to = {this.getDailyStatsRoute('attendance')}>
 								<div>{today_attendance.LEAVE + today_attendance.SHORT_LEAVE + today_attendance.SICK_LEAVE + today_attendance.CASUAL_LEAVE }</div>
 								<div>Leave</div>
 							</Link>
@@ -272,21 +276,21 @@ class Landing extends Component {
 						<div className="row">
 							<Link 
 								className="box no-underline bg-green" 
-								to = "/analytics/teacher-attendance">
+								to = {this.getDailyStatsRoute('teacher-attendance')}>
 								<div>{today_teacher_attendance.PRESENT}</div>
 								<div>Present</div>
 							</Link>
 
 							<Link 
 								className="box no-underline bg-red"
-								to = "/analytics/teacher-attendance">
+								to = {this.getDailyStatsRoute('teacher-attendance')}>
 								<div>{today_teacher_attendance.ABSENT}</div>
 								<div>Absent</div>
 							</Link>
 							
 							<Link
 								className="box no-underline bg-grey"
-								to = "/analytics/teacher-attendance">
+								to = {this.getDailyStatsRoute('teacher-attendance')}>
 								<div>{today_teacher_attendance.LEAVE}</div>
 								<div>Leave</div>
 							</Link>
@@ -296,14 +300,14 @@ class Landing extends Component {
 						<div className="row">
 							<Link
 								className="box no-underline bg-blue"
-								to = "/analytics/fees">
+								to = {this.getDailyStatsRoute('fees')}>
 								<div>{numberWithCommas(today_payment)}</div>
 								<div>Rupees</div>
 							</Link>
 
 							<Link
 								className="box no-underline bg-green"
-								to = "/analytics/fees">
+								to = {this.getDailyStatsRoute('fees')}>
 								<div>{today_payment_students}</div>
 								<div>Students</div>
 							</Link>

@@ -333,11 +333,13 @@ class SingleExam extends Component {
 						// 	.filter(([id, student]) => student.section_id === this.section_id())
 						Object.keys(this.state.exam.student_marks || {})
 							.map(xid => this.props.students[xid])
+							.filter( s => s !== undefined && s.id !==undefined)
+							.sort((a, b) => (a.RollNumber !== undefined && b.RollNumber !== undefined) ? (parseFloat(a.RollNumber) - parseFloat(b.RollNumber)) : -1 )
 							.map(student => (
 								<div className="section" key={student.id}>
 									
 									<div className="remove row">
-										<label><Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
+										<label>{student.RollNumber ? student.RollNumber : ""} <Link to={`/student/${student.id}/profile`} >{student.Name}</Link></label>
 										<div className="button red" onClick={() => this.removeStudent(student)}>x</div>
 									</div>
 
@@ -366,6 +368,7 @@ class SingleExam extends Component {
 											<option value="Fail">Fail</option>
 											<option value="Better">Better</option>
 											<option value="Shown Improvement">Shown Improvement</option>
+											<option value="Absent"> Absent</option>
 										</select>
 									</div>
 							</div>
