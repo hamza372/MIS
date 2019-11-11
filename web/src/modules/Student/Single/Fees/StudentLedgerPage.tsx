@@ -77,5 +77,14 @@ export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ paymen
 				<label style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
 				<div style={{ color: owed <= 0 ? "#5ECDB9" : "#FC6171" }}><b>Rs. {numberWithCommas( Math.abs(owed))}</b></div>
 			</div>
+			<div className="row voucher-signature line">
+				<div>___________________</div>
+				<div>___________________</div>
+			</div>	
+			<div className="row voucher-signature">
+				<div>Principal Signature</div>
+				<div>Accountant Signature</div>
+			</div>
 	</div>
+	
 }

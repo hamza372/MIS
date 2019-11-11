@@ -52,4 +52,10 @@
 			width: 100%;
 		}
 
+		.voucher-signature div {
+			font-size: 0.5rem;
+		}
+		.voucher-signature .line {
+			margin-bottom: 2mm;
+		}
 	}

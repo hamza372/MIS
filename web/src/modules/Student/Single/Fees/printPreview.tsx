@@ -84,10 +84,6 @@ class printPreview extends Component <propTypes, S>{
 	return	<div className="student-fees-ledger">
 				<div className="print button" style={{marginBottom:"10px"}} onClick={() => window.print()}>Print</div>
 				<div className="voucher-row">{vouchers}</div>
-				<div className="row">
-					<div>Principal Signature</div>
-					<div>Accountant Signature</div>
-				</div>
 			</div>
   }
 }
