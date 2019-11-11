@@ -171,14 +171,14 @@ class FeeAnalytics extends Component<propTypes, S> {
 	background_calculation: NodeJS.Timeout
 
 	constructor(props: propTypes) {
-	  	super(props)
+		super(props)
 	
 	 	 const parsed_query = queryString.parse(this.props.location.search);
 
 		const sd_param = parsed_query["?start_date"] || ""
 		const ed_param = parsed_query["end_date"] || ""
 		const period = parsed_query["period"] || ""
-
+		
 		const start_date =  sd_param !== "" ? moment(sd_param, "MM-DD-YYYY").unix() * 1000 : moment().subtract(1,'year').unix() * 1000
 		const end_date = ed_param !=="" ? moment(ed_param, "MM-DD-YYYY").unix() * 1000 : moment().unix() * 1000
 
@@ -322,14 +322,13 @@ class FeeAnalytics extends Component<propTypes, S> {
 			const sid = student.id;
 
 			i += 1;
-			console.log('processing student', i)
 
 			const debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
 			
 			for(const pid in student.payments || {}) {
 				const payment = student.payments[pid];
 
-				if(!( moment(payment.date).isSameOrAfter(temp_sd) && moment(payment.date).isSameOrBefore(temp_ed) )){
+				if (!(moment(payment.date).isSameOrAfter(temp_sd,"day") && moment(payment.date).isSameOrBefore(temp_ed,"day"))) {
 					continue
 				}
 
@@ -479,7 +478,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 				<input
 					type="checkbox"
 					{...this.former.super_handle([ "chartFilter", "total" ])}
-				/> 
+				/>
 				Total
 			</div>
 		

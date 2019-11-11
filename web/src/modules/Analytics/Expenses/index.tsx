@@ -240,8 +240,8 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 					const inc_month = moment(payment.date).format(period_format)
 
 					if (payment.type === "SUBMITTED"
-						&& moment(payment.date).isSameOrAfter(start_date)
-						&& moment(payment.date).isSameOrBefore(end_date)) {
+						&& moment(payment.date).isSameOrAfter(start_date,"day")
+						&& moment(payment.date).isSameOrBefore(end_date,"day")) {
 						collective_obj[inc_month] = collective_obj[inc_month] ?
 							{
 								income: collective_obj[inc_month].income + payment.amount,
@@ -262,8 +262,8 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 				j += 1;
 
 				if (expense.type === "PAYMENT_GIVEN"
-					&& moment(expense.date).isSameOrAfter(start_date)
-					&& moment(expense.date).isSameOrBefore(end_date)) {
+					&& moment(expense.date).isSameOrAfter(start_date,"day")
+					&& moment(expense.date).isSameOrBefore(end_date,"day")) {
 					const inc_month = moment(expense.date).format(period_format)
 					const curr_amount = typeof (expense.amount) === "string" ? parseFloat(expense.amount) : expense.amount
 
