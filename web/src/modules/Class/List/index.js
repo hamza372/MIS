@@ -9,35 +9,46 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 
 
-const ClassItem = (section) => 
-	<Link key={section.id} to={`/class/${section.class_id}/${section.id}/${section.forwardTo}`} className="">
-		{section.namespaced_name}
-	</Link>
+const ClassItem = (c) => {
+	return <Link key={c.id} to={`/class/${c.id}/${c.forwardTo}`}>
+			{c.name}
+		</Link>
+}
+
+const SectionItem = (section) => {
+	return <Link key={section.id} to={`/class/${section.class_id}/${section.id}/${section.forwardTo}`}>
+			{section.namespaced_name}
+		</Link>
+}
 
 export const ClassListModule = ({ classes, forwardTo }) => {
 
-	const items = getSectionsFromClasses(classes)
+	let items = Object.values(classes)
 		.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
-		.map(section => ({...section, forwardTo}))
+		.map(c => ({...c, forwardTo}))
 	
 	let create = '/class/new'
 
 	if(forwardTo === 'fee-menu'){
 		create = ''
 	}
+
 	if(forwardTo === 'report-menu'){
 		create = '';
+		items = getSectionsFromClasses(classes)
+			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
+			.map(section => ({...section, forwardTo}))
 	}
 		
 	return <div className="class-module">
-		<div className="title">Classes/Sections</div>
+		<div className="title">Classes</div>
 		
 		<List
 			items={items}
-			Component={ClassItem}
+			Component={ forwardTo === "report-menu" ? SectionItem : ClassItem}
 			create={create} 
 			createText={"Add new Class"} 
-			toLabel={section => section.name} 
+			toLabel={c => {return c.name !== undefined ? c.name : c.namespaced_name}} 
 			/>
 	</div>
 }
