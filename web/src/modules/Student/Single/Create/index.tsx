@@ -591,21 +591,22 @@ class SingleStudent extends Component<propTypes, S> {
 							<option value="female">Female</option>
 						</select>
 					</div>
-
-					<div className="row">
-						<label>Blood Type</label>
-						<select {...this.former.super_handle(["BloodType"])}>
-							<option value="">Select Blood Type</option>
-							<option value="A+">A Positive</option>
-							<option value="A-">A Negative</option>
-							<option value="B+">B Positive</option>
-							<option value="B-">B Negative</option>
-							<option value="AB+">AB Positive</option>
-							<option value="AB-">AB Negative</option>
-							<option value="O+">O Positive</option>
-							<option value="O-">O Negative</option>
-						</select>
-					</div>
+				
+					{ !prospective ? <div className="row">
+							<label>Blood Type</label>
+							<select {...this.former.super_handle(["BloodType"])}>
+								<option value="">Select Blood Type</option>
+								<option value="A+">A Positive</option>
+								<option value="A-">A Negative</option>
+								<option value="B+">B Positive</option>
+								<option value="B-">B Negative</option>
+								<option value="AB+">AB Positive</option>
+								<option value="AB-">AB Negative</option>
+								<option value="O+">O Positive</option>
+								<option value="O-">O Negative</option>
+							</select>
+						</div>
+					: false}
 
 
 					<div className="divider">Family & Contact Information</div>
