@@ -290,7 +290,7 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 
 			for (const [date, record] of Object.entries(student.attendance)) {
 
-				if (!(moment(date).isSameOrAfter(temp_sd) && moment(date).isSameOrBefore(temp_ed))) {
+				if (!(moment(date).isSameOrAfter(temp_sd,"day") && moment(date).isSameOrBefore(temp_ed,"day"))) {
 					continue
 				}
 
