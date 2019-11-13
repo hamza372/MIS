@@ -401,9 +401,9 @@ class FeeAnalytics extends Component<propTypes, S> {
 	const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
 	const items = Object.values(this.state.total_student_debts)
-		.filter(({student, debt}) => (student.id && student.Name) &&
+		.filter(({student, debt}) => student.id !==undefined && student.Phone !== undefined && (student.tags === undefined || !student.tags["PROSPECTIVE"]) &&
 			(this.state.classFilter === "" || student.section_id === this.state.classFilter ) &&
-			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase())
+			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()) && this.calculateDebt(debt) < 0
 		)
 		.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 
@@ -516,8 +516,11 @@ class FeeAnalytics extends Component<propTypes, S> {
 		</div>
 		{
 			items.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
-					<Link to={`/student/${student.id}/payment`}>{ familyId ? familyId : student.Name}</Link>
-					<div>{ student.Phone }</div>
+					{
+						familyId ? <Link to={`/families/${familyId}`}>{familyId}(F)</Link> : 
+							<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
+					}
+					<div>{ student.Phone ? student.Phone : "-" }</div>
 					<div  style={ this.calculateDebt(debt) >= 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
 				</div>)
 		}
