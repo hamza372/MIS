@@ -39,10 +39,6 @@ class ToFeeDefaulters extends Component {
 		clearTimeout(this.background_calculation)
 
 		let i = 0;
-		let total_paid = 0;
-		let total_owed = 0;
-		let total_forgiven = 0;
-		let total_scholarship = 0;
 		
 		const total_student_debts = {}
 		const student_list = Object.values(this.props.students)
@@ -76,11 +72,6 @@ class ToFeeDefaulters extends Component {
 					debt[payment.type] += amount
 				}
 			}
-
-			total_paid += debt.SUBMITTED;
-			total_owed += debt.OWED;
-			total_forgiven += debt.FORGIVEN; 	
-			total_scholarship += debt.SCHOLARSHIP;
 
 			if(student.FamilyID) {
 				const existing = total_student_debts[student.FamilyID]
