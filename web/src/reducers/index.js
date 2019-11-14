@@ -277,7 +277,14 @@ const rootReducer = (state, action) => {
 				connected: state.connected
 			}
 		}
-			
+		
+		case "GETTING_DB":
+		{
+			return {
+				...state,
+				initialized: false
+			}
+		}
 		case LOGIN_SUCCEED:
 		{
 			const auth = {
@@ -295,6 +302,7 @@ const rootReducer = (state, action) => {
 					...state.db,
 					...action.db
 				},
+				initialized: true,
 				lastSnapshot: new Date().getTime(),
 				acceptSnapshot: true
 			}

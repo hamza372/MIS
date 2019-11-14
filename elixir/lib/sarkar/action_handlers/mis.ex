@@ -1,13 +1,29 @@
 defmodule Sarkar.ActionHandler.Mis do
 
-	def handle_action(%{"type" => "LOGIN", "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password}}, state) do
+	def handle_action(%{ "type" => "LOGIN",  "payload" => %{"school_id" => school_id, "client_id" => client_id, "password" => password }}, state) do
 		case Sarkar.Auth.login({school_id, client_id, password}) do
 			{:ok, token} ->
-				start_school(school_id)
-				register_connection(school_id, client_id)
-				db = Sarkar.School.get_db(school_id)
-				{:reply, succeed(%{token: token, db: db}), %{school_id: school_id, client_id: client_id}}
-			{:error, message} -> {:reply, fail(message), %{}}
+
+				parent = self()
+
+				spawn fn ->
+					start_school(school_id)
+					register_connection(school_id, client_id)
+
+					db = Sarkar.School.get_db(school_id)
+
+					send(parent, {:broadcast, %{
+						"type" => "LOGIN_SUCCEED",
+						"db" => db,
+						"token" => token
+					}})
+
+				end
+
+				{:reply, succeed(%{status: "SUCCESS"}), "SUCCESS"}
+
+			{:error, message} -> 
+				{:reply, fail(message), %{}}
 		end
 	end
 
