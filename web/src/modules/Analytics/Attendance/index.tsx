@@ -6,6 +6,7 @@ import queryString from 'querystring'
 import { PrintHeader } from 'components/Layout'
 import Former from "utils/former"
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import { ProgressBar } from 'components/ProgressBar'
 
 import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'recharts'
 
@@ -130,7 +131,7 @@ interface S {
 	start_date: number;
 	end_date: number;
 	isStudentAttendanceFilter: boolean;
-
+	percentage: number
 	loading: boolean;
 	totals: {
 		PRESENT: number;
@@ -174,6 +175,7 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 				leave: true,
 				percentage: true
 			},
+			percentage: 0,
 			classFilter: "",
 			selected_section_id: "",
 			selected_period: period !== "" ? period.toString() : "Monthly",
@@ -258,7 +260,12 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 
 		const reducify = () => {
 
-			console.log('processing student ', i)
+			const interval = Math.floor(students_list.length/10)
+			if (i % interval === 0) {
+				this.setState({
+					percentage: (i / students_list.length) * 100
+				})
+			}
 
 			if (i >= students_list.length) {
 				// done
@@ -266,7 +273,8 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 					loading: false,
 					totals,
 					attendance,
-					student_attendance
+					student_attendance,
+					percentage: 0
 				})
 
 				return
@@ -330,19 +338,17 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 			.sort(([, { ABSENT: a1 }], [, { ABSENT: a2 }]) => a2 - a1)
 
 
-		return <div className="attendance-analytics">
-
+		return this.state.loading ? <ProgressBar percentage={this.state.percentage}/> :<div className = "attendance-analytics">
+				
 			<PrintHeader
 				settings={settings}
 				logo={schoolLogo}
 			/>
 
-			{this.state.loading && <div>Calculating...</div>}
-
-			<div className="table row">
-				<label>Total Present</label>
-				<div>{totals.PRESENT}</div>
-			</div>
+		<div className="table row">
+			<label>Total Present</label>
+			<div>{totals.PRESENT}</div>
+		</div>
 			<div className="table row">
 				<label>Total Absent</label>
 				<div>{totals.ABSENT}</div>
@@ -360,7 +366,8 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 				<div className="button green" onClick={() => this.setState({ isStudentAttendanceFilter: !this.state.isStudentAttendanceFilter })}>Show Filters
 			</div>
 			</div>
-			{this.state.isStudentAttendanceFilter && <div className="no-print section form">
+			{
+			this.state.isStudentAttendanceFilter && <div className="no-print section form">
 				<div className="row">
 					<label> Start Date </label>
 					<input type="date"
@@ -396,7 +403,7 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 			</div>}
 
 
-			<div className="divider">{this.state.selected_period} Attendance</div>
+		<div className="divider">{this.state.selected_period} Attendance</div>
 
 			<div className="no-print">
 				<AttendanceChart

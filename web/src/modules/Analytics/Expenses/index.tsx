@@ -6,6 +6,7 @@ import queryString from 'querystring'
 import { PrintHeader } from 'components/Layout'
 import Former from 'utils/former'
 import { numberWithCommas } from 'utils/numberWithCommas'
+import { ProgressBar } from 'components/ProgressBar'
 
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from "recharts"
 
@@ -106,6 +107,7 @@ interface S {
 	end_date: number;
 
 	loading: boolean;
+	percentage: number
 }
 
 interface routeInfo {
@@ -144,7 +146,8 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 			end_date,
 			is_payment_filter: false,
 			selected_period: period !== "" ? period.toString() : "Monthly",
-			loading: true
+			loading: true,
+			percentage: 0
 		}
 		this.former = new Former(this, [])
 	}
@@ -220,12 +223,20 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 
 		const reducify = () => {
 
+			const interval = Math.floor(s_length/10)
+			if (i % interval === 0) {
+				this.setState({
+					percentage: (i / s_length) * 100
+				})
+			}
+
 			if (i >= s_length && j >= e_length) {
 				return this.setState({
 					loading: false,
 					collective_obj,
 					total_income,
-					total_expense
+					total_expense,
+					percentage: 0
 				})
 			}
 
@@ -291,13 +302,11 @@ class ExpenseAnalytics extends Component<propTypes, S> {
 
 		const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
-		return <div className="expense-analytics">
+		return this.state.loading ? <ProgressBar percentage={this.state.percentage} /> : <div className="expense-analytics">
 
 			<PrintHeader
 				settings={settings}
 				logo={schoolLogo} />
-
-			{this.state.loading && <div> Calculating... </div>}
 
 			<div className="divider">Payments over Time</div>
 

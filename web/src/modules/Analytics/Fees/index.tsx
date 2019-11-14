@@ -8,10 +8,12 @@ import Former from 'utils/former'
 import checkDuesAsync from 'utils/calculateDuesAsync'
 import { numberWithCommas } from 'utils/numberWithCommas'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
+import { ProgressBar } from 'components/ProgressBar'
 import { chunkify } from 'utils/chunkify'
 import { OutstandingFeePrintableList } from 'components/Printable/Fee/list'
 
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts'
+
 
 interface Filters {
 	total: boolean;
@@ -136,6 +138,7 @@ interface S {
 	end_date: number;
 
 	loading: boolean;
+	percentage: number;
 	payments: ChartProps["payments"];
 	total_student_debts: StudentDebtMap;
 	total_debts: {
@@ -197,6 +200,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 			end_date,
 
 			loading: true,
+			percentage: 0,
 			payments: {},
 			total_student_debts: {},
 			total_debts: {
@@ -305,6 +309,13 @@ class FeeAnalytics extends Component<propTypes, S> {
 
 		const reducify = () => {
 
+			const interval = Math.floor(student_list.length/10)
+			if (i % interval === 0) {
+				this.setState({
+					percentage: (i / student_list.length) * 100
+				})
+			}
+
 			// in loop
 			if(i >= student_list.length) {
 				// we're done
@@ -314,7 +325,8 @@ class FeeAnalytics extends Component<propTypes, S> {
 					loading: false,
 					payments,
 					total_student_debts,
-					total_debts
+					total_debts,
+					percentage: 0
 				})
 			}
 
@@ -409,8 +421,8 @@ class FeeAnalytics extends Component<propTypes, S> {
 
 	const sections = Object.values(getSectionsFromClasses(this.props.classes))
 
-	return <div className="fees-analytics">
-		
+	return this.state.loading ? <ProgressBar percentage={this.state.percentage} /> : <div className="fees-analytics">
+
 		<div className="no-print" style={{ marginRight:"10px" }}>
 			<div className="divider">Payments over Time</div>
 

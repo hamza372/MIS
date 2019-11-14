@@ -63,6 +63,10 @@ class SchoolLogin extends Component {
 			return <div>Connecting.....</div>
 		}
 
+		if (!this.props.initialized) {
+			return <div style={{ fontSize:"25px"}}> Downloading Database ...</div>
+		}
+
 		return <Layout history={this.props.history}>
 			<div className="school-login">
 				<div className="title">Verify your School</div>
@@ -87,7 +91,8 @@ class SchoolLogin extends Component {
 
 export default connect(state => ({
 	connected: state.connected,
-	auth: state.auth
+	auth: state.auth,
+	initialized: state.initialized
 }), dispatch => ({
 	login: (school_id, password) => dispatch(createSchoolLogin(school_id, password))
 }))(withRouter(SchoolLogin))
