@@ -5,6 +5,8 @@ import { createLogin } from 'actions'
 
 import Former from 'utils/former'
 import Layout from 'components/Layout'
+import eyeOpen from './icons/eye_open.svg'
+import eyeClosed from './icons/eye_closed.svg'
 
 import './style.css'
 import { openDB } from 'idb'
@@ -22,11 +24,15 @@ class Login extends Component {
 				username: "",
 				name: "",
 				password: ""
-			}
+			},
+			showPassword: false
 		}
 
 		this.former = new Former(this, ["login"]);
 	}
+
+	getPasswordInputType = () => this.state.showPassword ? "text" : "password"
+	getShowHideIcon = () => this.state.showPassword ? eyeOpen : eyeClosed
 
 	onLogin = () => {
 		this.props.login(this.state.login)
@@ -135,7 +141,21 @@ class Login extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="text" {...this.former.super_handle(["password"])} placeholder="Password" autoCapitalize="off" onKeyDown={this.handleKeyDown}/>
+						<div style={{ display:"flex" }}>
+							<input
+								type={`${this.getPasswordInputType()}`}
+								{...this.former.super_handle(["password"])}
+								placeholder="Password" autoCapitalize="off"
+								onKeyDown={this.handleKeyDown}
+								style={{ borderRadius:"5px 0px 0px 5px"}}
+							/>
+							<div className="show-hide-container">
+								<img
+									src={this.getShowHideIcon()}
+									onClick={() => this.setState({ showPassword: !this.state.showPassword })} />
+
+							</div>
+						</div>
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>

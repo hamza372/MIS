@@ -4,7 +4,7 @@ import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
-import downloadIcon from './download.svg'
+import downloadIcon from './icons/download.svg'
 
 class SchoolLogin extends Component {
 
