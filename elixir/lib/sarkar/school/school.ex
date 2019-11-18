@@ -14,7 +14,8 @@ defmodule Sarkar.School do
 		GenServer.start_link(
 			__MODULE__,
 			{school_id, writes, db},
-			name: {:via, Registry, {Sarkar.SchoolRegistry, school_id}})
+			name: via(school_id)
+		)
 	end
 
 	def init_trial (school_id) do
