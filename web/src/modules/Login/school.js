@@ -4,6 +4,7 @@ import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
+import downloadIcon from './download.svg'
 
 class SchoolLogin extends Component {
 
@@ -64,7 +65,10 @@ class SchoolLogin extends Component {
 		}
 
 		if (!this.props.initialized) {
-			return <div style={{ fontSize:"25px"}}> Downloading Database ...</div>
+			return <div className="downloading">
+				<img className="bounce" src={downloadIcon} />
+				<div style={{ marginTop: "10px" }}>Downloading Database</div>
+			</div>
 		}
 
 		return <Layout history={this.props.history}>
