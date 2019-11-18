@@ -6,24 +6,36 @@ defmodule Sarkar.ActionHandler.Mis do
 
 				parent = self()
 
-				spawn fn ->
-					start_school(school_id)
-					register_connection(school_id, client_id)
+				start_school(school_id)
+				register_connection(school_id, client_id)
 
+				spawn fn ->
 					db = Sarkar.School.get_db(school_id)
 
 					send(parent, {:broadcast, %{
 						"type" => "LOGIN_SUCCEED",
 						"db" => db,
-						"token" => token
+						"token" => token,
+						"school_id" => school_id
 					}})
-
 				end
 
-				{:reply, succeed(%{status: "SUCCESS"}), "SUCCESS"}
+				{:reply, succeed(%{status: "SUCCESS"}), %{school_id: school_id, client_id: client_id}}
 
 			{:error, message} -> 
 				{:reply, fail(message), %{}}
+		end
+	end
+
+	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
+		case Sarkar.Auth.verify({school_id, client_id, token}) do
+			{:ok, _} ->
+				start_school(school_id)
+				register_connection(school_id, client_id)
+				{:reply, succeed(), %{school_id: school_id, client_id: client_id}}
+			{:error, msg} ->
+				IO.puts "#{school_id} has error #{msg}"
+				{:reply, fail(), state}
 		end
 	end
 
@@ -39,18 +51,6 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:ok, resp} = Sarkar.Slack.send_alert(alert_message)
 
 		{:reply, succeed(), state}
-	end
-
-	def handle_action(%{"type" => "VERIFY", "payload" => %{"school_id" => school_id, "token" => token, "client_id" => client_id}}, state) do
-		case Sarkar.Auth.verify({school_id, client_id, token}) do
-			{:ok, _} ->
-				start_school(school_id)
-				register_connection(school_id, client_id)
-				{:reply, succeed(), %{school_id: school_id, client_id: client_id}}
-			{:error, msg} ->
-				IO.puts "#{school_id} has error #{msg}"
-				{:reply, fail(), state}
-		end
 	end
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "lastSnapshot" => last_sync_date}, %{school_id: school_id, client_id: client_id} = state) do
@@ -69,6 +69,7 @@ defmodule Sarkar.ActionHandler.Mis do
 
 		changes = payload |> Map.keys |> Enum.count 
 		IO.puts "school #{school_id} has not authenticated the connection, and is trying to make #{changes} changes."
+		IO.inspect state
 
 		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end
