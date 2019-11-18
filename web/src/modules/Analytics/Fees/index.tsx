@@ -8,10 +8,12 @@ import Former from 'utils/former'
 import checkDuesAsync from 'utils/calculateDuesAsync'
 import { numberWithCommas } from 'utils/numberWithCommas'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
+import { ProgressBar } from 'components/ProgressBar'
 import { chunkify } from 'utils/chunkify'
 import { OutstandingFeePrintableList } from 'components/Printable/Fee/list'
 
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts'
+
 
 interface Filters {
 	total: boolean;
@@ -136,6 +138,7 @@ interface S {
 	end_date: number;
 
 	loading: boolean;
+	percentage: number;
 	payments: ChartProps["payments"];
 	total_student_debts: StudentDebtMap;
 	total_debts: {
@@ -197,6 +200,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 			end_date,
 
 			loading: true,
+			percentage: 0,
 			payments: {},
 			total_student_debts: {},
 			total_debts: {
@@ -305,6 +309,13 @@ class FeeAnalytics extends Component<propTypes, S> {
 
 		const reducify = () => {
 
+			const interval = Math.floor(student_list.length/10)
+			if (i % interval === 0) {
+				this.setState({
+					percentage: (i / student_list.length) * 100
+				})
+			}
+
 			// in loop
 			if(i >= student_list.length) {
 				// we're done
@@ -314,7 +325,8 @@ class FeeAnalytics extends Component<propTypes, S> {
 					loading: false,
 					payments,
 					total_student_debts,
-					total_debts
+					total_debts,
+					percentage: 0
 				})
 			}
 
@@ -401,16 +413,16 @@ class FeeAnalytics extends Component<propTypes, S> {
 	const period_format = this.state.selected_period === "Daily" ? "DD/MM/YYYY" : "MM/YYYY"
 
 	const items = Object.values(this.state.total_student_debts)
-		.filter(({student, debt}) => (student.id && student.Name) &&
+		.filter(({student, debt}) => student.id !==undefined && student.Phone !== undefined && (student.tags === undefined || !student.tags["PROSPECTIVE"]) &&
 			(this.state.classFilter === "" || student.section_id === this.state.classFilter ) &&
-			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase())
+			student.Name.toUpperCase().includes(this.state.filterText.toUpperCase()) && this.calculateDebt(debt) < 0
 		)
 		.sort((a, b) => this.calculateDebt(a.debt) - this.calculateDebt(b.debt))
 
 	const sections = Object.values(getSectionsFromClasses(this.props.classes))
 
-	return <div className="fees-analytics">
-		
+	return this.state.loading ? <ProgressBar percentage={this.state.percentage} /> : <div className="fees-analytics">
+
 		<div className="no-print" style={{ marginRight:"10px" }}>
 			<div className="divider">Payments over Time</div>
 
@@ -516,8 +528,11 @@ class FeeAnalytics extends Component<propTypes, S> {
 		</div>
 		{
 			items.map(({ student, debt, familyId }) => <div className="table row" key={student.id}>
-					<Link to={`/student/${student.id}/payment`}>{ familyId ? familyId : student.Name}</Link>
-					<div>{ student.Phone }</div>
+					{
+						familyId ? <Link to={`/families/${familyId}`}>{familyId}(F)</Link> : 
+							<Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
+					}
+					<div>{ student.Phone ? student.Phone : "-" }</div>
 					<div  style={ this.calculateDebt(debt) >= 1 ? {color:"#5ecdb9"} : {color:"#fc6171" } } > {numberWithCommas(-1 * this.calculateDebt(debt))}</div>
 				</div>)
 		}

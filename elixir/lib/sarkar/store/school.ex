@@ -76,41 +76,49 @@ defmodule Sarkar.Store.School do
 
 		# now just generate the sql queries for each one of these segments
 
+		chunk_size = 100
+
 		results = Postgrex.transaction(Sarkar.School.DB, fn(conn) -> 
 
 			flattened_db_sequence
 			|> Enum.map(fn %{"type" => type, "mutations" => muts} -> 
-				case type do
-					"MERGE" -> 
-						gen_value_strings_db = 1..trunc(Enum.count(muts))
-							|> Enum.map(fn i ->
-								x = (i - 1) * 4 + 1
-								"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})" 
-							end)
 
-						query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
-							VALUES #{Enum.join(gen_value_strings_db, ",")}
-							ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+				muts
+				|> Enum.chunk_every(chunk_size)
+				|> Enum.map(fn chunked_muts ->
 
-						arguments = muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
-						{:ok, res }= Postgrex.query(conn, query_string, arguments)
-						res
+					case type do
+						"MERGE" -> 
+							gen_value_strings_db = 1..trunc(Enum.count(chunked_muts))
+								|> Enum.map(fn i ->
+									x = (i - 1) * 4 + 1
+									"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3})" 
+								end)
 
-					"DELETE" -> 
-						{query_section, arguments} = muts 
-							|> Enum.with_index()
-							|> Enum.map(fn {[_, path, _, _], index} -> 
-								{ "(path LIKE $#{index + 2})", [path <> "%"] }
-							end)
-							|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
-								[ query | queries ],
-								args ++ arg
-							} end)
-						
-						query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
-						{:ok, res} = Postgrex.query(conn, query_string, [school_id | arguments])
-						res
-				end
+							query_string = "INSERT INTO flattened_schools (school_id, path, value, time)
+								VALUES #{Enum.join(gen_value_strings_db, ",")}
+								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
+
+							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
+							{:ok, res }= Postgrex.query(conn, query_string, arguments)
+							res
+
+						"DELETE" -> 
+							{query_section, arguments} = chunked_muts 
+								|> Enum.with_index()
+								|> Enum.map(fn {[_, path, _, _], index} -> 
+									{ "(path LIKE $#{index + 2})", [path <> "%"] }
+								end)
+								|> Enum.reduce({[], []}, fn {query, arg}, {queries, args} -> {
+									[ query | queries ],
+									args ++ arg
+								} end)
+							
+							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
+							{:ok, res} = Postgrex.query(conn, query_string, [school_id | arguments])
+							res
+					end
+				end)
 			end)
 		end)
 

@@ -8,11 +8,13 @@ class ToFeeDefaulters extends Component {
 	super(props)
 	
 	this.state = {
-			text: "",
+		text: "",
+		total_student_debts: {}
 	}
-
+	
+	this.background_calculation = null
 	this.former = new former(this, [])
-	}
+}
 
 	logSms = (messages) =>{
 		if(messages.length === 0){
@@ -29,30 +31,103 @@ class ToFeeDefaulters extends Component {
 
 		this.props.logSms(historyObj)
 	}
-	
-	render() {
 
-	const { students, sendBatchMessages, smsOption } = this.props;
-	
-	const messages = Object.values(students)
-	.filter(student => 
-			student.Phone && 
-			(student.tags === undefined || !student.tags["PROSPECTIVE"]) && 
-			Object.values(student.payments)
-				.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0) > 0)
-	.reduce((agg,student)=> {
-		const index  = agg.findIndex(s => s.number === student.Phone)		
-		if(index >= 0 ){
-			return agg
+	calculateDebt = ({ SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP }) => (SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED) * -1;
+
+	calculate = () => {
+
+		clearTimeout(this.background_calculation)
+
+		let i = 0;
+		
+		const total_student_debts = {}
+		const student_list = Object.values(this.props.students)
+
+		const reducify = () => {
+
+			// in loop
+			if(i >= student_list.length) {
+				return this.setState({
+					total_student_debts
+				})
+			}
+
+			const student = student_list[i];
+			const sid = student.id;
+
+			i += 1;
+
+			const debt = { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
+			
+			for(const pid in student.payments || {}) {
+				const payment = student.payments[pid];
+
+				// some payment.amount has type string
+				const amount =  typeof(payment.amount) === "string" ? parseFloat(payment.amount) : payment.amount
+				
+				// for 'scholarship', payment has also type OWED and negative amount
+				if(amount < 0) {
+					debt["SCHOLARSHIP"] += Math.abs(amount)
+				} else {
+					debt[payment.type] += amount
+				}
+			}
+
+			if(student.FamilyID) {
+				const existing = total_student_debts[student.FamilyID]
+				if(existing) {
+					total_student_debts[student.FamilyID] = {
+						student,
+						debt: {
+							OWED: existing.debt.OWED + debt.OWED,
+							SUBMITTED: existing.debt.SUBMITTED + debt.SUBMITTED,
+							FORGIVEN: existing.debt.FORGIVEN + debt.FORGIVEN,
+							SCHOLARSHIP: existing.debt.SCHOLARSHIP + debt.SCHOLARSHIP
+						},
+						familyId: student.FamilyID
+					}
+				} else {
+					total_student_debts[student.FamilyID] = { student, debt, familyId: student.FamilyID }
+				}
+			} else {
+				total_student_debts[sid] = { student, debt };
+			}
+
+			this.background_calculation = setTimeout(reducify, 0);
 		}
 
-		return [...agg,{
-			number: student.Phone,
-			text : this.state.text
-		}]
-	}, [])
+		this.background_calculation = setTimeout(reducify, 0)
+	}
 
-	console.log(messages)
+	componentDidMount() {
+		// calculating students debt
+		this.calculate()
+	}
+
+	render() {
+
+	const { sendBatchMessages, smsOption } = this.props;
+	
+	const messages = Object.values(this.state.total_student_debts)
+		.filter(({student, debt}) => {
+			return student.id !==undefined && student.Phone !== undefined &&
+				(student.tags === undefined || !student.tags["PROSPECTIVE"]) &&
+				this.calculateDebt(debt) > 0
+		})
+		.reduce((agg, {student}) => {
+
+			const index  = agg.findIndex(s => s.number === student.Phone)		
+			
+			if(index >= 0 ) {
+				return agg
+			}
+
+			return [...agg, {
+				number: student.Phone,
+				text : this.state.text
+			}]
+		}, [])
+
 	return (
 			<div>
 				<div className="row">

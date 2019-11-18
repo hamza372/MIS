@@ -4,6 +4,7 @@ import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
+import downloadIcon from './download.svg'
 
 class SchoolLogin extends Component {
 
@@ -63,6 +64,13 @@ class SchoolLogin extends Component {
 			return <div>Connecting.....</div>
 		}
 
+		if (!this.props.initialized) {
+			return <div className="downloading">
+				<img className="bounce" src={downloadIcon} />
+				<div style={{ marginTop: "10px" }}>Downloading Database</div>
+			</div>
+		}
+
 		return <Layout history={this.props.history}>
 			<div className="school-login">
 				<div className="title">Verify your School</div>
@@ -87,7 +95,8 @@ class SchoolLogin extends Component {
 
 export default connect(state => ({
 	connected: state.connected,
-	auth: state.auth
+	auth: state.auth,
+	initialized: state.initialized
 }), dispatch => ({
 	login: (school_id, password) => dispatch(createSchoolLogin(school_id, password))
 }))(withRouter(SchoolLogin))
