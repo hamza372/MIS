@@ -4,7 +4,9 @@ import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
-import downloadIcon from './download.svg'
+import downloadIcon from './icons/download.svg'
+import eyeOpen from './icons/eye_open.svg'
+import eyeClosed from './icons/eye_closed.svg'
 
 class SchoolLogin extends Component {
 
@@ -15,11 +17,15 @@ class SchoolLogin extends Component {
 			loading: false,
 			school: "",
 			password: "",
-			errorMessage: ""
+			errorMessage: "",
+			showPassword: false
 		}
 
 		this.former = new Former(this, [])
 	}
+
+	getPasswordInputType = () => this.state.showPassword ? "text" : "password"
+	getShowHideIcon = () => this.state.showPassword ? eyeOpen : eyeClosed
 
 	onLogin = () => {
 		this.props.login(this.state.school, this.state.password);
@@ -81,7 +87,20 @@ class SchoolLogin extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<input type="password" {...this.former.super_handle(["password"])} onKeyDown={this.handleKeyDown} placeholder="Password" />
+						<div style={{ display:"flex"}}>
+							<input
+								type={`${this.getPasswordInputType()}`}
+								{...this.former.super_handle(["password"])}
+								onKeyDown={this.handleKeyDown}
+								placeholder="Password"
+								style={{ borderRadius:"5px 0px 0px 5px"}}
+							/>
+							<div className="show-hide-container">
+								<img
+									src={this.getShowHideIcon()}
+									onClick={() => this.setState({ showPassword: !this.state.showPassword })} />
+							</div>
+						</div>
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>

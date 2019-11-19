@@ -186,6 +186,9 @@ a.block {
 			margin: 10px 0;
 		}
 
+		.row {
+			align-items: center;
+		}
 		.form .row>* {
 			width: 30%;
 		}
