@@ -2,6 +2,14 @@
 .login .form .row>* {
     width: initial;
 }
+	.row .show-hide-container {
+		border: 1px solid #bbb;
+		border-radius: 0px 5px 5px 0px;
+		padding: 0px 5px;
+		display: flex;
+		border-left: 0px;
+	}
+
 .school-login .form .row>* {
     width: initial;
 }
