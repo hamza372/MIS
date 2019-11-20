@@ -121,7 +121,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			Months.add(moment(s.date).format("MMMM"))
 			Years.add(moment(s.date).format("YYYY"))
 		}
-		console.log("CATEGORY", this.state.categoryFilter)
+
 		const income_exp_sorted = Object.values(income_exp)
 			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) &&
 				e.type === "PAYMENT_GIVEN" && (this.state.categoryFilter !=="" ? this.state.categoryFilter === e.category : true))
@@ -224,7 +224,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.category : (e.type === "SUBMITTED" && e.fee_name) || "-"}</label>
 						<label> { e.type === "PAYMENT_GIVEN" && e.expense === "MIS_EXPENSE" ? e.quantity : "-"} </label>
-						<label> { e.type === "PAYMENT_GIVEN" ? -1 * (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
+						<label> { e.type === "PAYMENT_GIVEN" ? (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
 					</div>
 				})
 			}

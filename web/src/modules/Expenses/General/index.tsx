@@ -197,7 +197,7 @@ class Expenses extends Component<propTypes, S> {
 
 		if (payment.category === "SALARY") {
 
-			this.props.addSalaryExpense(id, parseFloat(payment.amount) || 0, this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, parseFloat(payment.deduction) || 0, payment.deduction_reason)
+			this.props.addSalaryExpense(id, parseFloat(payment.amount) || 0, this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, Math.abs(parseFloat(payment.deduction) || 0), payment.deduction_reason)
 
 			this.setState({
 				banner: {
@@ -431,7 +431,7 @@ class Expenses extends Component<propTypes, S> {
 								{ this.state.edits[id] !== undefined ? (<div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-								</div>) : (<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>)}
+								</div>) : (<label> {numberWithCommas(e.amount - e.deduction)}</label>)}
 							</div>
 						}
 						if (e.expense === "MIS_EXPENSE")
