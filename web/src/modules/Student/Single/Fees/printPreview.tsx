@@ -65,7 +65,11 @@ class printPreview extends Component <propTypes, S>{
 		const { classes, student, settings } = this.props
 
 		const sections =  getSectionsFromClasses(classes)
-		const curr_class = sections.find(x => x.id === student.section_id ).namespaced_name
+		
+		const curr_class = student.section_id !== undefined && student.section_id !== "" ?
+			sections.find(x => x.id === student.section_id ).namespaced_name :
+			"No Class"
+		
 		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(student), this.year(), this.month())
 		
 		// generate random voucher number
