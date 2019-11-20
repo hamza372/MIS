@@ -110,7 +110,7 @@ class Login extends Component {
 	render() {
 		
 		if (!this.props.initialized && this.props.auth.token !== undefined ) {
-			return <div>Loading Database....</div>
+			return <div>Loading Database...</div>
 		}
 		
 		if(!this.props.auth.token) {
@@ -152,7 +152,8 @@ class Login extends Component {
 							<div className="show-hide-container">
 								<img
 									src={this.getShowHideIcon()}
-									onClick={() => this.setState({ showPassword: !this.state.showPassword })} />
+									onClick={() => this.setState({ showPassword: !this.state.showPassword })} 
+									alt="eye-icon"/>
 
 							</div>
 						</div>

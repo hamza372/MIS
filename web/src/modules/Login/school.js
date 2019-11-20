@@ -98,7 +98,8 @@ class SchoolLogin extends Component {
 							<div className="show-hide-container">
 								<img
 									src={this.getShowHideIcon()}
-									onClick={() => this.setState({ showPassword: !this.state.showPassword })} />
+									onClick={() => this.setState({ showPassword: !this.state.showPassword })}
+									alt="eye-icon"/>
 							</div>
 						</div>
 					</div>
