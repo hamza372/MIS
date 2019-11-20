@@ -252,6 +252,7 @@ class SignUp extends Component <propTypes, S> {
 					<select {...this.former.super_handle(["value", "type_of_login"])}>
 						<option value="">Select</option>
 						<option value="AGENT">Agent </option>
+						<option value="AGENT_SCHOOL"> Agent-School</option>
 						<option value="ASSOCIATION">Association</option>
 						<option value="EDFIN">EdFin</option>
 						<option value="SCHOOL_REFERRAL">School Referrals</option>
