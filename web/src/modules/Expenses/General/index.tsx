@@ -197,7 +197,7 @@ class Expenses extends Component<propTypes, S> {
 
 		if (payment.category === "SALARY") {
 
-			this.props.addSalaryExpense(id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, parseFloat(payment.deduction), payment.deduction_reason)
+			this.props.addSalaryExpense(id, parseFloat(payment.amount) || 0, this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, parseFloat(payment.deduction) || 0, payment.deduction_reason)
 
 			this.setState({
 				banner: {
@@ -492,15 +492,16 @@ class Expenses extends Component<propTypes, S> {
 					{ this.state.payment.category === "SALARY" && <div className="row">
 							<label> Teacher </label>
 							<select onChange={(e) => this.onTeacherSelect(e)}>
-								<option value=""> SELECT</option>
+								<option value="">SELECT</option>
 								{
 									Object.values(teachers)
+									.filter( f => f && f.Active && f.Name)
 									.sort((a, b) => a.Name.localeCompare(b.Name))
 									.map(t => {
 										return <option key={t.id} value={t.id}> {t.Name} </option>
 									})
-							}
-						</select>
+								}
+							</select>
 					</div>
 					}
 
