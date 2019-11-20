@@ -79,9 +79,9 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 		const { expenses, students, settings } = this.props
 
-		const chunkSize = 32 // records per table
+		const chunkSize = 22 // records per table
 
-		const stu_payments = Object.entries(students)
+		const students_payments = Object.entries(students)
 			.filter(([id, s]) => s.Name)
 			.reduce((prev,[id, s]) => {
 
@@ -112,7 +112,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 			}, {} as { [id: string]: MISExpense | MISSalaryExpense})
 
-		const income_exp = {...stu_payments, ...filtered_expense}
+		const income_exp = {...students_payments, ...filtered_expense}
 
 		const Months  = new Set([])
 		const Years = new Set([])
@@ -121,10 +121,10 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			Months.add(moment(s.date).format("MMMM"))
 			Years.add(moment(s.date).format("YYYY"))
 		}
-
+		console.log("CATEGORY", this.state.categoryFilter)
 		const income_exp_sorted = Object.values(income_exp)
 			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) &&
-				( e.type === "PAYMENT_GIVEN" && this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category: true))
+				e.type === "PAYMENT_GIVEN" && (this.state.categoryFilter !=="" ? this.state.categoryFilter === e.category : true))
 			.sort((a, b) => a.date - b.date)
 
 		let total_income = 0
@@ -223,7 +223,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 						<label> { moment(e.date).format("DD-MM-YY")} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.category : (e.type === "SUBMITTED" && e.fee_name) || "-"}</label>
-						<label> { e.type === "PAYMENT_GIVEN" ? e.expense === "MIS_EXPENSE" && e.quantity : "1"} </label>
+						<label> { e.type === "PAYMENT_GIVEN" && e.expense === "MIS_EXPENSE" ? e.quantity : "-"} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? -1 * (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
 					</div>
 				})

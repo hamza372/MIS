@@ -333,7 +333,7 @@ class Expenses extends Component<propTypes, S> {
 
 		const { expenses, teachers, settings } = this.props
 
-		const chunkSize = 32 // records per table
+		const chunkSize = 21 // records per table
 
 		let Months  = new Set([])
 		let Years = new Set([])
@@ -369,7 +369,7 @@ class Expenses extends Component<propTypes, S> {
 
 			<div className="divider no-print">Expense Information</div>
 
-			<div className="table row">
+			<div className="table row no-print">
 				<label>Total Expense:</label>
 				<div>Rs. {numberWithCommas(total_expense)}</div>
 			</div>
@@ -426,15 +426,15 @@ class Expenses extends Component<propTypes, S> {
 								<label> {moment(e.date).format("DD-MM-YY")} </label>
 								<label> {e.label}</label>
 								<label> {e.category}</label>
-								<label> {`-`} </label>
-								<label> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
+								<label> - </label>
+								<label> { e.deduction }{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
 								{ this.state.edits[id] !== undefined ? (<div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
 								</div>) : (<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>)}
 							</div>
 						}
-						else if (e.expense === "MIS_EXPENSE")
+						if (e.expense === "MIS_EXPENSE")
 						{
 							return <div key={id} className="table row">
 								<label> {moment(e.date).format("DD-MM-YY")} </label>
