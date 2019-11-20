@@ -54,9 +54,10 @@ class StudentAttendance extends Component {
 			<div className="divider">Record</div>
 			<div className="section">
 			{ Object.values(attendance)
-				.map(rec => <div className="row" key={rec.date}>
-						<label>{moment(rec.date).format("DD-MM-YYYY")}</label>
-						<div>{rec.status}</div>
+				.sort((a, b) => b.time - a.time) // intentionally sort in desc order
+				.map(item => <div className="row" key={item.date}>
+						<label>{moment(item.date).format("DD-MM-YYYY")}</label>
+						<div>{item.status}</div>
 					</div>)
 			}
 			</div>
