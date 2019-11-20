@@ -73,7 +73,7 @@ class SchoolLogin extends Component {
 		if (!this.props.initialized) {
 			return <div className="downloading">
 				<img className="bounce" src={downloadIcon} alt="download-icon" />
-				<div style={{ marginTop: "10px" }}>Downloading Database</div>
+				<div style={{ marginTop: "10px" }}>Downloading Database, Please wait...</div>
 			</div>
 		}
 
