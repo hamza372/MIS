@@ -1,0 +1,41 @@
+
+    .printable-single-voucher {
+        border: 2px black solid;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 5px;
+        height: 33.33%px;
+        font-size: 0.8rem;
+    }
+    .printable-single-voucher .school-logo {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+    }
+    .row .student-name, .admission-no {
+        width: 70%;
+    }
+    .row .student-class, .roll-no {
+        width: 30%;
+    }
+    .voucher-no, .voucher-print-date {
+        width: 25%;
+    }
+    .school-info {
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    .payment-row {
+        margin-bottom: 4px;
+        font-weight: bold;
+    }
+    .text-right {
+        text-align: right;
+    }
+    .voucher-signature div {
+        font-size: 0.6rem;
+        width: 50%;
+    }
+    .voucher-signature .line {
+        margin-bottom: 2mm;
+    }

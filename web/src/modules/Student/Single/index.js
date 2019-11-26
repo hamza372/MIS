@@ -25,7 +25,7 @@ class StudentPage extends Component {
 		const permissions = this.props.permissions;
 
 		return <Layout history={this.props.history}>
-			<div className="single-student">
+			<div className="single-student" style={{paddingBottom: "0px"}}>
 				{ loc === "new" || loc === "prospective-student" ? false : 
 				<div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "red" : false}`} to="profile" replace={true}>Profile</Link>

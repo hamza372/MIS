@@ -223,7 +223,6 @@ export class StudentList extends Component {
 						schoolName={ settings.schoolName }/>)
 			}
 			
-			<div className="print button" onClick={() => window.print()}>Print</div>
 		</div>
 	}
 }
