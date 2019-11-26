@@ -72,8 +72,8 @@ class SchoolLogin extends Component {
 
 		if (!this.props.initialized) {
 			return <div className="downloading">
-				<img className="bounce" src={downloadIcon} />
-				<div style={{ marginTop: "10px" }}>Downloading Database</div>
+				<img className="bounce" src={downloadIcon} alt="download-icon" />
+				<div style={{ marginTop: "10px" }}>Downloading Database, Please wait...</div>
 			</div>
 		}
 
@@ -98,7 +98,8 @@ class SchoolLogin extends Component {
 							<div className="show-hide-container">
 								<img
 									src={this.getShowHideIcon()}
-									onClick={() => this.setState({ showPassword: !this.state.showPassword })} />
+									onClick={() => this.setState({ showPassword: !this.state.showPassword })}
+									alt="eye-icon"/>
 							</div>
 						</div>
 					</div>

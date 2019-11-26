@@ -35,18 +35,18 @@ export const GeneralExpensePrintableList = (props: PropsTypes) => {
                             <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
                             <td>{exp.label}</td>
                             <td>{exp.category}</td>
-                            <td style={{textAlign: "center"}}> - </td>
-                            <td style={{textAlign: "center"}}>{exp.deduction}</td>
-                            <td style={{textAlign: "center"}}>{exp.amount - exp.deduction}</td>
+                            <td className="cell-center"> - </td>
+                            <td className="cell-center">{exp.deduction}{ exp.deduction_reason ? `(${exp.deduction_reason})` : "" }</td>
+                            <td className="cell-center">{exp.amount - exp.deduction}</td>
                         </tr>
                     } else {
                         return <tr>
                             <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
                             <td>{exp.label}</td>
                             <td>{exp.category}</td>
-                            <td style={{textAlign: "center"}}>{exp.quantity}</td>
-                            <td style={{textAlign: "center"}}> - </td>
-                            <td style={{textAlign: "center"}}>{exp.amount}</td>
+                            <td className="cell-center">{exp.quantity}</td>
+                            <td className="cell-center"> - </td>
+                            <td className="cell-center">{exp.amount}</td>
                         </tr>
                     }})
                 }
