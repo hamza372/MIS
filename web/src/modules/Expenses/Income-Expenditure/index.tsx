@@ -26,7 +26,6 @@ interface S {
 	};
 	monthFilter: string;
 	yearFilter: string;
-	categoryFilter: string;
 }
 
 interface Routeinfo {
@@ -43,13 +42,12 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 		this.state = {
 			banner: {
-			active: false,
-			good: true,
-			text: "Saved!"
-		},
-		monthFilter: "",
-		yearFilter: moment().format("YYYY"),
-		categoryFilter: ""
+				active: false,
+				good: true,
+				text: "Saved!"
+			},
+			monthFilter: "",
+			yearFilter: moment().format("YYYY"),
 		}
 		this.former = new Former (this,[])
 	}
@@ -123,8 +121,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 		}
 
 		const income_exp_sorted = Object.values(income_exp)
-			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) &&
-				e.type === "PAYMENT_GIVEN" && (this.state.categoryFilter !=="" ? this.state.categoryFilter === e.category : true))
+			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
 			.sort((a, b) => a.date - b.date)
 
 		let total_income = 0
@@ -146,7 +143,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			{
 				total_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i) && ( this.state.categoryFilter !== "" ? this.state.categoryFilter === i.category: true)){
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
 					total_monthly_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				}
 			}
@@ -192,19 +189,6 @@ class IncomeExpenditure extends Component <propTypes, S> {
 						return <option key={year} value={year}> {year} </option>
 					})
 				}
-			</select>
-
-
-			<select {...this.former.super_handle(["categoryFilter"])}>
-				<option value="">Select Category</option>
-				<option value="SALARY">Salary</option>
-				<option value="BILLS">Utility Bills</option>
-				<option value="STATIONARY">Stationary</option>
-				<option value="REPAIRS">Repairs</option>
-				<option value="RENT">Rent</option>
-				<option value="ACTIVITY">Student Activity</option>
-				<option value="DAILY">Daily</option>
-				<option value="PETTY_CASH">Petty Cash</option>
 			</select>
 		</div>
 
