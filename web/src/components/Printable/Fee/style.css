@@ -1,16 +1,26 @@
-
+    @media print {
+        .printable-single-voucher .section div {
+            font-weight: normal;
+        }
+        .printable-single-voucher .table.row {
+            line-height: 1rem;
+        }
+    }
     .printable-single-voucher {
         border: 2px black solid;
         border-radius: 5px;
         padding: 10px;
         margin: 5px;
-        height: 33.33%px;
+        height: 33.33%;
         font-size: 0.8rem;
     }
-    .printable-single-voucher .school-logo {
+    .printable-single-voucher .school-info {
         display: flex;
         flex-direction: column;
         margin: auto;
+    }
+    .printable-single-voucher .table.row label {
+        font-weight: bold;
     }
     .row .student-name, .admission-no {
         width: 70%;
@@ -21,7 +31,7 @@
     .voucher-no, .voucher-print-date {
         width: 25%;
     }
-    .school-info {
+    .school-name {
         text-transform: uppercase;
         font-weight: bold;
     }

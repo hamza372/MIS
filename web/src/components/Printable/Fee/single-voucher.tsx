@@ -22,8 +22,8 @@ export const SingleStudentPrintableFeeVoucher = (props: propsType) => {
             <div className="row">
                 <div className="voucher-no text-left">Voucher no: {props.voucherNo}</div>
                 
-                <div className="school-logo text-center">
-                        <div className="school-info">{props.settings.schoolName ? props.settings.schoolName : ""}</div>
+                <div className="school-info text-center">
+                        <div className="school-name">{props.settings.schoolName ? props.settings.schoolName : ""}</div>
                         <div>{props.settings.schoolAddress}</div>
                         <div>Tel:{props.settings.schoolPhoneNumber}</div>
                 </div>
@@ -40,11 +40,16 @@ export const SingleStudentPrintableFeeVoucher = (props: propsType) => {
             </div>
             <div className="text-center payment-row">Payment Details</div>
             <div className="section">
+                <div className="table row">
+                    <label>Month</label>
+                    <label>Label</label>
+                    <label>Amount</label>
+                </div>
                 {
                     props.payments
                     .filter(([id, payment]: any) => payment.type !== "SUBMITTED")
                     .map(([id, payment]: any) => {
-                        return <div className="payment" key={id} >
+                        return <div key={id} >
                             <div className="table row">
 							    <div>{moment(payment.date).format("MMMM")}</div>
                                 <div>{getFeeLabel(payment)}</div>

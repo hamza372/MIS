@@ -4,7 +4,6 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import qs from 'querystring'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
 import { getFilteredPayments } from 'utils/getFilteredPayments'
-import { StudentLedgerPage } from './StudentLedgerPage';
 import { SingleStudentPrintableFeeVoucher } from 'components/Printable/Fee/single-voucher';
 
 interface P {
@@ -37,30 +36,6 @@ class printPreview extends Component <propTypes, S>{
 	month = (): string => `${qs.parse(this.props.location.search)["?month"] || ""}`
 	year = (): string => `${qs.parse(this.props.location.search)["year"] || ""}`
 
-	mergedPaymentsForStudent = (student: MISStudent) => {
-		// if(student.FamilyID) {
-		// 	const siblings = Object.values(this.props.students)
-		// 		.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
-
-		// 	const merged_payments = siblings.reduce((agg, curr) => ({
-		// 		...agg,
-		// 		...Object.entries(curr.payments).reduce((agg, [pid, p]) => { 
-		// 			return {
-		// 				...agg,
-		// 				[pid]: {
-		// 					...p,
-		// 					fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`
-		// 				}
-		// 			}
-		// 		}, {} as MISStudent['payments'])
-		// 	}), {} as { [id: string]: MISStudentPayment})
-
-		// 	return merged_payments
-		// }
-
-		return student.payments
-	}
-
 	render() {
 
 		const { classes, student, settings } = this.props
@@ -71,35 +46,29 @@ class printPreview extends Component <propTypes, S>{
 			sections.find(x => x.id === student.section_id ).namespaced_name :
 			"No Class"
 		
-		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(student), this.year(), this.month())
+		const filteredPayments = getFilteredPayments(student.payments, this.year(), this.month())
 		
 		// generate random voucher number
 		const voucherNo = Math.floor(100000 + Math.random() * 900000)
 		let vouchers  = [];
 		
 		for (let i = 0; i <parseInt(settings.vouchersPerPage || "3"); i++) {
-			vouchers.push(<StudentLedgerPage key={i} 
-				payments = {filteredPayments} 
-				settings = {settings}
-				student = {student}
-				class_name = {curr_class}
-				voucherNo = {voucherNo}/>)
+			vouchers.push(<div className="section-mb">
+							<SingleStudentPrintableFeeVoucher key={i}
+								settings = {this.props.settings}
+								voucherNo = {voucherNo}
+								className = {curr_class}
+								student = {student}
+								payments = {filteredPayments}/>
+						</div>)
 		}
-	return (
-		<table className="printable-vouchers">
-		<section className="section-mb">
-			<SingleStudentPrintableFeeVoucher
-			settings = {this.props.settings}
-			voucherNo = {voucherNo}
-			className = {curr_class}
-			student = {student}
-			payments = {filteredPayments}/>
-		</section>);
-		
-	// return	<div className="student-fees-ledger">
-	// 			<div className="print button" style={{marginBottom:"10px"}} onClick={() => window.print()}>Print</div>
-	// 			<div className="voucher-row">{vouchers}</div>
-	// 		</div>
+
+	return <div className="printable-vouchers">
+			{
+				vouchers
+			}
+			<div className="row button blue" style={{margin: "10px 0px"}} onClick={() => window.print()}>Print Fee Voucher</div>
+		</div>
   }
 }
 export default connect((state: RootReducerState, { match: { params: { id } } }: { match: { params: { id: string}}}) => ({
