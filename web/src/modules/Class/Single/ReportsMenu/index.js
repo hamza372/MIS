@@ -6,9 +6,11 @@ import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Mar
 import { smsIntentLink } from 'utils/intent'
 import { logSms } from 'actions'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
-
+import chunkify from 'utils/chunkify'
+import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 
 import './style.css'
+import calculateGrade from 'utils/calculateGrade'
 
 class ClassReportMenu extends Component {
 
@@ -22,7 +24,8 @@ class ClassReportMenu extends Component {
 				exam_name: "",
 				examFilterText: "",
 				subjectFilterText: "",
-				dateOrSerial: "Date"
+				dateOrSerial: "Date",
+				printable_type: "Class Result Cards"
 			}
 		}
 		this.report_former = new Former(this, ["report_filters"])
@@ -45,25 +48,73 @@ class ClassReportMenu extends Component {
 
 	render() {
 
-		const { students, exams, classes, settings, sms_templates } = this.props
+		const { students, exams, classes, settings, sms_templates, curr_section_id, curr_class_id } = this.props
 
-		const curr_section = getSectionsFromClasses(classes).filter( section  => section.id === this.props.curr_section_id)[0]
+		const curr_section = getSectionsFromClasses(classes).filter( section  => section.id === curr_section_id)[0]
+
+		// no. of records per chunk
+		const chunkSize = 22;
 
 		const relevant_students = Object.values(students)
-			.filter(s => s.section_id !== undefined && s.section_id === this.props.curr_section_id)
+			.filter(s => s.Name && s.exams && s.section_id !== undefined && s.section_id === curr_section_id)
 			.sort((a, b) => (a.RollNumber || 0) - (b.RollNumber || 0))
-
-		const subjects = new Set()
+		
+		const relevant_exams = Object.values(exams)
+			.filter(e => e.class_id === curr_class_id &&
+				e.section_id !== undefined &&
+				e.section_id === curr_section_id)
+		
+		const examSubjectsWithMarks = new Set()
 		const examSet = new Set()
+		const subjects = new Set()
 
-		for (const s of relevant_students) {
-			for (const e of Object.values(exams)) {
-				if (e.section_id === s.section_id) {
-					subjects.add(e.subject)
-					examSet.add(e.name)
-				}
+		for (const e of relevant_exams) {
+			// show only subjects and marks for selected exam else all subjects
+			if( this.state.report_filters.examFilterText !== "" ? e.name === this.state.report_filters.examFilterText : true) {
+				examSubjectsWithMarks.add(`${e.subject} ( ${e.total_score} )`)
+				subjects.add(e.subject)
 			}
+			// exams list
+			examSet.add(e.name)
 		}
+
+		// sorted marks sheet
+		const marksSheet = relevant_students
+			.reduce((agg, curr) => { 
+
+				let new_exams = []
+				let temp_marks = { total: 0, obtained: 0}
+				/**
+				 *  check the relevant exam exists in student.exams, if exists create a new object
+				 *  with all information of relevant exam from this.props.exams and also containing
+				 * 	student.exam {score, remarks, grades} and add to new_exams array
+				 * 	
+				 * 	if the relevant exam doesn't exist in student.exams, create a new object with all information
+				 * 	of relevant exam from this.props.exams and stats, containing default stats : {score: 0, remarks: "", grade: ""} 
+				 * 	which is make sure, if a student didn't attempt the exam so that he must have default value to avoid calculations
+				 * 	error or property accessing issues while printing record of student
+				 */
+				for (const e of relevant_exams) {
+					const stats = curr.exams[e.id] || { score: 0, remarks: "", grade: "" }
+					new_exams.push({ ...exams[e.id], stats })
+					temp_marks.obtained += parseFloat(stats.score || 0)
+					temp_marks.total += parseFloat(e.total_score || 0)
+				}
+
+				return [
+					...agg,
+					{
+						id: curr.id,
+						name: curr.Name,
+						roll: curr.RollNumber ? curr.RollNumber : "",
+						marks: temp_marks,
+						grade: calculateGrade(temp_marks.obtained, temp_marks.total, this.props.grades),
+						position: 0,
+						exams: new_exams
+					}
+				]
+			}, [])
+			.sort((a, b) => b.marks.obtained - a.marks.obtained)
 
 		const messages = relevant_students
 			.filter(s => s.Phone !== "")
@@ -81,7 +132,7 @@ class ClassReportMenu extends Component {
 
 
 		return <div className="class-report-menu" style={{ width: "100%" }}>
-			<div className="title no-print">Print Result Card for {curr_section.namespaced_name}</div>
+			<div className="title no-print">Print {this.state.report_filters.printable_type} for {curr_section.namespaced_name}</div>
 			<div className="form no-print">
 				<div className="row">
 					<label>Start Date</label>
@@ -119,6 +170,14 @@ class ClassReportMenu extends Component {
 					</select>
 				</div>
 				<div className="row">
+					<label>Print</label>
+					<select {...this.report_former.super_handle(["printable_type"])}>
+						<option value="">Select Print</option>
+						<option value="Class Result Cards">Class Result Cards</option>
+						<option value="Class Result Sheet"> Class Result Sheet</option>
+					</select>
+				</div>
+				<div className="row">
 					<label>Show Date/Serial No.</label>
 					<select {...this.report_former.super_handle(["dateOrSerial"])}>
 						<option value="Date">Date</option>
@@ -130,31 +189,36 @@ class ClassReportMenu extends Component {
 
 			<div className="table btn-section">
 				{settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
-				<div className="row print button" onClick={() => window.print()} style={{ marginTop: " 10px" }}>Print</div>
+				<div className="row print button" onClick={() => window.print()} style={{ marginTop: " 10px" }}>Print {this.state.report_filters.printable_type}</div>
 			</div>
 
-			<div className="class-report" style={{ height: "100%" }}>
-
-				{
-					//TODO: put in total marks, grade, signature, and remarks.
-					relevant_students.map(s =>
-						<div className="print-page student-report" key={s.id} style={{ height: "100%" }}>
+			<div className="class-report print-page" style={{ height: "100%" }}>
+				{ 	
+					this.state.report_filters.printable_type === "Class Result Sheet" && this.state.report_filters.examFilterText !== "" ?
+						chunkify(marksSheet, chunkSize)
+							.map((chunkItems, index) => <ClassResultSheet key={index}
+								sectionName={ curr_section.namespaced_name }
+								examSubjectsWithMarks={ examSubjectsWithMarks }
+								examName={ this.state.report_filters.examFilterText }
+								schoolName={ this.props.settings.schoolName }
+								students={ chunkItems }
+								chunkSize={ index === 0 ? 0 : chunkSize * index }/>) :
+								
+						relevant_students.map(s => <div className="student-report" key={s.id} style={{ height: "100%" }}>
 							<StudentMarks
 								student={s}
-								exams={this.props.exams}
 								settings={this.props.settings}
 								startDate={this.state.report_filters.start}
 								endDate={this.state.report_filters.end}
+								exams={this.props.exams}
 								examFilter={this.state.report_filters.examFilterText}
 								subjectFilter={this.state.report_filters.subjectFilterText}
 								curr_section={curr_section}
 								logo={this.props.schoolLogo}
 								grades={this.props.grades}
-								dateOrSerial={this.state.report_filters.dateOrSerial}
-							/>
+								dateOrSerial={this.state.report_filters.dateOrSerial}/>
 						</div>)
 				}
-
 			</div>
 
 		</div>
