@@ -10,6 +10,7 @@ import { PrintHeader } from 'components/Layout'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import './style.css'
+import calculateGrade from 'utils/calculateGrade'
 
 class StudentMarksContainer extends Component {
 
@@ -184,31 +185,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			total_marks: 0,
 			marks_obtained: 0
 		})
-
-	const getGrade = (obtained, total) => {
-
-		const percent_score = Math.abs(( obtained / total) * 100) || 0
-
-		const sorted_grades = Object.entries(grades).sort((a, b)=> parseFloat(b[1]) - parseFloat(a[1]))
-
-		let prev_grade = 0
-
-		const highest_grade = sorted_grades[0]
-
-		for( const e of sorted_grades)
-		{
-			if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
-				return highest_grade[0]
-			}
-			else if(prev_grade !== 0 && percent_score <= prev_grade && percent_score >= e[1]){
-				return e[0]
-			}
-			else {
-				prev_grade = parseFloat(e[1])
-			}
-		}
-	}
-
+	
 	return<div className="result-card"> 
 		<div className="student-marks">
 			<PrintHeader settings={settings} logo={logo} />
@@ -273,7 +250,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			</div>
 			
 			<div className="result-stats">
-				<div className="row">Grade: &nbsp; <b>{ getGrade( marks_obtained, total_marks) }</b></div>
+				<div className="row">Grade: &nbsp; <b>{calculateGrade(marks_obtained, total_marks, grades)}</b></div>
 				<div className="row">Position: __________ </div>
 			</div>
 
