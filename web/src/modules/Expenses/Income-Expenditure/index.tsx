@@ -26,7 +26,6 @@ interface S {
 	};
 	monthFilter: string;
 	yearFilter: string;
-	categoryFilter: string;
 }
 
 interface Routeinfo {
@@ -43,13 +42,12 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 		this.state = {
 			banner: {
-			active: false,
-			good: true,
-			text: "Saved!"
-		},
-		monthFilter: "",
-		yearFilter: moment().format("YYYY"),
-		categoryFilter: ""
+				active: false,
+				good: true,
+				text: "Saved!"
+			},
+			monthFilter: "",
+			yearFilter: moment().format("YYYY"),
 		}
 		this.former = new Former (this,[])
 	}
@@ -79,9 +77,9 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 		const { expenses, students, settings } = this.props
 
-		const chunkSize = 32 // records per table
+		const chunkSize = 22 // records per table
 
-		const stu_payments = Object.entries(students)
+		const students_payments = Object.entries(students)
 			.filter(([id, s]) => s.Name)
 			.reduce((prev,[id, s]) => {
 
@@ -112,7 +110,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 
 			}, {} as { [id: string]: MISExpense | MISSalaryExpense})
 
-		const income_exp = {...stu_payments, ...filtered_expense}
+		const income_exp = {...students_payments, ...filtered_expense}
 
 		const Months  = new Set([])
 		const Years = new Set([])
@@ -123,8 +121,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 		}
 
 		const income_exp_sorted = Object.values(income_exp)
-			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e) &&
-				( e.type === "PAYMENT_GIVEN" && this.state.categoryFilter !== "" ? this.state.categoryFilter === e.category: true))
+			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
 			.sort((a, b) => a.date - b.date)
 
 		let total_income = 0
@@ -146,7 +143,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			{
 				total_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i) && ( this.state.categoryFilter !== "" ? this.state.categoryFilter === i.category: true)){
+				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
 					total_monthly_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
 				}
 			}
@@ -193,19 +190,6 @@ class IncomeExpenditure extends Component <propTypes, S> {
 					})
 				}
 			</select>
-
-
-			<select {...this.former.super_handle(["categoryFilter"])}>
-				<option value="">Select Category</option>
-				<option value="SALARY">Salary</option>
-				<option value="BILLS">Utility Bills</option>
-				<option value="STATIONARY">Stationary</option>
-				<option value="REPAIRS">Repairs</option>
-				<option value="RENT">Rent</option>
-				<option value="ACTIVITY">Student Activity</option>
-				<option value="DAILY">Daily</option>
-				<option value="PETTY_CASH">Petty Cash</option>
-			</select>
 		</div>
 
 		<div className="payment-history no-print section">
@@ -223,8 +207,8 @@ class IncomeExpenditure extends Component <propTypes, S> {
 						<label> { moment(e.date).format("DD-MM-YY")} </label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
 						<label> { e.type === "PAYMENT_GIVEN" ? e.category : (e.type === "SUBMITTED" && e.fee_name) || "-"}</label>
-						<label> { e.type === "PAYMENT_GIVEN" ? e.expense === "MIS_EXPENSE" && e.quantity : "1"} </label>
-						<label> { e.type === "PAYMENT_GIVEN" ? -1 * (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
+						<label> { e.type === "PAYMENT_GIVEN" && e.expense === "MIS_EXPENSE" ? e.quantity : "-"} </label>
+						<label> { e.type === "PAYMENT_GIVEN" ? (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
 					</div>
 				})
 			}

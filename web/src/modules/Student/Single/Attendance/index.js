@@ -1,23 +1,69 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { PrintHeader } from 'components/Layout'
-import moment from 'moment';
+import moment from 'moment'
+import former from 'utils/former'
+import sortYearMonths from 'utils/sortUtils'
 
 import './style.css'
 
 class StudentAttendance extends Component {
 
+	constructor(props) {
+		super(props)
+
+		this.state = {
+			filter: {
+				month: "",
+				year: ""
+			}
+		}
+
+		this.former = new former(this, ["filter"])
+	}
+
+	getFilterCondition = (time, month, year) => {
+
+		if(month === "" && year === "") {
+			return true
+		} 
+		
+		if(month === "" && year !== "") {
+			return moment(time).format("YYYY") === year
+		}
+		
+		if(month !== "" && year === "") {
+			return moment(time).format("MMMM") === month
+		} 
+		
+		if(month !== "" && year !== "") {
+			return moment(time).format("MMMM") === month && moment(time).format("YYYY") === year;
+		}
+	}
+
 	render() {
 
 		const id = this.props.match.params.id;
 		const student = this.props.students[id];
+		const attendance = Object.values(student.attendance || {})
+		
+		let months = new Set()
+		let years = new Set()
+		let filtered_attendance = []
 
-		const attendance = student.attendance || {};
+		for(const item of attendance) {
+			months.add(moment(item.time).format("MMMM"))
+			years.add(moment(item.time).format("YYYY"))
+			
+			if(this.getFilterCondition(item.time, this.state.filter.month, this.state.filter.year)) {
+				filtered_attendance.push(item)
+			}
+		}
 
 		const { PRESENT: num_present, ABSENT: num_absent, 
 				LEAVE: num_leave, SICK_LEAVE: num_sick_leave,
 				SHORT_LEAVE: num_short_leave, CASUAL_LEAVE: num_casual_leave  
-			} = Object.values(attendance).reduce((agg, curr) => {
+			} = filtered_attendance.reduce((agg, curr) => {
 					agg[curr.status] += 1;
 					return agg;
 			}, {PRESENT: 0, ABSENT: 0, LEAVE: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0})
@@ -47,16 +93,37 @@ class StudentAttendance extends Component {
 				<label>Present Percentage:</label>
 				<div>{(num_present / (num_absent + num_present + total_leave_count) * 100).toFixed(2)}%</div>
 			</div>
+			<div className="no-print">
+				<select {...this.former.super_handle(["month"])}>
+					<option value="">Select Month</option>
+					{
+						sortYearMonths(months).map(month => {
+							return <option key={month} value={month}>{month}</option>	
+						})
+					}
+				</select>
+
+				<select {...this.former.super_handle(["year"])}>
+					<option value="">Select Year</option>
+					{ 
+						Array.from(years).map(year => {
+							return <option key={year} value={year}>{year}</option>
+						})
+					}
+				</select>
+			</div>
+
 			<div className="row">
 				<div className="print button" onClick={() => window.print()}>Print</div>
 			</div>
 			
 			<div className="divider">Record</div>
 			<div className="section">
-			{ Object.values(attendance)
-				.map(rec => <div className="row" key={rec.date}>
-						<label>{moment(rec.date).format("DD-MM-YYYY")}</label>
-						<div>{rec.status}</div>
+			{ filtered_attendance
+				.sort((a, b) => b.time - a.time) // intentionally sort in desc order
+				.map(item => <div className="row" key={item.date}>
+						<label>{moment(item.date).format("DD-MM-YYYY")}</label>
+						<div>{item.status}</div>
 					</div>)
 			}
 			</div>
