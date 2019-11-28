@@ -12,7 +12,7 @@
         padding: 10px;
         margin: 5px;
         height: 33.33%;
-        font-size: 0.8rem;
+        font-size: 0.8em;
     }
     .printable-single-voucher .school-info {
         display: flex;
@@ -31,6 +31,12 @@
     .voucher-no, .voucher-print-date {
         width: 25%;
     }
+    .voucher-no span {
+        border-bottom: 1px solid;
+    }
+    .voucher-print-date span {
+        border-bottom: 1px solid;
+    }
     .school-name {
         text-transform: uppercase;
         font-weight: bold;
@@ -38,12 +44,13 @@
     .payment-row {
         margin-bottom: 4px;
         font-weight: bold;
+        font-size: 1rem;
     }
     .text-right {
         text-align: right;
     }
     .voucher-signature div {
-        font-size: 0.6rem;
+        font-size: 0.6em;
         width: 50%;
     }
     .voucher-signature .line {

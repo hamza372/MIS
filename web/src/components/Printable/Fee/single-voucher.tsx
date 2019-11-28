@@ -20,7 +20,7 @@ export const SingleStudentPrintableFeeVoucher = (props: propsType) => {
     return(
         <div className="printable-single-voucher">
             <div className="row">
-                <div className="voucher-no text-left">Voucher no: {props.voucherNo}</div>
+                <div className="voucher-no text-left">Voucher No: <span>{props.voucherNo}</span></div>
                 
                 <div className="school-info text-center">
                         <div className="school-name">{props.settings.schoolName ? props.settings.schoolName : ""}</div>
@@ -28,15 +28,15 @@ export const SingleStudentPrintableFeeVoucher = (props: propsType) => {
                         <div>Tel:{props.settings.schoolPhoneNumber}</div>
                 </div>
 
-                <div className="voucher-print-date text-right">Date: {moment().format("DD-MM-YYYY")}</div>
+                <div className="voucher-print-date text-right">Date: <span>{moment().format("DD-MM-YYYY")}</span></div>
             </div>
             <div className="row">
                 <div className="student-name">Name: <b> {props.student.Name}</b> </div>
                 <div className="student-class">Class: <b> {props.className}</b> </div>
             </div>
             <div className="row">
-                <div className="admission-no">Admission no: <b>{props.student.AdmissionNumber}</b> </div>
-                <div className="roll-no">Roll no: <b>{props.student.RollNumber}</b> </div>
+                <div className="admission-no">Admission No: <b>{props.student.AdmissionNumber}</b> </div>
+                <div className="roll-no">Roll No: <b>{props.student.RollNumber}</b> </div>
             </div>
             <div className="text-center payment-row">Payment Details</div>
             <div className="section">
@@ -51,7 +51,7 @@ export const SingleStudentPrintableFeeVoucher = (props: propsType) => {
                     .map(([id, payment]: any) => {
                         return <div key={id} >
                             <div className="table row">
-							    <div>{moment(payment.date).format("MMMM")}</div>
+							    <div>{moment(payment.date).format("DD-MMMM")}</div>
                                 <div>{getFeeLabel(payment)}</div>
                                 <div>{numberWithCommas(payment.amount)}</div>
                             </div>
