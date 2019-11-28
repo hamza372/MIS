@@ -270,7 +270,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 				<label><b> Date </b></label>
 				<label><b> Label </b></label>
 				<label><b> Category </b></label>
-				<label><b> Entry(s)) </b></label>
+				<label><b> Quantity </b></label>
 				<label><b> Amount </b></label>
 			</div>
 			{
@@ -281,7 +281,7 @@ class IncomeExpenditure extends Component <propTypes, S> {
 						<label> {moment(e.date).format( viewBy === "DAILY" ? "DD-MM-YY" : "MM-YYYY") } </label>
 						<label> {e.label} </label>
 						<label> {e.category} </label>
-						<label> {e.quantity} </label>
+						<label> {e.quantity === 1 ? `${e.quantity} Entry` : `${e.quantity} Entries`}</label>
 						<label> {e.amount} </label>
 					</div>
 				})
