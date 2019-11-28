@@ -35,7 +35,7 @@
         text-transform: uppercase;
         text-align: center;
     }
-
+    /* outstanding fee css rules*/
     .row-sr {
         width: 10%;
     }
@@ -54,23 +54,54 @@
     .row-name {
         width: 24%;
     }
-
+    /* expense module css rules*/
     .row-quantity {
-        width: 10% !important;
+        width: 10%;
     }
     .row-date {
-        width: 10% !important;
+        width: 10%;
     }
     .row-deduction {
-        width: 25% !important;
+        width: 25%;
     }
     .row-amount {
-        width: 15% !important;
+        width: 15%;
     }
     .row-category {
-        width: 20% !important;
+        width: 20%;
     }
     .row-label {
-        width: 20% !important;
+        width: 20%;
     }
+    
+    /* result sheet rules*/
+    .row-marks {
+        width: 10%;
+    }
+    .row-grade {
+        width: 5%;
+    }
+    .outer-space {
+        width: 98% !important;
+        margin: auto;
+    }
+}
+
+/* print preview result sheet rules*/
+.row-marks {
+    width: 10%;
+}
+.row-grade {
+    width: 5%;
+}
+.outer-space .result-sheet {
+    font-size: .65em;
+    text-transform: capitalize;
+}
+table td.cell-center {
+    text-align: center;
+}
+.outer-space {
+    width: 90%;
+    margin: auto;
 }
