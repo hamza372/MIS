@@ -7,6 +7,7 @@ interface p {
 
 export const ProgressBar = ({ percentage }: p) => <div className="progress-bar">
 	<Filler percentage={percentage} />
+	Calculating...
 </div>
 
-export const Filler = ({ percentage }: p) => <div className="filler" style={{ width: `${percentage}%`}}/>
+export const Filler = ({ percentage }: p) => <div className="filler" style={{ width: `${percentage}%`}}/> 

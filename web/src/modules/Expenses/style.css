@@ -20,6 +20,8 @@
 
 .expenses .payment-history.section {
 	overflow-x: auto;
+	width: auto;
+	max-height: 50vh;
 }
 
 	.expenses .payment-history.section .table.row {
