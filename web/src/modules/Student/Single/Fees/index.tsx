@@ -299,6 +299,10 @@ class StudentFees extends Component <propTypes, S> {
 
 	}
 
+	getOwedAmountStyle = (owed_amount: number): string => {
+		return owed_amount <= 0 ? "advance-amount" : "pending-amount"
+	}
+
 	render() {
 
 		const Months =  new Set(
@@ -314,9 +318,10 @@ class StudentFees extends Component <propTypes, S> {
 			
 		const filteredPayments = getFilteredPayments(this.mergedPayments(), this.state.year, this.state.month)
 
-		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-		//const curr_month = moment().format("MM/YYYY")
-		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
+		const filtered_owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+		
+		const total_owed = Object.entries(this.mergedPayments())
+			.reduce((agg, [, curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
 		return <div className="student-fees">
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -382,9 +387,15 @@ class StudentFees extends Component <propTypes, S> {
 								</div>
 							</div> })
 				}
-				<div className="table row last">
-					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-					<div style={style}><b>Rs. {numberWithCommas(Math.abs(owed))}</b></div>
+				{
+					this.state.month !== "" && <div className={`table row last ${this.getOwedAmountStyle(filtered_owed)}`}>
+						<label>{filtered_owed <= 0 ? "Current Month Advance:" : "Current Month Pending:"}</label>
+						<div>Rs. {numberWithCommas(Math.abs(filtered_owed))}</div>
+					</div>
+				}
+				<div className={`table row last ${this.getOwedAmountStyle(total_owed)}`}>
+					<label>{total_owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
+					<div>Rs. {numberWithCommas(Math.abs(total_owed))}</div>	
 				</div>
 			</div>
 			<div className="form">

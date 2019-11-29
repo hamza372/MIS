@@ -59,3 +59,11 @@
 			margin-bottom: 2mm;
 		}
 	}
+.pending-amount{
+	color: #FC6171;
+	font-weight: bold;
+}
+.advance-amount{
+	color: #5ECDB9;
+	font-weight: bold;
+}
