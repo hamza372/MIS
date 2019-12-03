@@ -211,8 +211,8 @@ class SingleStudent extends Component<propTypes, S> {
 					&& student.AdmissionNumber !== undefined 
 					&& student.AdmissionNumber !== "" 
 					&& student.AdmissionNumber === this.state.profile.AdmissionNumber	
-
-				if(AdmissionNumber || RollNumber)
+				
+				if(this.state.profile["Active"] && (AdmissionNumber || RollNumber))
 				{
 					return this.setState({
 						banner: {
