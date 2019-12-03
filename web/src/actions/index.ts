@@ -765,7 +765,14 @@ export const addDiary = (date: string, section_id: string, diary: MISDiary["sect
 
 }
 
-export const editPayment = (student: MISStudent, payments: MISStudent["payments"]) => (dispatch: Function) => {
+interface EditedPayments {
+	[pid : string]: {
+		amount: number,
+		fee_id: string
+	}
+}
+
+export const editPayment = (student: MISStudent, payments: EditedPayments) => (dispatch: Function) => {
 
 	// payments is an object with id as key and value is { amount, fee_id } 
  	const merges = Object.entries(payments).reduce((agg, [p_id, {amount,fee_id}]) => {

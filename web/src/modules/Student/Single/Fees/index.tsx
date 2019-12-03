@@ -47,7 +47,7 @@ interface P {
 	addMultiplePayments: (payments: payment[] ) => any;
 	sendSMS: (text: string, number: string) => any;
 	logSms: (history: any) => any;
-	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => any;
+	editPayment: (student: MISStudent, payments: EditedPayments) => any;
 }
 
 interface S {
@@ -64,8 +64,7 @@ interface S {
 	};
 	month: string;
 	year: string;
-	edits: MISStudent["payments"];
-
+	edits: EditedPayments
 }
 
 interface RouteInfo {
@@ -74,6 +73,13 @@ interface RouteInfo {
 
 type propTypes = RouteComponentProps<RouteInfo> & P
 
+interface EditedPayments {
+	[pid : string]: {
+		amount: number,
+		fee_id: string
+	}
+}
+
 class StudentFees extends Component <propTypes, S> {
 
 	Former: former
@@ -81,9 +87,10 @@ class StudentFees extends Component <propTypes, S> {
 		super(props);
 		
 		const current_month = moment().format("MM/YYYY")
+
 		const edits = Object.entries(this.student().payments)
-			.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
-			.reduce((agg,[id,payment]) => {
+			.filter(([id, payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+			.reduce((agg, [id, payment]) => {
 				return {
 					...agg,
 					[id]: {
@@ -267,6 +274,37 @@ class StudentFees extends Component <propTypes, S> {
 	}
 
 	onSave = () => {
+		
+		const modified_payments = this.state.edits
+		let edit_flag = false
+
+		const next_edits = Object.entries(modified_payments)
+			.reduce((agg, [payment_id, payment]) => {
+	
+				const { fee_id, amount } = payment
+				const parsed_amount = parseFloat(amount.toString())
+				// check if the user added empty amount while editing current month payments
+				if(isNaN(parsed_amount))
+				{
+					edit_flag = true
+					return agg
+				}
+
+				return {
+					...agg,
+					[payment_id]: {
+						amount: parsed_amount,
+						fee_id
+					}
+				} as EditedPayments
+
+			}, {} as EditedPayments)
+		
+		if(edit_flag) {
+			alert("Please enter valid input")
+			return
+		}
+
 		this.setState({
 			banner: {
 				active: true,
@@ -274,6 +312,8 @@ class StudentFees extends Component <propTypes, S> {
 				text: "Saved!"
 			}
 		})
+
+		this.props.editPayment(this.student(), next_edits)
 
 		setTimeout(() => {
 			this.setState({
@@ -283,19 +323,6 @@ class StudentFees extends Component <propTypes, S> {
 				}
 			})
 		}, 1000);
-
-		const next_edits = Object.entries(this.state.edits)
-			.reduce((agg, [payment_id, { fee_id, amount }]) => {
-				return {
-					...agg,
-					[payment_id]: {
-						fee_id,
-						amount
-					}
-				}
-			}, {})
-
-		this.props.editPayment(this.student(), next_edits)
 
 	}
 
@@ -442,5 +469,5 @@ export default connect((state: RootReducerState) => ({
 	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text: string, number: string) => dispatch(sendSMS(text, number)),
 	logSms: (history: any) => dispatch(logSms(history)),
-	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => dispatch(editPayment(student,payments))
+	editPayment: (student: MISStudent, payments: EditedPayments) => dispatch(editPayment(student,payments))
 }))(withRouter(StudentFees))
