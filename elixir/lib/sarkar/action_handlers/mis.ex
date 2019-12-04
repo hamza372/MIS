@@ -74,10 +74,10 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end
 
-	def handle_action(%{"type" => type, "payload" => payload}, state) do
+	def handle_action(%{"type" => type, "payload" => payload} = msg, state) do
 		IO.puts "it is likely you have not authenticated. no handler exists for this combination of state and message"
 		IO.inspect type
-		IO.inspect payload
+		IO.inspect msg 
 		IO.inspect state
 		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end
