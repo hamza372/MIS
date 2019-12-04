@@ -613,12 +613,12 @@ export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
 			path: ["db", "students", student_fee.student_id, "fees", student_fee.fee_id],
 			value: {
 				amount: student_fee.amount,
-				nane: student_fee.name,
+				name: student_fee.name,
 				period: student_fee.period,
 				type: student_fee.type
 			}
 		}]
-
+	
 	dispatch(createMerges(merges))
 }
 

@@ -150,10 +150,36 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	onFeeEditCompletion = (id: string) => {
+		
+		const curr_edited_fee = this.state.profile.fees[id]
+		let temp_amount = curr_edited_fee.amount
+		
+		// to make sure SCHOLARSHIP amount must be saved as absolute amount
+		if(curr_edited_fee.type === "SCHOLARSHIP") {
+			const parsed_amount = parseFloat(curr_edited_fee.amount)
+
+			if(!isNaN(parsed_amount))
+			{
+				temp_amount = Math.abs(parsed_amount).toString()
+			} else {
+				alert("Please Enter Valid Amount")
+				return
+			}
+		}
 
 		const { [id]: removed_edit, ...rest} = this.state.edit
 
 		this.setState({
+			profile: {
+				...this.state.profile,
+				fees: {
+					...this.state.profile.fees,
+					[id]: {
+						...curr_edited_fee,
+						amount: temp_amount
+					}
+				}
+			},
 			edit: rest
 		})
 	}
@@ -287,11 +313,10 @@ class SingleStudent extends Component<propTypes, S> {
 			}
 		}
 
-		if(!this.isProspective()){
+		if(!this.isProspective()) {
 			const { prospective_section_id: removed, ...rest } = student
 			this.props.save(rest);
-		}
-		else{
+		} else {
 			this.props.save(student);
 		}
 		this.setState({
