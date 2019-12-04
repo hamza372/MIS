@@ -613,12 +613,12 @@ export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
 			path: ["db", "students", student_fee.student_id, "fees", student_fee.fee_id],
 			value: {
 				amount: student_fee.amount,
-				nane: student_fee.name,
+				name: student_fee.name,
 				period: student_fee.period,
 				type: student_fee.type
 			}
 		}]
-
+	
 	dispatch(createMerges(merges))
 }
 
@@ -765,7 +765,14 @@ export const addDiary = (date: string, section_id: string, diary: MISDiary["sect
 
 }
 
-export const editPayment = (student: MISStudent, payments: MISStudent["payments"]) => (dispatch: Function) => {
+interface EditedPayments {
+	[pid : string]: {
+		amount: number,
+		fee_id: string
+	}
+}
+
+export const editPayment = (student: MISStudent, payments: EditedPayments) => (dispatch: Function) => {
 
 	// payments is an object with id as key and value is { amount, fee_id } 
  	const merges = Object.entries(payments).reduce((agg, [p_id, {amount,fee_id}]) => {

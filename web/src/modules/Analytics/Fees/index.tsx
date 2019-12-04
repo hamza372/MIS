@@ -44,8 +44,8 @@ const FeesChart = (props: ChartProps) => {
 					data={
 						Object.entries(props.payments)
 							.sort(([d1,], [d2,]) => moment(d1, props.date_format).diff(moment(d2, props.date_format)))
-							.map(([month, { OWED, SUBMITTED, FORGIVEN }]) => ({
-								month, OWED, SUBMITTED, FORGIVEN, net: Math.abs(SUBMITTED - OWED) 
+							.map(([month, { OWED, SUBMITTED, FORGIVEN, SCHOLARSHIP }]) => ({
+								month, OWED, SUBMITTED, FORGIVEN: FORGIVEN + SCHOLARSHIP, net: Math.abs(OWED - (SUBMITTED + FORGIVEN + SCHOLARSHIP))
 							}))}>
 					
 					<XAxis dataKey="month" />
@@ -107,7 +107,7 @@ const FeesTable = (props: TableProps) => {
 						<label style={{ backgroundColor: "#bedcff", textAlign:"center" }}><b>{numberWithCommas(total.OWED)}</b></label>
 						<label style={{ backgroundColor: "#93d0c5", textAlign:"center" }}><b>{numberWithCommas(total.PAID)}</b></label>
 						<label style={{ backgroundColor: "#e0e0e0", textAlign:"center" }}><b>{numberWithCommas(total.FORGIVEN + total.SCHOLARSHIP)}</b></label>
-						<label style={{ backgroundColor: "#fc6171", textAlign:"center"}}><b>{numberWithCommas(Math.abs(total.OWED - (total.PAID + total.FORGIVEN)))}</b></label>
+						<label style={{ backgroundColor: "#fc6171", textAlign:"center"}}><b>{numberWithCommas(Math.abs(total.OWED - (total.SCHOLARSHIP + total.PAID + total.FORGIVEN)))}</b></label>
 					</div>
 				]
 			}
@@ -347,22 +347,26 @@ class FeeAnalytics extends Component<propTypes, S> {
 				// some payment.amount has type string
 				// @ts-ignore 
 				const amount =  typeof(payment.amount) === "string" ? parseFloat(payment.amount) : payment.amount
-				
+
 				const period_key = moment(payment.date).format(period_format);
 				const period_debt = payments[period_key] || { OWED: 0, SUBMITTED: 0, FORGIVEN: 0, SCHOLARSHIP: 0}
 				
-				// for 'scholarship', payment has also type OWED and negative amount
-				if(amount < 0) {
-					const new_amount = Math.abs(amount)
-					debt["SCHOLARSHIP"] += new_amount
-					period_debt["SCHOLARSHIP"] += new_amount
-				} else {
-					debt[payment.type] += amount
-					period_debt[payment.type] += amount
+				// some schools, intentionly added some null payments' amounts through student ledger 
+				// which causing null values in amount having type owed, mostly were scholarships
+				// check is added in the student ledger page, so this check for past payments
+				if(!isNaN(amount)) {
+					// for 'scholarship', payment has also type OWED and negative amount
+					if(amount < 0) {
+						const new_amount = Math.abs(amount)
+						debt["SCHOLARSHIP"] += new_amount
+						period_debt["SCHOLARSHIP"] += new_amount
+					} else {
+						debt[payment.type] += amount
+						period_debt[payment.type] += amount
+					}
+
+					payments[period_key] = period_debt;
 				}
-
-				payments[period_key] = period_debt;
-
 			}
 
 			total_paid += debt.SUBMITTED;
@@ -543,7 +547,8 @@ class FeeAnalytics extends Component<propTypes, S> {
 			// for other tables, Sr. no will start from chunkSize * index
 			// here's "index" representing table (chunk) no.
 			chunkify(items, chunkSize)
-				.map((itemsChunk: any, index: number) => <OutstandingFeePrintableList items={ itemsChunk }
+				.map((itemsChunk: any, index: number) => <OutstandingFeePrintableList key={index}
+					items={ itemsChunk }
 					chunkSize={ index === 0 ? 0 : chunkSize * index }
 					schoolName={ this.props.settings.schoolName }
 					sections={ sections }/>)

@@ -5,10 +5,12 @@ import moment from "moment"
 type PropsTypes = {
     items: any
     chunkSize: number
-    schoolName: string
+	schoolName: string
+	dateFormat: string
 }
 
 export const IncomeExpenditurePrintableList = (props: PropsTypes) => {
+	const dateView = props.dateFormat === "DAILY" ? "DD-MM-YY" : "MM-YYYY"
     return (
         <div className="print-only print-table">
             <table>
@@ -29,11 +31,11 @@ export const IncomeExpenditurePrintableList = (props: PropsTypes) => {
                 <tbody>
                 {
                     props.items.map(([id, exp]: any, i: number) => <tr key={id}>
-                    <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
-                    <td> { exp.type === "PAYMENT_GIVEN" ? exp.label : exp.type === "SUBMITTED" ? "PAID": "-" }</td>
-                    <td> { exp.type === "PAYMENT_GIVEN" ? exp.category : exp.type === "SUBMITTED" && exp.fee_name !== undefined ? exp.fee_name : "-"}</td>
-                    <td> { exp.type === "PAYMENT_GIVEN" && exp.expense === "MIS_EXPENSE" ? exp.quantity : "-"} </td>
-                    <td> { exp.type === "PAYMENT_GIVEN" ? (exp.amount - (exp.expense === "SALARY_EXPENSE" ? exp.deduction : 0)) : exp.amount}</td>
+                    <td>{moment(exp.date).format(dateView)}</td>
+					<td> {exp.label}</td>
+					<td> {exp.category}</td>
+					<td> {exp.quantity} {exp.quantity !== 1 ? "Entries" : "Entry"}</td>
+					<td> {exp.amount}</td>
                     </tr>)
                 }
                 </tbody>

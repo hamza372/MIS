@@ -109,32 +109,51 @@ class ManageFees extends Component <propTypes,S> {
 	save = () => {
 
 		const { students } = this.props;
+		const { amount, name, type, period } = this.state.fee
 
-		if (this.state.fee.name === "" ||
-			this.state.fee.amount === "" ||
-			this.state.fee.period === "" ||
-			this.state.fee.type === ""
-			){
-				setTimeout(() => this.setState({ banner: { active: false } }), 3000);
-				return this.setState({
-					banner:
-					{
-						active: true,
-						good:false,
-						text: "Please Fill All of the Information"
-					}
-				})
-			}
+		if (name === "" || amount === "" || period === "" || type === "" ) {
+
+			setTimeout(() => this.setState({ banner: { active: false } }), 3000);
+
+			return this.setState({
+				banner: {
+					active: true,
+					good:false,
+					text: "Please Fill All of the Information"
+				}
+			})
+		}
+
+		// check if scholarship and validate entered amount and make it absolute
+		// (if intentionally entered amount is negative) because we make Amount
+		// Negative while generating every payment from fees having type SCHOLARSHIP against any student,
+		// to differentiate between other types of generated payments, so it must be a Absolute Amount here
 		
+		let temp_amount = amount;
+
+		if(type === "SCHOLARSHIP") {
+			const parsed_amount = parseFloat(temp_amount)
+
+			if(!isNaN(parsed_amount)) {
+				temp_amount = Math.abs(parsed_amount).toString()
+			} else {
+				alert("Please Enter Valid Amount")
+				return
+			}
+		}
+
 		if(this.state.fee_filter === "to_single_student" && this.state.selected_student_id !=="" && this.state.selected_section_id !== "") {
 		
 			const student_fee = {
 				student_id: this.state.selected_student_id,
 				fee_id: v4(),
-				...this.state.fee
+				amount: temp_amount,
+				type,
+				name,
+				period
 			}
 
-			// add fee
+			// adding single fee of type FEE | SHOLARSHIP
 			this.props.addFee(student_fee)
 			
 			this.setState({
@@ -152,12 +171,11 @@ class ManageFees extends Component <propTypes,S> {
 				.filter( s => s.Name && s.Active && this.state.selected_section_id === "" ? true : s.section_id === this.state.selected_section_id)
 				.map(student => {
 						const fee_id = v4()
-						const {name, amount, type, period } = this.state.fee
 						return {
 								student,
 								fee_id,
 								name,
-								amount,
+								amount: temp_amount,
 								type,
 								period
 							}
@@ -169,7 +187,7 @@ class ManageFees extends Component <propTypes,S> {
 
 			if (window.confirm(alert_message)) {
 
-				// adding multiple fees
+				// adding multiple fees of type FEE | SCHOLARSHIP
 				this.props.addMultipleFees(fees)
 	
 				this.setState({
@@ -265,7 +283,7 @@ class ManageFees extends Component <propTypes,S> {
 						</div>
 						<div className="row">
 							<label>Amount</label>
-							<input type="text" {...this.former.super_handle(["fee", "amount"])} placeholder="Enter Amount" />
+							<input type="number" {...this.former.super_handle(["fee", "amount"])} placeholder="Enter Amount" />
 						</div>
 						<div className="row">
 							<label>Fee Period</label>

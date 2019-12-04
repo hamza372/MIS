@@ -7,6 +7,7 @@ import moment from 'moment';
 import Banner from 'components/Banner';
 import chunkify from 'utils/chunkify';
 import { IncomeExpenditurePrintableList } from 'components/Printable/Expense/Other/list';
+import { ProgressBar } from 'components/ProgressBar';
 
 import '../style.css';
 
@@ -18,14 +19,32 @@ interface P {
 	schoolLogo: RootDBState["assets"]["schoolLogo"];
 }
 
+interface collectiveOBJ {
+	[id: string]: {
+		amount: number;
+		quantity: number;
+		category: string;
+		label: string;
+		date: number
+	}
+}
+
 interface S {
 	banner: {
 		active: boolean;
 		good: boolean;
 		text: string;
 	};
+	loading: boolean;
+	collective_obj: collectiveOBJ
+	total_income: number,
+	total_expense: number,
+	percentage: number
 	monthFilter: string;
 	yearFilter: string;
+	Months: Set<any>
+	Years: Set<any>
+	viewBy: "DAILY" | "MONTHLY"
 }
 
 interface Routeinfo {
@@ -37,6 +56,7 @@ type propTypes = RouteComponentProps<Routeinfo> & P
 class IncomeExpenditure extends Component <propTypes, S> {
 
 	former: Former
+	background_calculation: NodeJS.Timeout
 	constructor(props: propTypes) {
 		super(props)
 
@@ -46,10 +66,24 @@ class IncomeExpenditure extends Component <propTypes, S> {
 				good: true,
 				text: "Saved!"
 			},
+			loading: false,
+			collective_obj: {},
+			total_income: 0,
+			total_expense: 0,
+			percentage: 0,
+			Months: new Set(),
+			Years: new Set(),
 			monthFilter: "",
 			yearFilter: moment().format("YYYY"),
+			viewBy: "MONTHLY"
 		}
 		this.former = new Former (this,[])
+	}
+	componentDidMount() {
+		this.calculate()
+	}
+	componentWillReceiveProps() {
+		this.calculate()
 	}
 
 	getFilterCondition = (year: string, month: string, payment: any) =>
@@ -72,108 +106,142 @@ class IncomeExpenditure extends Component <propTypes, S> {
 			return moment(payment.date).format("MMMM") === month && moment(payment.date).format("YYYY") === year;
 		}
 	}
+	calculate = () => {
 
-	render() {
+		let i = 0;
+		let j = 0;
 
-		const { expenses, students, settings } = this.props
+		clearTimeout(this.background_calculation)
 
-		const chunkSize = 22 // records per table
+		this.setState({
+			loading: true
+		})
 
-		const students_payments = Object.entries(students)
-			.filter(([id, s]) => s.Name)
-			.reduce((prev,[id, s]) => {
+		const collective_obj: collectiveOBJ = {}
 
-				const curr_pay = Object.entries(s.payments)
-					.filter(([, curr]) => curr.type === "SUBMITTED")
-					.reduce((prev, [id, curr]) => {
-						return {
-							...prev,
-							[id]: curr
-						}
-					}, {})
+		let total_income = 0;
+		let total_expense = 0;;
 
-				return {
-					...prev,
-					...curr_pay
-					}
+		const { students, expenses } = this.props
+		const { monthFilter, yearFilter } = this.state
 
-			}, {} as { [id: string]: MISStudentPayment })
-
-		const filtered_expense = Object.entries(expenses)
-			.filter(([id,e]) => e.type === "PAYMENT_GIVEN")
-			.reduce((agg, [id, curr]) => {
-
-				return {
-					...agg,
-					[id]: curr
-				}
-
-			}, {} as { [id: string]: MISExpense | MISSalaryExpense})
-
-		const income_exp = {...students_payments, ...filtered_expense}
+		const student_list = Object.values(students)
+		const expense_list = Object.values(expenses)
 
 		const Months  = new Set([])
 		const Years = new Set([])
 
-		for(const s of Object.values(income_exp)){
-			Months.add(moment(s.date).format("MMMM"))
-			Years.add(moment(s.date).format("YYYY"))
-		}
+		const s_length = student_list.length
+		const e_length = expense_list.length
 
-		const income_exp_sorted = Object.values(income_exp)
-			.filter(e => this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, e))
-			.sort((a, b) => a.date - b.date)
+		const month = monthFilter
+		const year = yearFilter
+		const viewBy = this.state.viewBy === "MONTHLY" ? "MM-YYYY" : "DD-MM-YY"
 
-		let total_income = 0
-		let total_expense = 0
-		let total_monthly_income = 0
-		let total_monthly_expense = 0
+		const reducify = () => {
 
-		Object.values(income_exp).forEach(i => {
+			const interval = Math.floor(s_length/10)
+			if (i % interval === 0) {
+				this.setState({
+					percentage: (i / s_length) * 100
+				})
+			}
 
-			if(i.type === "SUBMITTED")
-			{
-				total_income += i.amount
+			if (i >= s_length && j >= e_length) {
+				return this.setState({
+					loading: false,
+					collective_obj,
+					total_income,
+					total_expense,
+					percentage: 0,
+					Months,
+					Years
+				})
+			}
 
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
-					total_monthly_income += i.amount
+			if (i < s_length) {
+
+				const student = student_list[i];
+				i += 1;
+
+				for (const pid in student.payments || {}) {
+
+					const payment = student.payments[pid]
+					const inc_month = `INCOME-${moment(payment.date).format(viewBy)}`
+					
+					Months.add(moment(payment.date).format("MMMM"))
+					Years.add(moment(payment.date).format("YYYY"))
+
+					if (payment.type === "SUBMITTED" && this.getFilterCondition(year, month, payment))
+					{
+						collective_obj[inc_month] = collective_obj[inc_month] ?
+							{
+								...collective_obj[inc_month],
+								amount: collective_obj[inc_month].amount + payment.amount,
+								quantity: collective_obj[inc_month].quantity + 1,
+							} : {
+								amount: payment.amount,
+								quantity: 1,
+								category: "Fee",
+								label: "PAID",
+								date: payment.date
+							}
+
+						total_income += payment.amount
+					}
 				}
 			}
-			else if(i.type === "PAYMENT_GIVEN")
-			{
-				total_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
+
+			if (j < e_length) {
+
+				const expense = expense_list[j]
+				j += 1;
 				
-				if(this.getFilterCondition(this.state.yearFilter, this.state.monthFilter, i)) {
-					total_monthly_expense += i.amount - ((i.expense === "SALARY_EXPENSE" && i.deduction) || 0)
+				if (expense.type === "PAYMENT_GIVEN" && this.getFilterCondition(year, month, expense)) {
+
+					Months.add(moment(expense.date).format("MMMM"))
+					Years.add(moment(expense.date).format("YYYY"))
+					
+					const inc_month = `EXPENSE-${moment(expense.date).format(viewBy)}-${expense.category}`
+					const curr_amount = typeof (expense.amount) === "string" ? parseFloat(expense.amount) : expense.amount
+
+					collective_obj[inc_month] = collective_obj[inc_month] ?
+						{
+							...collective_obj[inc_month],
+							amount: collective_obj[inc_month].amount + (expense.expense === "SALARY_EXPENSE" ? expense.amount - expense.deduction : expense.amount),
+							quantity: collective_obj[inc_month].quantity + 1
+						} : {
+							amount:  expense.expense === "SALARY_EXPENSE" ? expense.amount - expense.deduction : expense.amount,
+							quantity: 1,
+							category: expense.category,
+							label: "EXPENSE",
+							date: expense.date
+						}
+
+					total_expense += curr_amount
 				}
+
 			}
-		})
+			this.background_calculation = setTimeout(reducify, 0)
+		}
+		this.background_calculation = setTimeout(reducify, 0)
+	}
 
-	return <div className="expenses page">
+	render() {
 
-		{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+		const { settings } = this.props
+		const { percentage, collective_obj, total_income, total_expense, viewBy, Months, Years, banner, loading} = this.state
+
+		const chunkSize = 22 // records per table
+
+	return loading ? <ProgressBar percentage={percentage} /> : <div className="expenses page">
+
+		{ banner.active ? <Banner isGood={banner.good} text={banner.text} /> : false }
 
 		<div className="divider no-print">Income and Expenditure</div>
-		
-		<div className="table row no-print">
-			<label>Total Income:</label>
-			<div><b>Rs. {numberWithCommas(total_income)}</b></div>
-		</div>
-		
-		<div className="table row no-print">
-			<label>Total Expense:</label>
-				<div><b>Rs. {numberWithCommas(total_expense)}</b></div>
-		</div>
-
-		<div className="table row no-print">
-			<label>Profit:</label>
-			<div><b>Rs. {numberWithCommas(total_income-total_expense)}</b></div>
-		</div>
-
-		<div className="divider no-print">Ledger</div>
 
 		<div className="filter row no-print" style={{marginBottom:"10px", flexWrap:"wrap"}}>
-			<select {...this.former.super_handle(["monthFilter"])}>
+			<select {...this.former.super_handle(["monthFilter"], () => true, () => this.calculate())}>
 				<option value="">Select Month</option>
 				{
 					[...Months].map( Month => {
@@ -182,13 +250,18 @@ class IncomeExpenditure extends Component <propTypes, S> {
 				}
 			</select>
 
-			<select {...this.former.super_handle(["yearFilter"])}>
+			<select {...this.former.super_handle(["yearFilter"], () => true, () => this.calculate())}>
 				<option value="">Select Year</option>
 				{
 					[...Years].map( year => {
 						return <option key={year} value={year}> {year} </option>
 					})
 				}
+			</select>
+
+			<select {...this.former.super_handle(["viewBy"], () => true, () => this.calculate())}>
+				<option value="MONTHLY">Monthly View</option>
+				<option value="DAILY">Daily View</option>
 			</select>
 		</div>
 
@@ -201,36 +274,40 @@ class IncomeExpenditure extends Component <propTypes, S> {
 				<label><b> Amount </b></label>
 			</div>
 			{
-				Object.entries(income_exp_sorted)
+				Object.entries(this.state.collective_obj)
+				.sort(([,a],[,b]) => a.date - b.date)
 				.map(([id, e]) => {
 					return <div key={id} className="table row">
-						<label> { moment(e.date).format("DD-MM-YY")} </label>
-						<label> { e.type === "PAYMENT_GIVEN" ? e.label : e.type === "SUBMITTED" ? "PAID": "-" }</label>
-						<label> { e.type === "PAYMENT_GIVEN" ? e.category : (e.type === "SUBMITTED" && e.fee_name) || "-"}</label>
-						<label> { e.type === "PAYMENT_GIVEN" && e.expense === "MIS_EXPENSE" ? e.quantity : "-"} </label>
-						<label> { e.type === "PAYMENT_GIVEN" ? (e.amount - (e.expense === "SALARY_EXPENSE" ? e.deduction : 0)) : e.amount}</label>
+						<label> {moment(e.date).format( viewBy === "DAILY" ? "DD-MM-YY" : "MM-YYYY") } </label>
+						<label> {e.label} </label>
+						<label> {e.category} </label>
+						<label> {e.quantity === 1 ? `${e.quantity} Entry` : `${e.quantity} Entries`}</label>
+						<label> {e.amount} </label>
 					</div>
 				})
 			}
 			<div className="table row last">
 				<label><b>Income</b></label>
-				<div><b>Rs. {numberWithCommas(total_monthly_income)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_income)}</b></div>
 			</div>
 			<div className="table row last">
 				<label><b>Expense</b></label>
-				<div><b>Rs. {numberWithCommas(total_monthly_expense)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_expense)}</b></div>
 			</div>
 			<div className="table row last">
 				<label><b>Profit</b></label>
-				<div><b>Rs. {numberWithCommas(total_monthly_income - total_monthly_expense)}</b></div>
+				<div><b>Rs. {numberWithCommas(total_income - total_expense)}</b></div>
 			</div>
 		</div>
 		{
-			chunkify(Object.entries(income_exp_sorted), chunkSize)
-						.map((itemsChunk: any, index: number) => <IncomeExpenditurePrintableList key={index}
-							items={itemsChunk}
-							chunkSize={index === 0 ? 0 : chunkSize * index}
-							schoolName={settings.schoolName}/>)
+			chunkify(Object.entries(collective_obj), chunkSize)
+				.map((itemsChunk: any, index: number) => <IncomeExpenditurePrintableList key={index}
+					items={itemsChunk}
+					chunkSize={index === 0 ? 0 : chunkSize * index}
+					schoolName={settings.schoolName}
+					dateFormat={viewBy}
+					/>
+				)
 		}
 		<div className="print button" style={{marginTop:"5px"}} onClick={() => window.print()} >Print</div>
 	</div>
