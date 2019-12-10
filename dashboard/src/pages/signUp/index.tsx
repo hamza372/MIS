@@ -239,6 +239,8 @@ class SignUp extends Component <propTypes, S> {
 						<option value="SIALKOT">Sialkot</option>
 						<option value="GUJRANWALA">Gujranwala</option>
 						<option value="FAISALABAD">Faisalabad</option>
+						<option value="ISLAMABAD">Islamabad</option>
+						<option value="RAWALPINDI">Rawalpindi</option>
 					</select>
 				</div>
 

@@ -53,7 +53,7 @@ interface TrialsDataRow {
 interface SignUpValue {
 	package_name: "FREE_TRIAL" | "TALEEM1" | "TALEEM2" | "TALEEM3"
 	area_manager_name: "AYESHA" | "UMER" | "FAROOQ" | "ZAHID" | "KAMRAN" | "NOMAN" | ""
-	office: "" | "LAHORE" | "SARGODHA" | "SIALKOT" | "GUJRANWALA" | "FAISALABAD"
+	office: "" | "LAHORE" | "SARGODHA" | "SIALKOT" | "GUJRANWALA" | "FAISALABAD" | "ISLAMABAD" | "RAWALPINDI"
 	city: string
 	type_of_login: "" | "SCHOOL_REFERRAL" | "ASSOCIATION" | "EDFIN" | "INDIVIDUAL" | "AGENT" | "PLATFORM" | "AGENT_SCHOOL"
 
