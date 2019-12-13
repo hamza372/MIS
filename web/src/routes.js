@@ -37,6 +37,7 @@ import StudentFees from './modules/Student/Single/Fees/index'
 import ManageFees from 'modules/Student/ManageFees'
 
 import TrackedRoute from 'components/TrackedRoute'
+import printPreview from 'modules/Student/Single/Fees/printPreview'
 import AuthedRoute from 'components/AuthedRoute'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
@@ -106,7 +107,7 @@ export default class Routes extends React.Component {
 					<TrackedRoute path="/reports-menu" component={ReportsMenu} />
 					<TrackedRoute path="/expenses" component={ExpensePage} />
 
-      		<TrackedRoute exact path="/families/:famId/fee-print-preview" component={printPreview}/>
+      				<TrackedRoute exact path="/families/:famId/fee-print-preview" component={printPreview}/>
 					<TrackedRoute path="/families/:famId/payments" component={StudentFees}/>
 					<TrackedRoute path="/families/:id" component={SingleFamily} />
 					<TrackedRoute path="/families" component={FamilyModule} />
