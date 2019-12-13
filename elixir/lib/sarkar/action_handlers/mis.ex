@@ -80,7 +80,7 @@ defmodule Sarkar.ActionHandler.Mis do
 	end
 
 	def handle_action(%{"type" => "SYNC", "payload" => payload, "lastSnapshot" => last_sync_date}, %{school_id: school_id, client_id: client_id} = state) do
-
+		IO.puts "OLD SYNC FROM #{school_id}!"
 		res = Sarkar.School.sync_changes(school_id, client_id, payload, last_sync_date)
 
 		{:reply, succeed(res), state}
