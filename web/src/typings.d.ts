@@ -126,6 +126,16 @@ interface MISClass {
 	};
 }
 
+interface AugmentedSection {
+	id: string;
+	class_id: string;
+	namespaced_name: string;
+	className: string;
+	classYear: number;
+	name: string;
+	faculty_id?: string;
+}
+
 interface MISStudent {
 	id: string;
 	Name: string;
@@ -173,6 +183,8 @@ interface MISFamilyInfo {
 	ManCNIC: string;
 	Address: string;
 }
+
+type AugmentedMISFamily = MISFamilyInfo & { ID: string }
 
 interface MISCertificate {
 	type: string;

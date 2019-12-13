@@ -104,7 +104,7 @@ class StudentFees extends Component <propTypes, S> {
 
 	student = (): MISStudent => {
 		const id = this.props.match.params.id;
-		return this.props.students[id] || this.siblings()[0];
+		return id === undefined ? this.siblings()[0] : this.props.students[id]
 	}
 
 	familyID = (): string =>  {
@@ -421,6 +421,15 @@ class StudentFees extends Component <propTypes, S> {
 		const style_class = owed_amount <= 0 ? "advance-amount" : "pending-amount"
 		return style_class
 	}
+
+	// return a route for fee voucher preview
+	getPreviewRoute = (): string => {
+		const famId = this.familyID()
+		const redirectTo = famId === undefined ? `/student/${this.props.match.params.id}` : `/families/${famId}`
+
+		return `${redirectTo}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`
+	}
+
 	render() {
 
 		const merged_payments = this.mergedPayments()
@@ -541,7 +550,7 @@ class StudentFees extends Component <propTypes, S> {
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> }
-				<Link className="print button" to={`/student/${this.props.match.params.id}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`}>Print Preview</Link>
+				<Link className="print button" to={this.getPreviewRoute()}> Print Preview</Link>
 			</div>
 
 		</div>

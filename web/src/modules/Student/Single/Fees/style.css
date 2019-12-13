@@ -84,9 +84,8 @@
 
 		.voucher-signature div {
 			font-size: 0.5rem;
-		}
-		.voucher-signature .line {
-			margin-bottom: 2mm;
+			margin-top: 4px;
+			border-top: 1px solid;
 		}
 	}
 	.pending-amount{

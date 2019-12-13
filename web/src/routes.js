@@ -35,7 +35,7 @@ import FamilyModule from './modules/Family'
 import SingleFamily from './modules/Family/Single'
 import StudentFees from './modules/Student/Single/Fees/index'
 import ManageFees from 'modules/Student/ManageFees'
-
+import printPreview from './modules/Student/Single/Fees/printPreview'
 import AuthedRoute from 'components/AuthedRoute'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
@@ -104,6 +104,7 @@ export default class Routes extends React.Component {
 					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
 					<AuthedRoute path="/expenses" component={ExpensePage} />
 
+					<AuthedRoute exact path="/families/:famId/fee-print-preview" component={printPreview}/>
 					<AuthedRoute path="/families/:famId/payments" component={StudentFees}/>
 					<AuthedRoute path="/families/:id" component={SingleFamily} />
 					<AuthedRoute path="/families" component={FamilyModule} />

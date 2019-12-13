@@ -14,33 +14,26 @@ interface P {
 	settings: RootDBState["settings"];
 }
 
-interface S {
-
-}
-
 interface RouteInfo {
 	id: string;
+	famId: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
 
-class printPreview extends Component <propTypes, S>{
-	constructor(props: propTypes) {
-		super(props)
+class printPreview extends Component <propTypes>{
 
-		this.state = {
+	month = (): string => qs.parse(this.props.location.search)["?month"].toString() || ""
+	year = (): string => qs.parse(this.props.location.search)["year"].toString() || ""
 
-		}
-	}
+	studentID = (): string =>  this.props.match.params.id
+	
+	familyID = (): string => this.props.match.params.famId
 
-	month = (): string => `${qs.parse(this.props.location.search)["?month"] || ""}`
-	year = (): string => `${qs.parse(this.props.location.search)["year"] || ""}`
-
-	mergedPaymentsForStudent = (student: MISStudent) => {
-		if(student.FamilyID) {
-			const siblings = Object.values(this.props.students)
-				.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
-
+	mergedPaymentsForStudent = () => {
+	
+		if(this.familyID() !== undefined) {
+			const siblings = this.siblings()
 			const merged_payments = siblings.reduce((agg, curr) => ({
 				...agg,
 				...Object.entries(curr.payments).reduce((agg, [pid, p]) => { 
@@ -57,33 +50,78 @@ class printPreview extends Component <propTypes, S>{
 			return merged_payments
 		}
 
-		return student.payments
+		return this.student().payments
 	}
+
+	student = (): MISStudent => {
+		const id = this.studentID()
+		return id === undefined ? this.siblings()[0] : this.props.students[id]
+	}
+
+	siblings = (): MISStudent[] => {
+		const famId = this.familyID()
+		return Object.values(this.props.students)
+			.filter(s => s && s.Name && s.FamilyID && s.FamilyID === famId)
+	}
+
+	getStudentClass = (sections: AugmentedSection[]): string => { 
+		const student = this.student()
+		return sections.find((x ) => x.id === student.section_id ).namespaced_name || "No Class"
+	}
+
+	getFamily = () => {
+		const student = this.student()
+		const family = {
+			ID: student.FamilyID,
+			ManName: student.ManName,
+			ManCNIC: student.ManCNIC,
+			Phone: student.Phone
+		} as AugmentedMISFamily
+
+		return family
+	}
+
+	generateVoucherNumber = (): number => Math.floor(100000 + Math.random() * 900000)
 
 	render() {
 
-		const { classes, student, settings } = this.props
+		const { classes, settings } = this.props
+		const famId = this.familyID()
+		
+		let student_class_name: string
+		let family: AugmentedMISFamily
 
-		const sections =  getSectionsFromClasses(classes)
-		
-		const curr_class = student.section_id !== undefined && student.section_id !== "" ?
-			sections.find(x => x.id === student.section_id ).namespaced_name :
-			"------"
-		
-		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(student), this.year(), this.month())
+		if(famId === undefined) {
+			const sections = getSectionsFromClasses(classes)
+			student_class_name = this.getStudentClass(sections)
+		} else {
+			family = this.getFamily()
+		}
+
+		const filteredPayments = getFilteredPayments(this.mergedPaymentsForStudent(), this.year(), this.month())
 		
 		// generate random voucher number
-		const voucherNo = Math.floor(100000 + Math.random() * 900000)
+		const voucherNo = this.generateVoucherNumber()
 		let vouchers  = [];
 		
 		for (let i = 0; i <parseInt(settings.vouchersPerPage || "3"); i++) {
-			vouchers.push(<StudentLedgerPage key={i}
-				payments = {filteredPayments}
-				settings = {settings}
-				student = {student}
-				class_name = {curr_class}
-				voucherNo = {voucherNo}
-				css_style = {i === 0 ? "" : "print-only"}/>)
+			
+			if(famId === undefined) {
+				vouchers.push(<StudentLedgerPage key={i}
+					payments = {filteredPayments}
+					settings = {settings}
+					student = {this.student()}
+					class_name = {student_class_name}
+					voucherNo = {voucherNo}
+					css_style = {i === 0 ? "" : "print-only"}/>)
+			} else {
+				vouchers.push(<StudentLedgerPage key={i}
+					payments = {filteredPayments}
+					settings = {settings}
+					family = {family}
+					voucherNo = {voucherNo}
+					css_style = {i === 0 ? "" : "print-only"}/>)
+			}
 		}
 
 	return	<div className="student-fees-ledger">
@@ -91,11 +129,11 @@ class printPreview extends Component <propTypes, S>{
 				<div className="voucher-row">{vouchers}</div>
 			</div>
   }
+
 }
-export default connect((state: RootReducerState, { match: { params: { id } } }: { match: { params: { id: string}}}) => ({
+export default connect((state: RootReducerState) => ({
 	classes: state.db.classes,
 	faculty_id: state.auth.faculty_id,
-	student: state.db.students[id],
 	students: state.db.students,
 	settings: state.db.settings,
 }))(withRouter(printPreview))
