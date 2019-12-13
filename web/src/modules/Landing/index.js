@@ -430,7 +430,7 @@ export default connect(state => ({
 	faculty: state.db.faculty,
 	permissions: state.db.settings.permissions,
 	lastSnapshot: state.lastSnapshot,
-	unsyncd: Object.keys(state.queued).length,
+	unsyncd: Object.keys(state.queued.mutations || {}).length,
 	package_info: state.db.package_info || { date: -1, trial_period: 15, paid: false}, //If package info is undefined
 	school_id: state.auth.school_id
 }), dispatch => ({

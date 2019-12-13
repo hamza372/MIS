@@ -41,18 +41,33 @@ interface RootDBState {
 	diary : MISDiary
 }
 
+interface BaseAnalyticsEvent {
+	type: string;
+	meta: any;
+}
+interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
+	type: "ROUTE";
+	time: number;
+	meta: { route: string };
+}
+
 interface RootReducerState {
 	client_id: string;
 	initialized: boolean;
 	queued: {
-		[path: string]: {
-			action: {
-				path: string[];
-				value?: any;
-				type: "MERGE" | "DELETE";
-			}; 
-			date: number; 
-		}; 
+		mutations: {
+			[path: string]: {
+				action: {
+					path: string[];
+					value?: any;
+					type: "MERGE" | "DELETE";
+				}; 
+				date: number; 
+			}
+		},
+		analytics: {
+			[id: string]: RouteAnalyticsEvent
+		}
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;
