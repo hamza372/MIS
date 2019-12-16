@@ -53,9 +53,38 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, succeed(), state}
 	end
 
-	def handle_action(%{"type" => "SYNC", "payload" => payload, "lastSnapshot" => last_sync_date}, %{school_id: school_id, client_id: client_id} = state) do
-		res = Sarkar.School.sync_changes(school_id, client_id, payload, last_sync_date)
+	def handle_action(
+		%{
+			"type" => "SYNC",
+			"payload" => %{"analytics" => analytics, "mutations" => mutations },
+			"lastSnapshot" => last_sync_date
+		},
+		%{
+			school_id: school_id,
+			client_id: client_id
+		} = state
+	) do
+
+		mutation_res = if map_size(mutations || %{}) > 0 do
+			Sarkar.School.sync_changes(school_id, client_id, mutations, last_sync_date)
+		end
+
+		analytics_res = Sarkar.Analytics.record(school_id, client_id, analytics, last_sync_date)
+
+		res = %{
+			"mutations" => mutation_res,
+			"analytics" => analytics_res,
+		}
+
 		{:reply, succeed(res), state}
+	end
+
+	def handle_action(%{"type" => "SYNC", "payload" => payload, "lastSnapshot" => last_sync_date}, %{school_id: school_id, client_id: client_id} = state) do
+		IO.puts "OLD SYNC FROM #{school_id}!"
+		res = Sarkar.School.sync_changes(school_id, client_id, payload, last_sync_date)
+
+		{:reply, succeed(res), state}
+
 	end
 
 	def handle_action(%{"type" => "SMS", "payload" => payload}, %{school_id: school_id, client_id: client_id} = state) do
@@ -74,10 +103,10 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end
 
-	def handle_action(%{"type" => type, "payload" => payload}, state) do
+	def handle_action(%{"type" => type, "payload" => payload} = msg, state) do
 		IO.puts "it is likely you have not authenticated. no handler exists for this combination of state and message"
 		IO.inspect type
-		IO.inspect payload
+		IO.inspect msg 
 		IO.inspect state
 		{:reply, fail("Please update your mischool app to the latest version."), state}
 	end

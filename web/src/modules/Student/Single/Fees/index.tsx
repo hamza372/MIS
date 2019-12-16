@@ -3,33 +3,19 @@ import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps, Link } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
-
-import former from '../../../.../../../utils/former';
-
-import { PrintHeader } from '../../../../components/Layout'
-import Banner from '../../../../components/Banner'
-import { addMultiplePayments, addPayment, logSms, editPayment } from '../../../../actions'
-import { sendSMS } from '../../../../actions/core'
-import { checkStudentDuesReturning } from '../../../../utils/checkStudentDues'
-import { smsIntentLink } from '../../../../utils/intent'
-import { numberWithCommas } from '../../../../utils/numberWithCommas'
-import { getFeeLabel } from '../../../../utils/getFeeLabel'
-import { getFilteredPayments } from '../../../../utils/getFilteredPayments'
-import { sortYearMonths } from '../../../../utils/sortUtils'
+import former from 'utils/former';
+import { PrintHeader } from 'components/Layout'
+import Banner from 'components/Banner'
+import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
+import { sendSMS } from 'actions/core'
+import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import { smsIntentLink } from 'utils/intent'
+import { numberWithCommas } from 'utils/numberWithCommas'	
+import { getFeeLabel } from 'utils/getFeeLabel'
+import { getFilteredPayments } from 'utils/getFilteredPayments'
+import { sortYearMonths } from 'utils/sortUtils'
 
 import './style.css'
-
-/*
-
-	Write a payment has been received
-	Forgive a fee
-	View past payments
-	Compare to the expected amount
-
-	Multiple students will have the same payer (parent)
-	We need to know when the school year starts and ends (fee period)
-
-*/
 
 type payment = {
 	student: MISStudent;
@@ -47,8 +33,8 @@ interface P {
 	addMultiplePayments: (payments: payment[] ) => any;
 	sendSMS: (text: string, number: string) => any;
 	logSms: (history: any) => any;
-	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => any;
-}
+	editPayment: (payments: AugmentedMISPaymentMap) => any;
+ }
 
 interface S {
 	banner: {
@@ -64,34 +50,37 @@ interface S {
 	};
 	month: string;
 	year: string;
-	edits: MISStudent["payments"];
-
+	edits: AugmentedMISPaymentMap
 }
 
 interface RouteInfo {
 	id: string;
+	famId: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P
+
+
 
 class StudentFees extends Component <propTypes, S> {
 
 	Former: former
 	constructor(props: propTypes) {
 		super(props);
-		
+
 		const current_month = moment().format("MM/YYYY")
-		const edits = Object.entries(this.student().payments)
+		const edits = Object.entries(this.mergedPayments())
 			.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
 			.reduce((agg,[id,payment]) => {
 				return {
 					...agg,
 					[id]: {
-						amount: payment.amount,
-						fee_id: payment.fee_id
+						...payment,
+						student_id: payment.student_id,
+						edited: false
 					}
 				}
-			}, {})
+			}, {} as AugmentedMISPaymentMap)
 
 		this.state = {
 			banner: {
@@ -113,18 +102,32 @@ class StudentFees extends Component <propTypes, S> {
 		this.Former = new former(this, []);
 	}
 
-	student = () => {
+	student = (): MISStudent => {
 		const id = this.props.match.params.id;
-		return this.props.students[id];
+		return id === undefined ? this.siblings()[0] : this.props.students[id]
 	}
 
-	siblings = () => {
+	familyID = (): string =>  {
+		const famId = this.props.match.params.famId || this.student().FamilyID
+		return famId;
+	}
 
-		const student = this.student();
-
+	siblings = (): MISStudent[] => {
+		const famId = this.familyID()
 		return Object.values(this.props.students)
-			.filter(s => s.Name && s.FamilyID && s.FamilyID === student.FamilyID)
+			.filter(s => s && s.Name && s.FamilyID && s.FamilyID === famId)
+	}
 
+	paymentEditTracker = (pid: string) => () => {
+		this.setState({
+			edits: {
+				...this.state.edits,
+				[pid]: {
+					...this.state.edits[pid],
+					edited: true
+				}
+			}
+		})
 	}
 
 	mergedPayments = () => {
@@ -139,18 +142,51 @@ class StudentFees extends Component <propTypes, S> {
 						...agg,
 						[pid]: {
 							...p,
-							fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`
+							fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`,
+							student_id: curr.id
 						}
 					}
-				}, {} as MISStudent['payments'])
-			}), {} as { [id: string]: MISStudentPayment})
+				}, {})
+			}), {} as AugmentedMISPaymentMap)
 
 			return merged_payments;
 
 		}
 
-		return this.student().payments
+		return Object.entries(this.student().payments)
+			.reduce((agg, [pid, curr]) => ({
+				...agg,
+				[pid]: {
+					...curr,
+					student_id: this.student().id,
+					edited: false
+				}
+			}), {} as AugmentedMISPaymentMap)
 	}
+	
+	getFees = () => {
+		
+		const siblings = this.siblings()
+		if(siblings.length > 0) {
+			const agg_fees = siblings
+				.reduce((agg, curr) => ({
+					...agg,
+					...Object.entries(curr.fees)
+						.reduce((agg, [fid, f]) => { 
+							return {
+								...agg,
+								[fid]: {
+									...f
+								}
+							}
+						}, {} as MISStudent['fees'])
+				}), {} as { [id: string]: MISStudentFee})
+
+			return agg_fees;
+		}
+		
+		return this.student().fees
+    }
 
 	newPayment = () => {
 		this.setState({ 
@@ -176,8 +212,10 @@ class StudentFees extends Component <propTypes, S> {
 			date: new Date().getTime()
 		}
 
-		const balance = [...Object.values(this.student().payments), payment]
+		const balance = [...Object.values(this.mergedPayments()), payment]
 					.reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+
+		const student = this.student()
 
 		if(this.state.payment.sendSMS) {
 			// send SMS with replace text for regex etc.
@@ -185,15 +223,13 @@ class StudentFees extends Component <propTypes, S> {
 			const message = this.props.feeSMSTemplate
 					.replace(/\$BALANCE/g, `${balance}`)
 					.replace(/\$AMOUNT/g, `${payment.amount}`)
-					.replace(/\$NAME/g, this.student().Name)
+					.replace(/\$NAME/g, student.FamilyID || student.Name)
 
-			
+			// console.log("MESSAGE DATA", message)
 			if(this.props.settings.sendSMSOption !== "SIM") {
 				alert("can only send messages from local SIM");
-			}
-
-			else {
-				const url = smsIntentLink({ messages: [{ text: message, number: this.student().Phone }], return_link: window.location.href })
+			} else {
+				const url = smsIntentLink({ messages: [{ text: message, number: student.Phone }], return_link: window.location.href })
 				
 				const historyObj = {
 					faculty: this.props.faculty_id,
@@ -208,7 +244,7 @@ class StudentFees extends Component <propTypes, S> {
 			}
 		}
 
-		this.props.addPayment(this.student(), id, payment.amount, payment.date, payment.type, payment.fee_id)
+		this.props.addPayment(student, id, payment.amount, payment.date, payment.type, payment.fee_id)
 
 		this.setState({
 			payment: {
@@ -219,15 +255,23 @@ class StudentFees extends Component <propTypes, S> {
 	}
 
 	componentDidMount() {
-		// loop through fees, check if we have added 
-		const owedPayments = checkStudentDuesReturning(this.student());
-		
-		if (owedPayments.length > 0) {
-			this.props.addMultiplePayments(owedPayments);
+		// loop through fees, check if we have added
+		if(this.familyID() === undefined) {
+			const owedPayments = checkStudentDuesReturning(this.student());
+			if (owedPayments.length > 0) {
+				this.props.addMultiplePayments(owedPayments);
+			}
 		}
+		if(this.familyID() !== undefined) {
+			const siblings = this.siblings()
+			this.generateSiblingsPayments(siblings)
+		}
+	}
 
-		if (this.siblings().length > 0) {
-			const sibling_payments = this.siblings()
+	generateSiblingsPayments = (siblings: MISStudent[]) => {
+		
+		if (siblings.length > 0) {
+			const sibling_payments = siblings
 				.reduce((agg, curr) => {
 					const curr_student_payments = checkStudentDuesReturning(curr)
 					if (curr_student_payments.length > 0) {
@@ -239,27 +283,75 @@ class StudentFees extends Component <propTypes, S> {
 					return agg
 				}, [])
 
-			this.props.addMultiplePayments(sibling_payments)
+			if(sibling_payments.length > 0) {
+				this.props.addMultiplePayments(sibling_payments)	
+			}			
 		}
 	}
 
-	componentWillReceiveProps(newProps: propTypes) {
-		//This will make we get the lates changes
-		const id = this.props.match.params.id;
-		const student =  newProps.students[id];
+	componentWillReceiveProps(nextProps: propTypes) {
+		// This will make we get the lates changes
+		const id = nextProps.match.params.id
+		const student = nextProps.students[id]
+		const famId = nextProps.match.params.famId || student.FamilyID
+
+		let siblings: MISStudent[]
+		let payments
+
+		if(famId !== undefined) {
+		 	siblings = Object.values(nextProps.students)
+				.filter(s => s && s.Name && s.FamilyID && s.FamilyID === famId)
+		}
+
+		// generating payments from fees if any
+		if(famId === undefined) {
+			const owedPayments = checkStudentDuesReturning(student);
+			if (owedPayments.length > 0) {
+				this.props.addMultiplePayments(owedPayments);
+				console.log(owedPayments)
+			}
+		}
+		this.generateSiblingsPayments(siblings)
+
+		// getting payments if against any single student or siblings
+		if(famId === undefined) {
+			payments = Object.entries(student.payments)
+				.reduce((agg, [pid, curr]) => ({
+					...agg,
+					[pid]: {
+						...curr,
+						student_id: student.id,
+						edited: false
+					}
+				}), {} as AugmentedMISPaymentMap)
+
+		} else {
+			payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...Object.entries(curr.payments).reduce((agg, [pid, payment]) => ({
+						...agg,
+						[pid]: {
+							...payment,
+							student_id: curr.id,
+							edited: false
+						}
+					}), {} as AugmentedMISPaymentMap)
+			}), {})
+		}
 
 		const current_month = moment().format("MM/YYYY")
-		const edits = Object.entries(student.payments)
-			.filter(([id,payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
-			.reduce((agg,[id,payment]) => {
+		const edits = Object.entries(payments)
+			.filter(([id, payment]) => moment(payment.date).format("MM/YYYY") === current_month && payment.type !== "SUBMITTED")
+			.reduce((agg, [id, payment]) => {
 				return {
 					...agg,
 					[id]: {
-						amount: payment.amount,
-						fee_id: payment.fee_id
+						...payment,
+						student_id: payment.student_id,
+						edited: false
 					}
 				}
-			}, {})
+			}, {} as AugmentedMISPaymentMap)
 
 			this.setState({
 				edits
@@ -267,6 +359,43 @@ class StudentFees extends Component <propTypes, S> {
 	}
 
 	onSave = () => {
+
+		const modified_payments = this.state.edits
+		let edit_flag = false
+
+		const next_edits = Object.entries(modified_payments)
+			.reduce((agg, [payment_id, payment]) => {
+				if(payment.edited) {
+
+					const { fee_id, amount } = payment
+					const parsed_amount = parseFloat(amount.toString())
+					// check if the user added empty amount while editing current month payments
+					if(isNaN(parsed_amount))
+					{
+						edit_flag = true
+						return agg
+					}
+
+					return {
+						...agg,
+						[payment_id]: {
+							...payment,
+							amount: parsed_amount,
+							fee_id,
+							student_id: payment.student_id
+						}
+					}
+				}
+
+				return agg
+
+			}, {} as AugmentedMISPaymentMap)
+		
+		if(edit_flag) {
+			alert("Please enter valid input")
+			return
+		}
+
 		this.setState({
 			banner: {
 				active: true,
@@ -275,6 +404,8 @@ class StudentFees extends Component <propTypes, S> {
 			}
 		})
 
+		this.props.editPayment(next_edits)
+			
 		setTimeout(() => {
 			this.setState({
 				banner: {
@@ -284,57 +415,60 @@ class StudentFees extends Component <propTypes, S> {
 			})
 		}, 1000);
 
-		const next_edits = Object.entries(this.state.edits)
-			.reduce((agg, [payment_id, { fee_id, amount }]) => {
-				return {
-					...agg,
-					[payment_id]: {
-						fee_id,
-						amount
-					}
-				}
-			}, {})
+	}
 
-		this.props.editPayment(this.student(), next_edits)
+	getOwedAmountStyle = (owed_amount: number): string => {
+		const style_class = owed_amount <= 0 ? "advance-amount" : "pending-amount"
+		return style_class
+	}
 
+	// return a route for fee voucher preview
+	getPreviewRoute = (): string => {
+		const famId = this.familyID()
+		const redirectTo = famId === undefined ? `/student/${this.props.match.params.id}` : `/families/${famId}`
+
+		return `${redirectTo}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`
 	}
 
 	render() {
 
+		const merged_payments = this.mergedPayments()
+		
 		const Months =  new Set(
-			Object.entries(this.student().payments || {})
+			Object.entries(merged_payments)
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
 				.map(([id, payment]) => moment(payment.date).format("MMMM"))
 			)
 		const Years = [...new Set(
-			Object.entries(this.student().payments)
+			Object.entries(merged_payments)
 				.sort(([,a_payment],[,b_payment]) => a_payment.date - b_payment.date)
 				.map(([id,payment]) => moment(payment.date).format("YYYY"))
 			)]
 			
-		const filteredPayments = getFilteredPayments(this.mergedPayments(), this.state.year, this.state.month)
+		const filteredPayments = getFilteredPayments(merged_payments, this.state.year, this.state.month)
 
-		const owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
-		//const curr_month = moment().format("MM/YYYY")
-		const style = { color: owed <= 0 ? "#5ECDB9" : "#FC6171" }
+		const filtered_owed = filteredPayments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+		
+		const total_owed = Object.entries(merged_payments)
+			.reduce((agg, [, curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
 		return <div className="student-fees">
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo}/>
-			<div className="divider">Payment Information</div>
+			<div className="divider">Payments Information</div>
 			<div className="table row">
 				<label>Total Monthly Fees:</label>
-				<div>Rs. {Object.values(this.student().fees).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
+				<div>Rs. {Object.values(this.getFees()).reduce((agg, curr) => curr.type === "FEE" && curr.period === "MONTHLY" ? agg + parseFloat(curr.amount) : agg, 0)}</div>
 			</div>
 
 			<div className="table row">
 				<label>Total One-Time Fees:</label>
 				<div>Rs. {
-					Object.values(this.student().fees)
+					Object.values(this.getFees())
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
 			</div>
-			<div className="divider">Ledger</div>
+			<div className="divider">{this.familyID() !== undefined ? "Family Ledger" : "Student Ledger"}</div>
 
 			<div className="filter row no-print"  style={{marginBottom:"10px"}}>
 				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
@@ -358,8 +492,6 @@ class StudentFees extends Component <propTypes, S> {
 				</select>
 			</div>
 
-			<div className="student-name print-only" style={{ textAlign: "left", fontWeight: "normal" }}><b>Student Name:</b> {this.student().Name}</div>
-			
 			<div className="payment-history section">
 				<div className="table row heading">
 					<label><b>Date</b></label>
@@ -375,16 +507,22 @@ class StudentFees extends Component <propTypes, S> {
 									
 									{ this.state.edits[id] !== undefined ? 
 										<div className="row" style={{color:"rgb(94, 205, 185)"}}>
-											<input style={{textAlign:"right", border: "none"}} type="number" {...this.Former.super_handle(["edits", id, "amount"])} />
+											<input style={{textAlign:"right", border: "none"}} type="number" {...this.Former.super_handle(["edits", id, "amount"], () => true, this.paymentEditTracker(id))} />
 											<span className="no-print" style={{ width:"min-content" }}>*</span>
 										</div>
 									: <div> {numberWithCommas(payment.amount)}</div>}
 								</div>
 							</div> })
 				}
-				<div className="table row last">
-					<label style={style}><b>{owed <= 0 ? "Advance:" : "Pending:"}</b></label>
-					<div style={style}><b>Rs. {numberWithCommas(Math.abs(owed))}</b></div>
+				{
+					this.state.month !== "" && <div className={`table row last ${this.getOwedAmountStyle(filtered_owed)}`}>
+						<label>{filtered_owed <= 0 ? "Current Month Advance:" : "Current Month Pending:"}</label>
+						<div>Rs. {numberWithCommas(Math.abs(filtered_owed))}</div>
+					</div>
+				}
+				<div className={`table row last ${this.getOwedAmountStyle(total_owed)}`}>
+					<label>{total_owed <= 0 ? "Total Advance:" : "Total Pending:"}</label>
+					<div>Rs. {numberWithCommas(Math.abs(total_owed))}</div>	
 				</div>
 			</div>
 			<div className="form">
@@ -412,7 +550,7 @@ class StudentFees extends Component <propTypes, S> {
 					</div>
 					<div className="button save" onClick={this.addPayment}>Add Payment</div>
 				</div> }
-				<Link className="print button" to={`/student/${this.props.match.params.id}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`}>Print Preview</Link>
+				<Link className="print button" to={this.getPreviewRoute()}> Print Preview</Link>
 			</div>
 
 		</div>
@@ -431,5 +569,5 @@ export default connect((state: RootReducerState) => ({
 	addMultiplePayments: (payments: payment[]) => dispatch(addMultiplePayments(payments)),
 	sendSMS: (text: string, number: string) => dispatch(sendSMS(text, number)),
 	logSms: (history: any) => dispatch(logSms(history)),
-	editPayment: (student: MISStudent, payments: MISStudent["payments"]) => dispatch(editPayment(student,payments))
+	editPayment: (payments: AugmentedMISPaymentMap) => dispatch(editPayment(payments)),
 }))(withRouter(StudentFees))

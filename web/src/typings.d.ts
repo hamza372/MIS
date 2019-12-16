@@ -41,18 +41,33 @@ interface RootDBState {
 	diary : MISDiary
 }
 
+interface BaseAnalyticsEvent {
+	type: string;
+	meta: any;
+}
+interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
+	type: "ROUTE";
+	time: number;
+	meta: { route: string };
+}
+
 interface RootReducerState {
 	client_id: string;
 	initialized: boolean;
 	queued: {
-		[path: string]: {
-			action: {
-				path: string[];
-				value?: any;
-				type: "MERGE" | "DELETE";
-			}; 
-			date: number; 
-		}; 
+		mutations: {
+			[path: string]: {
+				action: {
+					path: string[];
+					value?: any;
+					type: "MERGE" | "DELETE";
+				}; 
+				date: number; 
+			}
+		},
+		analytics: {
+			[id: string]: RouteAnalyticsEvent
+		}
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;
@@ -126,6 +141,16 @@ interface MISClass {
 	};
 }
 
+interface AugmentedSection {
+	id: string;
+	class_id: string;
+	namespaced_name: string;
+	className: string;
+	classYear: number;
+	name: string;
+	faculty_id?: string;
+}
+
 interface MISStudent {
 	id: string;
 	Name: string;
@@ -174,6 +199,8 @@ interface MISFamilyInfo {
 	Address: string;
 }
 
+type AugmentedMISFamily = MISFamilyInfo & { ID: string }
+
 interface MISCertificate {
 	type: string;
 	faculty_id: string;
@@ -209,6 +236,12 @@ interface MISStudentPayment {
 	type: "SUBMITTED" | "FORGIVEN" | "OWED";
 	fee_id?: string;
 	fee_name?: string;
+}
+
+type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited: boolean }
+
+interface AugmentedMISPaymentMap {
+	[pid: string] : AugmentedMISPayment
 }
 
 interface BaseMISExpense {

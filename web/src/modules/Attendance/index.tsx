@@ -57,7 +57,7 @@ class Attendance extends Component <propTypes, S> {
 
 		const my_sections = sections.filter(s => s.faculty_id === props.current_faculty.id)
 
-		const selected_section = my_sections.length > 0 ? my_sections[0].id : (sections.length > 0 ? sections[0].id : "");
+		const selected_section = my_sections.length > 0 ? my_sections[0].id : sections.length > 0 ? sections[0].id : "";
 
 		this.state = {
 			date: moment.now(),
@@ -74,9 +74,8 @@ class Attendance extends Component <propTypes, S> {
 	}
 
 	sendBatchSMS = (messages: MISSms[]) => {
-		if(messages.length === 0){
-			console.log("No Messages to Log")
-			return
+		if(messages.length === 0) {
+			return;
 		}
 		const historyObj = {
 			faculty: this.props.current_faculty.id,
@@ -108,12 +107,10 @@ class Attendance extends Component <propTypes, S> {
 			this.setState({
 				selected_students: Object.keys(this.state.selected_students).reduce((agg, curr) => ({...agg, [curr]: false}), {})
 			})
-		}
-		else {
+		} else {
 			this.setState({
 				selected_students: Object.keys(this.state.selected_students).reduce((agg, curr) => ({...agg, [curr]: true}), {})
 			})
-
 		}
 	}
 
@@ -222,7 +219,7 @@ class Attendance extends Component <propTypes, S> {
 			.map(id => this.props.students[id])
 	}
 
-	getLeaveStatus = (s: string): boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
+	getLeaveStatus = (s: MISStudentAttendanceEntry["status"] | "n/a" ): boolean => s === "LEAVE" || s === "SHORT_LEAVE" || s === "SICK_LEAVE" || s === "CASUAL_LEAVE"
 
 	markLeave = (e: { target: { value: any } }, x: MISStudent) => {
 		const status = e.target.value

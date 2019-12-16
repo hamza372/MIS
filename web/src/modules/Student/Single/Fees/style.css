@@ -1,5 +1,6 @@
 .student-fees {
 	width: 90%;
+	margin: auto;
 }
 
 .student-fees .form {
@@ -51,11 +52,47 @@
 			display: block;
 			width: 100%;
 		}
+		.payment-history.section .row.info * {
+			font-weight: normal;
+			font-size: 0.7rem;
+		}
+		.payment-history {
+			margin: 10px 5px;
+		}
+		.payment-history .divider {
+			margin: 10px
+		}
+		.voucher.table.row * {
+			font-weight: normal;
+			line-height: 1.5rem;
+			font-size: 0.8rem;
+			width: 100%;
+		}
+		.voucher.table.row .date {
+			text-align: left;
+			max-width: 20%;
+		}
+		.voucher.table.row .amount {
+			text-align: right;
+			max-width: 20%;
+		}
+		.voucher.table.row .label {
+			text-align: center;
+			max-width: 60%;
+			word-wrap: normal;
+		}
 
 		.voucher-signature div {
 			font-size: 0.5rem;
+			margin-top: 4px;
+			border-top: 1px solid;
 		}
-		.voucher-signature .line {
-			margin-bottom: 2mm;
-		}
+	}
+	.pending-amount{
+		color: #FC6171;
+		font-weight: bold;
+	}
+	.advance-amount{
+		color: #5ECDB9;
+		font-weight: bold;
 	}

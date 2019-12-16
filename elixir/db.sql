@@ -49,3 +49,14 @@ create table writes (
 
 create index on writes(school_id);
 create index on writes(time);
+
+CREATE TABLE mischool_analytics (
+	id text unique not null,
+	school_id text not null,
+	value jsonb not null,
+	time bigint not null,
+	type text not null,
+	client_id text not null,
+	sync_time timestamp default current_timestamp
+);
+create index on mischool_analytics(school_id);

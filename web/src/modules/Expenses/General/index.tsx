@@ -197,7 +197,7 @@ class Expenses extends Component<propTypes, S> {
 
 		if (payment.category === "SALARY") {
 
-			this.props.addSalaryExpense(id, parseFloat(payment.amount), this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, parseFloat(payment.deduction), payment.deduction_reason)
+			this.props.addSalaryExpense(id, parseFloat(payment.amount) || 0, this.props.teachers[payment.faculty_id].Name, "PAYMENT_GIVEN", payment.faculty_id, payment.date, 0, Math.abs(parseFloat(payment.deduction) || 0), payment.deduction_reason)
 
 			this.setState({
 				banner: {
@@ -333,7 +333,7 @@ class Expenses extends Component<propTypes, S> {
 
 		const { expenses, teachers, settings } = this.props
 
-		const chunkSize = 32 // records per table
+		const chunkSize = 21 // records per table
 
 		let Months  = new Set([])
 		let Years = new Set([])
@@ -369,7 +369,7 @@ class Expenses extends Component<propTypes, S> {
 
 			<div className="divider no-print">Expense Information</div>
 
-			<div className="table row">
+			<div className="table row no-print">
 				<label>Total Expense:</label>
 				<div>Rs. {numberWithCommas(total_expense)}</div>
 			</div>
@@ -426,15 +426,15 @@ class Expenses extends Component<propTypes, S> {
 								<label> {moment(e.date).format("DD-MM-YY")} </label>
 								<label> {e.label}</label>
 								<label> {e.category}</label>
-								<label> {`-`} </label>
-								<label> {`${e.deduction}`}{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
+								<label> - </label>
+								<label> { e.deduction }{ e.deduction_reason ? `(${e.deduction_reason})` : "" } </label>
 								{ this.state.edits[id] !== undefined ? (<div className="row" style={{color: "rgb(94, 205, 185)", justifyContent:"space-between"}}>
 									<input style={{ textAlign: "right", border: "none", borderBottom: "1px solid #bbb", width: "70%"}} type="number" {...this.former.super_handle(["edits", id, "amount"])}/>
 									<div className="button red" style={{ padding: "0px", textAlign:"center", width: "15px", lineHeight: "15px" }} onClick={() => this.onDelete(id)}>x</div>
-								</div>) : (<label> {`${numberWithCommas(e.amount - e.deduction)} Rs`}</label>)}
+								</div>) : (<label> {numberWithCommas(e.amount - e.deduction)}</label>)}
 							</div>
 						}
-						else if (e.expense === "MIS_EXPENSE")
+						if (e.expense === "MIS_EXPENSE")
 						{
 							return <div key={id} className="table row">
 								<label> {moment(e.date).format("DD-MM-YY")} </label>
@@ -492,15 +492,16 @@ class Expenses extends Component<propTypes, S> {
 					{ this.state.payment.category === "SALARY" && <div className="row">
 							<label> Teacher </label>
 							<select onChange={(e) => this.onTeacherSelect(e)}>
-								<option value=""> SELECT</option>
+								<option value="">SELECT</option>
 								{
 									Object.values(teachers)
+									.filter( f => f && f.Active && f.Name)
 									.sort((a, b) => a.Name.localeCompare(b.Name))
 									.map(t => {
 										return <option key={t.id} value={t.id}> {t.Name} </option>
 									})
-							}
-						</select>
+								}
+							</select>
 					</div>
 					}
 

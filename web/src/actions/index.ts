@@ -1,5 +1,5 @@
 import { hash } from 'utils'
-import { createMerges, createDeletes, createLoginSucceed, createLoginFail } from './core'
+import { createMerges, createDeletes, createLoginFail, analyticsEvent } from './core'
 import moment from 'moment'
 import {v4} from "node-uuid"
 import Syncr from 'syncr';
@@ -613,12 +613,12 @@ export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
 			path: ["db", "students", student_fee.student_id, "fees", student_fee.fee_id],
 			value: {
 				amount: student_fee.amount,
-				nane: student_fee.name,
+				name: student_fee.name,
 				period: student_fee.period,
 				type: student_fee.type
 			}
 		}]
-
+	
 	dispatch(createMerges(merges))
 }
 
@@ -765,18 +765,18 @@ export const addDiary = (date: string, section_id: string, diary: MISDiary["sect
 
 }
 
-export const editPayment = (student: MISStudent, payments: MISStudent["payments"]) => (dispatch: Function) => {
+export const editPayment = (payments: AugmentedMISPaymentMap) => (dispatch: Function) => {
 
 	// payments is an object with id as key and value is { amount, fee_id } 
- 	const merges = Object.entries(payments).reduce((agg, [p_id, {amount,fee_id}]) => {
+ 	const merges = Object.entries(payments).reduce((agg, [p_id, {student_id, amount,fee_id}]) => {
 		return [...agg,
 			{
-				path:["db", "students", student.id, "payments", p_id, "amount"],
+				path:["db", "students", student_id, "payments", p_id, "amount"],
 				value: amount
 			},
 			{
-				path:["db", "students", student.id, "fees", fee_id, "amount"],
-				value: amount
+				path:["db", "students", student_id, "fees", fee_id, "amount"],
+				value: Math.abs(amount)
 			}
 		]
 	}, [])
@@ -817,4 +817,15 @@ export const markPurchased = () => (dispatch: Function) => {
 		path: ["db", "package_info", "paid"],
 		value: true
 	}]))
+}
+
+export const trackRoute = (route: string) => (dispatch: Function) => {	
+	dispatch(analyticsEvent([
+		{
+			type: "ROUTE",
+			meta: {
+				route: route.split("/").splice(1)
+			}
+		}
+	]))
 }
