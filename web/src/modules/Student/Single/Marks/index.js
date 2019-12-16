@@ -177,7 +177,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			return remarks
 		}
 
-		return grade !== undefined && grade !== "" ? grades[grade].remarks : ""
+		return grade && grades[grade] ? grades[grade].remarks : ""
 	}
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})

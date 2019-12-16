@@ -107,7 +107,7 @@ class ClassReportMenu extends Component {
 				}
 
 				const grade = calculateGrade(temp_marks.obtained, temp_marks.total, this.props.grades)
-				const remarks = grade !== undefined && grade !== "" ? this.props.grades[grade].remarks : ""
+				const remarks = grade && this.props.grades[grade] ? this.props.grades[grade].remarks : ""
 
 				return [
 					...agg,
