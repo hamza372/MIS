@@ -419,7 +419,7 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 					})
 				})
 				.then(resp => {
-					dispatch(resp)
+					dispatch(multiAction(resp))
 				})
 				.catch(err => {
 					console.error(err)
