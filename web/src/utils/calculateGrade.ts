@@ -9,25 +9,26 @@ const calculateGrade = (marks_obtained: number, total_marks: number, grades: MIS
 
     const percent_score = Math.abs(( marks_obtained / total_marks) * 100)
 
-    const sorted_grades = Object.entries(grades).sort((a, b)=> parseFloat(b[1]) - parseFloat(a[1]))
+    const sorted_grades = Object.entries(grades).sort((a, b) => parseFloat(b[1].percent) - parseFloat(a[1].percent))
 
-    let prev_grade: number = 0
+    let previous_percent: number = 0
     let grade: string
 
     const highest_grade = sorted_grades[0]
 
-    for(const e of sorted_grades)
+    for(const curr of sorted_grades)
     {
-        if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
+        if(previous_percent !== 0 && percent_score >= parseFloat(highest_grade[1].percent)){
             grade = highest_grade[0]
             break
         }
-        else if(prev_grade !== 0 && percent_score <= prev_grade && percent_score >= parseFloat(e[1])){
-            grade = e[0]
+        else if(previous_percent !== 0 && percent_score <= previous_percent && percent_score >= parseFloat(curr[1].percent)){
+            grade = curr[0]
             break
         }
         else {
-            prev_grade = parseFloat(e[1])
+            previous_percent = parseFloat(curr[1].percent)
+            grade = curr[0]
         }
     }
     

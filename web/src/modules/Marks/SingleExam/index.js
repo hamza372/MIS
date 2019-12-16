@@ -11,6 +11,7 @@ import Banner from 'components/Banner'
 import Layout from 'components/Layout'
 import Former from 'utils/former'
 import Dropdown from 'components/Dropdown'
+import calculateGrade from 'utils/calculateGrade'
 
 import './style.css'
 
@@ -226,35 +227,14 @@ class SingleExam extends Component {
 		this.props.removeStudent(this.state.exam.id, student.id) //To remove exam from student
 	}
 
-	getGradeFromScore = (score) => {
-
-		const total_score = parseFloat(this.state.exam.total_score) || 0
-		const percent_score = Math.abs( (parseFloat(score) / total_score) * 100 ) || 0
-
-		if(total_score){
-			
-			const sorted_grades = Object.entries(this.props.grades)
-			.sort((a,b)=> parseFloat(b[1]) - parseFloat(a[1]))
-
-			let prev_grade = 0
-			const highest_grade = sorted_grades[0]
-
-			for( const e of sorted_grades)
-			{
-				if(prev_grade !== 0 && percent_score >= parseFloat(highest_grade[1])){
-					return highest_grade[0]
-				}
-				else if(prev_grade !== 0 && percent_score <= prev_grade && percent_score >= e[1]){
-					return e[0]
-				}
-				else {
-					prev_grade = parseFloat(e[1])
-				}
-			}
-		}
-	}
-
 	setGrade = (student) => {
+
+		const marks_obtained = this.state.exam.student_marks[student.id].score
+		const total_marks = parseFloat(this.state.exam.total_score) || 0
+
+		const grade = calculateGrade(marks_obtained, total_marks, this.props.grades)
+
+		const remarks = grade !== undefined ? this.props.grades[grade].remarks : ""
 
 		this.setState({
 			exam: {
@@ -263,7 +243,8 @@ class SingleExam extends Component {
 					...this.state.exam.student_marks,
 					[student.id]:{
 						...this.state.exam.student_marks[student.id],
-						grade: this.getGradeFromScore(this.state.exam.student_marks[student.id].score)
+						grade,
+						remarks
 					}
 				}
 			}
@@ -359,15 +340,12 @@ class SingleExam extends Component {
 
 										<select {...this.former.super_handle(["student_marks", student.id, "remarks"])} style={{width:"inherit"}}>
 											<option value="">Remarks</option>
-											<option value="Excellent">Excellent</option>
-											<option value="Very Good">Very Good</option>
-											<option value="Good">Good</option>
-											<option value="Average">Average</option>
-											<option value="Needs Improvement">Needs Improvement</option>
-											<option value="Pass">Pass</option>
-											<option value="Fail">Fail</option>
-											<option value="Better">Better</option>
-											<option value="Shown Improvement">Shown Improvement</option>
+											{
+												Object.entries(this.props.grades)
+													.map(([ grade, {percent, remarks} ]) => {
+														return	<option key={grade} value={remarks}>{remarks}</option>
+													})
+											}
 											<option value="Absent"> Absent</option>
 										</select>
 									</div>

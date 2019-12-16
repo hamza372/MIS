@@ -33,7 +33,10 @@ export const ClassResultSheet = (props: PropsTypes) => {
     // 66% is the remaining width for dynamic section subjects
     // tested with 9 subjects, output is fine
     const widthForSubjectName = 66 / props.examSubjectsWithMarks.size
-
+    const formatMarks = (marks_obtained: number) => {
+        // if a number is decimal, fix it to only 2 decimal positions
+        return marks_obtained % 1 === 0 ? marks_obtained : marks_obtained.toFixed(2)
+    } 
     return (
         <div className="print-table print-page">
             <table className="outer-space">
@@ -63,7 +66,7 @@ export const ClassResultSheet = (props: PropsTypes) => {
                                 {
                                     student.exams.map((exam, i) => <td key={i} className="cell-center"> {exam.stats ? exam.stats.score : 0 } </td>)
                                 }
-                                <td className="cell-center">{`${ student.marks.obtained }/${ student.marks.total }`}</td>
+                                <td className="cell-center">{`${ formatMarks(student.marks.obtained) }/${ student.marks.total }`}</td>
                                 <td>{ student.grade }</td>
                         </tr>})
                     }
