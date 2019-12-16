@@ -100,7 +100,10 @@ interface MISSettings {
 	};
 	exams: {
 		grades: {
-			[grade: string]: string;
+			[grade: string]: {
+				percent: string
+				remarks: string
+			}
 		};
 	};
 }
