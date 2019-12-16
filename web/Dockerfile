@@ -13,4 +13,4 @@ RUN rm -rf node_modules
 ARG VERSION
 ENV SHA_VERSION=$VERSION
 
-CMD ./set_config.sh > build/config.js && serve -s ./build
+CMD ./set_config.sh > build/config.js && serve ./build

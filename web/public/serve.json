@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        { "source": "/static/js/:fname", "destination": "/static/js/:fname" },
+        { "source": "/static/css/:fname", "destination": "/static/css/:fname" },
+        { "source": "!static/**", "destination": "/index.html" }
+    ]
+}
+
