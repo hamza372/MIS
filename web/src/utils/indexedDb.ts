@@ -274,8 +274,39 @@ const checkGrades = (state: RootReducerState) => {
 	return state
 }
 
+// re-constructing old structure [grade: string]: string to
+// [grade: string]: { percent: string, remarks: string }
+	
+const reconstructGradesObject = (state: RootReducerState) =>  {
+	
+	if(state.db.settings && state.db.settings.exams) {
+
+		const grades_values = Object.values(state.db.settings.exams.grades)
+		
+		// check if new structure already exists
+		if (typeof(grades_values[0]) === "object") {
+			return state
+		}
+		
+		// else construct new structure using previous information
+		const grades = Object.entries(state.db.settings.exams.grades)
+		state.db.settings.exams.grades = grades.reduce((agg, [grade, val]) => {
+			return {
+				...agg,
+				[grade]: {
+					percent: val,
+					remarks: ""
+				}
+			}
+		}, {})
+	}
+
+	return state
+}
+
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
-	checkGrades
+	checkGrades,
+	reconstructGradesObject
 ];

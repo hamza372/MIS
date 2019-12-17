@@ -54,6 +54,8 @@ class ClassReportMenu extends Component {
 
 		// no. of records per chunk
 		const chunkSize = 22;
+		const start = moment(this.state.report_filters.start);
+		const end = moment(this.state.report_filters.end);	
 
 		const relevant_students = Object.values(students)
 			.filter(s => s.Name && s.exams && s.section_id !== undefined && s.section_id === curr_section_id)
@@ -67,10 +69,10 @@ class ClassReportMenu extends Component {
 		const examSubjectsWithMarks = new Set()
 		const examSet = new Set()
 		const subjects = new Set()
-
+		
 		for (const e of relevant_exams) {
 			// show only subjects and marks for selected exam else all subjects
-			if( this.state.report_filters.examFilterText !== "" ? e.name === this.state.report_filters.examFilterText : true) {
+			if((this.state.report_filters.examFilterText !== "" ? e.name === this.state.report_filters.examFilterText : true) && moment(e.date).isBetween(start, end)) {
 				examSubjectsWithMarks.add(`${e.subject} ( ${e.total_score} )`)
 				subjects.add(e.subject)
 			}
@@ -96,10 +98,16 @@ class ClassReportMenu extends Component {
 				 */
 				for (const e of relevant_exams) {
 					const stats = curr.exams[e.id] || { score: 0, remarks: "", grade: "" }
-					new_exams.push({ ...exams[e.id], stats })
-					temp_marks.obtained += parseFloat(stats.score || 0)
-					temp_marks.total += parseFloat(e.total_score || 0)
+
+					if(e.name === this.state.report_filters.examFilterText && moment(e.date).isBetween(start, end)) {
+						new_exams.push({ ...exams[e.id], stats })
+						temp_marks.obtained += parseFloat(stats.score || 0)
+						temp_marks.total += parseFloat(e.total_score || 0)
+					}
 				}
+
+				const grade = calculateGrade(temp_marks.obtained, temp_marks.total, this.props.grades)
+				const remarks = grade && this.props.grades[grade] ? this.props.grades[grade].remarks : ""
 
 				return [
 					...agg,
@@ -108,9 +116,10 @@ class ClassReportMenu extends Component {
 						name: curr.Name,
 						roll: curr.RollNumber ? curr.RollNumber : "",
 						marks: temp_marks,
-						grade: calculateGrade(temp_marks.obtained, temp_marks.total, this.props.grades),
 						position: 0,
-						exams: new_exams
+						exams: new_exams,
+						grade,
+						remarks
 					}
 				]
 			}, [])

@@ -172,6 +172,13 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 	
 	const start = moment(startDate);
 	const end = moment(endDate); 
+	const getRemarks = (remarks, grade) => {
+		if(remarks !== "" || remarks === "Absent") {
+			return remarks
+		}
+
+		return grade && grades[grade] ? grades[grade].remarks : ""
+	}
 
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.filter(exam_id => exams[exam_id])
@@ -232,7 +239,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 							<div>{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</div>
 							<div>{student.exams[exam.id].grade !== "Absent" ? (student.exams[exam.id].score / exam.total_score * 100).toFixed(2) : "N/A"}</div>
 							<div>{student.exams[exam.id].grade}</div>
-							<div>{student.exams[exam.id].remarks}</div>
+							<div>{getRemarks(student.exams[exam.id].remarks, student.exams[exam.id].grade)}</div>
 						</div>),
 						
 						<div className="table row footing" key={`${student.id}-total-footing`}>

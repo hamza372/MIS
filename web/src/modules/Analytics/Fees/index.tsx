@@ -305,7 +305,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 
 		const { students } = this.props
 
-		const student_list = Object.values(students)
+		const student_list = Object.values(students).filter(student => student && student.Name)
 
 		const reducify = () => {
 
