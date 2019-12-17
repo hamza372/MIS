@@ -1,4 +1,4 @@
-import { Dispatch, AnyAction } from 'redux'
+import { Dispatch } from 'redux'
 import Syncr from 'syncr';
 import { loadDb } from 'utils/indexedDb';
 import { v4 } from 'node-uuid';
@@ -364,7 +364,7 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 			.then(resp => dispatch(multiAction(resp)))
 			.catch(err => {
 				console.error(err)
-				alert("Authorization Failed. Log out and Log in again.")
+				// alert("Authorization Failed. Log out and Log in again.")
 			})
 	}
 }
@@ -423,7 +423,7 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 				})
 				.catch(err => {
 					console.error(err)
-					alert("Authorization Failed. Log out and Log in again.")
+					// alert("Authorization Failed. Log out and Log in again.")
 				})
 		}
 

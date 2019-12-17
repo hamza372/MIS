@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
-import { Reducer, AnyAction } from 'redux'
+import { AnyAction } from 'redux'
 
 const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
 
