@@ -1,4 +1,4 @@
-import { Dispatch, AnyAction } from 'redux'
+import { Dispatch } from 'redux'
 import Syncr from 'syncr';
 import { loadDb } from 'utils/indexedDb';
 import { v4 } from 'node-uuid';

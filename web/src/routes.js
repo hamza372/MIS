@@ -38,7 +38,6 @@ import ManageFees from 'modules/Student/ManageFees'
 
 import TrackedRoute from 'components/TrackedRoute'
 import printPreview from 'modules/Student/Single/Fees/printPreview'
-import AuthedRoute from 'components/AuthedRoute'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
 
