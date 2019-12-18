@@ -829,3 +829,39 @@ export const trackRoute = (route: string) => (dispatch: Function) => {
 		}
 	]))
 }
+
+export interface dateSheetMerges {
+	[date: string]: MISDateSheet
+}
+
+export const saveDateSheet = ( datesheetMerges: dateSheetMerges) => (dispatch: Function) => {
+
+	const merges = Object.entries(datesheetMerges)
+		.reduce((agg, [date, dateSheet]) => {
+
+			const currMerges = Object.entries(dateSheet)
+				.reduce((agg, [subj, ds]) => {
+					return [
+						...agg,
+						{
+							path: ["db", "planner", "datesheet", date, subj],
+							value: ds
+						}
+					]
+				},[])
+
+			return [
+				...agg,
+				...currMerges
+			]
+		}, [])
+	dispatch(createMerges(merges))
+}
+
+export const removeSubjectFromDatesheet = ( date: string, subj: string ) => (dispatch: Function) => {
+
+	dispatch(createDeletes([{
+		path:["db", "planner","datesheet", date, subj]
+	}]))
+
+}

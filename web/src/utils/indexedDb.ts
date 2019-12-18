@@ -39,7 +39,10 @@ export const initState: RootReducerState = {
 			trial_period: 15,
 			paid: false
 		},
-		diary: {} as MISDiary
+		diary: {} as MISDiary,
+		planner: {
+			datesheet: {}
+		}
 	},
 	auth: {
 		school_id: undefined,

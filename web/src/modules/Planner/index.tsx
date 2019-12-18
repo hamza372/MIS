@@ -6,13 +6,16 @@ import { PrintHeader } from 'components/Layout'
 import Former from 'utils/former'
 import moment from 'moment';
 
-import { logSms } from 'actions'
+import { logSms, dateSheetMerges, removeSubjectFromDatesheet } from 'actions'
 import { smsIntentLink } from 'utils/intent';
 import { sendBatchSMS } from 'actions/core';
+import { saveDateSheet } from 'actions/index'
 
 import './style.css'
+import { any } from 'prop-types';
 
 interface P {
+	datesheet: RootDBState["planner"]["datesheet"]
 	students: RootDBState["students"];
 	classes: RootDBState["classes"];
 	settings: RootDBState['settings'];
@@ -20,14 +23,17 @@ interface P {
 	faculty_id: string;
 	logSms: (history: any) => any;
 	sendBatchMessages: (messages: MISSms[]) => any;
+	saveDateSheet: (dateSheetMerges: dateSheetMerges) => any;
+	removeSubjectFromDatesheet: ( date: string, subj: string ) => any;
 }
 
 interface S {
 	selected_task: string;
-	dateSheet: {[subject: string]: { date: number; time: string} };
+	datesheet: MISDateSheet;
 	selected_student_number: string;
 	newSubject: string;
 	notes: string;
+	selected_date: string;
 }
 
 interface RouteInfo {
@@ -43,32 +49,32 @@ class Planner extends Component <propTypes, S> {
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
-		
-		const { class_id } = this.props.match.params
-		const curr_class = this.props.classes[class_id]
-		
-		const date = moment.now()
-		const time = moment().format("hh:mm")
 
-		const dateSheet = Object.keys(curr_class.subjects)
-		.reduce((agg, curr) => ({
-			...agg,
-			[curr]: {
-				date,
-				time
-			}
-			
-		}), {})
+		const curr_day = moment().format("YYYY-MM-DD")
+		const datesheet = props.datesheet[curr_day] ? JSON.parse(JSON.stringify(props.datesheet[curr_day])) : this.getDateSheetTemplate()
 
 		this.state = {
 			selected_task: "DATE_SHEET",
-			dateSheet,
+			datesheet,
 			selected_student_number: "",
 			newSubject: "",
-			notes: ""
+			notes: "",
+			selected_date: curr_day
 		}
 		
-		this.former = new Former (this,[])
+		this.former = new Former(this, [])
+	}
+
+	componentDidUpdate(prevProps: propTypes) {
+		if (JSON.stringify(this.props.datesheet) !== JSON.stringify(prevProps.datesheet)) {
+
+			const curr_date = this.state.selected_date
+			const datesheet = this.props.datesheet[curr_date] ? { ...JSON.parse(JSON.stringify(this.props.datesheet[curr_date])), ...this.state.datesheet } : this.state.datesheet
+
+			this.setState({
+				datesheet
+			})
+		}
 	}
 
 	section_id = () => this.props.match.params.section_id
@@ -110,10 +116,10 @@ class Planner extends Component <propTypes, S> {
 	}
 
 	dateSheetString = (): string => {
-		
+
 		const header = `Date: ${moment().format("DD MMMM YYYY")}\nDate Sheet of ${this.props.classes[this.class_id()].name}\n`
-		
-		const dateSheet_message = Object.entries(this.state.dateSheet)
+
+		const dateSheet_message = Object.entries(this.state.datesheet)
 				.map( ([ subject, {date, time} ]) => {
 					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}( ${moment(date).format("dddd")} )`
 			})
@@ -138,13 +144,14 @@ class Planner extends Component <propTypes, S> {
 
 	addSubject = () => {
 
-		const subject = this.state.newSubject
+		const subject = this.state.newSubject.trim()
 
-		if(this.state.dateSheet[subject] || this.state.newSubject === ""){
-			if(this.state.newSubject === "")
-				window.alert("Please Enter a Subject Name !!!")
-			else
-				window.alert("Subject Alreday Exists !!!")
+		if (this.state.datesheet[subject]) {
+			window.alert("Please Enter a Subject Name !!!")
+			return
+		}
+		else if (subject === "") {
+			window.alert("Subject Alreday Exists !!!")
 			return
 		}
 
@@ -152,24 +159,84 @@ class Planner extends Component <propTypes, S> {
 		const time = moment().format("hh:mm")
 
 		this.setState({
-			dateSheet:{
-				...this.state.dateSheet,
+			datesheet:{
+				...this.state.datesheet,
 				[subject]: { date, time }
 			}
 		})
 	}
 
-	removeSubject = ( subject: string) => {
+	removeSubject = (subject: string) => {
 
+		const curr_date = this.state.selected_date
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
 			return
-		
-		const { [subject]: removed, ...rest }  = this.state.dateSheet
+
+		const { [subject]: removed, ...rest }  = this.state.datesheet
 
 		this.setState({
-			dateSheet: rest
+			datesheet: rest
 		})
+
+		if (this.props.datesheet[curr_date] && this.props.datesheet[curr_date][subject]) {
+			this.props.removeSubjectFromDatesheet(curr_date, subject)
+		}
+	}
+
+	getDateSheetTemplate = (): MISDateSheet => {
+		
+		const { class_id } = this.props.match.params
+		const curr_class = this.props.classes[class_id]
+		
+		const date = moment.now()
+		const time = moment().format("hh:mm")
+
+		return Object.keys(curr_class.subjects)
+			.reduce((agg, curr) => ({
+				...agg,
+				[curr]: {
+					date,
+					time
+				}
+			}), {})
+	}
+
+	updateDateSheet = (e: any) => {
+		//on date change this will set the new/prev datesheet
+
+		const day = e.target.value
+		const datesheet = this.props.datesheet[day] ? JSON.parse(JSON.stringify(this.props.datesheet[day])) : this.getDateSheetTemplate()
+
+		this.setState({
+			selected_date: day,
+			datesheet
+		})
+	}
+
+	onSave = () => {
+
+		const curr_date = this.state.selected_date
+		const merges = Object.entries(this.state.datesheet)
+			.reduce((agg, [subj, { date, time }]) => {
+
+				if (this.props.datesheet[curr_date] && this.props.datesheet[curr_date][subj] ? 
+						( this.props.datesheet[curr_date][subj].date !== date || this.props.datesheet[curr_date][subj].time !== time )
+					: true)
+				{
+					return {
+						...agg,
+						[subj]: {
+							date,
+							time
+						}
+					}
+				}
+				return agg
+
+			}, {})
+
+		this.props.saveDateSheet({ [curr_date]: merges })
 	}
 
 	render() {
@@ -208,6 +275,15 @@ class Planner extends Component <propTypes, S> {
 				</div> 
 			*/}
 				<div className="title">DateSheet</div>
+				<div className="row form no-print" style={{ marginBottom:"5px"}}>
+					<label>Date</label>
+					<input
+						type="date"
+						onChange={(e) => this.updateDateSheet(e)}
+						value={this.state.selected_date}
+					/>
+				</div>
+				<div className="divider no-print">{`${moment(this.state.selected_date).format("DD MMM YYYY")}`}</div>
 
 				<div className="row input info"> 
 					<div className="row" style={{justifyContent:"flex-start"}}>
@@ -217,7 +293,7 @@ class Planner extends Component <propTypes, S> {
 					
 					<div className="row" style={{justifyContent:"flex-end"}}>
 						<label> <b> Exam: </b> </label>
-						<input style={{marginLeft:"1px"}} type="text"/> 
+						<input style={{marginLeft:"1px"}} type="text" placeholder="e.g x Term"/> 
 					</div>
 				</div>
 
@@ -228,25 +304,22 @@ class Planner extends Component <propTypes, S> {
 						<div className="item"><b> Subject </b></div>
 					</div>
 						{
-							Object.entries(this.state.dateSheet)
+							Object.entries(this.state.datesheet)
 								.sort(([,a],[, b]) => a.date !== b.date ? (a.date - b.date) : (a.time.localeCompare(b.time)))
 								.map( ([ subject, { date, time }]) => {
 									return <div className="row" key={subject}>
 
 										<input className="item" type="date"
 											value={moment(date).format("YYYY-MM-DD")}
-											onChange={this.former.handle(["dateSheet", subject, "date"])}
+											onChange={this.former.handle(["datesheet", subject, "date"])}
 										/>
-
 
 										<input className="item" type="time"
-											{...this.former.super_handle(["dateSheet", subject, "time"])}
+											{...this.former.super_handle(["datesheet", subject, "time"])}
 										/>
 
-										<div className="item"> {subject}</div>
-
+										<div className="item"> {subject} </div>
 										<div className="button red" onClick={()=> this.removeSubject(subject)}> x </div>
-
 									</div>
 							})
 						}
@@ -270,8 +343,11 @@ class Planner extends Component <propTypes, S> {
 							return_link: window.location.href 
 							})} onClick={() => this.logSms(messages)} className="button blue">Send</a> 
 							: <div className="button" onClick={() => this.sendBatchMessages(messages)}>Send</div> }
+					<div className="button save" onClick={() => this.onSave()} > Save </div>
 
-					<div className="button blue" onClick={() => window.print()}> Print</div>
+				</div>
+				<div className="form row" style={{ justifyContent: "flex-end"}}>
+					<div className="button grey" onClick={() => window.print()}> Print</div>
 				</div>
 			</div>
 	  
@@ -281,6 +357,7 @@ class Planner extends Component <propTypes, S> {
 }
 
 export default connect((state: RootReducerState) => ({
+	datesheet: state.db.planner ? state.db.planner.datesheet || {} : {},
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
@@ -288,5 +365,7 @@ export default connect((state: RootReducerState) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : ""
 }), (dispatch: Function) =>({
 	logSms: (history: any) => dispatch(logSms(history)),
-	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages))
+	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages)),
+	saveDateSheet: (dateSheetMerges: dateSheetMerges) => dispatch(saveDateSheet(dateSheetMerges)),
+	removeSubjectFromDatesheet: ( date: string, subj: string ) => dispatch(removeSubjectFromDatesheet(date, subj))
 }) )(Planner)
