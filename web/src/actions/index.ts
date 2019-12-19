@@ -831,20 +831,20 @@ export const trackRoute = (route: string) => (dispatch: Function) => {
 }
 
 export interface dateSheetMerges {
-	[date: string]: MISDateSheet
+	[id: string]: MISDateSheet
 }
 
 export const saveDateSheet = ( datesheetMerges: dateSheetMerges, section_id: string) => (dispatch: Function) => {
 
 	const merges = Object.entries(datesheetMerges)
-		.reduce((agg, [date, dateSheet]) => {
+		.reduce((agg, [id, dateSheet]) => {
 
 			const currMerges = Object.entries(dateSheet)
 				.reduce((agg, [subj, ds]) => {
 					return [
 						...agg,
 						{
-							path: ["db", "planner", "datesheet",section_id, date, subj],
+							path: ["db", "planner", "datesheet",section_id, id, subj],
 							value: ds
 						}
 					]
@@ -858,10 +858,10 @@ export const saveDateSheet = ( datesheetMerges: dateSheetMerges, section_id: str
 	dispatch(createMerges(merges))
 }
 
-export const removeSubjectFromDatesheet = ( date: string, subj: string, section_id: string ) => (dispatch: Function) => {
+export const removeSubjectFromDatesheet = ( id: string, subj: string, section_id: string ) => (dispatch: Function) => {
 
 	dispatch(createDeletes([{
-		path:["db", "planner","datesheet", section_id, date, subj]
+		path:["db", "planner","datesheet", section_id, id, subj]
 	}]))
 
 }
