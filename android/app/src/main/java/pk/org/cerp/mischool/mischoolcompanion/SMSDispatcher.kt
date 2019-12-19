@@ -153,17 +153,18 @@ class SMSJob : Job() {
 
             if(messages.size > 1) {
                 Log.d(TAG, "SENDING MULTIPART")
-                updateLogText("sending multipart message")
                 smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
+                updateLogText("sent multipart message to: $phoneNumber")
             }
             else {
                 smsManager.sendTextMessage(phoneNumber, null, text, null, null)
+                updateLogText("sent message to: $phoneNumber")
             }
 
             // updateLogText("message sent")
         } catch( e: Exception) {
             Log.d(TAG, e.message)
-            updateLogText("ERROR ${e.message}")
+            updateLogText("ERROR sending to $phoneNumber: ${e.message}")
         }
 
     }
