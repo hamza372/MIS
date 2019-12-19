@@ -42,7 +42,9 @@ interface RootDBState {
 	planner: { 
 		// Will be able to add more planner stuff here i.e Teacher/Class shedule e.t.c 
 		datesheet: {
-			[id: string]: MISDateSheet
+			[section_id: string]: {
+				[id: string]: MISDateSheet
+			}
 		}
 	}
 }

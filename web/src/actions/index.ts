@@ -834,7 +834,7 @@ export interface dateSheetMerges {
 	[date: string]: MISDateSheet
 }
 
-export const saveDateSheet = ( datesheetMerges: dateSheetMerges) => (dispatch: Function) => {
+export const saveDateSheet = ( datesheetMerges: dateSheetMerges, section_id: string) => (dispatch: Function) => {
 
 	const merges = Object.entries(datesheetMerges)
 		.reduce((agg, [date, dateSheet]) => {
@@ -844,7 +844,7 @@ export const saveDateSheet = ( datesheetMerges: dateSheetMerges) => (dispatch: F
 					return [
 						...agg,
 						{
-							path: ["db", "planner", "datesheet", date, subj],
+							path: ["db", "planner", "datesheet",section_id, date, subj],
 							value: ds
 						}
 					]
@@ -858,10 +858,10 @@ export const saveDateSheet = ( datesheetMerges: dateSheetMerges) => (dispatch: F
 	dispatch(createMerges(merges))
 }
 
-export const removeSubjectFromDatesheet = ( date: string, subj: string ) => (dispatch: Function) => {
+export const removeSubjectFromDatesheet = ( date: string, subj: string, section_id: string ) => (dispatch: Function) => {
 
 	dispatch(createDeletes([{
-		path:["db", "planner","datesheet", date, subj]
+		path:["db", "planner","datesheet", section_id, date, subj]
 	}]))
 
 }
