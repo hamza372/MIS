@@ -2,13 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { v4 } from 'node-uuid'
 import { Link, Redirect } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router'
 
 import Former from 'utils/former'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
-import { RouteComponentProps } from 'react-router';
-
 import Banner from 'components/Banner'
-
 import Dropdown from 'components/Dropdown'
 import { createEditClass, addStudentToSection, removeStudentFromSection, deleteClass } from 'actions'
 
@@ -27,7 +25,7 @@ interface P {
 
 interface S {
 	class: AugmentedMISClass
-	redirect : boolean
+	redirect: boolean
 	banner: {
 		active: boolean
 		good?: boolean
@@ -36,7 +34,7 @@ interface S {
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type AugmentedMISClass = MISClass & {
@@ -82,7 +80,7 @@ class SingleClass extends Component<propsType, S> {
 	constructor(props: propsType) {
 		super(props);
 
-		const id = props.match.params.id;
+		const id = this.id()
 		const currClass = id === undefined ? blankClass() : this.props.classes[id]
 
 		this.state = {
@@ -106,15 +104,15 @@ class SingleClass extends Component<propsType, S> {
 		// sections table.
 		// so we need to loop through all sections, pull out the subjects and compile them
 
-		const s = new Set<string>();
+		const subjects = new Set<string>();
 
 		Object.values(this.props.classes)
 			.forEach(cl => {
 				Object.keys(cl.subjects)
-					.forEach(subj => s.add(subj))
+					.forEach(subj => subjects.add(subj))
 			})
 
-		return s;
+		return subjects;
 	}
 
 	onSave = () => {
@@ -229,13 +227,13 @@ class SingleClass extends Component<propsType, S> {
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
-	removeClass = (Class: AugmentedMISClass) => {
+	removeClass = (mis_class: AugmentedMISClass) => {
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
 			return
 
 		Object.values(this.props.students)
-			.forEach(student => Object.keys(Class.sections)
+			.forEach(student => Object.keys(mis_class.sections)
 					.forEach(section => 
 						{ 
 							if(section === student.section_id) 
@@ -243,7 +241,7 @@ class SingleClass extends Component<propsType, S> {
 						})
 					)
 
-		this.props.removeClass(Class)
+		this.props.removeClass(mis_class)
 
 		this.setState({
 			banner:{
@@ -365,9 +363,9 @@ class SingleClass extends Component<propsType, S> {
 									<div className="row">
 										<Dropdown
 											items={Object.values(this.props.students)}
-											toLabel={(s: MISStudent) => s.Name} 
+											toLabel={(student: MISStudent) => student.Name} 
 											onSelect={this.addStudent(id)} 
-											toKey={(s: MISStudent) => s.id} 
+											toKey={(student: MISStudent) => student.id} 
 											placeholder="Student Name" />
 									</div>
 								</div>
@@ -394,5 +392,5 @@ export default connect((state: RootReducerState) => ({
 	save: (mis_class: AugmentedMISClass) => dispatch(createEditClass(mis_class)),
 	addStudent: (section_id: string, student: MISStudent) => dispatch(addStudentToSection(section_id, student)),
 	removeStudent: (student: MISStudent) => dispatch(removeStudentFromSection(student)),
-	removeClass: (Class: AugmentedMISClass) => dispatch(deleteClass(Class))  //////
+	removeClass: (mis_class: AugmentedMISClass) => dispatch(deleteClass(mis_class))
 }))(SingleClass)
