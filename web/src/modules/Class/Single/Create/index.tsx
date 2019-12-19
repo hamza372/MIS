@@ -5,6 +5,7 @@ import { Link, Redirect } from 'react-router-dom'
 
 import Former from 'utils/former'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import { RouteComponentProps } from 'react-router';
 
 import Banner from 'components/Banner'
 
@@ -12,6 +13,37 @@ import Dropdown from 'components/Dropdown'
 import { createEditClass, addStudentToSection, removeStudentFromSection, deleteClass } from 'actions'
 
 import './style.css'
+
+interface P {
+	classes: RootDBState["classes"],
+	faculty: RootDBState["faculty"],
+	students: RootDBState["students"]
+
+	save: (mis_class: AugmentedMISClass) => void,
+	addStudent: (section_id: string, student: MISStudent) => void,
+	removeStudent: (student: MISStudent) => void,
+	removeClass: (mis_class: AugmentedMISClass) => void
+}
+
+interface S {
+	class: AugmentedMISClass
+	redirect : boolean
+	banner: {
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+}
+
+interface RouteInfo {
+	id: string;
+}
+
+type AugmentedMISClass = MISClass & {
+	new_subject?: string
+}
+
+type propsType = RouteComponentProps<RouteInfo> & P
 
 const blankClass = () => ({
 	id: v4(),
@@ -44,9 +76,10 @@ const defaultClasses = {
 	"A Level": 12
 }
 
-class SingleClass extends Component {
+class SingleClass extends Component<propsType, S> {
 
-	constructor(props) {
+	former: Former
+	constructor(props: propsType) {
 		super(props);
 
 		const id = props.match.params.id;
@@ -68,12 +101,12 @@ class SingleClass extends Component {
 	id = () => this.props.match.params.id
 
 
-	uniqueSubjects = () => {
+	uniqueSubjects = (): Set<string> => {
 		// instead of having a db of subjects, just going to derive it from the 
 		// sections table.
 		// so we need to loop through all sections, pull out the subjects and compile them
 
-		const s = new Set();
+		const s = new Set<string>();
 
 		Object.values(this.props.classes)
 			.forEach(cl => {
@@ -136,7 +169,7 @@ class SingleClass extends Component {
 		})
 	}
 
-	removeSubject = subj => () => {
+	removeSubject = (subj: string) => () => {
 
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
@@ -152,7 +185,7 @@ class SingleClass extends Component {
 		})
 	}
 
-	removeSection = (id) => () => {
+	removeSection = (id: string) => () => {
 
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
@@ -181,11 +214,11 @@ class SingleClass extends Component {
 		}, () => this.props.save(this.state.class))
 	}
 
-	addStudent = id => student => {
+	addStudent = (id: string) => (student: MISStudent) => {
 		this.props.addStudent(id, student);
 	}
 
-	removeStudent = student => {
+	removeStudent = (student: MISStudent) => {
 
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
@@ -196,7 +229,7 @@ class SingleClass extends Component {
 
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
-	removeClass = Class => {
+	removeClass = (Class: AugmentedMISClass) => {
 		const val = window.confirm("Are you sure you want to delete?")
 		if(!val)
 			return
@@ -225,11 +258,14 @@ class SingleClass extends Component {
 	}
 
 	setClassOrder = () => {
-		if(defaultClasses[this.state.class.name]) {
+
+		//@ts-ignore
+		const class_year = defaultClasses[this.state.class.name]
+		if(class_year) {
 			this.setState({
 				class: {
 					...this.state.class,
-					classYear: defaultClasses[this.state.class.name]
+					classYear: class_year
 				}
 			})
 		}
@@ -260,7 +296,7 @@ class SingleClass extends Component {
 						<option value={"O Level"} />
 						<option value={"A Level"} />
 					</datalist>
-					<input list="class-name" {...this.former.super_handle_flex(["name"], { cb: this.setClassOrder, styles: (val) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
+					<input list="class-name" {...this.former.super_handle_flex(["name"], { cb: this.setClassOrder, styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
 				</div>
 				<div className="row">
 					<label>Class Order</label>
@@ -303,7 +339,7 @@ class SingleClass extends Component {
 								<div className="row">
 									<label>{arr.length === 1 ? "Teacher" : "Section Teacher"}</label>
 									<select {...this.former.super_handle(["sections", id, "faculty_id"])}>
-										<option disabled selected value>select teacher</option>
+										<option value={""}>Select Teacher</option>
 										{
 											Object.values(this.props.faculty)
 												.filter( f => f && f.Active && f.Name)
@@ -329,9 +365,9 @@ class SingleClass extends Component {
 									<div className="row">
 										<Dropdown
 											items={Object.values(this.props.students)}
-											toLabel={s => s.Name} 
+											toLabel={(s: MISStudent) => s.Name} 
 											onSelect={this.addStudent(id)} 
-											toKey={s => s.id} 
+											toKey={(s: MISStudent) => s.id} 
 											placeholder="Student Name" />
 									</div>
 								</div>
@@ -350,13 +386,13 @@ class SingleClass extends Component {
 	}
 }
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	classes: state.db.classes,
 	faculty: state.db.faculty,
 	students: state.db.students
-}), dispatch => ({
-	save: (c) => dispatch(createEditClass(c)),
-	addStudent: (section_id, student) => dispatch(addStudentToSection(section_id, student)),
-	removeStudent: (student) => dispatch(removeStudentFromSection(student)),
-	removeClass: (Class) => dispatch(deleteClass(Class))  //////
+}), (dispatch: Function) => ({
+	save: (mis_class: AugmentedMISClass) => dispatch(createEditClass(mis_class)),
+	addStudent: (section_id: string, student: MISStudent) => dispatch(addStudentToSection(section_id, student)),
+	removeStudent: (student: MISStudent) => dispatch(removeStudentFromSection(student)),
+	removeClass: (Class: AugmentedMISClass) => dispatch(deleteClass(Class))  //////
 }))(SingleClass)
