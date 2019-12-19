@@ -1,12 +1,13 @@
 defmodule Sarkar.ActionHandler.Dashboard do
 
 	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value }}, state) do		
-			
-		{:ok, resp} = Sarkar.Auth.create({username, password, limit, value })
-			
-		IO.inspect resp
-
-		{:reply, succeed(resp), state}
+		case Sarkar.Auth.createTracked({username, password, limit, value }) do 
+			{:ok, resp} ->
+				IO.inspect resp
+				{:reply, succeed(resp), state}
+			{:err, msg} ->
+				{:reply, fail(msg), state}
+		end
 	end
 
 	def handle_action(%{ "type" => "UPDATE_REFERRALS_INFO", "payload" => %{ "school_id" => school_id, "value" => value }}, state) do

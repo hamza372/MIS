@@ -89,7 +89,7 @@ class Login extends Component {
 					if (localStorage.getItem('db')){
 						localStorage.removeItem("db")
 					}
-					this.props.history.push("/landing")
+
 					window.location.reload()
 				})
 				.catch(err => console.error(err))
