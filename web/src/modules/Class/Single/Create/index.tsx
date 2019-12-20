@@ -8,11 +8,12 @@ import Former from 'utils/former'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import Banner from 'components/Banner'
 import Dropdown from 'components/Dropdown'
-import { createEditClass, addStudentToSection, removeStudentFromSection, deleteClass } from 'actions'
+import { createEditClass, addStudentToSection, removeStudentFromSection, deleteClass, mergeSettings } from 'actions'
 
 import './style.css'
 
 interface P {
+	settings: RootDBState["settings"]
 	classes: RootDBState["classes"],
 	faculty: RootDBState["faculty"],
 	students: RootDBState["students"]
@@ -21,6 +22,7 @@ interface P {
 	addStudent: (section_id: string, student: MISStudent) => void,
 	removeStudent: (student: MISStudent) => void,
 	removeClass: (mis_class: AugmentedMISClass) => void
+	mergeSettings: (settings: RootDBState["settings"]) => void
 }
 
 interface S {
@@ -31,6 +33,7 @@ interface S {
 		good?: boolean
 		text?: string
 	}
+	fee: MISStudentFee
 }
 
 interface RouteInfo {
@@ -74,14 +77,31 @@ const defaultClasses = {
 	"A Level": 12
 }
 
+const defaultFee = {
+	name: "",
+	type: "FEE",
+	amount: "",
+	period: "MONTHLY"
+} as MISStudentFee
+
 class SingleClass extends Component<propsType, S> {
 
 	former: Former
 	constructor(props: propsType) {
 		super(props);
 
+		const settings = this.props.settings
 		const id = this.id()
 		const currClass = id === undefined ? blankClass() : this.props.classes[id]
+		
+		let curr_class_default_fee = defaultFee
+		
+		if(settings.classes) {
+			const default_fee = settings.classes.defaultFee[id]
+			if(default_fee) {
+				curr_class_default_fee = default_fee
+			}
+		}
 
 		this.state = {
 			class: currClass,
@@ -90,10 +110,13 @@ class SingleClass extends Component<propsType, S> {
 				active: false,
 				good: true,
 				text: "Saved!"
+			},
+			fee: {
+				...curr_class_default_fee		
 			}
 		}
 
-		this.former = new Former(this, ["class"])
+		this.former = new Former(this, [])
 	}
 
 	id = () => this.props.match.params.id
@@ -133,8 +156,46 @@ class SingleClass extends Component<propsType, S> {
 				}
 			})
 		}
+		
+		const settings = this.props.settings
+		const class_id = this.state.class.id
+		const amount = parseFloat(this.state.fee.amount)
 
-		this.props.save(this.state.class);
+		const default_fee = {
+			...this.state.fee,
+			amount: amount < 0 ? Math.abs(amount).toString() : this.state.fee.amount
+		}
+
+		let modified_settings: MISSettings
+		
+		if(settings.classes){
+			modified_settings = {
+				...settings,
+				classes: {
+					...settings.classes,
+					defaultFee: {
+						...settings.classes.defaultFee,
+						[class_id]: default_fee
+					}
+				}
+			}
+		}
+		else {
+			modified_settings = {
+				...settings,
+				classes: {
+					defaultFee: {
+						[class_id]: default_fee
+					}
+				}
+			}
+		}
+
+		// updating MISSettings
+		this.props.mergeSettings(modified_settings)
+
+		// updating or saving class
+		this.props.save(this.state.class)
 
 		this.setState({
 			banner:{
@@ -294,15 +355,15 @@ class SingleClass extends Component<propsType, S> {
 						<option value={"O Level"} />
 						<option value={"A Level"} />
 					</datalist>
-					<input list="class-name" {...this.former.super_handle_flex(["name"], { cb: this.setClassOrder, styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
+					<input list="class-name" {...this.former.super_handle_flex(["class", "name"], { cb: this.setClassOrder, styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
 				</div>
 				<div className="row">
 					<label>Class Order</label>
-					<input type="number" {...this.former.super_handle(["classYear"])} placeholder="Class Year" />
+					<input type="number" {...this.former.super_handle(["class", "classYear"])} placeholder="Class Year" />
 				</div>
 
 
-				<div className="divider">Subjects</div> {/* this needs to be a dropdown component */ }
+				<div className="divider">Subjects</div>
 				{
 					Object.keys(this.state.class.subjects)
 					.map(subject => <div className="subject row" key={subject}>
@@ -312,7 +373,7 @@ class SingleClass extends Component<propsType, S> {
 				}
 
 				<div className="subject row">
-					<input list="subjects" {...this.former.super_handle(["new_subject"])} placeholder="Type or Select Subject" />
+					<input list="subjects" {...this.former.super_handle(["class", "new_subject"])} placeholder="Type or Select Subject" />
 					<datalist id="subjects">
 					{
 						[...this.uniqueSubjects().keys()]
@@ -330,13 +391,13 @@ class SingleClass extends Component<propsType, S> {
 							return <div className={arr.length === 1 ? "" : "section"} key={id}>
 								{ arr.length === 1 ? false : <div className="row">
 										<label>Section Name</label>
-										<input type="text" {...this.former.super_handle(["sections", id, "name"])} placeholder="Type Section Name"/>
+										<input type="text" {...this.former.super_handle(["class", "sections", id, "name"])} placeholder="Type Section Name"/>
 									</div>
 								}
 
 								<div className="row">
 									<label>{arr.length === 1 ? "Teacher" : "Section Teacher"}</label>
-									<select {...this.former.super_handle(["sections", id, "faculty_id"])}>
+									<select {...this.former.super_handle(["class", "sections", id, "faculty_id"])}>
 										<option value={""}>Select Teacher</option>
 										{
 											Object.values(this.props.faculty)
@@ -375,6 +436,20 @@ class SingleClass extends Component<propsType, S> {
 						})
 				}
 				<div className="button green" onClick={this.addSection}>Add Another Section</div>
+
+				<div className="section default-fee">
+					<div className="divider">Default Fee</div>
+					<div className="row">
+						<label>Name</label>
+						<input type="text" {...this.former.super_handle(["fee", "name"])} placeholder="Enter Name" />
+					</div>
+					<div className="row">
+						<label>Amount</label>
+						<input type="number" {...this.former.super_handle(["fee", "amount"])} placeholder="Enter Amount" />
+					</div>
+					<div><span className="note-message">Note:</span> This is default class fee (MONTHLY) which will be added to every newly created student</div>
+                </div>
+
 				<div className="save-delete">
 					{ !this.isNew() ? <div className="button red" onClick={() => this.removeClass(this.state.class)}>Delete</div> : false }
 					<div className="button save" onClick={this.onSave}>Save</div>
@@ -385,6 +460,7 @@ class SingleClass extends Component<propsType, S> {
 }
 
 export default connect((state: RootReducerState) => ({
+	settings: state.db.settings,
 	classes: state.db.classes,
 	faculty: state.db.faculty,
 	students: state.db.students
@@ -392,5 +468,6 @@ export default connect((state: RootReducerState) => ({
 	save: (mis_class: AugmentedMISClass) => dispatch(createEditClass(mis_class)),
 	addStudent: (section_id: string, student: MISStudent) => dispatch(addStudentToSection(section_id, student)),
 	removeStudent: (student: MISStudent) => dispatch(removeStudentFromSection(student)),
-	removeClass: (mis_class: AugmentedMISClass) => dispatch(deleteClass(mis_class))
+	removeClass: (mis_class: AugmentedMISClass) => dispatch(deleteClass(mis_class)),
+	mergeSettings: (settings: RootDBState["settings"]) => dispatch(mergeSettings(settings))
 }))(SingleClass)
