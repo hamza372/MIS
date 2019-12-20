@@ -776,7 +776,7 @@ export const editPayment = (payments: AugmentedMISPaymentMap) => (dispatch: Func
 			},
 			{
 				path:["db", "students", student_id, "fees", fee_id, "amount"],
-				value: Math.abs(amount)
+				value: Math.abs(amount).toString() // because we're handling fees as string value
 			}
 		]
 	}, [])
