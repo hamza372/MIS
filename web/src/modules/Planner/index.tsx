@@ -77,10 +77,10 @@ class Planner extends Component <propTypes, S> {
 		this.former = new Former(this, [])
 	}
 
-	UNSAFE_componentWillReceiveProps(prevProps: propTypes) {
+	UNSAFE_componentWillReceiveProps(nextProps: propTypes) {
 
-		if (JSON.stringify(this.props.datesheet) !== JSON.stringify(prevProps.datesheet)) {
-			const datesheet = this.getDsFromProps() ? { ...JSON.parse(JSON.stringify(this.getDsFromProps())), ...this.state.datesheet } : this.state.datesheet
+		if (JSON.stringify(this.props.datesheet) !== JSON.stringify(nextProps.datesheet)) {
+			const datesheet = this.getDsFromProps(nextProps) ? JSON.parse(JSON.stringify(this.getDsFromProps(nextProps))) : this.state.datesheet
 			this.setState({
 				datesheet
 			})
@@ -89,7 +89,7 @@ class Planner extends Component <propTypes, S> {
 
 	section_id = () => this.props.match.params.section_id
 	class_id = () => this.props.match.params.class_id
-	getDsFromProps = () => this.props.datesheet[this.section_id()] && this.props.datesheet[this.section_id()][this.state.datesheet_id]
+	getDsFromProps = (props : propTypes) => props.datesheet[this.section_id()] && props.datesheet[this.section_id()][this.state.datesheet_id]
 
 	logSms = (messages: any) =>{
 		if(messages.length === 0){
@@ -190,7 +190,7 @@ class Planner extends Component <propTypes, S> {
 			datesheet: rest
 		})
 
-		if (this.getDsFromProps() && this.getDsFromProps()[subject]) {
+		if (this.getDsFromProps(this.props) && this.getDsFromProps(this.props)[subject]) {
 			this.props.removeSubjectFromDatesheet(curr_date, subject, this.section_id())
 		}
 	}
@@ -227,7 +227,7 @@ class Planner extends Component <propTypes, S> {
 
 	onSave = () => {
 
-		const prevDatesheet = this.getDsFromProps()
+		const prevDatesheet = this.getDsFromProps(this.props)
 
 		const merges = Object.entries(this.state.datesheet)
 			.reduce((agg, [subj, { date, time }]) => {
