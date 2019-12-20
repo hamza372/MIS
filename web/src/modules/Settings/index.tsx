@@ -103,7 +103,10 @@ const defaultSettings = {
 	sendSMSOption: "SIM", // API
 	permissions: defaultPermissions,
 	devices: {},
-	exams: defaultExams
+	exams: defaultExams,
+	classes: {
+		defaultFee: {}
+	} 
 }
 class Settings extends Component <propsType, S>{
 	
@@ -125,6 +128,9 @@ class Settings extends Component <propsType, S>{
 				grades: {
 					...aggGrades
 				}
+			},
+			classes: {
+				...(props.settings || defaultSettings).classes
 			}
 		} as RootDBState["settings"]
 
@@ -210,7 +216,7 @@ class Settings extends Component <propsType, S>{
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Expense Information? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+				<select {...					this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
 					<option value={"true"}>Yes</option>
 					<option value={"false"}>No</option>
 				</select>
@@ -479,6 +485,9 @@ class Settings extends Component <propsType, S>{
         .filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
 		).length
 		
+		//@ts-ignore
+		const mis_version = window.version || "no version set"
+	
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -555,8 +564,7 @@ class Settings extends Component <propsType, S>{
 
 					<div className="row">
 						<label>MISchool Version</label>
-						//@ts-ignore
-						<label>{window.version || "no version set"}</label>
+						<label>{mis_version}</label>
 					</div>
 
 					<div className="row">
@@ -597,6 +605,7 @@ class Settings extends Component <propsType, S>{
 						this.state.gradeMenu && this.gradeMenu()
 					}
 
+					<Link className="button grey" to="settings/class">Class Settings</Link>
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
 					<Link className="button grey" to="/settings/excel-import/students">Import From Excel</Link>

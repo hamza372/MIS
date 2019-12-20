@@ -40,6 +40,7 @@ import TrackedRoute from 'components/TrackedRoute'
 import printPreview from 'modules/Student/Single/Fees/printPreview'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
+import ClassSettings from 'modules/Settings/ClassSettings/Index'
 
 export default class Routes extends React.Component {
 
@@ -98,6 +99,7 @@ export default class Routes extends React.Component {
 
 					<TrackedRoute path="/settings/excel-import" component={ExcelImport} />
 					<TrackedRoute path="/settings/promote" component={PromotionPage} />
+					<TrackedRoute path="/settings/class" component={ClassSettings}/>
 					<TrackedRoute path="/settings/historicalFee" component={historicalFee} />
 					<TrackedRoute path="/settings" component={Settings} />
 					<TrackedRoute path="/analytics" component={Analytics} />
