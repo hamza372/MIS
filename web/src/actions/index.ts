@@ -776,7 +776,7 @@ export const editPayment = (payments: AugmentedMISPaymentMap) => (dispatch: Func
 			},
 			{
 				path:["db", "students", student_id, "fees", fee_id, "amount"],
-				value: Math.abs(amount)
+				value: Math.abs(amount).toString() // because we're handling fees as string value
 			}
 		]
 	}, [])
@@ -828,4 +828,40 @@ export const trackRoute = (route: string) => (dispatch: Function) => {
 			}
 		}
 	]))
+}
+
+export interface dateSheetMerges {
+	[id: string]: MISDateSheet
+}
+
+export const saveDateSheet = ( datesheetMerges: dateSheetMerges, section_id: string) => (dispatch: Function) => {
+
+	const merges = Object.entries(datesheetMerges)
+		.reduce((agg, [id, dateSheet]) => {
+
+			const currMerges = Object.entries(dateSheet)
+				.reduce((agg, [subj, ds]) => {
+					return [
+						...agg,
+						{
+							path: ["db", "planner", "datesheet",section_id, id, subj],
+							value: ds
+						}
+					]
+				},[])
+
+			return [
+				...agg,
+				...currMerges
+			]
+		}, [])
+	dispatch(createMerges(merges))
+}
+
+export const removeSubjectFromDatesheet = ( id: string, subj: string, section_id: string ) => (dispatch: Function) => {
+
+	dispatch(createDeletes([{
+		path:["db", "planner","datesheet", section_id, id, subj]
+	}]))
+
 }

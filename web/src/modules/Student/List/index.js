@@ -64,7 +64,8 @@ export class StudentList extends Component {
 	  this.state = {
 		showActiveStudent: true,
 		showInactiveStudent: false,
-		tag:""
+		tag: "",
+		selected_section_id: ""
 	  }
 	  this.former = new Former(this, [])
 	}
@@ -135,15 +136,23 @@ export class StudentList extends Component {
 
 	}
 
+	getSectionName = (sections) => {
+		const section = sections.find( section => section.id === this.state.selected_section_id)
+		const section_name = section ? section.namespaced_name : ""
+		return section_name
+	}
+
 	render (){
-		
 		const { classes, students, settings, forwardTo, max_limit } = this.props
 
-		const sections = getSectionsFromClasses(classes) 
+		const sections = getSectionsFromClasses(classes)
+		const curr_section = this.getSectionName(sections)
 		const chunkSize = 32 // students per table on printsheet
 	
 		let items = Object.entries(students)
-		.filter(([, s]) => s.id && s.Name && (forwardTo === "prospective-student" || this.getListFilterCondition(s)) ) // hiding the error for now.... need to build reporting mechanism
+		.filter(([, s]) => s.id && s.Name && 
+			(forwardTo === "prospective-student" || this.getListFilterCondition(s)) &&
+			(this.state.selected_section_id !== "" ? s.section_id === this.state.selected_section_id : true)) // hiding the error for now.... need to build reporting mechanism
 		.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 		.map( ([id, student]) => {
 			const relevant_section = sections.find(section => student.section_id === section.id);
@@ -209,6 +218,14 @@ export class StudentList extends Component {
 									.map(tag => <option key={tag} value={tag}> {tag} </option>)
 							}
 						</select>
+						<select className="list-select" {...this.former.super_handle(["selected_section_id"])}>
+							<option value="">Select Class</option>
+							{
+								sections
+									.sort((a, b) => a.classYear - b.classYear)
+									.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
+							}
+						</select>
 					</div>}
 				</Card>
 			</div>
@@ -220,7 +237,8 @@ export class StudentList extends Component {
 				chunkify(items, chunkSize)
 					.map((chunkItems, index) => <StudentPrintableList students={chunkItems} key={index} 
 						chunkSize={ index === 0 ? 0 : chunkSize * index }
-						schoolName={ settings.schoolName }/>)
+						schoolName={ settings.schoolName }
+						studentClass= { curr_section }/>)
 			}
 			
 			<div className="print button" onClick={() => window.print()}>Print</div>

@@ -38,7 +38,15 @@ interface RootDBState {
 		trial_period: number
 		paid: boolean
 	}
-	diary : MISDiary
+	diary: MISDiary
+	planner: { 
+		// Will be able to add more planner stuff here i.e Teacher/Class shedule e.t.c 
+		datesheet: {
+			[section_id: string]: {
+				[id: string]: MISDateSheet
+			}
+		}
+	}
 }
 
 interface BaseAnalyticsEvent {
@@ -336,4 +344,10 @@ interface MISDiary{
 			};
 		};
 	};
+}
+interface MISDateSheet {
+	[subject: string]: {
+		date: number,
+		time: string
+	}
 }

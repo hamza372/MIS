@@ -5,16 +5,20 @@ type PropsTypes = {
     students: MISStudent[]
     chunkSize: number
     schoolName: string
-}
+    studentClass: string
+}   
 
 export const StudentPrintableList = (props: PropsTypes) => {
-
+    const students = props.studentClass !== "" ? 
+        props.students.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0)) : 
+        props.students
+    
     return (
         <div className="print-only print-table" style={{width: "90%"}}>
             <table>
-                <caption>
+                <caption>   
                     <div>{ props.schoolName ? props.schoolName.toUpperCase() : "" }</div>
-                    <div>Student List</div>
+                    <div>Student List { props.studentClass }</div>
                 </caption>
                 <thead>
                     <tr>
@@ -27,7 +31,7 @@ export const StudentPrintableList = (props: PropsTypes) => {
                 </thead>
                 <tbody>
                    {
-                       props.students.map((student: MISStudent, i) => <tr key={student.id}>
+                       students.map((student: MISStudent, i) => <tr key={student.id}>
                             <td style={{textAlign: "center"}}>{i + props.chunkSize + 1}</td>
                             <td>{student.Name}</td>
                             <td>{student.ManName}</td>

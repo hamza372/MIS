@@ -53,7 +53,9 @@ export const defaultPermissions = {
 	fee:  { teacher: true },
 	dailyStats: { teacher: true },
 	setupPage: {teacher: true },
-	expense: { teacher: true }
+	expense: { teacher: true },
+	prospective: { teacher: true },
+	family: { teacher: true }
 }
 
 export const defaultExams = {
@@ -219,6 +221,20 @@ class Settings extends Component <propsType, S>{
 				<select {...					this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
 					<option value={"true"}>Yes</option>
 					<option value={"false"}>No</option>
+				</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Family Information? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "family","teacher"])}>
+					<option value={true}>Yes</option>
+					<option value={false}>No</option>
+				</select>
+			</div>
+			<div className="row">
+				<label> Allow teacher to view Prospective Information? </label>
+				<select {...this.former.super_handle(["settings", "permissions", "prospective","teacher"])}>
+					<option value={true}>Yes</option>
+					<option value={false}>No</option>
 				</select>
 			</div>
 		</div>
