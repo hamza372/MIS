@@ -4,7 +4,7 @@ import { withRouter, RouteComponentProps, Link } from 'react-router-dom'
 import moment from 'moment'
 import {v4} from 'node-uuid'
 import former from 'utils/former';
-import { PrintHeader } from 'components/Layout'
+import Layout, { PrintHeader } from 'components/Layout'
 import Banner from 'components/Banner'
 import { addMultiplePayments, addPayment, logSms, editPayment } from 'actions'
 import { sendSMS } from 'actions/core'
@@ -432,7 +432,7 @@ class StudentFees extends Component <propTypes, S> {
 	render() {
 
 		const merged_payments = this.mergedPayments()
-		
+		const famId = this.familyID()
 		const Months =  new Set(
 			Object.entries(merged_payments)
 				.sort(([, a_payment], [, b_payment]) => a_payment.date - b_payment.date)
@@ -451,7 +451,7 @@ class StudentFees extends Component <propTypes, S> {
 		const total_owed = Object.entries(merged_payments)
 			.reduce((agg, [, curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 
-		return <div className="student-fees">
+		const RenderBody = <div className="student-fees">
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
 			<PrintHeader settings={this.props.settings} logo={this.props.schoolLogo}/>
 			<div className="divider">Payments Information</div>
@@ -467,7 +467,7 @@ class StudentFees extends Component <propTypes, S> {
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
 			</div>
-			<div className="divider">{this.familyID() === undefined || this.familyID() !== ""? "Student Ledger" : "Family Ledger"}</div>
+			<div className="divider">{famId === undefined || famId !== "" ? "Student Ledger" : "Family Ledger"}</div>
 
 			<div className="filter row no-print"  style={{marginBottom:"10px"}}>
 				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
@@ -553,6 +553,14 @@ class StudentFees extends Component <propTypes, S> {
 			</div>
 
 		</div>
+
+		if(famId === undefined || famId === "") {
+			return RenderBody
+		}
+		// if family payment ledger
+		return <Layout history={this.props.history}> 
+			<div>{ RenderBody }</div>
+		</Layout>
 	}
 }
 

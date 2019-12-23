@@ -5,6 +5,7 @@ import qs from 'querystring'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
 import { getFilteredPayments } from 'utils/getFilteredPayments'
 import { StudentLedgerPage } from './StudentLedgerPage';
+import Layout from "components/Layout";
 
 interface P {
 	classes: RootDBState["classes"];
@@ -123,12 +124,19 @@ class printPreview extends Component <propTypes>{
 					css_style = {i === 0 ? "" : "print-only"}/>)
 			}
 		}
-
-	return	<div className="student-fees-ledger">
-				<div className="print button" style={{marginBottom:"10px"}} onClick={() => window.print()}>Print</div>
-				<div className="voucher-row">{vouchers}</div>
-			</div>
-  }
+	const RenderBody = <div className="student-fees-ledger">
+					<div className="print button" style={{marginBottom:"10px"}} onClick={() => window.print()}>Print</div>
+					<div className="voucher-row">{vouchers}</div>
+				</div>
+	
+	if(famId === undefined){
+		return RenderBody	
+	}
+	// if family payment ledger
+	return <Layout history={this.props.history}>
+			<div style={{marginTop: 10}}>{ RenderBody }</div>
+	</Layout>
+}
 
 }
 export default connect((state: RootReducerState) => ({
