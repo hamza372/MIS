@@ -11,7 +11,10 @@ const defaultTemplates = () => ({
 
 export const initState: RootReducerState = {
 	client_id: localStorage.getItem("client_id") || v4(),
-	queued: { },
+	queued: {
+		mutations: {},
+		analytics: {}
+	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	initialized: false,
@@ -36,7 +39,10 @@ export const initState: RootReducerState = {
 			trial_period: 15,
 			paid: false
 		},
-		diary: {} as MISDiary
+		diary: {} as MISDiary,
+		planner: {
+			datesheet: {}
+		}
 	},
 	auth: {
 		school_id: undefined,
@@ -103,8 +109,24 @@ export const loadDb = async () => {
 			}
 		}
 
-		const prev: RootReducerState = JSON.parse(serialized)
+		let prev: RootReducerState = JSON.parse(serialized)
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
+
+		if ( prev.queued && (!prev.queued.mutations || !prev.queued.analytics)) {
+			console.log("MOVING FROM OLD QUEUE")
+
+			prev.queued = {
+				analytics: {},
+				//@ts-ignore
+				mutations: {
+					...prev.queued
+				}
+			}
+		}
+		else {
+			console.log("NOT MOVING FROM OLD QUEUE")
+		}
+
 		const merged = {
 			...initState,
 			...prev,

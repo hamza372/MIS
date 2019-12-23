@@ -1,14 +1,3 @@
-
-interface AugmentedSection {
-	id: string;
-	class_id: string;
-	namespaced_name: string;
-	className: string;
-	classYear: number;
-	name: string;
-	faculty_id?: string;
-}
-
 export const getSectionsFromClasses = (classes: RootDBState['classes']) => {
 
 	const sections: AugmentedSection[] = Object.values(classes)

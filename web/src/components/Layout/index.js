@@ -42,6 +42,12 @@ export const PrintHeader = ({settings, logo}) => <div className="print-only scho
 			</div>
 		</div>
 
+export const PrintHeaderSmall = ({settings}) => <div className="print-only small-school-header">
+			<div className="small-title">{settings.schoolName ? settings.schoolName : ""}</div>
+			<div className="small-address">{settings.schoolAddress}</div>
+			<div className="small-phone-number"> Tel:{settings.schoolPhoneNumber} </div>
+	</div>
+
 export default connect(state => ({ 
 	user: state.db.faculty[state.auth.faculty_id]
 }))(Layout)

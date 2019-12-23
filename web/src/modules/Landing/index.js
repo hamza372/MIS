@@ -164,7 +164,9 @@ class Landing extends Component {
 		const dailyStats = permissions && permissions.dailyStats ? permissions.dailyStats.teacher : true
 		const teacher_fee_permission = permissions && permissions.fee ? permissions.fee.teacher : true;
 		const teacher_expense_permission = permissions && permissions.expense ? permissions.expense.teacher : true;
-
+		const prospective_permission = permissions && permissions.prospective ? permissions.prospective.teacher : true;
+		const family_permission = permissions && permissions.family ? permissions.family.teacher : true;
+		
 
 		for(const student of Object.values(students)) {
 
@@ -201,7 +203,7 @@ class Landing extends Component {
 				today_teacher_attendance.LEAVE += 1;
 			}
 		}
-
+		
 		return <Layout history={this.props.history}>
 			<div className="landing">
 				{!package_info.paid && package_info.date !== -1 && <div onClick={() => this.askForPassword()} className="trial-bar">
@@ -222,9 +224,10 @@ class Landing extends Component {
 							<Link to="/settings" className="button red-shadow" style={{backgroundImage: `url(${settingsIcon})` }}>Settings</Link>
 						</div> : false}
 						<div className="row">
-							<div className="badge-container">
-								<Link to="/student?forwardTo=prospective-student" className="button yellow-shadow" style={{backgroundImage: `url(${prospective})` }}>Prospective</Link>
-							</div>
+							{
+								(user.Admin || prospective_permission ) &&
+									<Link to="/student?forwardTo=prospective-student" className="button yellow-shadow" style={{backgroundImage: `url(${prospective})` }}>Prospective</Link>
+							}
 							<Link to="/help" className="button grey-shadow" style={{backgroundImage: `url(${Help})` }}>Help</Link>
 						</div>
 						<div className="row">
@@ -240,14 +243,14 @@ class Landing extends Component {
 							<div className="button yellow-shadow" onClick={logout} style={{backgroundImage: `url(${switchUserIcon})` }}>Logout</div>
 						</div>
 						<div className="row">
-							<div className="badge-container">
-								<img className="new-badge" src={newBadge} alt=""/>
+						{
+							(user.Admin || family_permission ) &&
 								<Link to="/families"
 									className="button green-shadow"
 									style={{ backgroundImage: `url(${family})`}}>
 									Families
 								</Link>
-							</div>
+						}
 						</div>
 					</div>
 
@@ -430,7 +433,7 @@ export default connect(state => ({
 	faculty: state.db.faculty,
 	permissions: state.db.settings.permissions,
 	lastSnapshot: state.lastSnapshot,
-	unsyncd: Object.keys(state.queued).length,
+	unsyncd: Object.keys(state.queued.mutations || {}).length,
 	package_info: state.db.package_info || { date: -1, trial_period: 15, paid: false}, //If package info is undefined
 	school_id: state.auth.school_id
 }), dispatch => ({

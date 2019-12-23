@@ -12,7 +12,10 @@ const defaultTemplates = () => ({
 const initState: RootReducerState = {
 	client_id: v4(),
 	initialized: false,
-	queued: { },
+	queued: { 
+		mutations: {},
+		analytics: {}
+	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	db: {
@@ -36,7 +39,10 @@ const initState: RootReducerState = {
 			paid: false
 		},
 		max_limit: -1,
-		diary: {} as MISDiary
+		diary: {} as MISDiary,
+		planner: {
+			datesheet: {}
+		}
 	},
 	// this part of the tree i want to obscure.
 	// but will get to that later

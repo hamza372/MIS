@@ -1,11 +1,35 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETES, CONFIRM_SYNC, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF } from 'actions/core'
+import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
+import { AnyAction } from 'redux'
 
-const rootReducer = (state, action) => {
+const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerState => {
 
 	console.log(action)
+
 	switch (action.type) {
+
+		case "CONFIRM_ANALYTICS_SYNC":
+		{
+			const newA = Object.entries(state.queued.analytics)
+				.reduce((agg, [key,val]) => {
+					if (val.time > (action as ConfirmAnalyticsSyncAction).time) {
+						return {
+							...agg,
+							[key]: val
+						}
+					}
+					return agg
+				},{})
+
+			return {
+				...state,
+				queued: {
+					...state.queued,
+					analytics: newA
+				}
+			}
+		}
 
 		case SIGN_UP_LOADING:
 			{
@@ -45,7 +69,7 @@ const rootReducer = (state, action) => {
 
 		case MERGES:
 			{
-				const nextState = action.merges.reduce((agg, curr) => {
+				const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
 					return Dynamic.put(agg, curr.path, curr.value)
 				}, JSON.parse(JSON.stringify(state)))
 
@@ -60,9 +84,9 @@ const rootReducer = (state, action) => {
 		case DELETES:
 			{
 
-				const state_copy = JSON.parse(JSON.stringify(state));
+				const state_copy = JSON.parse(JSON.stringify(state)) as RootReducerState;
 
-				action.paths.forEach(a => Dynamic.delete(state_copy, a.path));
+				(action as DeletesAction).paths.forEach(a => Dynamic.delete(state_copy, a.path));
 
 				return {
 					...state_copy,
@@ -72,60 +96,60 @@ const rootReducer = (state, action) => {
 
 		case QUEUE:
 			{
+				const actionType = action as QueueAction
+				
+				if (actionType.queue_type === "analytics") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							analytics: {
+								...state.queued.analytics,
+								...actionType.payload
+							}
+						},
+						acceptSnapshot: false
+					}
+				}
 				return {
 					...state,
 					queued: {
 						...state.queued,
-						...action.payload
+						mutations : {
+							...state.queued.mutations,
+							...actionType.payload
+						}
 					},
 					acceptSnapshot: false
 				}
 			}
 
-		case CONFIRM_SYNC:
-			{
-				const last = action.date;
-				// action = {db: {}, date: number}
-
-				// remove all queued writes less than this last date.
-				const newQ = Object.keys(state.queued)
-					.filter(t => state.queued[t].date > last)
-					.reduce((agg, curr_key) => {
-						return { ...agg, [curr_key]: state.queued[curr_key] }
-					}, {})
-
-				let next = Dynamic.put(state, ["queued"], newQ);
-
-				if (Object.keys(action.db).length > 0) {
-					next = Dynamic.put(next, ["db"], { ...state.db, ...action.db }) // this way if we add new fields on client which arent on db it wont null them. only top level tho....
-				}
-
-				return {
-					...next,
-					acceptSnapshot: true,
-					lastSnapshot: new Date().getTime()
-				}
-			}
-
 		case CONFIRM_SYNC_DIFF:
 			{
+				const diff_action = action as ConfirmSyncAction
 				console.log("confirm sync diff: ",
-					Object.keys(action.new_writes).length,
+					Object.keys(diff_action.new_writes).length,
 					" changes synced")
 
-				const newQ = Object.keys(state.queued)
+				const newM = Object.keys(state.queued.mutations)
 					.filter(t => {
-						console.log(state.queued[t].date, action.date, state.queued[t].date - action.date);
-						return state.queued[t].date > action.date
+						console.log(state.queued.mutations[t].date, diff_action.date, state.queued.mutations[t].date - diff_action.date);
+						return state.queued.mutations[t].date > diff_action.date
 					})
 					.reduce((agg, curr) => {
-						return Dynamic.put(agg, ["queued", state.queued[curr].action.path], state.queud[curr].action)
+						return Dynamic.put(agg,
+							[state.queued.mutations[curr].action.path], state.queued.mutations[curr])
 					}, {})
 
-				if (Object.keys(action.new_writes).length > 0) {
+				const newQ = {
+					...state.queued,
+					mutations: newM,
+				}
+
+				if (Object.keys(diff_action.new_writes).length > 0) {
 					// remove queued items
 
-					const nextState = Object.values(action.new_writes)
+					const nextState = Object.values(diff_action.new_writes)
 						.reduce((agg, curr) => {
 							if (curr.type === "DELETE") {
 								return Dynamic.delete(agg, curr.path)
@@ -151,16 +175,17 @@ const rootReducer = (state, action) => {
 
 		case SNAPSHOT_DIFF:
 			{
-
-				console.log("snapshot_diff: ", Object.keys(action.new_writes).length, "changes broadcasted")
+				//@ts-ignore
+				const snapshot = action as SnapshotDiffAction
+				console.log("snapshot_diff: ", Object.keys(snapshot.new_writes).length, "changes broadcasted")
 
 				if (!state.acceptSnapshot) {
 					return state;
 				}
 
-				if (Object.keys(action.new_writes).length > 0) {
+				if (Object.keys(snapshot.new_writes).length > 0) {
 
-					const nextState = Object.values(action.new_writes)
+					const nextState = Object.values(snapshot.new_writes)
 						.reduce((agg, curr) => {
 							if (curr.type === "DELETE") {
 								return Dynamic.delete(agg, curr.path);

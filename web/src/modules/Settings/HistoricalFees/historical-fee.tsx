@@ -254,7 +254,6 @@ class historicalFee extends Component <propTypes, S > {
 					settings = {settings}
 					student = {selected_student}
 					class_name = {curr_class_name}
-					voucherNo = {777}
 				/>
 			</div>}
 

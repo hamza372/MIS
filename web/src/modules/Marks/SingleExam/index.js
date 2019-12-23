@@ -234,17 +234,17 @@ class SingleExam extends Component {
 
 		const grade = calculateGrade(marks_obtained, total_marks, this.props.grades)
 
-		const remarks = grade !== undefined ? this.props.grades[grade].remarks : ""
+		const remarks = grade && this.props.grades[grade] ? this.props.grades[grade].remarks : ""
 
 		this.setState({
 			exam: {
 				...this.state.exam,
 				student_marks:{
 					...this.state.exam.student_marks,
-					[student.id]:{
+					[student.id]: {
 						...this.state.exam.student_marks[student.id],
-						grade,
-						remarks
+						grade: marks_obtained ? grade : "",
+						remarks: marks_obtained ? remarks: ""
 					}
 				}
 			}

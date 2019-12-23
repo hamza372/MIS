@@ -33,10 +33,11 @@ import CertificateMenu from 'modules/CertificateMenu'
 import historicalFee from './modules/Settings/HistoricalFees/historical-fee';
 import FamilyModule from './modules/Family'
 import SingleFamily from './modules/Family/Single'
-
+import StudentFees from './modules/Student/Single/Fees/index'
 import ManageFees from 'modules/Student/ManageFees'
 
-import AuthedRoute from 'components/AuthedRoute'
+import TrackedRoute from 'components/TrackedRoute'
+import printPreview from 'modules/Student/Single/Fees/printPreview'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
 
@@ -70,50 +71,53 @@ export default class Routes extends React.Component {
 		return <Provider store={this.props.store}>
 			<BrowserRouter>
 				<Switch>
-					<AuthedRoute exact path="/landing" component={Landing} />
+					<TrackedRoute exact path="/landing" component={Landing} />
 
 					<Route path="/faculty/first" component={TeacherSingle} />
-					<AuthedRoute path="/faculty/:id" component={TeacherSingle} />
-					<AuthedRoute path="/teacher" component={TeacherList} />
 
-					<AuthedRoute path="/student/:id" component={StudentSingle} />
-					<AuthedRoute path="/student" component={StudentList} />
+					<TrackedRoute path="/faculty/:id" component={TeacherSingle} />
+					<TrackedRoute path="/teacher" component={TeacherList} />
+
+					<TrackedRoute path="/student/:id" component={StudentSingle} />
+					<TrackedRoute path="/student" component={StudentList} />
 					
-					<AuthedRoute path="/class/:id" component={ClassSingle} />
-					<AuthedRoute path="/class" component={ClassModule} />
+					<TrackedRoute path="/class/:id" component={ClassSingle} />
+					<TrackedRoute path="/class" component={ClassModule} />
 
-					<AuthedRoute path="/attendance" component={Attendance} />
-					<AuthedRoute path="/teacher-attendance" component={TeacherAttendance} />
+					<TrackedRoute path="/attendance" component={Attendance} />
+					<TrackedRoute path="/teacher-attendance" component={TeacherAttendance} />
 
-					<AuthedRoute path="/sms" component={SMS} />
+					<TrackedRoute path="/sms" component={SMS} />
 
-					<AuthedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
-					<AuthedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
-					<AuthedRoute path="/reports/:class_id/:section_id" component={ExamList} />
-					<AuthedRoute path="/reports" component={Marks} />
+					<TrackedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
+					<TrackedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
+					<TrackedRoute path="/reports/:class_id/:section_id" component={ExamList} />
+					<TrackedRoute path="/reports" component={Marks} />
 
-					<AuthedRoute path="/fees/manage" component={ManageFees} />
+					<TrackedRoute path="/fees/manage" component={ManageFees} />
 
-					<AuthedRoute path="/settings/excel-import" component={ExcelImport} />
-					<AuthedRoute path="/settings/promote" component={PromotionPage} />
-					<AuthedRoute path="/settings/historicalFee" component={historicalFee} />
-					<AuthedRoute path="/settings" component={Settings} />
-					<AuthedRoute path="/analytics" component={Analytics} />
-					<AuthedRoute path="/diary" component={Diary} />
+					<TrackedRoute path="/settings/excel-import" component={ExcelImport} />
+					<TrackedRoute path="/settings/promote" component={PromotionPage} />
+					<TrackedRoute path="/settings/historicalFee" component={historicalFee} />
+					<TrackedRoute path="/settings" component={Settings} />
+					<TrackedRoute path="/analytics" component={Analytics} />
+					<TrackedRoute path="/diary" component={Diary} />
 
-					<AuthedRoute path="/reports-menu" component={ReportsMenu} />
-					<AuthedRoute path="/expenses" component={ExpensePage} />
+					<TrackedRoute path="/reports-menu" component={ReportsMenu} />
+					<TrackedRoute path="/expenses" component={ExpensePage} />
 
-					<AuthedRoute path="/families/:id" component={SingleFamily} />
-					<AuthedRoute path="/families" component={FamilyModule} />
+      				<TrackedRoute exact path="/families/:famId/fee-print-preview" component={printPreview}/>
+					<TrackedRoute path="/families/:famId/payments" component={StudentFees}/>
+					<TrackedRoute path="/families/:id" component={SingleFamily} />
+					<TrackedRoute path="/families" component={FamilyModule} />
 					
-					<AuthedRoute path="/ClassList" component={PlannerList} />
-					<AuthedRoute path="/planner/:class_id/:section_id" component={Planner} />
+					<TrackedRoute path="/ClassList" component={PlannerList} />
+					<TrackedRoute path="/planner/:class_id/:section_id" component={Planner} />
 
-					<AuthedRoute path="/help" component={Help} />
-					<AuthedRoute path="/certificate-menu" component={CertificateMenu} />
+					<TrackedRoute path="/help" component={Help} />
+					<TrackedRoute path="/certificate-menu" component={CertificateMenu} />
 					
-					<AuthedRoute path="/fee-menu" component={FeeMenu} />
+					<TrackedRoute path="/fee-menu" component={FeeMenu} />
 					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />
 					<Route path="/login" component={Login} />

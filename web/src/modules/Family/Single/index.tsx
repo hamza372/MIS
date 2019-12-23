@@ -151,8 +151,8 @@ class SingleFamily extends React.Component<P, S> {
 							toKey={(s: MISStudent) => s.id}
 							placeholder="Student Name" />
 					</div>
-
 					<div className="save button" onClick={this.onSave}>Save</div>
+					<Link to={`/families/${this.famId()}/payments`} style={{marginTop: 10}} className="button blue">View Payments</Link>
 				</div>
 
 			</div>

@@ -1,5 +1,5 @@
 import { hash } from 'utils'
-import { createMerges, createDeletes, createLoginFail } from './core'
+import { createMerges, createDeletes, createLoginFail, analyticsEvent } from './core'
 import moment from 'moment'
 import {v4} from "node-uuid"
 import Syncr from 'syncr';
@@ -765,25 +765,18 @@ export const addDiary = (date: string, section_id: string, diary: MISDiary["sect
 
 }
 
-interface EditedPayments {
-	[pid : string]: {
-		amount: number,
-		fee_id: string
-	}
-}
-
-export const editPayment = (student: MISStudent, payments: EditedPayments) => (dispatch: Function) => {
+export const editPayment = (payments: AugmentedMISPaymentMap) => (dispatch: Function) => {
 
 	// payments is an object with id as key and value is { amount, fee_id } 
- 	const merges = Object.entries(payments).reduce((agg, [p_id, {amount,fee_id}]) => {
+ 	const merges = Object.entries(payments).reduce((agg, [p_id, {student_id, amount,fee_id}]) => {
 		return [...agg,
 			{
-				path:["db", "students", student.id, "payments", p_id, "amount"],
+				path:["db", "students", student_id, "payments", p_id, "amount"],
 				value: amount
 			},
 			{
-				path:["db", "students", student.id, "fees", fee_id, "amount"],
-				value: amount
+				path:["db", "students", student_id, "fees", fee_id, "amount"],
+				value: Math.abs(amount).toString() // because we're handling fees as string value
 			}
 		]
 	}, [])
@@ -824,4 +817,51 @@ export const markPurchased = () => (dispatch: Function) => {
 		path: ["db", "package_info", "paid"],
 		value: true
 	}]))
+}
+
+export const trackRoute = (route: string) => (dispatch: Function) => {	
+	dispatch(analyticsEvent([
+		{
+			type: "ROUTE",
+			meta: {
+				route: route.split("/").splice(1)
+			}
+		}
+	]))
+}
+
+export interface dateSheetMerges {
+	[id: string]: MISDateSheet
+}
+
+export const saveDateSheet = ( datesheetMerges: dateSheetMerges, section_id: string) => (dispatch: Function) => {
+
+	const merges = Object.entries(datesheetMerges)
+		.reduce((agg, [id, dateSheet]) => {
+
+			const currMerges = Object.entries(dateSheet)
+				.reduce((agg, [subj, ds]) => {
+					return [
+						...agg,
+						{
+							path: ["db", "planner", "datesheet",section_id, id, subj],
+							value: ds
+						}
+					]
+				},[])
+
+			return [
+				...agg,
+				...currMerges
+			]
+		}, [])
+	dispatch(createMerges(merges))
+}
+
+export const removeSubjectFromDatesheet = ( id: string, subj: string, section_id: string ) => (dispatch: Function) => {
+
+	dispatch(createDeletes([{
+		path:["db", "planner","datesheet", section_id, id, subj]
+	}]))
+
 }
