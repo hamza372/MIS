@@ -218,7 +218,7 @@ class Settings extends Component <propsType, S>{
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Expense Information? </label>
-				<select {...					this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
 					<option value={"true"}>Yes</option>
 					<option value={"false"}>No</option>
 				</select>
@@ -226,15 +226,15 @@ class Settings extends Component <propsType, S>{
 			<div className="row">
 				<label> Allow teacher to view Family Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "family","teacher"])}>
-					<option value={true}>Yes</option>
-					<option value={false}>No</option>
+					<option value={"true"}>Yes</option>
+					<option value={"false"}>No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Prospective Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "prospective","teacher"])}>
-					<option value={true}>Yes</option>
-					<option value={false}>No</option>
+					<option value={"true"}>Yes</option>
+					<option value={"false"}>No</option>
 				</select>
 			</div>
 		</div>
