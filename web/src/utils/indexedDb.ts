@@ -19,19 +19,19 @@ export const initState: RootReducerState = {
 	lastSnapshot: 0,
 	initialized: false,
 	db: {
-		faculty: { },
-		users: { },
-		students: { },
-		classes: { },
+		faculty: {},
+		users: {},
+		students: {},
+		classes: {},
 		sms_templates: defaultTemplates(),
-		exams: { },
-		settings: { } as MISSettings,
+		exams: {},
+		settings: {} as MISSettings,
 		expenses: {},
 		analytics: {
 			sms_history: {}
 		},
-		assets:{
-			schoolLogo:""
+		assets: {
+			schoolLogo: ""
 		},
 		max_limit: -1,
 		package_info: {
@@ -89,13 +89,13 @@ export const loadDb = async () => {
 						localStorage.removeItem('db')
 					}
 					catch (err) {
-						console.error("BACK UP TO LOCALSTORAGE FAIURE !!!", err )
+						console.error("BACK UP TO LOCALSTORAGE FAIURE !!!", err)
 					}
 				})
 				.catch((err) => {
 					console.error("ERROR WHILE TRANFERING LOCAL DATA TO IDB", err)
 				})
-			
+
 			serialized = await db.get('root-state', 'db')
 
 		} else {
@@ -112,7 +112,7 @@ export const loadDb = async () => {
 		let prev: RootReducerState = JSON.parse(serialized)
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
 
-		if ( prev.queued && (!prev.queued.mutations || !prev.queued.analytics)) {
+		if (prev.queued && (!prev.queued.mutations || !prev.queued.analytics)) {
 			console.log("MOVING FROM OLD QUEUE")
 
 			prev.queued = {
@@ -127,7 +127,7 @@ export const loadDb = async () => {
 			console.log("NOT MOVING FROM OLD QUEUE")
 		}
 
-		const merged = {
+		const merged: RootReducerState = {
 			...initState,
 			...prev,
 			client_id,
@@ -169,7 +169,7 @@ export const loadDb = async () => {
 
 const checkPersistent = () => {
 	// check and request persistent storage
-	if(navigator.storage && navigator.storage.persist) {
+	if (navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist()
 			.then(persist => {
 				//console.log("PERSIST!!!!", persist)
@@ -178,19 +178,19 @@ const checkPersistent = () => {
 
 		navigator.storage.persisted()
 			.then(persistent => {
-				if(persistent) {
+				if (persistent) {
 					console.log('persistent storage activated')
 				}
 				else {
 					console.log('persistent storage denied')
 				}
 			})
-		
-			navigator.storage.estimate()
-				.then(estimate => {
-					//console.log("ESTIMATE!!", estimate)
-				})
-				.catch(err => console.error(err))
+
+		navigator.storage.estimate()
+			.then(estimate => {
+				//console.log("ESTIMATE!!", estimate)
+			})
+			.catch(err => console.error(err))
 	}
 	else {
 		console.log('no navigator.storage or navigator.storage.persist')
@@ -206,27 +206,27 @@ export const saveDb = (state: RootReducerState) => {
 
 	const json = JSON.stringify(state)
 	// console.log("IN SAVE DB FUNCTION INDEXED DB", state)
-	
+
 	openDB('db', 1, {
 		upgrade(db) {
 			db.createObjectStore('root-state')
 		}
 	})
-	.then(db => {
-		// console.log('putting db')
-		db.put('root-state', json, "db")
-		const s2 = new Date().getTime()
-		console.log("SAVING IDB-END", s2 - s1, "milliseconds");
-	})
-	.catch(err => {
-		console.error(err)
-		alert("Error saving database. Please contact helpline")
-	})
+		.then(db => {
+			// console.log('putting db')
+			db.put('root-state', json, "db")
+			const s2 = new Date().getTime()
+			console.log("SAVING IDB-END", s2 - s1, "milliseconds");
+		})
+		.catch(err => {
+			console.error(err)
+			alert("Error saving database. Please contact helpline")
+		})
 }
 
 const addFacultyID = (state: RootReducerState) => {
 
-	if(state.auth.faculty_id !== undefined) {
+	if (state.auth.faculty_id !== undefined) {
 		//console.log("not running addFacultyID script")
 		return state;
 	}
@@ -242,8 +242,8 @@ const checkPermissions = (state: RootReducerState) => {
 
 	const permission = state.db.settings.permissions
 
-	if( permission.dailyStats !== undefined && permission.fee !== undefined &&
-		permission.setupPage !== undefined && permission.expense !== undefined ) {
+	if (permission.dailyStats !== undefined && permission.fee !== undefined &&
+		permission.setupPage !== undefined && permission.expense !== undefined) {
 		// console.log("NOT Running Permission Scripts")
 		return state
 	}
@@ -251,11 +251,11 @@ const checkPermissions = (state: RootReducerState) => {
 
 	state.db.settings = {
 		...state.db.settings,
-		permissions:{
+		permissions: {
 			fee: { teacher: true },
-			dailyStats: {teacher: true },
-			setupPage: {teacher: true},
-			expense: {teacher: true },
+			dailyStats: { teacher: true },
+			setupPage: { teacher: true },
+			expense: { teacher: true },
 			...state.db.settings.permissions
 		}
 	}
@@ -263,7 +263,7 @@ const checkPermissions = (state: RootReducerState) => {
 }
 
 const checkGrades = (state: RootReducerState) => {
-	if(state.db.settings.exams){
+	if (state.db.settings.exams) {
 		// console.log("Not Running Grades Script")
 		return state
 	}
@@ -279,18 +279,18 @@ const checkGrades = (state: RootReducerState) => {
 
 // re-constructing old structure [grade: string]: string to
 // [grade: string]: { percent: string, remarks: string }
-	
-const reconstructGradesObject = (state: RootReducerState) =>  {
-	
-	if(state.db.settings && state.db.settings.exams) {
+
+const reconstructGradesObject = (state: RootReducerState) => {
+
+	if (state.db.settings && state.db.settings.exams) {
 
 		const grades_values = Object.values(state.db.settings.exams.grades)
-		
+
 		// check if new structure already exists
-		if (typeof(grades_values[0]) === "object") {
+		if (typeof (grades_values[0]) === "object") {
 			return state
 		}
-		
+
 		// else construct new structure using previous information
 		const grades = Object.entries(state.db.settings.exams.grades)
 		state.db.settings.exams.grades = grades.reduce((agg, [grade, val]) => {

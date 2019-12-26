@@ -12,26 +12,26 @@ const defaultTemplates = () => ({
 const initState: RootReducerState = {
 	client_id: v4(),
 	initialized: false,
-	queued: { 
+	queued: {
 		mutations: {},
 		analytics: {}
 	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	db: {
-		faculty: { },
-		users: { }, // username: passwordhash, permissions, etc.  
-		students: { },
-		classes: { }, // id: { name, class, teacher_id, subjects: { name: 1 } },
+		faculty: {},
+		users: {}, // username: passwordhash, permissions, etc.  
+		students: {},
+		classes: {}, // id: { name, class, teacher_id, subjects: { name: 1 } },
 		sms_templates: defaultTemplates(),
-		exams: { }, // id: { name, total_score, subject, etc. rest of info is under student }
-		settings: { } as MISSettings,
+		exams: {}, // id: { name, total_score, subject, etc. rest of info is under student }
+		settings: {} as MISSettings,
 		expenses: {},
 		analytics: {
 			sms_history: {}
 		},
-		assets:{
-			schoolLogo:""
+		assets: {
+			schoolLogo: ""
 		},
 		package_info: {
 			date: -1,
@@ -95,12 +95,12 @@ export const loadDB = () => {
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {
 			try {
 				const next = curr(agg)
-				if(next === undefined) {
+				if (next === undefined) {
 					return agg;
 				}
 				return next;
 			}
-			catch(e) {
+			catch (e) {
 				console.error(e)
 				return agg;
 			}
@@ -108,7 +108,7 @@ export const loadDB = () => {
 
 		return updatedDB;
 	}
-	catch(err) {
+	catch (err) {
 		console.error(err)
 		return undefined;
 	}
@@ -120,14 +120,14 @@ export const saveDB = (db: RootReducerState) => {
 		localStorage.setItem('db', json)
 		localStorage.setItem("client_id", db.client_id)
 	}
-	catch(err) {
+	catch (err) {
 		console.error(err)
 	}
 
 	try {
 		saveDbToFilesystem(db);
 	}
-	catch(e) {
+	catch (e) {
 		console.error(e)
 	}
 
@@ -147,7 +147,7 @@ const saveDbToFilesystem = (db: RootReducerState) => {
 
 const checkPersistent = () => {
 	// check and request persistent storage
-	if(navigator.storage && navigator.storage.persist) {
+	if (navigator.storage && navigator.storage.persist) {
 		navigator.storage.persist()
 			.then(persist => {
 				console.log("PERSIST!!!!", persist)
@@ -156,17 +156,17 @@ const checkPersistent = () => {
 
 		navigator.storage.persisted()
 			.then(persistent => {
-				if(persistent) {
+				if (persistent) {
 					console.log('persistent storage activated')
 				}
 				else {
 					console.log('persistent storage denied')
 				}
 			})
-		
-			navigator.storage.estimate()
-				.then(estimate => console.log("ESTIMATE!!", estimate))
-				.catch(err => console.error(err))
+
+		navigator.storage.estimate()
+			.then(estimate => console.log("ESTIMATE!!", estimate))
+			.catch(err => console.error(err))
 	}
 	else {
 		console.log('no navigator.storage or navigator.storage.persist')
@@ -178,7 +178,7 @@ checkPersistent();
 // add faculty_id to the auth field if it doesn't exist.
 const addFacultyID = (state: RootReducerState) => {
 
-	if(state.auth.faculty_id !== undefined) {
+	if (state.auth.faculty_id !== undefined) {
 		console.log("not running addFacultyID script")
 		return state;
 	}
@@ -195,8 +195,8 @@ const checkPermissions = (state: RootReducerState) => {
 
 	const permission = state.db.settings.permissions
 
-	if( permission.dailyStats !== undefined && permission.fee !== undefined &&
-		permission.setupPage !== undefined && permission.expense !== undefined ) {
+	if (permission.dailyStats !== undefined && permission.fee !== undefined &&
+		permission.setupPage !== undefined && permission.expense !== undefined) {
 		console.log("NOT Running Permission Scripts")
 		return state
 	}
@@ -204,11 +204,11 @@ const checkPermissions = (state: RootReducerState) => {
 
 	state.db.settings = {
 		...state.db.settings,
-		permissions:{
+		permissions: {
 			fee: { teacher: true },
-			dailyStats: {teacher: true },
-			setupPage: {teacher: true},
-			expense: {teacher: true },
+			dailyStats: { teacher: true },
+			setupPage: { teacher: true },
+			expense: { teacher: true },
 			...state.db.settings.permissions
 		}
 	}
@@ -216,7 +216,7 @@ const checkPermissions = (state: RootReducerState) => {
 }
 
 const checkGrades = (state: RootReducerState) => {
-	if(state.db.settings.exams){
+	if (state.db.settings.exams) {
 		console.log("Not Running Grades Script")
 		return state
 	}
