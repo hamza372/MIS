@@ -3,19 +3,30 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import List from 'components/List'
 import Layout from 'components/Layout'
+import { RouteComponentProps } from 'react-router';
 
-const ExamItem = (exam) => 
+type propsType = {
+	exams: RootDBState["exams"]
+	classes: RootDBState["classes"]
+} & RouteComponentProps<RouteInfo>
+
+interface RouteInfo {
+	section_id: string
+	class_id: string
+}
+
+const ExamItem = (exam: MISExam) => 
 	<div className="table row" key={exam.id}>
 		<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>
-			{examLabel(exam)}
+			{examLabel(exam)} 
 		</Link>
 
 		<div>{new Date(exam.date).toLocaleDateString()}</div>
 	</div>
 
-const examLabel = (exam) => `${exam.subject}: ${exam.name}`;
+const examLabel = (exam: MISExam) => `${exam.subject}: ${exam.name}`;
 
-class ReportList extends Component {
+class ReportList extends Component<propsType> {
 
 	render() {
 
@@ -49,7 +60,7 @@ class ReportList extends Component {
 	}
 }
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	exams: state.db.exams,
 	classes: state.db.classes
 }))(ReportList);
