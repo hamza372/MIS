@@ -424,7 +424,7 @@ class StudentFees extends Component <propTypes, S> {
 	// return a route for fee voucher preview
 	getPreviewRoute = (): string => {
 		const famId = this.familyID()
-		const redirectTo = famId === undefined ? `/student/${this.props.match.params.id}` : `/families/${famId}`
+		const redirectTo = famId === undefined || famId === "" ? `/student/${this.props.match.params.id}` : `/families/${famId}`
 
 		return `${redirectTo}/fee-print-preview?month=${this.state.month}&year=${this.state.year}`
 	}
@@ -467,7 +467,7 @@ class StudentFees extends Component <propTypes, S> {
 						.reduce((agg, curr) => curr.type === "FEE" && curr.period === "SINGLE" ? agg + parseFloat(curr.amount) : agg, 0)
 				}</div>
 			</div>
-			<div className="divider">{famId === undefined || famId !== "" ? "Student Ledger" : "Family Ledger"}</div>
+			<div className="divider">{famId === undefined || famId === "" ? "Student Ledger" : "Family Ledger"}</div>
 
 			<div className="filter row no-print"  style={{marginBottom:"10px"}}>
 				<select className="" {...this.Former.super_handle(["month"])} style={{ width: "150px" }}>
@@ -554,7 +554,7 @@ class StudentFees extends Component <propTypes, S> {
 
 		</div>
 
-		if(famId === undefined || famId === "") {
+		if(famId === undefined || famId === "" || this.props.match.params.id !== undefined) {
 			return RenderBody
 		}
 		// if family payment ledger
