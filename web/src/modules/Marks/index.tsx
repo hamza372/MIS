@@ -3,8 +3,14 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Layout from 'components/Layout'
+import { RouteComponentProps } from 'react-router'
 
-class Reports extends Component {
+type propsType = {
+	classes: RootDBState["classes"]
+	exams: RootDBState["exams"]
+} & RouteComponentProps
+
+class Reports extends Component<propsType> {
 
 	render() {
 
@@ -25,6 +31,6 @@ class Reports extends Component {
 	}
 } 
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	classes: state.db.classes
 }))(Reports)
