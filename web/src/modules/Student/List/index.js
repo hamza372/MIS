@@ -7,6 +7,7 @@ import Former from 'utils/former'
 import getStudentLimt from 'utils/getStudentLimit';
 import { LayoutWrap } from 'components/Layout';
 import { StudentPrintableList } from 'components/Printable/Student/list';
+import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist';
 import {chunkify} from 'utils/chunkify'
 import Card from 'components/Card'
 
@@ -18,7 +19,7 @@ const StudentItem = (S) => {
 	return <div className="icon-card">
 				<div className="icard-title">
 					<Link style={{textDecoration:"none"}} to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
-						{S.Name} 
+					{S.Name}
 					</Link>
 				</div>
 				<div className="icard-para">
@@ -64,6 +65,7 @@ export class StudentList extends Component {
 	  this.state = {
 		showActiveStudent: true,
 		showInactiveStudent: false,
+		printStudentCard: false,
 		tag: "",
 		selected_section_id: ""
 	  }
@@ -208,6 +210,10 @@ export class StudentList extends Component {
 								<input type="checkbox" {...this.former.super_handle(["showInactiveStudent"])} style={{height:"20px"}} />
 									InActive
 							</div>
+							<div className="checkbox">
+							<input type="checkbox" {...this.former.super_handle(["printStudentCard"])} style={{height:"20px"}} />
+								ID Cards
+							</div>
 						</div>
 						<select className="list-select" {...this.former.super_handle(["tag"])}>
 							<option value="">Select Tag</option>
@@ -233,15 +239,22 @@ export class StudentList extends Component {
 			{	// for first table, Sr. no will start from 1,
 				// for other tables, Sr. no will start from chunkSize * index
 				// here's "index" representing table number
-
+				!this.state.printStudentCard ?
 				chunkify(items, chunkSize)
 					.map((chunkItems, index) => <StudentPrintableList students={chunkItems} key={index} 
 						chunkSize={ index === 0 ? 0 : chunkSize * index }
 						schoolName={ settings.schoolName }
-						studentClass= { curr_section }/>)
+						studentClass={ curr_section }/>)
+                                              :
+                // print 8 students ID cards per page
+				chunkify(items, 8)
+					.map((chunkItems, index) => <StudenPrintableIDCardList students={chunkItems} key={index}
+						schoolName={ settings.schoolName }
+						schoolLogo={ this.props.schoolLogo }
+						studentClass={ curr_section }/>)
 			}
 			
-			<div className="print button" onClick={() => window.print()}>Print</div>
+			<div className="print button" onClick={() => window.print()}>{ this.state.printStudentCard ? "Print ID Cards" : "Print Students List"}</div>
 		</div>
 	}
 }
