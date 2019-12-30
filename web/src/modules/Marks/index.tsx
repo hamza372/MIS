@@ -9,10 +9,16 @@ import moment from 'moment';
 import { EditIcon, DeleteIcon } from 'assets/icons'
 
 import './style.css'
+import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
+import chunkify from 'utils/chunkify'
+import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 
 type propsType = {
 	classes: RootDBState["classes"]
+	students: RootDBState["students"]
 	exams: RootDBState["exams"]
+	grades: RootDBState["settings"]["exams"]["grades"]
+	schoolName: string
 } & RouteComponentProps
 
 type S = {
@@ -28,8 +34,8 @@ class Reports extends Component<propsType, S> {
 
 		const year = moment().format("YYYY")
 		this.state = {
-			section_id: '',
-			exam_title: '',
+			section_id: '1ba345d2-1346-4a9e-a2ab-0cb867a13b85',
+			exam_title: 'Final-Term',
 			year
 		}
 
@@ -82,15 +88,50 @@ class Reports extends Component<propsType, S> {
 		return filtered_exams
 	}
 
+	renderClassResultSheet = (section: AugmentedSection) => {
+
+		const { section_id, exam_title, year } = this.state
+		const { students, exams, grades, schoolName } = this.props
+		const filter = { exam_title, year }
+		const chunkSize  = 22
+		const section_students = Object.values(students)
+			.filter(s => s && s.id && s.exams && s.section_id === section_id )
+		
+		const section_exams = Object.values(exams)
+			.filter(exam => exam && exam.section_id && exam.section_id === section_id)
+
+		const examSubjectsWithMarks = new Set<string>()
+		
+		for (const exam of section_exams) {
+			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year) {
+				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
+			}
+		}
+
+		const marks_sheet = getStudentExamMarksSheet(section_students, exams, section_exams, grades, filter)
+		
+		return chunkify(marks_sheet, chunkSize)
+			.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
+				sectionName={ section ? section.namespaced_name : '' }
+				examSubjectsWithMarks={ examSubjectsWithMarks }
+				examName={ exam_title }
+				schoolName={ schoolName }
+				students={ chunkItems }
+				chunkSize={ index === 0 ? 0 : chunkSize * index }/>)
+
+	}
+
 	render() {
 
-		const { section_id, exam_title } = this.state
+		const { section_id, exam_title, year } = this.state
 		const { classes, exams } = this.props
 
 		const sections = getSectionsFromClasses(classes)
 			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		
 		const filtered_exams = this.getFilteredExams()
+		
+		const curr_section = sections.find( section => section.id === section_id)
 
 		const years = new Set<string>()
 		const exam_titles = new Set<string>()
@@ -103,7 +144,7 @@ class Reports extends Component<propsType, S> {
 		}
 
 		return <Layout history={this.props.history}>
-			<div className="reports-page">
+			<div className="reports-page no-print">
 				<div className="title">Grade Book</div>
 				<div className="form section exams-filter">
 					<div className="row create-exam">
@@ -144,43 +185,50 @@ class Reports extends Component<propsType, S> {
 				{	
 					exam_title !=='' && <div className="section exams-list">
 						<fieldset>
-							<legend className="text-uppercase">{exam_title.toUpperCase()}</legend>
-							<div className="table-row table-header">
-								<div className="thead cell">Subject</div>
-								<div className="thead cell">Max Score</div>
-								<div className="thead cell">Date</div>
-								<div className="thead cell" style={{width: "10%"}}>Edit/Delete</div>
-							</div>
-							{
-								filtered_exams
-									.filter(exam => exam.name === exam_title)
-									.map(exam => <div className="table-row" key={exam.id}>
-										<div className="cell">
-											<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`} onClick={() => this.preserveState()}>{exam.subject}</Link>
-										</div>
-										<div className="cell">{exam.total_score}</div>
-										<div className="cell">{moment(exam.date).format("DD/MM")}</div>
-										<div className="cell" style={{width: "10%"}}>
-											<div className="">
-												<img className="edit-icon" src={EditIcon} onClick={() => this.editExam(exam)} alt="edit"/>
-												<img className="delete-icon" src={DeleteIcon} onClick={() => this.deleteExam(exam.id)} alt="delete"/>
+							<legend>{exam_title.toUpperCase()}</legend>
+							<div className="exams-table">
+								<div className="table-row table-header">
+									<div className="thead cell">Subject</div>
+									<div className="thead cell">Max Score</div>
+									<div className="thead cell">Date</div>
+									<div className="thead cell" style={{width: "10%"}}>Edit/Delete</div>
+								</div>
+								{
+									filtered_exams
+										.filter(exam => exam.name === exam_title)
+										.map(exam => <div className="table-row" key={exam.id}>
+											<div className="cell">
+												<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`} onClick={() => this.preserveState()}>{exam.subject}</Link>
 											</div>
-										</div>
-									</div>)
-							}
+											<div className="cell">{exam.total_score}</div>
+											<div className="cell">{moment(exam.date).format("DD/MM")}</div>
+											<div className="cell" style={{width: "10%"}}>
+												<div className="">
+													<img className="edit-icon" src={EditIcon} onClick={() => this.editExam(exam)} alt="edit"/>
+													<img className="delete-icon" src={DeleteIcon} onClick={() => this.deleteExam(exam.id)} alt="delete"/>
+												</div>
+											</div>
+										</div>)
+								}
+							</div>
 						</fieldset>
 						<div className="row">
-							<div className="button grey">Print Result Sheet</div>
+							<div className="button grey" onClick={() => window.print()}>Print Result Sheet</div>
 						</div>
 					</div>
 				}
 			</div>
+			{
+				section_id !== '' && exam_title !== '' && year !=='' && <div className="print-only">{this.renderClassResultSheet(curr_section)}</div>
+			}
 		</Layout>
-
 	}
-} 
+}
 
 export default connect((state: RootReducerState) => ({
 	classes: state.db.classes,
-	exams: state.db.exams
+	students: state.db.students,
+	exams: state.db.exams,
+	grades: state.db.settings.exams.grades,
+	schoolName: state.db.settings.schoolName
 }))(Reports)
