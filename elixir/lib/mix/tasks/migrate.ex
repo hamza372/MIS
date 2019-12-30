@@ -1,6 +1,154 @@
 defmodule Mix.Tasks.Migrate do
 	use Mix.Task
 
+	def run(["negative-fees"]) do
+		Application.ensure_all_started(:sarkar)
+
+		{:ok, res} = Postgrex.query(Sarkar.School.DB, "
+		SELECT
+			school_id,
+			time,
+			path,
+			value
+		FROM writes
+		where path[4] = 'fees' and path[6] = 'amount'
+		order by time desc 
+		", [])
+
+		negative = res.rows 
+		|> Enum.filter(fn [sid, time, path, value] -> value != nil and sid != "cerp" end)
+		|> Enum.filter(fn [sid, time, path, value] -> value < 0 end)
+
+		IO.inspect Enum.count(negative)
+
+		schools = Enum.reduce(negative, %{}, fn [sid, time, path, value], agg -> 
+
+			t = DateTime.from_unix(time, :millisecond)
+			IO.inspect t
+			IO.puts "#{sid}: #{Enum.join(path, ",")} -> #{value}"
+			case Map.has_key?(agg, sid) do
+				true -> 
+					existing = Map.get(agg, sid)
+					new = [{path, value} | existing ]
+					Map.put(agg, sid, new)
+				false ->
+					Map.put(agg, sid, [{path, value}])
+			end
+		end)
+
+		Enum.map(schools, fn {k, v} -> 
+			IO.puts "#{k}: #{Enum.count(v)}" 
+		end)
+
+		IO.puts "affected schools: #{Enum.count(schools)}"
+
+	end
+
+	# need to identify the payments amounts that should be positive but are negative.
+
+	def run(["negative-fees-end"]) do
+
+		blank_id = "____________________________________"
+		
+		Application.ensure_all_started(:sarkar)
+
+		IO.puts "querying..."
+		{:ok, res} = Postgrex.query(Sarkar.School.DB, "
+		SELECT 
+			school_id,
+			path,
+			value
+		FROM flattened_schools
+		WHERE path like 'students,#{blank_id},fees,#{blank_id},amount'
+		", [])
+
+		negative = res.rows 
+			|> Enum.filter(fn [sid, path, value] -> sid != "cerp" and value < 0 end)
+
+		schools = Enum.reduce(negative, %{}, fn [sid, path, value], agg -> 
+
+			case Map.has_key?(agg, sid) do
+				true ->
+					existing = Map.get(agg, sid)
+					new = [{String.split(path, ","), value} | existing]
+					Map.put(agg, sid, new)
+				false ->
+					Map.put(agg, sid, [{String.split(path, ","), value}])
+			end
+		end)
+
+		#Enum.map(schools, fn {k, v} -> 
+		#	IO.puts "#{k}: #{Enum.count(v)}"
+		#end)
+
+		# TODO: this is to be replaced by a loop over all schools
+		IO.inspect Map.keys(schools)
+
+		Map.keys(schools)
+		|> Enum.each(fn example_sid -> 
+			IO.inspect example_sid
+
+			example = Map.get(schools, example_sid)
+
+			# probably better to just go and load this school into memory.
+			start_school(example_sid)
+
+			db = Sarkar.School.get_db(example_sid)
+
+			results = Enum.reduce(example, 0, fn {path, value}, agg -> 
+
+				[_, sid, _, fee_id, _] = path
+
+				payments = Dynamic.get(db, ["students", sid, "payments"])
+
+				relevant = Enum.filter(payments, fn {payment_id, payment} -> 
+					# we are looking at values that are all negative because of our earlier filtering.
+					# all of these values were supposed to be positive
+					# they got saved as negative because of an editing bug
+					# so scholarships which are supposed to be stored as negative amounts got double flipped into positive amounts
+					# here we identify relevant payments which are incorrectly positive. these should be set to their negative values
+					
+					Map.get(payment, "fee_id") == fee_id and Map.get(payment, "amount") == -value 
+				end)
+
+				IO.puts "RELEVANT PAYMENTS"
+				IO.inspect relevant
+
+				fixed_writes = relevant
+					|> Enum.map(fn {payment_id, payment} -> 
+
+						fixed_path = ["db", "students", sid, "payments", payment_id, "amount"]
+
+						%{
+							"type" => "MERGE",
+							"path" => fixed_path,
+							"value" => value
+						}
+
+					end)
+				
+				fixed_writes = [%{
+					"type" => "MERGE",
+					"path" => ["db", "students", sid, "fees", fee_id, "amount"],
+					"value" => -value
+				} | fixed_writes]
+
+				IO.puts "FIXED:"
+				IO.inspect fixed_writes
+
+				# sync these changes and it will reverse all incorrect payments and set the fee correctly
+
+
+				prepared = Sarkar.School.prepare_changes(fixed_writes)
+				# Sarkar.School.sync_changes(example_sid, "backend", prepared, :os.system_time(:millisecond))
+
+				agg + Enum.count(relevant)
+				# now check how many of the relevant are equal to the NEGATIVE of the messed up write
+
+			end)
+		
+		end)
+	end
 
 	def run(["assign_max_students"]) do
 
