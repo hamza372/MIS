@@ -7,11 +7,12 @@ import { RouteComponentProps } from 'react-router'
 import Former from 'utils/former';
 import moment from 'moment';
 import { EditIcon, DeleteIcon } from 'assets/icons'
-
-import './style.css'
 import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
 import chunkify from 'utils/chunkify'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
+import { deleteExam } from 'actions'
+
+import './style.css'
 
 type propsType = {
 	classes: RootDBState["classes"]
@@ -19,12 +20,20 @@ type propsType = {
 	exams: RootDBState["exams"]
 	grades: RootDBState["settings"]["exams"]["grades"]
 	schoolName: string
+
+	deleteExam: (students: Array<string>, exam_id: string) => void
+
 } & RouteComponentProps
 
 type S = {
 	section_id: string
 	exam_title: string
 	year: string
+	banner: {
+		active: boolean
+		good?: boolean
+		text?: string
+	}
 }
 class Reports extends Component<propsType, S> {
 
@@ -34,9 +43,14 @@ class Reports extends Component<propsType, S> {
 
 		const year = moment().format("YYYY")
 		this.state = {
-			section_id: '1ba345d2-1346-4a9e-a2ab-0cb867a13b85',
-			exam_title: 'Final-Term',
-			year
+			section_id: '',
+			exam_title: '',
+			year,
+			banner: {
+				active: false,
+				good: false,
+				text: ''
+			}
 		}
 
 		this.former = new Former(this, [])
@@ -45,8 +59,28 @@ class Reports extends Component<propsType, S> {
 	preserveState = (): void => {
 	
 	}
-	deleteExam = (id: string): void => {
+	deleteExam = (exam_id: string): void => {
 		
+		if(window.confirm('Are you sure you want to delete?') === false) {
+			return
+		}
+			
+		const students = Object.values(this.props.students)
+							.filter(s => s && s.exams !== undefined && s.exams[exam_id] !== undefined)
+							.map(s => s.id)
+
+		this.setState({
+			banner: {
+				active: true,
+				good: false,
+				text: "Exam Deleted"
+			}
+		})
+
+		this.props.deleteExam(students, exam_id)
+
+		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
+
 	}
 	editExam = (exam: MISExam): void => {
 		const {class_id, section_id, id} = exam
@@ -231,4 +265,6 @@ export default connect((state: RootReducerState) => ({
 	exams: state.db.exams,
 	grades: state.db.settings.exams.grades,
 	schoolName: state.db.settings.schoolName
+}), (dispatch: Function) => ({
+	deleteExam: (students: Array<string>, exam_id: string) => dispatch(deleteExam(students, exam_id))
 }))(Reports)
