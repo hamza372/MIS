@@ -2,25 +2,8 @@ import React from "react"
 import "./../print.css"
 import moment from "moment"
 
-type studentMarks = {
-    id: string
-    name: string
-    roll: string
-    marks: { obtained: number, total: number}
-    grade: string
-    exams: Exams[]
-}
-
-type Exams = MISExam & {
-    stats: {
-        score: number 
-        remarks: string
-        grade: string
-    }
-}
-
 type PropsTypes = {
-    students: studentMarks[]
+    students: StudentMarksSheet[]
     examSubjectsWithMarks: Set<string>
     chunkSize: number
     sectionName: string

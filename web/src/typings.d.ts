@@ -346,3 +346,15 @@ interface MISDateSheet {
 		time: string
 	}
 }
+
+type AugmentedMISExam = MISExam & { stats: MISStudentExam }
+interface StudentMarksSheet {
+	id: MISStudent["id"]
+    name: MISStudent["Name"]
+    roll: MISStudent["RollNumber"]
+    marks: { total: number, obtained: number }
+    position: number
+    exams: AugmentedMISExam[]
+    grade: string
+    remarks: string
+}
