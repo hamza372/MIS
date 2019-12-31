@@ -65,10 +65,7 @@ defmodule Sarkar.ActionHandler.Mis do
 		} = state
 	) do
 
-		mutation_res = if map_size(mutations || %{}) > 0 do
-			Sarkar.School.sync_changes(school_id, client_id, mutations, last_sync_date)
-		end
-
+		mutation_res = Sarkar.School.sync_changes(school_id, client_id, mutations, last_sync_date)
 		analytics_res = Sarkar.Analytics.record(school_id, client_id, analytics, last_sync_date)
 
 		res = %{
