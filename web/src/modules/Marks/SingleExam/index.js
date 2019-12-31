@@ -253,8 +253,14 @@ class SingleExam extends Component {
 
 	render() {
 
+		const students = Object.values(this.props.students)
+			.filter(student => student && student.Name && student.section_id === this.section_id())
+
+		const exam_title = this.state.exam.name
+		const year = moment(this.state.exam.date).format("YYYY")
+	
 		if(this.state.redirect) {
-			return <Redirect to={`/reports/${this.class_id()}/${this.section_id()}`} />
+			return <Redirect to={`/reports?section_id=${this.section_id()}&exam_title=${exam_title}&year=${year}`}/>
 		}
 		return <Layout history={this.props.history}>
 			<div className="single-exam">
@@ -355,7 +361,7 @@ class SingleExam extends Component {
 					<div className="students">
 						<div className="row">
 							<Dropdown
-								items={Object.values(this.props.students)}
+								items={students}
 								toLabel={s => s.Name} 
 								onSelect={s => this.addStudent(s)}
 								toKey={s => s.id} 

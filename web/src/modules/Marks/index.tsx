@@ -11,6 +11,7 @@ import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
 import chunkify from 'utils/chunkify'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 import { deleteExam } from 'actions'
+import queryString from 'querystring'
 
 import './style.css'
 
@@ -41,10 +42,15 @@ class Reports extends Component<propsType, S> {
 	constructor(props: propsType) {
 		super(props)
 
-		const year = moment().format("YYYY")
+		const parsed_query = queryString.parse(this.props.location.search)
+
+		const section_id = parsed_query["?section_id"] ? parsed_query["?section_id"].toString() : ''
+		const exam_title = parsed_query["exam_title"] ? parsed_query["exam_title"].toString() : ''
+		const year = parsed_query["year"] ? parsed_query["year"].toString() : ''
+
 		this.state = {
-			section_id: '',
-			exam_title: '',
+			section_id,
+			exam_title,
 			year,
 			banner: {
 				active: false,
@@ -56,9 +62,6 @@ class Reports extends Component<propsType, S> {
 		this.former = new Former(this, [])
 	}
 
-	preserveState = (): void => {
-	
-	}
 	deleteExam = (exam_id: string): void => {
 		
 		if(window.confirm('Are you sure you want to delete?') === false) {
@@ -86,6 +89,7 @@ class Reports extends Component<propsType, S> {
 		const {class_id, section_id, id} = exam
 		const url = `/reports/${class_id}/${section_id}/exam/${id}`
 
+		// redirect to edit exam page
 		window.location.href = url
 	}
 	createNewExam = (): void => {
@@ -93,17 +97,15 @@ class Reports extends Component<propsType, S> {
 		const { section_id } = this.state
 
 		if(section_id === '') {
-			alert("Please select class/section first!")
+			alert("Please select class first!")
 			return
 		}
 
 		const class_id = this.getClassID(section_id)
 		const url = `/reports/${class_id}/${section_id}/new`
 		
-		// preserve state
-		this.preserveState()
 		// redirect to create new exam page
-		window.location.replace(url)
+		window.location.href = url
 	}
 	getClassID = (section_id: string) => {
 		const { classes } = this.props
@@ -155,6 +157,31 @@ class Reports extends Component<propsType, S> {
 
 	}
 
+	onStateChange = () => {
+
+		const { section_id, exam_title, year  } = this.state
+
+		const url = '/reports'
+		const params = `section_id=${section_id}&exam_title=${exam_title}&year=${year}`
+
+		window.history.replaceState(this.state, "Grade Book", `${url}?${params}`)
+	}
+
+	UNSAFE_componentWillReceiveProps(nextProps: propsType){
+		
+		const parsed_query = queryString.parse(nextProps.location.search)
+
+		const section_id = parsed_query["?section_id"] ? parsed_query["?section_id"].toString() : ''
+		const exam_title = parsed_query["exam_title"] ? parsed_query["exam_title"].toString() : ''
+		const year = parsed_query["year"] ? parsed_query["year"].toString() : ''
+
+		this.setState({
+			section_id,
+			exam_title,
+			year
+		})
+	}
+
 	render() {
 
 		const { section_id, exam_title, year } = this.state
@@ -181,13 +208,10 @@ class Reports extends Component<propsType, S> {
 			<div className="reports-page no-print">
 				<div className="title">Grade Book</div>
 				<div className="form section exams-filter">
-					<div className="row create-exam">
-						<div className="button blue create-exam" onClick={() => this.createNewExam()}>Create New Exam</div>
-					</div>
 					<div className="table">
 						<div className="row">
 							<label>Class/Section</label>
-							<select {...this.former.super_handle(["section_id"])}>
+							<select {...this.former.super_handle(["section_id"], () => true, this.onStateChange)}>
 								<option value="">Select Section</option>
 								{
 									sections.map( section => <option key={section.id} value={section.id}>{section.namespaced_name}</option>)
@@ -196,7 +220,7 @@ class Reports extends Component<propsType, S> {
 						</div>
 						<div className="row">
 							<label>Exams for Year</label>
-							<select {...this.former.super_handle(["year"])}>
+							<select {...this.former.super_handle(["year"], () => true, this.onStateChange)}>
 								<option value="">Select Year</option>
 								{
 									Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
@@ -205,7 +229,7 @@ class Reports extends Component<propsType, S> {
 						</div>
 						<div className="row">
 							<label>Exam</label>
-							<select {...this.former.super_handle(["exam_title"])}>
+							<select {...this.former.super_handle(["exam_title"], () => true, this.onStateChange)}>
 								<option value="">Select Exam</option>
 								{
 									Array.from(exam_titles)
@@ -215,9 +239,12 @@ class Reports extends Component<propsType, S> {
 							</select>
 						</div>
 					</div>
+					<div className="row create-exam">
+						<div className="button blue create-exam" onClick={() => this.createNewExam()}>Create New Exam</div>
+					</div>
 				</div>
 				{	
-					exam_title !=='' && <div className="section exams-list">
+					exam_title !== '' && year !== '' && <div className="section exams-list">
 						<fieldset>
 							<legend>{exam_title.toUpperCase()}</legend>
 							<div className="exams-table">
@@ -232,7 +259,7 @@ class Reports extends Component<propsType, S> {
 										.filter(exam => exam.name === exam_title)
 										.map(exam => <div className="table-row" key={exam.id}>
 											<div className="cell">
-												<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`} onClick={() => this.preserveState()}>{exam.subject}</Link>
+												<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.subject}</Link>
 											</div>
 											<div className="cell">{exam.total_score}</div>
 											<div className="cell">{moment(exam.date).format("DD/MM")}</div>
