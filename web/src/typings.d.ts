@@ -59,6 +59,12 @@ interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
 	meta: { route: string };
 }
 
+interface ImageMergeItem {
+	id: string
+	image_string: string
+	path: string[]
+}
+
 interface RootReducerState {
 	client_id: string;
 	initialized: boolean;
@@ -75,6 +81,9 @@ interface RootReducerState {
 		},
 		analytics: {
 			[id: string]: RouteAnalyticsEvent
+		},
+		images: {
+			[id: string]: ImageMergeItem
 		}
 	};
 	acceptSnapshot: boolean;

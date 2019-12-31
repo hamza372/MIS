@@ -10,26 +10,26 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 	switch (action.type) {
 
 		case "CONFIRM_ANALYTICS_SYNC":
-		{
-			const newA = Object.entries(state.queued.analytics)
-				.reduce((agg, [key,val]) => {
-					if (val.time > (action as ConfirmAnalyticsSyncAction).time) {
-						return {
-							...agg,
-							[key]: val
+			{
+				const newA = Object.entries(state.queued.analytics)
+					.reduce((agg, [key, val]) => {
+						if (val.time > (action as ConfirmAnalyticsSyncAction).time) {
+							return {
+								...agg,
+								[key]: val
+							}
 						}
-					}
-					return agg
-				},{})
+						return agg
+					}, {})
 
-			return {
-				...state,
-				queued: {
-					...state.queued,
-					analytics: newA
+				return {
+					...state,
+					queued: {
+						...state.queued,
+						analytics: newA
+					}
 				}
 			}
-		}
 
 		case SIGN_UP_LOADING:
 			{
@@ -97,7 +97,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 		case QUEUE:
 			{
 				const actionType = action as QueueAction
-				
+
 				if (actionType.queue_type === "analytics") {
 					return {
 						...state,
@@ -107,20 +107,35 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 								...state.queued.analytics,
 								...actionType.payload
 							}
+						}
+					}
+				}
+
+				if (actionType.queue_type === "mutations") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							mutations: {
+								...state.queued.mutations,
+								...actionType.payload
+							}
 						},
 						acceptSnapshot: false
 					}
 				}
-				return {
-					...state,
-					queued: {
-						...state.queued,
-						mutations : {
-							...state.queued.mutations,
-							...actionType.payload
+
+				if (actionType.queue_type === "images") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							images: {
+								...state.queued.images,
+								...actionType.payload
+							}
 						}
-					},
-					acceptSnapshot: false
+					}
 				}
 			}
 
