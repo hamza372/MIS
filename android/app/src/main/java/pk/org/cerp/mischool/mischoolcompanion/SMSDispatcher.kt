@@ -8,6 +8,10 @@ import com.evernote.android.job.Job
 import com.evernote.android.job.JobCreator
 import com.evernote.android.job.JobRequest
 import java.io.File
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class SMSDispatcher : JobCreator {
 
@@ -149,21 +153,25 @@ class SMSJob : Job() {
 
             val messages = smsManager.divideMessage(text)
 
+            val currentTime = DateFormat.getDateTimeInstance().format(Date())
+
             Log.d(TAG, "size of messages: ${messages.size}")
 
             if(messages.size > 1) {
                 Log.d(TAG, "SENDING MULTIPART")
-                updateLogText("sending multipart message")
                 smsManager.sendMultipartTextMessage(phoneNumber, null, messages, null, null)
+                updateLogText("sent multipart message to: $phoneNumber at $currentTime")
             }
             else {
                 smsManager.sendTextMessage(phoneNumber, null, text, null, null)
+                updateLogText("sent message to: $phoneNumber at $currentTime")
             }
 
             // updateLogText("message sent")
         } catch( e: Exception) {
             Log.d(TAG, e.message)
-            updateLogText("ERROR ${e.message}")
+            val currentTime = DateFormat.getDateTimeInstance().format(Date())
+            updateLogText("ERROR sending to $phoneNumber: ${e.message} at $currentTime")
         }
 
     }

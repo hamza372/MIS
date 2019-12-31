@@ -3,21 +3,21 @@ interface RootDBState {
 	faculty: {
 		[id: string]: MISTeacher;
 	};
-	users: { 
+	users: {
 		[id: string]: MISUser;
 	};
 	students: {
 		[id: string]: MISStudent;
 	};
-	classes: { 
+	classes: {
 		[id: string]: MISClass;
 	};
-	sms_templates: { 
+	sms_templates: {
 		attendance: string;
 		fee: string;
 		result: string;
 	};
-	exams: { 
+	exams: {
 		[id: string]: MISExam;
 	};
 	settings: MISSettings;
@@ -29,8 +29,8 @@ interface RootDBState {
 			[id: string]: MISSMSHistory
 		}
 	}
-	assets : {
-		schoolLogo : string
+	assets: {
+		schoolLogo: string
 	}
 	max_limit: number
 	package_info: {
@@ -39,7 +39,7 @@ interface RootDBState {
 		paid: boolean
 	}
 	diary: MISDiary
-	planner: { 
+	planner: {
 		// Will be able to add more planner stuff here i.e Teacher/Class shedule e.t.c 
 		datesheet: {
 			[section_id: string]: {
@@ -75,8 +75,8 @@ interface RootReducerState {
 					path: string[];
 					value?: any;
 					type: "MERGE" | "DELETE";
-				}; 
-				date: number; 
+				};
+				date: number;
 			}
 		},
 		analytics: {
@@ -186,7 +186,7 @@ interface MISStudent {
 	Birthdate: string;
 	Address: string;
 	Notes: string;
-	StartDate: number; 
+	StartDate: number;
 	AdmissionNumber: string;
 	BloodType?: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 	FamilyID?: string;
@@ -208,11 +208,11 @@ interface MISStudent {
 	};
 	tags: { [tag: string]: boolean };
 	certificates: {
-		[id: string]: MISCertificate; 
+		[id: string]: MISCertificate;
 	};
 }
 
-interface MISFamilyInfo { 
+interface MISFamilyInfo {
 	ManName: string;
 	Phone: string;
 	ManCNIC: string;
@@ -261,7 +261,7 @@ interface MISStudentPayment {
 type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited: boolean }
 
 interface AugmentedMISPaymentMap {
-	[pid: string] : AugmentedMISPayment
+	[pid: string]: AugmentedMISPayment
 }
 
 interface BaseMISExpense {
@@ -269,7 +269,7 @@ interface BaseMISExpense {
 	amount: number;
 	label: string;
 	type: string;
-	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | "";   
+	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | "";
 	date: number;
 	time: number;
 }
@@ -299,7 +299,7 @@ interface MISStudentAttendanceEntry {
 
 interface MISTeacher {
 	id: string;
-	Name: string; 
+	Name: string;
 	CNIC: string;
 	Gender: string;
 	Username: string;
@@ -319,7 +319,7 @@ interface MISTeacher {
 	HireDate: string;
 	Admin: boolean;
 
-	attendance:  MISTeacherAttendance;
+	attendance: MISTeacherAttendance;
 }
 
 type MISTeacherAttendanceStatus = "check_in" | "check_out" | "absent" | "leave" | ""
@@ -340,7 +340,7 @@ interface MISSmsPayload {
 	return_link: string;
 }
 
-interface MISDiary{
+interface MISDiary {
 	[date: string]: {
 		[section_id: string]: {
 			[subject: string]: {

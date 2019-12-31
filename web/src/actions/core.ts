@@ -1,5 +1,5 @@
 import { Dispatch } from 'redux'
-import Syncr from '@cerp/syncr';
+import Syncr from '@cerp/syncr'
 import { loadDb } from 'utils/indexedDb';
 import { v4 } from 'node-uuid';
 
@@ -51,12 +51,19 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 
 	dispatch(QueueAnalytics(event_payload))
 
+	if (!syncr.connection_verified) {
+		console.warn("connection not verified")
+		return
+	}
+
 	syncr.send(payload)
 		.then(res => {
 			dispatch(multiAction(res))
 		})
 		.catch(err => {
 			dispatch(QueueAnalytics(event_payload))
+
+			console.error("analytics error:", err)
 
 			if (state.connected && err !== "timeout") {
 				alert("Syncing Error: " + err)
@@ -154,11 +161,17 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 
 	dispatch(QueueMutations(new_merges))
 
+	if (!syncr.connection_verified) {
+		console.warn("connection not verified")
+		return;
+	}
+
 	syncr.send(payload)
 		.then(res => {
 			dispatch(multiAction(res))
 		})
 		.catch(err => {
+			console.error("create merges error: ", err)
 			dispatch(QueueMutations(new_merges))
 
 			if (state.connected && err !== "timeout") {
@@ -274,6 +287,11 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 	}
 
 	dispatch(QueueMutations(payload))
+
+	if (!syncr.connection_verified) {
+		console.warn("connection not verified")
+		return;
+	}
 
 	syncr.send({
 		type: SYNC,
@@ -420,6 +438,9 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 				}
 			})
 			.then(res => {
+
+				syncr.verify()
+
 				return syncr.send({
 					type: SYNC,
 					client_type: client_type,
@@ -477,6 +498,9 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 					}
 				})
 				.then(res => {
+
+					syncr.verify()
+
 					return syncr.send({
 						type: SYNC,
 						client_type: client_type,

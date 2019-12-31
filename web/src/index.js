@@ -11,17 +11,23 @@ import reducer from './reducers'
 
 import Routes from './routes'
 import { saveDb, initState } from './utils/indexedDb'
-import { loadDB } from './actions/core'
-import Syncr from 'syncr'
+import { loadDB, connected, disconnected } from './actions/core'
+import Syncr from '@cerp/syncr'
 
-const debug_host = 'wss://7e01bc49.ngrok.io';
-//const debug_host = 'wss://mis-socket.metal.fish';
+//const debug_host = 'wss://7e01bc49.ngrok.io';
+const debug_host = 'wss://mis-socket.metal.fish';
 
 const host = window.api_url || debug_host;
 
 const initialState = initState // loadDB();
 
-const syncr = new Syncr(`${host}/ws`, msg => store.dispatch(msg))
+const syncr = new Syncr(`${host}/ws`)
+syncr.on('connect', () => store.dispatch(connected()))
+syncr.on('disconnect', () => store.dispatch(disconnected()))
+syncr.on('message', (msg) => store.dispatch(msg))
+
+syncr.message_timeout = 90000;
+
 const store = createStore(reducer, initialState, applyMiddleware(thunkMiddleware.withExtraArgument(syncr)));
 
 store.dispatch(loadDB())
