@@ -4,8 +4,8 @@ fieldset{
 legend {
     font-weight: bold;
 }
-@media (max-width: 600px) {
-   fieldset {
+@media (max-width: 768px) {
+   .exams-table {
       overflow-x: scroll;
    }
  }
@@ -48,7 +48,10 @@ legend {
     margin-left: 10px;
  }
  .reports-page .create-exam {
-    margin-bottom: 10px;
+    margin-top: 12px;
+ }
+ .reports-page .section .row .button {
+    padding: 10px 15px;
  }
  .section.exams-filter, .section.exams-list {
     width: 90%; 
