@@ -39,6 +39,25 @@ defmodule Sarkar.School do
 
 	# API 
 
+	def prepare_changes(changes) do
+		# takes array of changes which are 
+		# %{ type: "MERGE" | "DELETE", path: [], value: any }
+		# and generates the map needed for sync_changes
+	
+		changes 
+		|> Enum.map(fn %{"type" => type, "path" => path, "value" => value} -> {
+			Enum.join(path, ","), %{
+				"action" => %{
+					"path" => path,
+					"type" => type,
+					"value" => value
+				},
+				"date" => :os.system_time(:millisecond)
+			}
+		} end)
+		|> Enum.into(%{})
+	end
+
 	def sync_changes(school_id, client_id, changes, last_sync_date) do
 		GenServer.call(via(school_id), {:sync_changes, client_id, changes, last_sync_date}, 30000)
 	end
