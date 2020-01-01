@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-
 import { RouteComponentProps } from 'react-router'
 import Layout from 'components/Layout'
+import Banner from 'components/Banner'
 import Former from 'utils/former'
 import { connect } from 'react-redux'
 import { mergeSettings } from 'actions'
@@ -19,6 +19,11 @@ interface S {
     selected_class_id: string
     disabled: boolean
     fee: MISStudentFee
+    banner: {
+        active: boolean
+        good?: boolean
+        text?: string
+    }
 }
 
 type propsType = RouteComponentProps & P
@@ -37,39 +42,46 @@ class ClassSettings extends Component<propsType, S> {
         super(props)
 
         this.state = {
-            fee: {
-                name: "",
-                type: "FEE",
-                amount: "",
-                period: "MONTHLY"
-            },
+            fee: defaultFee,
             selected_class_id: "",
-            disabled: true
+            disabled: true,
+            banner: {
+                active: false,
+                good: false,
+                text: ""
+            }
         }
 
         this.former = new Former(this, [])
     }
 
-    onSectionChange = (): void => {
+    onSectionChange = () => {
         
         const settings = this.props.settings
         const class_id = this.state.selected_class_id
-        if(settings.classes) {
+
+        if(settings.classes && settings.classes.defaultFee[class_id]) {
             
-            const default_fee = settings.classes.defaultFee[class_id] || defaultFee
+            this.setState({
+                fee: settings.classes.defaultFee[class_id]
+            })
+        } else {
 
             this.setState({
-                fee: default_fee
+                fee: defaultFee
             })
         }
+
+        // in case class not selected
+        this.checkFieldsFill()
     }
 
     checkFieldsFill = (): void => {
         
         const amount = this.state.fee.amount.trim()
         const name = this.state.fee.name.trim()
-
-        if(amount.length > 0 && name.length > 0 && this.state.selected_class_id !=="") {
+        console.log("AMT", amount, name, this.state.selected_class_id)
+        if(amount.length > 0 && name.length > 0 && this.state.selected_class_id !== "") {
             this.setState({ disabled: false })
         } else {
             this.setState({ disabled: true })
@@ -116,10 +128,21 @@ class ClassSettings extends Component<propsType, S> {
 					}
 				}
 			}
-		}
+        }
+        
+        this.setState({
+            banner: {
+                active: true,
+                good: true,
+                text: "Saved!"
+            }
+        })
 
         // updating MISSettings
-		this.props.mergeSettings(modified_settings)
+        this.props.mergeSettings(modified_settings)
+    
+		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
+
     }
 
 	render() {
@@ -127,6 +150,7 @@ class ClassSettings extends Component<propsType, S> {
 
 		return <Layout history={this.props.history}>
             <div className="class-settings">
+                {this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
                 <div className="divider">Default Fee</div>
                     <div className="section form default-fee">
                         <div className="row">
