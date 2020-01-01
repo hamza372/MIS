@@ -50,14 +50,7 @@ const blankStudent = (): MISStudent => ({
 	BloodType: "",
 	FamilyID: "",
 
-	fees: {
-		[v4()]: {
-			name: "Monthly Fee",
-			type: "FEE",
-			amount: "",
-			period: "MONTHLY"  // M: MONTHLY, Y: YEARLY 
-		}
-	},
+	fees: {},
 	payments: {},
 	attendance: {},
 	section_id: "",
@@ -182,6 +175,30 @@ class SingleStudent extends Component<propTypes, S> {
 			},
 			edit: rest
 		})
+	}
+
+	onSectionChange = (sections: AugmentedSection[]) => {
+
+		if(this.isNew()) {	
+
+			const { settings } = this.props
+			const { profile } = this.state
+
+			const section_id = profile.section_id
+			const class_id = sections.find(section => section.id === section_id).class_id
+
+			if(settings.classes && settings.classes.defaultFee[class_id]) {
+
+				this.setState({
+					profile: {
+						...profile,
+						fees: {
+							[v4()]: settings.classes.defaultFee[class_id] 
+						}
+					}
+				})
+			}
+		}
 	}
 
 	onSave = () => {
@@ -560,6 +577,8 @@ class SingleStudent extends Component<propTypes, S> {
 		const {students, max_limit} = this.props;
 		const prospective = this.isProspective()
 
+		const sections = getSectionsFromClasses(this.props.classes)
+
 		const oldStudent = students[this.props.match.params.id]
 
 		const { settings, logo } = this.props
@@ -715,7 +734,10 @@ class SingleStudent extends Component<propTypes, S> {
 						<select 
 							{...this.former.super_handle_flex(
 								["section_id"], 
-								{ styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {} })
+								{ 
+									styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {},
+									cb: () => this.onSectionChange(sections)
+								})
 							} 
 							disabled={!admin}>
 
@@ -739,7 +761,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 								<option value="">Please Select a Section</option>
 								{
-									getSectionsFromClasses(this.props.classes)
+									sections
 										.sort((a,b) => a.classYear - b.classYear )
 										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
 								}
