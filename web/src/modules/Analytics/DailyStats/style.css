@@ -1,0 +1,17 @@
+.daily-stats .section {
+    width: 90%;
+    margin: auto;
+}
+.daily-stats .section .table.row .number {
+    font-weight: bold;
+}
+.daily-stats .section .row .button {
+    padding: 10px 15px;
+}
+.daily-stats .section .list {
+    width: 100%;
+}
+.daily-stats .section .row.print-button {
+    margin-top: 15px;
+    justify-content: flex-end;
+}
