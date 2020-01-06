@@ -6,6 +6,8 @@ import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import getStudentSection from 'utils/getStudentSection'
 import queryString from 'querystring'
+import { PaidFeeStudentsPrintableList } from 'components/Printable/Fee/paidList'
+import chunkify from 'utils/chunkify'
 
 import './style.css'
 
@@ -96,7 +98,14 @@ class DailyStats extends Component<PropsType, S> {
                         <div className="button grey" onClick={() => window.print()}>Print Paid Students List</div>
                     </div>
                 </div>
-
+                {
+                    chunkify(paid_students, chunk_size)
+                        .map((itemsChunk: AugmentedStudent[], index: number) => <PaidFeeStudentsPrintableList key={ index } 
+                            students={ itemsChunk }
+                            chunkSize={ index === 0 ? 0 : chunk_size * index }
+                            totalAmount={ total_amount_received }
+                            totalStudents={ total_students_paid }/>)
+                }
             </>);
     }
 
