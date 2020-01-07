@@ -64,12 +64,12 @@ class Reports extends Component<propsType, S> {
 
 	deleteExam = (exam_id: string): void => {
 		
-		if(window.confirm('Are you sure you want to delete?') === false) {
+		if(!window.confirm('Are you sure you want to delete?')) {
 			return
 		}
 			
 		const students = Object.values(this.props.students)
-							.filter(s => s && s.exams !== undefined && s.exams[exam_id] !== undefined)
+							.filter(s => s && s.exams && s.exams[exam_id])
 							.map(s => s.id)
 
 		this.setState({
@@ -85,6 +85,7 @@ class Reports extends Component<propsType, S> {
 		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
 
 	}
+
 	editExam = (exam: MISExam): void => {
 		const {class_id, section_id, id} = exam
 		const url = `/reports/${class_id}/${section_id}/exam/${id}`
@@ -92,6 +93,7 @@ class Reports extends Component<propsType, S> {
 		// redirect to edit exam page
 		window.location.href = url
 	}
+
 	createNewExam = (): void => {
 		
 		const { section_id } = this.state
@@ -107,12 +109,14 @@ class Reports extends Component<propsType, S> {
 		// redirect to create new exam page
 		window.location.href = url
 	}
+
 	getClassID = (section_id: string) => {
 		const { classes } = this.props
 
 		return  Object.values(classes)
 			.find(c => c.sections[section_id] ? true : false).id
 	}
+
 	getFilteredExams = (): MISExam[] => {
 		const { section_id, year } = this.state
 		const { exams } = this.props
@@ -144,7 +148,7 @@ class Reports extends Component<propsType, S> {
 			}
 		}
 
-		const marks_sheet = getStudentExamMarksSheet(section_students, exams, section_exams, grades, filter)
+		const marks_sheet = getStudentExamMarksSheet(section_students, section_exams, grades, filter)
 		
 		return chunkify(marks_sheet, chunkSize)
 			.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
@@ -244,7 +248,7 @@ class Reports extends Component<propsType, S> {
 					</div>
 				</div>
 				{	
-					exam_title !== '' && year !== '' && <div className="section exams-list">
+					exam_title && year && <div className="section exams-list">
 						<fieldset>
 							<legend>{exam_title.toUpperCase()}</legend>
 							<div className="exams-table">
@@ -280,7 +284,7 @@ class Reports extends Component<propsType, S> {
 				}
 			</div>
 			{
-				section_id !== '' && exam_title !== '' && year !=='' && <div className="print-only">{this.renderClassResultSheet(curr_section)}</div>
+				section_id && exam_title && year && <div className="print-only">{this.renderClassResultSheet(curr_section)}</div>
 			}
 		</Layout>
 	}

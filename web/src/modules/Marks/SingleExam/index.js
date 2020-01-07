@@ -166,7 +166,7 @@ class SingleExam extends Component {
 			return
 			
 		const students = Object.values(this.props.students)
-							.filter(s => s.exams !== undefined && s.exams[exam_id] !== undefined)
+							.filter(s => s.exams && s.exams[exam_id])
 							.map(s => s.id)
 
 		this.props.deleteExam(students, exam_id)
