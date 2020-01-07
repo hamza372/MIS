@@ -27,7 +27,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                         <th className="row-name">Name</th>
                         <th className="row-class">Class</th>
                         <th className="row-roll">Roll #</th>
-                        <th className="row-amount">Amount</th>
+                        <th className="row-amount">Amount Paid</th>
                     </tr>
                 </thead>
                 <tbody>

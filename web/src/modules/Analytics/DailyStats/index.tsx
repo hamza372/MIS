@@ -8,6 +8,7 @@ import getStudentSection from 'utils/getStudentSection'
 import queryString from 'querystring'
 import { PaidFeeStudentsPrintableList } from 'components/Printable/Fee/paidList'
 import chunkify from 'utils/chunkify'
+import Former from 'utils/former'
 
 import './style.css'
 
@@ -20,11 +21,14 @@ type PropsType = P & RouteComponentProps
 
 type S = {
     statsType: string
+    statsDate: number
 }
 
 type AugmentedStudent = MISStudent & { amount_paid: number, section: AugmentedSection }
 
 class DailyStats extends Component<PropsType, S> {
+
+    former: Former
     constructor(props: PropsType) {
         super(props)
         
@@ -33,15 +37,19 @@ class DailyStats extends Component<PropsType, S> {
 		const type = parsed_query["?type"] ? parsed_query["?type"].toString() : ''
         
         this.state = {
-            statsType: type
+            statsType: type,
+            statsDate: moment.now()
         }
+
+        this.former = new Former(this, [])
     }
 
     getFeeStats = () => {
 
         const { classes, students } = this.props
+        const { statsDate } = this.state
 
-        const today_date = moment().format("YYYY-MM-DD")
+        const today_date = moment(statsDate).format("YYYY-MM-DD")
         const chunk_size = 32
 
         let total_amount_received = 0
@@ -53,7 +61,7 @@ class DailyStats extends Component<PropsType, S> {
 			if(student && student.Name) {
 		
 				const additional_payment = Object.values(student.payments || {})
-					.filter(x => moment(x.date).format("YYYY-MM-DD") === today_date && x.type === "SUBMITTED")
+					.filter(payment => moment(payment.date).format("YYYY-MM-DD") === today_date && payment.type === "SUBMITTED")
 					.reduce((agg, curr) => agg + curr.amount, 0);
 
 				if(additional_payment > 0) {
@@ -65,12 +73,11 @@ class DailyStats extends Component<PropsType, S> {
 					total_students_paid += 1
 				}
 
-				total_amount_received += additional_payment;
+				total_amount_received += additional_payment
 			}
         }
         
-        return(
-            <>
+        return(<>
                 <div className="section no-print">
                     <div className="title">Students Fee</div>
                     <div className="table row">
@@ -104,7 +111,8 @@ class DailyStats extends Component<PropsType, S> {
                             students={ itemsChunk }
                             chunkSize={ index === 0 ? 0 : chunk_size * index }
                             totalAmount={ total_amount_received }
-                            totalStudents={ total_students_paid }/>)
+                            totalStudents={ total_students_paid }
+                            />)
                 }
             </>);
     }
@@ -120,16 +128,22 @@ class DailyStats extends Component<PropsType, S> {
 
     render() {
 
-        return(
-            <Layout history={this.props.history}>
+        const { statsDate } = this.state
+
+        return(<Layout history={this.props.history}>
                 <div className="daily-stats">
                     <div className="title no-print">Daily Statistics</div>
+                    <div className="row date no-print">
+                        <input type="date" 
+                            onChange={this.former.handle(["statsDate"])} 
+                            value={moment(statsDate).format("YYYY-MM-DD")} 
+                            placeholder="Current Date" />
+                    </div>
                     {
                         this.renderSection()
                     }
                 </div>
-            </Layout>
-        );
+            </Layout>);
     }
 }
 
