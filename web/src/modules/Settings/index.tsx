@@ -198,43 +198,43 @@ class Settings extends Component <propsType, S>{
 			<div className="row">
 				<label> Allow teacher to view Fee Information ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
-							<option value={"true"}>Yes</option>
-							<option value={"false"}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Daily Statistics ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "dailyStats","teacher"])}>
-							<option value={"true"}>Yes</option>
-							<option value={"false"}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Setup Page ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "setupPage","teacher"])}>
-							<option value={"true"}>Yes</option>
-							<option value={"false"}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Expense Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
-					<option value={"true"}>Yes</option>
-					<option value={"false"}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Family Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "family","teacher"])}>
-					<option value={"true"}>Yes</option>
-					<option value={"false"}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Prospective Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "prospective","teacher"])}>
-					<option value={"true"}>Yes</option>
-					<option value={"false"}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 		</div>
@@ -568,8 +568,8 @@ class Settings extends Component <propsType, S>{
 					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
-							<option value={"true"}>Yes</option>
-							<option value={"false"}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 					</div>
 

@@ -28,13 +28,6 @@ interface S {
 
 type propsType = RouteComponentProps & P
 
-const defaultFee = {
-	name: "",
-	type: "FEE",
-	amount: "",
-	period: "MONTHLY"
-} as MISStudentFee
-
 class ClassSettings extends Component<propsType, S> {
     
     former: Former
@@ -42,7 +35,7 @@ class ClassSettings extends Component<propsType, S> {
         super(props)
 
         this.state = {
-            fee: defaultFee,
+            fee: this.setDefaultFee(),
             selected_class_id: "",
             disabled: true,
             banner: {
@@ -53,6 +46,18 @@ class ClassSettings extends Component<propsType, S> {
         }
 
         this.former = new Former(this, [])
+    }
+
+    setDefaultFee = () => {
+        
+        const default_fee = {
+            name: "",
+            type: "FEE",
+            amount: "",
+            period: "MONTHLY"
+        } as MISStudentFee
+
+        return default_fee
     }
 
     onSectionChange = () => {
@@ -68,7 +73,7 @@ class ClassSettings extends Component<propsType, S> {
         } else {
 
             this.setState({
-                fee: defaultFee
+                fee: this.setDefaultFee()
             })
         }
 
@@ -80,7 +85,7 @@ class ClassSettings extends Component<propsType, S> {
         
         const amount = this.state.fee.amount.trim()
         const name = this.state.fee.name.trim()
-        console.log("AMT", amount, name, this.state.selected_class_id)
+        
         if(amount.length > 0 && name.length > 0 && this.state.selected_class_id !== "") {
             this.setState({ disabled: false })
         } else {
@@ -89,6 +94,10 @@ class ClassSettings extends Component<propsType, S> {
     }
 
     Save = (): void => {
+
+        if(!this.state.disabled)
+            return
+
         const amount = parseFloat(this.state.fee.amount)
         const settings = this.props.settings
         const class_id = this.state.selected_class_id
@@ -146,6 +155,7 @@ class ClassSettings extends Component<propsType, S> {
     }
 
 	render() {
+        
         const { classes } = this.props
 
 		return <Layout history={this.props.history}>

@@ -93,7 +93,7 @@ class SingleClass extends Component<propsType, S> {
 			}
 		}
 
-		this.former = new Former(this, [])
+		this.former = new Former(this, ["class"])
 	}
 
 	id = () => this.props.match.params.id
@@ -294,11 +294,11 @@ class SingleClass extends Component<propsType, S> {
 						<option value={"O Level"} />
 						<option value={"A Level"} />
 					</datalist>
-					<input list="class-name" {...this.former.super_handle_flex(["class", "name"], { cb: this.setClassOrder, styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
+					<input list="class-name" {...this.former.super_handle_flex(["name"], { cb: this.setClassOrder, styles: (val: string) => { return val === "" ? { borderColor : "#fc6171" } : {} } })} placeholder="Name" />
 				</div>
 				<div className="row">
 					<label>Class Order</label>
-					<input type="number" {...this.former.super_handle(["class", "classYear"])} placeholder="Class Year" />
+					<input type="number" {...this.former.super_handle(["classYear"])} placeholder="Class Year" />
 				</div>
 
 
@@ -312,7 +312,7 @@ class SingleClass extends Component<propsType, S> {
 				}
 
 				<div className="subject row">
-					<input list="subjects" {...this.former.super_handle(["class", "new_subject"])} placeholder="Type or Select Subject" />
+					<input list="subjects" {...this.former.super_handle(["new_subject"])} placeholder="Type or Select Subject" />
 					<datalist id="subjects">
 					{
 						[...this.uniqueSubjects().keys()]
@@ -330,13 +330,13 @@ class SingleClass extends Component<propsType, S> {
 							return <div className={arr.length === 1 ? "" : "section"} key={id}>
 								{ arr.length === 1 ? false : <div className="row">
 										<label>Section Name</label>
-										<input type="text" {...this.former.super_handle(["class", "sections", id, "name"])} placeholder="Type Section Name"/>
+										<input type="text" {...this.former.super_handle(["sections", id, "name"])} placeholder="Type Section Name"/>
 									</div>
 								}
 
 								<div className="row">
 									<label>{arr.length === 1 ? "Teacher" : "Section Teacher"}</label>
-									<select {...this.former.super_handle(["class", "sections", id, "faculty_id"])}>
+									<select {...this.former.super_handle(["sections", id, "faculty_id"])}>
 										<option value={""}>Select Teacher</option>
 										{
 											Object.values(this.props.faculty)
