@@ -6,7 +6,7 @@ type ExamFilter = {
     year: string
 }
 
-const getStudentExamMarksSheet = (students: MISStudent[], exams: RootDBState["exams"], section_exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
+const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
     console.log("Students", students)
     const marks_sheet = students
         .reduce((agg, curr) => {
@@ -25,16 +25,16 @@ const getStudentExamMarksSheet = (students: MISStudent[], exams: RootDBState["ex
              */
             for (const exam of section_exams) {
                 const stats = curr.exams[exam.id] || { score: 0, remarks: "", grade: "" }
-                const exam_id = exam.id
+
                 if(exam.name === filter.exam_title && moment(exam.date).format("YYYY") === filter.year) {
-                    new_exams.push({ ...exams[exam_id], stats })
+                    new_exams.push({ ...exam, stats })
                     temp_marks.obtained += parseFloat(stats.score.toString() || '0')
                     temp_marks.total += parseFloat(exam.total_score.toString() || '0')
                 }
             }
 
             const grade = calculateGrade(temp_marks.obtained, temp_marks.total, grades)
-            const remarks = grade && grades[grade] ? grades[grade].remarks : ""
+            const remarks = grade && grades && grades[grade] ? grades[grade].remarks : ""
 
             return [
                 ...agg,
