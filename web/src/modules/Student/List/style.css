@@ -20,17 +20,28 @@
 	align-items: center;
 	margin-bottom: 4px
 }
-	.filter-container .checkbox-container{
-		width:70%;
-		align-items:center;
-	}
-	.filter-container .checkbox-container .checkbox{
-		display: flex;
-		align-items: center;
-		margin-right: 4px;
-	}
+
+.filter-container .checkbox-container{
+	width: 80%;
+	align-items: center;
+}
+
+.filter-container .checkbox-container .checkbox{
+	display: flex;
+	align-items: center;
+	margin-right: 4px;
+}
 
 .list-select {
-	width: 30%; 
+	width: 50%;
 	height: 40px
+}
+
+@media (max-width: 600px) {
+	.filter-container {
+		flex-wrap: wrap;
+	}
+	.checkbox-container {
+		flex: 1 0 33%;
+	}
 }

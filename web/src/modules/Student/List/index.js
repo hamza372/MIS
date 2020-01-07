@@ -149,7 +149,7 @@ export class StudentList extends Component {
 
 		const sections = getSectionsFromClasses(classes)
 		const curr_section = this.getSectionName(sections)
-		const chunkSize = 32 // students per table on printsheet
+		const chunkSize = 21 // students per page on printsheet
 	
 		let items = Object.entries(students)
 		.filter(([, s]) => s.id && s.Name && 
@@ -194,6 +194,7 @@ export class StudentList extends Component {
 			<div className="title no-print">All Students</div>
 			<div className="no-print">
 				<Card
+					key = {Math.random()}
 					items = {items}
 					Component = {StudentItem}
 					create = {create}
@@ -215,23 +216,25 @@ export class StudentList extends Component {
 								ID Cards
 							</div>
 						</div>
-						<select className="list-select" {...this.former.super_handle(["tag"])}>
-							<option value="">Select Tag</option>
-							{
-								[...this.uniqueTags(students).keys()]
-									.filter(tag => tag !== "PROSPECTIVE" && ( this.state.showActiveStudent && 
-										!this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true ))
-									.map(tag => <option key={tag} value={tag}> {tag} </option>)
-							}
-						</select>
-						<select className="list-select" {...this.former.super_handle(["selected_section_id"])}>
-							<option value="">Select Class</option>
-							{
-								sections
-									.sort((a, b) => a.classYear - b.classYear)
-									.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
-							}
-						</select>
+						<div>
+							<select className="list-select" {...this.former.super_handle(["tag"])}>
+								<option value="">Select Tag</option>
+								{
+									[...this.uniqueTags(students).keys()]
+										.filter(tag => tag !== "PROSPECTIVE" && ( this.state.showActiveStudent && 
+											!this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true ))
+										.map(tag => <option key={tag} value={tag}> {tag} </option>)
+								}
+							</select>
+							<select className="list-select" {...this.former.super_handle(["selected_section_id"])}>
+								<option value="">Select Class</option>
+								{
+									sections
+										.sort((a, b) => a.classYear - b.classYear)
+										.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
+								}
+							</select>
+						</div>
 					</div>}
 				</Card>
 			</div>
