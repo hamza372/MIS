@@ -95,7 +95,8 @@ class ClassSettings extends Component<propsType, S> {
 
     Save = (): void => {
 
-        if(!this.state.disabled)
+        // if any field has invalid value
+        if(this.state.disabled)
             return
 
         const amount = parseFloat(this.state.fee.amount)
