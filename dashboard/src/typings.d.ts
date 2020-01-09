@@ -7,6 +7,10 @@ interface RootReducerState {
 	auth: {
 		id?: string
 		token?: string
+		role?: string
+		permissions?: {
+			[id: string]: boolean
+		}
 		client_type: "dashboard"
 	}
 	client_id: string

@@ -5,7 +5,35 @@ import moment from 'moment';
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
-export const createLogin = (username: string, password: string, number: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+type UserPermissions = {
+	role: string;
+	permissions: {
+		[id: string]: boolean;
+	};
+}
+
+export const createUser = ( name: string, password: string, permissions: UserPermissions) => ( dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+	
+	syncr.send({
+		type: "CREATE_USER",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			name: name,
+			password,
+			permissions
+		}
+	})
+	.then((res: any) => {
+		window.alert(res)
+	})
+	.catch(res => {
+		alert("create user failed" + JSON.stringify(res))
+	})
+}
+
+export const createLogin = (username: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState();
 
@@ -13,14 +41,13 @@ export const createLogin = (username: string, password: string, number: string) 
 		type: "LOGIN",
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
-		id: state.auth.id,
 		payload: {
 			id: username,
 			password
 		}
 	})
-	.then((res: {token: string, sync_state: SyncState }) => {
-		dispatch(createLoginSucceed(username, res.token, res.sync_state ))
+	.then((res: {id: string, token: string, permissions: UserPermissions }) => {
+		dispatch(createLoginSucceed( res.id, res.token, res.permissions.role, res.permissions.permissions))
 	})
 	.catch(res => {
 		console.error(res)

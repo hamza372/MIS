@@ -1,6 +1,6 @@
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF } from 'actions/core'
+import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed } from 'actions/core'
 import { SCHOOL_INFO, REFERRALS_INFO } from 'actions/index'
 import { AnyAction } from 'redux';
 
@@ -21,6 +21,21 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 			return {
 				...state,
 				connected: false
+			}
+		}
+
+		case LOGIN_SUCCEED:
+		{
+			const { id, token, role, permissions } = action as LoginSucceed
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					id,
+					token,
+					role,
+					permissions
+				}
 			}
 		}
 
