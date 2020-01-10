@@ -19,6 +19,31 @@ export interface MergeAction {
 	merges: Merge[];
 }
 
+const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['queued'], state: RootReducerState): RootReducerState['queued'] => {
+
+	// here we can do stuff to make sure we are not including queued items that are processing.
+	// for now we can make this only for images. in the future we can add support for mutations and analytics as well.
+
+	const filtered_images = Object.entries(state.queued.images || {})
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			if (v.status === "processing") {
+				return agg
+			}
+
+			agg[k] = v
+			return agg;
+		}, {})
+
+	return {
+		...state.queued,
+		images: filtered_images,
+		[key]: {
+			...state.queued[key],
+			...payload
+		}
+	}
+}
+
 export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const event_payload = event.reduce((agg, curr) => {
@@ -33,21 +58,8 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 	}, {} as { [id: string]: RouteAnalyticsEvent })
 
 	const state = getState();
-	const rationalized_event_payload = {
-		...state.queued,
-		analytics: {
-			...state.queued.analytics,
-			...event_payload
-		}
-	}
 
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type: client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_event_payload
-	}
+	const rationalized_event_payload = getRationalizedQueuePayload(event_payload, "analytics", state)
 
 	dispatch(QueueAnalytics(event_payload))
 
@@ -56,65 +68,85 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 		return
 	}
 
-	syncr.send(payload)
-		.then(res => {
-			dispatch(multiAction(res))
-		})
-		.catch(err => {
-			dispatch(QueueAnalytics(event_payload))
-
-			console.error("analytics error:", err)
-
-			if (state.connected && err !== "timeout") {
-				alert("Syncing Error: " + err)
-			}
-		})
+	dispatch(Sync(rationalized_event_payload))
 }
 
 export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const state = getState();
 
-	const queueable = images.reduce((agg, curr) => {
+	const connection_status = syncr.connection_verified
+
+	const queueable = images.reduce<ImagesQueuable>((agg, curr) => {
 		const key = curr.path.join(",")
 
-		agg[key] = curr
+		agg[key] = {
+			...curr,
+			status: syncr.connection_verified ? "processing" : "queued"
+		}
 
 		return agg;
-	}, {} as ImagesQueuable)
 
-	const rationalized_payload = {
-		...state.queued,
-		images: {
-			...state.queued.images,
-			...queueable
-		}
-	}
+	}, {})
 
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type: client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_payload
-	}
+	const rationalized_payload = getRationalizedQueuePayload(queueable, "images", state)
 
-	dispatch(QueueImages(queueable))
+	dispatch(QueueImages(queueable)) // should include status here?
 
-	if (!syncr.connection_verified) {
+	if (!connection_status) {
 		console.warn("connection not verified")
 		return
 	}
 
-	syncr.send(payload)
+	dispatch(Sync(rationalized_payload))
+}
+
+const markImagesInQueue = (images: ImagesQueuable, status: QueueStatus) => (dispatch: (a: any) => any) => {
+
+	const mapped = Object.entries(images)
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			return {
+				...agg,
+				[k]: {
+					...v,
+					status
+				}
+			}
+		}, {})
+
+	dispatch(QueueImages(mapped))
+
+}
+
+const Sync = (payload: RootReducerState['queued']) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState()
+	syncr.send({
+		type: SYNC,
+		school_id: state.auth.school_id,
+		client_type: client_type,
+		lastSnapshot: state.lastSnapshot,
+		payload
+	})
 		.then(res => {
+			// dispatch multiaction
 			dispatch(multiAction(res))
 		})
 		.catch(err => {
-			console.error("upload images error: ", err)
+			// go through payload, mark all images as error
+			// may need to handle specific errors here.
+			// really should have different timeout if there are images here
+			// uploading will be slow
+			// and really it could be happening over a different channel altogether.
+			// this could be http
+			// for now this should work.
+
+			dispatch(markImagesInQueue(payload.images, "queued"))
+
+			console.error("sync error:", err)
 
 			if (state.connected && err !== "timeout") {
-				alert("image upload error: " + err)
+				alert("Syncing Error: " + err)
 			}
 		})
 
@@ -143,21 +175,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 	}), {})
 
 	const state = getState();
-	const rationalized_merges = {
-		...state.queued,
-		mutations: {
-			...state.queued.mutations,
-			...new_merges
-		}
-	}
-
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type: client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_merges
-	}
+	const rationalized_merges = getRationalizedQueuePayload(new_merges, "mutations", state)
 
 	dispatch(QueueMutations(new_merges))
 
@@ -166,18 +184,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 		return;
 	}
 
-	syncr.send(payload)
-		.then(res => {
-			dispatch(multiAction(res))
-		})
-		.catch(err => {
-			console.error("create merges error: ", err)
-			dispatch(QueueMutations(new_merges))
-
-			if (state.connected && err !== "timeout") {
-				alert("Syncing Error: " + err)
-			}
-		})
+	dispatch(Sync(rationalized_merges))
 }
 
 export const SMS = "SMS"
@@ -278,13 +285,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 		}
 	}), {})
 
-	const rationalized_deletes = {
-		...state.queued,
-		mutations: {
-			...state.queued.mutations,
-			...payload
-		}
-	}
+	const rationalized_deletes = getRationalizedQueuePayload(payload, "mutations", state)
 
 	dispatch(QueueMutations(payload))
 
@@ -293,24 +294,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 		return;
 	}
 
-	syncr.send({
-		type: SYNC,
-		client_type: client_type,
-		school_id: state.auth.school_id,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_deletes
-	})
-		.then(res => {
-			dispatch(multiAction(res))
-		})
-		.catch(err => {
-
-			dispatch(QueueMutations(payload))
-
-			if (state.connected && err !== "timeout") {
-				alert("Syncing Error: " + err)
-			}
-		})
+	dispatch(Sync(rationalized_deletes))
 
 }
 
@@ -360,10 +344,6 @@ interface MutationsQueueable {
 
 interface AnalyticsQueuable {
 	[path: string]: RouteAnalyticsEvent;
-}
-
-interface ImagesQueuable {
-	[path: string]: ImageMergeItem
 }
 
 interface BaseQueueAction {
@@ -439,17 +419,11 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 			})
 			.then(res => {
 
+				console.log("VERIFYY")
 				syncr.verify()
 
-				return syncr.send({
-					type: SYNC,
-					client_type: client_type,
-					school_id: state.auth.school_id,
-					payload: state.queued,
-					lastSnapshot: state.lastSnapshot
-				})
+				dispatch(Sync(state.queued))
 			})
-			.then(resp => dispatch(multiAction(resp)))
 			.catch(err => {
 				console.error(err)
 				alert("Authorization Failed. Log out and Log in again.")
@@ -499,18 +473,10 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 				})
 				.then(res => {
 
+					console.log("VERIFYYYY")
 					syncr.verify()
 
-					return syncr.send({
-						type: SYNC,
-						client_type: client_type,
-						school_id: state.auth.school_id,
-						payload: state.queued,
-						lastSnapshot: state.lastSnapshot
-					})
-				})
-				.then(resp => {
-					dispatch(multiAction(resp))
+					dispatch(Sync(state.queued))
 				})
 				.catch(err => {
 					console.error(err)

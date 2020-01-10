@@ -14,8 +14,7 @@ import { saveDb, initState } from './utils/indexedDb'
 import { loadDB, connected, disconnected } from './actions/core'
 import Syncr from '@cerp/syncr'
 
-//const debug_host = 'wss://7e01bc49.ngrok.io';
-const debug_host = 'wss://mis-socket.metal.fish';
+const debug_host = 'wss://4ec4e66e.ngrok.io';
 
 const host = window.api_url || debug_host;
 

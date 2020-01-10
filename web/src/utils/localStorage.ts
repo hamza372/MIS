@@ -14,7 +14,8 @@ const initState: RootReducerState = {
 	initialized: false,
 	queued: {
 		mutations: {},
-		analytics: {}
+		analytics: {},
+		images: {}
 	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,

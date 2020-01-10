@@ -272,6 +272,8 @@ export const createSchoolLogin = (school_id: string, password: string) => (dispa
 	})
 		.then(res => {
 
+			syncr.verify()
+
 			dispatch({
 				type: "GETTING_DB"
 			})

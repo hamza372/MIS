@@ -59,10 +59,16 @@ interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
 	meta: { route: string };
 }
 
+type QueueStatus = "queued" | "processing" | "failed"
+
 interface ImageMergeItem {
 	id: string
 	image_string: string
 	path: string[]
+}
+
+interface ImagesQueuable {
+	[path: string]: ImageMergeItem & { status: QueueStatus }
 }
 
 interface RootReducerState {
@@ -78,13 +84,11 @@ interface RootReducerState {
 				};
 				date: number;
 			}
-		},
+		}
 		analytics: {
 			[id: string]: RouteAnalyticsEvent
-		},
-		images: {
-			[id: string]: ImageMergeItem
 		}
+		images: ImagesQueuable
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;

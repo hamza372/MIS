@@ -62,13 +62,13 @@ defmodule Sarkar.ActionHandler.Mis do
 		# and currently we'll upload it per navigation event because of our queueing
 
 		# best is to take images out of the queue entirely and handle separately.
-		spawn fn ->
-			image_merges = Map.get(payload, "images")
-			# 
-		end
+
+		image_merges = Map.get(payload, "images")
 
 		mutation_res = Sarkar.School.sync_changes(school_id, client_id, mutations, last_sync_date)
 		analytics_res = Sarkar.Analytics.record(school_id, client_id, analytics, last_sync_date)
+		# images_res = Sarkar.School.upload_images(school_id, client_id, image_merges, last_sync_date)
+		# this will instantly return an "ok" if everything is in the right shape, and then spawn a process which actually uploads
 
 		res = %{
 			"mutations" => mutation_res,
