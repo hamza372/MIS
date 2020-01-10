@@ -8,7 +8,7 @@ type PropsTypes = {
     chunkSize: number
 }
 
-type AugmentedStudent = MISStudent & { amount_paid: number, section: AugmentedSection }
+type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
 
 export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
 
@@ -28,6 +28,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                         <th className="row-class">Class</th>
                         <th className="row-roll">Roll #</th>
                         <th className="row-amount">Amount Paid</th>
+                        <th className="row-amount">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                                 <td className="cell-center">{student.AdmissionNumber || ''}</td>
                                 <td>{student.Name}</td>
                                 <td>{student.section.namespaced_name || ''}</td>
+                                <td>{student.balance}</td>
                                 <td className="cell-center">{student.RollNumber || ''}</td>
                                 <td className="cell-center">{student.amount_paid}</td>
                             </tr>)

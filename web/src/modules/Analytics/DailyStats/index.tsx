@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import moment from 'moment'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
-import getStudentSection from 'utils/getStudentSection'
+import getSectionFromId from 'utils/getSectionFromId'
 import queryString from 'querystring'
 import { PaidFeeStudentsPrintableList } from 'components/Printable/Fee/paidList'
 import chunkify from 'utils/chunkify'
@@ -24,7 +24,7 @@ type S = {
     statsDate: number
 }
 
-type AugmentedStudent = MISStudent & { amount_paid: number, section: AugmentedSection }
+type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
 
 class DailyStats extends Component<PropsType, S> {
 
@@ -44,6 +44,53 @@ class DailyStats extends Component<PropsType, S> {
         this.former = new Former(this, [])
     }
 
+    getSiblings = (student: MISStudent): MISStudent[] => {
+		const famId = student.FamilyID ? student.FamilyID : undefined 
+        
+        return Object.values(this.props.students)
+			.filter(s => s && s.Name && s.FamilyID && s.FamilyID === famId)
+	}
+
+    mergedPayments = (student: MISStudent) => {
+
+		const siblings = this.getSiblings(student)
+		if(siblings.length > 0) {
+
+			const merged_payments = siblings.reduce((agg, curr) => ({
+				...agg,
+				...Object.entries(curr.payments).reduce((agg, [pid, p]) => { 
+					return {
+						...agg,
+						[pid]: {
+							...p,
+							fee_name: p.fee_name && `${curr.Name}-${p.fee_name}`,
+							student_id: curr.id
+						}
+					}
+				}, {})
+			}), {} as AugmentedMISPaymentMap)
+
+			return merged_payments;
+		}
+
+		return Object.entries(student.payments)
+			.reduce((agg, [pid, curr]) => ({
+				...agg,
+				[pid]: {
+					...curr,
+					student_id: student.id,
+				}
+			}), {} as AugmentedMISPaymentMap)
+	}
+
+    getStudentBalance = (student: MISStudent) => {
+
+        const balance = Object.values(this.mergedPayments(student))
+            .reduce((agg, curr) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
+        
+        return balance
+    }
+
     getFeeStats = () => {
 
         const { classes, students } = this.props
@@ -60,20 +107,20 @@ class DailyStats extends Component<PropsType, S> {
 
 			if(student && student.Name) {
 		
-				const additional_payment = Object.values(student.payments || {})
+				const amount_paid_today = Object.values(student.payments || {})
 					.filter(payment => moment(payment.date).format("YYYY-MM-DD") === today_date && payment.type === "SUBMITTED")
 					.reduce((agg, curr) => agg + curr.amount, 0);
 
-				if(additional_payment > 0) {
+				if(amount_paid_today > 0) {
                     paid_students.push({
                         ...student,
-                        amount_paid: additional_payment,
-                        section: getStudentSection(student.section_id, classes)
+                        amount_paid: amount_paid_today,
+                        balance: this.getStudentBalance(student),
+                        section: getSectionFromId(student.section_id, classes)
                     })
 					total_students_paid += 1
 				}
-
-				total_amount_received += additional_payment
+				total_amount_received += amount_paid_today
 			}
         }
         
@@ -88,16 +135,24 @@ class DailyStats extends Component<PropsType, S> {
                         <label>Total Students Paid: </label>
                         <div className="number">{ total_students_paid }</div>
                     </div>
-                    <div className="list">
+                    <div style={{ border: "1px solid grey", borderRadius: '4px', padding: '5px' }}>
+                        <div className="table row">
+                            <label><b>Name</b></label>
+                            <label><b>Class</b></label>
+                            <label><b>Amount Paid</b></label>
+                            <label><b>Balance</b></label>
+                        </div>
                         {
                             paid_students
-                                .sort((a, b) => a.section.classYear - b.section.classYear)
-                                .map(student => <div className="table row">
-                                    <Link key={student.id} to={`/student/${student.id}/profile`}>
-                                        {student.Name}
-                                    </Link>
+                                .sort((a, b) => (a.section.classYear * 100 + parseInt(a.RollNumber) || 0) - (b.section.classYear * 100 + parseInt(a.RollNumber) || 0))
+                                .map(student => <div className="table row" key={student.id}>
+                                    {
+                                        student.FamilyID ? <Link to={`/families/${student.FamilyID}`}>{student.FamilyID}(F)</Link> : 
+                                            <Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
+                                    }
                                     <div>{student.section.namespaced_name}</div>
                                     <div>{student.amount_paid}</div>
+                                    <div className={student.balance > 0 ? 'pending-amount' : "advance-amount"}>{student.balance}</div>
                                 </div>)
                         }
                     </div>
