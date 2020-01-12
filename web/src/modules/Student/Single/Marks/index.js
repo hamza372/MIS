@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom'
 import moment from 'moment'
 import { logSms } from 'actions'
 import { smsIntentLink } from 'utils/intent'
-
+import calculateGrade from 'utils/calculateGrade'
 import Former from 'utils/former'
 import { PrintHeader } from 'components/Layout'
-import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
+import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
 
 import './style.css'
-import calculateGrade from 'utils/calculateGrade'
 
 class StudentMarksContainer extends Component {
 
@@ -180,6 +179,19 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		return grade && grades[grade] ? grades[grade].remarks : ""
 	}
 
+	const calculateAttendace = (student) => {
+
+		const attendance = student.attendance || {}
+
+		let attendance_status_count = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 }
+
+		for (const [, record] of Object.entries(attendance)) {
+			attendance_status_count[record.status] += 1
+		}
+
+		return attendance_status_count
+	}
+
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.filter(exam_id => exams[exam_id])
 		.map(exam_id => exams[exam_id])
@@ -193,6 +205,15 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			marks_obtained: 0
 		})
 	
+	const dob = moment(student.Birthdate).format("DD/MM/YYYY")
+	
+	const attendance = calculateAttendace(student)
+	
+	const total_leave_days = attendance.LEAVE + attendance.SHORT_LEAVE + attendance.SICK_LEAVE + attendance.CASUAL_LEAVE
+	const total_attendance_days = attendance.ABSENT + attendance.PRESENT + total_leave_days
+	
+	const attendance_percentage = (attendance.PRESENT / total_attendance_days) * 100
+
 	return<div className="result-card"> 
 		<div className="student-marks">
 			<PrintHeader settings={settings} logo={logo} />
@@ -200,17 +221,18 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
 			
 			<div className="student-info">
+				<div className="row" style={{justifyContent: "center"}}><b>Session </b> {"____"}-{"____"}</div>
 				<div className="row">
 					<div><b>Class:</b> {curr_section ? curr_section.namespaced_name : "No Class"}</div>
-					<div><b>Session:</b> {moment().format("YYYY")}</div>
+					<div><b>Roll No:</b> {student.RollNumber && student.RollNumber !== "" ? student.RollNumber : "________"}</div>
 				</div>
 				<div className="row">
-					<div><b>Admission #:</b> {student.AdmissionNumber}</div>
-					<div><b>Roll #:</b> {student.RollNumber !== undefined && student.RollNumber !== "" ? student.RollNumber : "______"}</div>
+					<div><b>Admission No:</b> {student.AdmissionNumber}</div>
+					<div><b>Date of Birth:</b> { dob !== "Invalid date" ? dob : "________"}</div>
 				</div>
 				<div className="row">
 					<div><b>Student Name:</b> {student.Name}</div>
-					<div><b>Father Name:</b> {student.ManName}</div>
+					<div><b>Father Name:</b> {student.ManName && student.ManName !== "" ? student.ManName : "_________"}</div>
 				</div>
 			</div>
 			
@@ -259,19 +281,23 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			<div className="result-stats">
 				<div className="row">Grade: &nbsp; <b>{calculateGrade(marks_obtained, total_marks, grades)}</b></div>
 				<div className="row">Position: __________ </div>
+				<div className="attendance-stats">
+					<div className="row">Days Present: {attendance.PRESENT}, Absent: {attendance.ABSENT}, Leave: {total_leave_days}</div>
+					<div className="row">Attendance: {Number.isInteger(attendance_percentage) ? attendance_percentage : attendance_percentage.toFixed(2)}%</div>
+				</div>
 			</div>
 
 			<div className="print-only">
 				<div className="remarks">
-					<div>Remarks</div>
+					<div>Overall Remarks</div>
 					<div>_____________________________________________________________________</div>
 				</div>
 				<div className="result-footer">
 					<div className="left">
-						<div> Teacher Signature</div>
+						<div> Teacher's Signature</div>
 					</div>
 					<div className="right">
-						<div> Principal Signature</div>
+						<div> Principal's Signature</div>
 					</div>
 				</div>
 			</div> 
