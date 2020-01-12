@@ -20,6 +20,7 @@ import Marks from 'modules/Marks'
 import ExamList from 'modules/Marks/ExamList'
 import SingleExam from 'modules/Marks/SingleExam'
 import Settings from 'modules/Settings'
+import DailyStats from 'modules/Analytics/DailyStats'
 import Analytics from 'modules/Analytics'
 import ReportsMenu from 'modules/ReportsMenu'
 import PromotionPage from 'modules/Settings/promote-students'
@@ -102,6 +103,7 @@ export default class Routes extends React.Component {
 					<TrackedRoute path="/settings/class" component={ClassSettings}/>
 					<TrackedRoute path="/settings/historicalFee" component={historicalFee} />
 					<TrackedRoute path="/settings" component={Settings} />
+					<TrackedRoute path="/analytics/daily-stats" component={DailyStats} />
 					<TrackedRoute path="/analytics" component={Analytics} />
 					<TrackedRoute path="/diary" component={Diary} />
 

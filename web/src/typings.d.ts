@@ -254,7 +254,7 @@ interface MISStudentPayment {
 	fee_name?: string;
 }
 
-type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited: boolean }
+type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited?: boolean }
 
 interface AugmentedMISPaymentMap {
 	[pid: string]: AugmentedMISPayment

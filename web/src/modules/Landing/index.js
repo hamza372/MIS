@@ -393,7 +393,7 @@ class Landing extends Component {
 
 							<Link
 								className="box no-underline bg-green"
-								to = {this.getDailyStatsRoute('fees')}>
+								to = '/analytics/daily-stats?type=paid_students'>
 								<div>{today_payment_students}</div>
 								<div>Students</div>
 							</Link>

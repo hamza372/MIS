@@ -10,7 +10,7 @@ import { numberWithCommas } from 'utils/numberWithCommas'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
 import { ProgressBar } from 'components/ProgressBar'
 import { chunkify } from 'utils/chunkify'
-import { OutstandingFeePrintableList } from 'components/Printable/Fee/list'
+import { OutstandingFeePrintableList } from 'components/Printable/Fee/outstandingList'
 
 import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'recharts'
 
