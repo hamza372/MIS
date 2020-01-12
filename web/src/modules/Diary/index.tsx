@@ -35,6 +35,7 @@ interface S {
 	};
 	selected_date: number;
 	selected_section_id: string;
+	selected_student_phone: string
 	students_filter: string;
 	diary: MISDiary["date"];
 }
@@ -56,6 +57,7 @@ class Diary extends Component <propTypes,S> {
 				return {
 					...agg,
 					[sec_id]: {
+						//@ts-ignore
 						...diary,
 						...propsDiary[sec_id]
 					}
@@ -69,8 +71,10 @@ class Diary extends Component <propTypes,S> {
 				good: true,
 				text: "Saved!"
 			},
+
 			selected_date: moment.now(),
 			selected_section_id: "",
+			selected_student_phone: "",
 			students_filter: "all_students",
 			diary
 		}
@@ -191,20 +195,20 @@ class Diary extends Component <propTypes,S> {
 		}, 1000);
 	}
 	
-	diaryString = (): string | [] => {
+	diaryString = (): string => {
 
 		if(this.state.selected_section_id === "" || this.state.diary[this.state.selected_section_id] === undefined ) {
 			console.log("Not running diary")
-			return []
+			return ""
 		}
+
 		const curr_date = `Date: ${moment(this.state.selected_date).format("DD MMMM YYYY")}\n`
 		const section_name = `Class: ${ this.getSelectedSectionName() }\n`
 		
 		const diary_message = Object.entries(this.state.diary[this.state.selected_section_id])
-				.map( ([ subject, { homework }]) => {
-					return `${subject}: ${homework}`
-			})
-		return curr_date + section_name + diary_message.join("\n")
+				.map( ([ subject, { homework }]) => `${subject}: ${homework}`)
+		
+		return  curr_date + section_name + diary_message.join("\n")
 	}
 
 	getSelectedSectionStudents = () => {
@@ -214,9 +218,9 @@ class Diary extends Component <propTypes,S> {
 					s.Phone !== undefined && s.Phone !== "")	
 	}
 
-	getFilterCondition = (s: MISStudent) => {
+	getFilterCondition = (student: MISStudent) => {
 		
-		const curr_attendance = s.attendance[moment(this.state.selected_date).format("YYYY-MM-DD")]
+		const curr_attendance = student.attendance[moment(this.state.selected_date).format("YYYY-MM-DD")]
 
 		switch (this.state.students_filter) {
 			case "absent_students":
@@ -235,22 +239,17 @@ class Diary extends Component <propTypes,S> {
 	getSelectedSectionName = () => getSectionsFromClasses(this.props.classes)
 		.filter(s => s.id === this.state.selected_section_id)
 		.map (s => s.namespaced_name)[0]
-
-	render() {
-
-		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
+	
+	getMessages = (): MISSms[] => {
 		
-		// ascending order of classes/sections
-		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
-
-		const subjects = new Set()
+		const phone = this.state.selected_student_phone
+		const diary = this.diaryString()
 		
-		for(const c of Object.values(classes)){
-			if(this.state.selected_section_id !== "" && c.sections[this.state.selected_section_id] !== undefined){
-				Object.keys(c.subjects).forEach(s => subjects.add(s))
-			}
+		// in case of single student
+		if(phone) {
+			return [{ number: phone, text: diary }]
 		}
-
+			
 		const selected_students = this.getSelectedSectionStudents().filter( s => this.getFilterCondition(s))
 		
 		const messages = selected_students
@@ -262,114 +261,145 @@ class Diary extends Component <propTypes,S> {
 					return agg
 				}
 
-				const diary_string = this.diaryString()
-
 				return [ 
 					...agg,
 					{
 						number: student.Phone,
-						text : diary_string
+						text: diary
 					}
 				]
+
 			}, [])
-
-	const selected_section_name  = this.getSelectedSectionName();
-
-	return <Layout history={this.props.history}>
-		<div className="diary">
-		<PrintHeader settings={settings} logo={schoolLogo}/>
 		
-			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+		return messages
+	}
 
-			<div className="title">School Diary</div>
-				<div className="form">
-					<div className="no-print divider">Send Diary for {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
-					
-					<div className ="print-only row">
-						<div><b>Date:</b> {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
-						<div><b>Class:</b> {selected_section_name}</div>
-					</div>
+	render() {
 
-					<div className="no-print section">
-						<div className="row">
-							<label>Diary Date</label>
-							<input 	type="date" 
-									onChange={this.former.handle(["selected_date"], () => true, () => this.diaryFilterCallback())} 
-									value={moment(this.state.selected_date).format("YYYY-MM-DD")} 
-									placeholder="Diary Date"/>
+		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
+		
+		// ascending order of classes/sections
+		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
+		const selected_section_name  = this.getSelectedSectionName();
+		
+		const messages = this.getMessages()
+
+		const subjects = new Set<string>()
+		
+		for(const mis_class of Object.values(classes)) {
+			
+			if(this.state.selected_section_id !== "" && mis_class.sections[this.state.selected_section_id] !== undefined) {
+				Object.keys(mis_class.subjects).forEach(s => subjects.add(s))
+			}
+		}
+
+		return <Layout history={this.props.history}>
+			<div className="diary">
+				<PrintHeader settings={settings} logo={schoolLogo}/>
+				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+					<div className="title">School Diary</div>
+					<div className="form">
+						<div className="no-print divider">Send Diary for {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
+						<div className ="print-only row">
+							<div><b>Date:</b> {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
+							<div><b>Class:</b> {selected_section_name}</div>
 						</div>
-
-						<div className="row">
-							<label>Select Class/Section</label>
-							<select {...this.former.super_handle(["selected_section_id"])}>
-								<option value="" disabled>Select Section</option>
-								{
-									sortedSections.map( s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)	
-								}
-							</select>
-						</div>
-						{
-							this.state.selected_section_id !== "" && <div className="no-print row">
-								<label>Send Diary to</label>
-								<select {...this.former.super_handle(["students_filter"])}>
-									<option value="" disabled>Select Students</option>
-									<option value="all_students"> All students</option>
-									<option value="absent_students"> Only Absent students</option>
-									<option value="leave_students"> Only Leave students</option>
+						<div className="no-print section">
+							<div className="row">
+								<label>Diary Date</label>
+								<input 	type="date" 
+										onChange={this.former.handle(["selected_date"], () => true, () => this.diaryFilterCallback())} 
+										value={moment(this.state.selected_date).format("YYYY-MM-DD")} 
+										placeholder="Diary Date"/>
+							</div>
+							<div className="row">
+								<label>Select Class/Section</label>
+								<select {...this.former.super_handle(["selected_section_id"])}>
+									<option value="" disabled>Select Section</option>
+									{
+										sortedSections.map( s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)	
+									}
 								</select>
 							</div>
-						}
-					</div>
-				{ 
-					this.state.selected_section_id !== "" && <div className="section">
+							{
+								this.state.selected_section_id !== "" && <div className="no-print row">
+									<label>Send Diary to</label>
+									<select {...this.former.super_handle(["students_filter"])}>
+										<option value="" disabled>Select Students</option>
+										<option value="all_students"> All students</option>
+										<option value="absent_students"> Only Absent students</option>
+										<option value="leave_students"> Only Leave students</option>
+										<option value="single_student"> Single student</option>
+									</select>
+								</div>
+							}
+							{
+								this.state.students_filter === "single_student" && <div className="no-print row">
+									<label>Select Student</label>
+									<datalist id="student-list">
+										{[	...Object.entries(this.props.students)
+											.filter(([, student]) => student &&
+												(student.tags === undefined || !student.tags["PROSPECTIVE"])&&
+												student.section_id === this.state.selected_section_id&&
+												student.Phone)
+											.sort(([, a], [, b]) => a.Name.localeCompare(b.Name))
+											.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
+										]}
+									</datalist>
+									<input list="student-list" {...this.former.super_handle(["selected_student_number"])} placeholder="Select Student" />
+								</div>
+							}
+						</div>
+					{
+						this.state.selected_section_id !== "" && <div className="section">
 						{
 							Array.from(subjects)
-								.map((s: any) => <div className="table row" key={`${this.state.selected_section_id}-${s}`}>
-									<div>{s}:</div>
+								.sort((a, b) => a.localeCompare(b))
+								.map((subject) => <div className="table row" key={subject}>
+									<div>{subject}:</div>
 									<input 
 										type="text"
 										style={{textAlign: "left"}} 
-										{...this.former.super_handle(["diary", this.state.selected_section_id, s, "homework"])}
+										{...this.former.super_handle(["diary", this.state.selected_section_id, subject, "homework"])}
 										placeholder="Enter Homework" />
 								</div>)
 						}
 
 						{ subjects.size > 0 && <div className="button blue" onClick={this.onSave}>Save</div> }
 
-					</div>
-				}
-
-				{
-					subjects.size === 0 ? false : settings.sendSMSOption === "SIM" ?
-						<div className ="row"> 
-						<a 
-							className="button blue mb"
-							style={{marginBottom: "12px" }}
-							href={smsIntentLink({
-								messages,
-								return_link: window.location.href 
-							})}
-							onClick={() => this.logSms(messages)}>
-							Send using Local SIM </a>
-							<div className="button" onClick={() => window.print()}>Print</div>
 						</div>
-							 :
-						<div className="row button" onClick={() => sendBatchMessages(messages)} style={{width: "20%"}}>Send</div>
-				}
-				
-			</div>
-			
-			<div className="print-only form">
-				<div className="row signature">
-					<div>Teacher Signature: ___________________</div>
+					}
+
+					{
+						subjects.size === 0 ? false : settings.sendSMSOption === "SIM" ?
+							<div className ="row"> 
+							<a 
+								className="button blue mb"
+								style={{marginBottom: "12px" }}
+								href={smsIntentLink({
+									messages,
+									return_link: window.location.href 
+								})}
+								onClick={() => this.logSms(messages)}>
+								Send using Local SIM </a>
+								<div className="button" onClick={() => window.print()}>Print</div>
+							</div>
+								:
+							<div className="row button" onClick={() => sendBatchMessages(messages)} style={{width: "20%"}}>Send</div>
+					}
+					
 				</div>
-				<div className="row signature">
-					<div>Parents Signature: ___________________</div>
+				<div className="print-only form">
+					<div className="row signature">
+						<div>Teacher's Signature: ___________________</div>
+					</div>
+					<div className="row signature">
+						<div>Parents' Signature: ___________________</div>
+					</div>
 				</div>
 			</div>
-		</div>
-	</Layout>
-  }
+		</Layout>
+  	}
 }
 export default connect((state: RootReducerState) => ({
 	faculty_id: state.auth.faculty_id,
