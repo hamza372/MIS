@@ -129,6 +129,11 @@ interface MISSettings {
 			}
 		};
 	};
+	classes: {
+		defaultFee: {
+			[class_id: string]: MISStudentFee
+		}
+	}
 }
 
 interface MISUser {
