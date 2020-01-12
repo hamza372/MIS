@@ -350,8 +350,9 @@ interface MISDateSheet {
 type AugmentedMISExam = MISExam & { stats: MISStudentExam }
 interface StudentMarksSheet {
 	id: MISStudent["id"]
-    name: MISStudent["Name"]
-    roll: MISStudent["RollNumber"]
+	name: MISStudent["Name"]
+	manName: MISStudent["ManName"]
+    rollNo: MISStudent["RollNumber"]
     marks: { total: number, obtained: number }
     position: number
     exams: AugmentedMISExam[]

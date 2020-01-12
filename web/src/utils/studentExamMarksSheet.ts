@@ -41,7 +41,8 @@ const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam
                 {
                     id: curr.id,
                     name: curr.Name,
-                    roll: curr.RollNumber ? curr.RollNumber : "",
+                    manName: curr.ManName,
+                    rollNo: curr.RollNumber ? curr.RollNumber : "",
                     marks: temp_marks,
                     position: 0,
                     exams: new_exams,

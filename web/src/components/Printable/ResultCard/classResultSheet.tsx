@@ -13,13 +13,14 @@ type PropsTypes = {
 
 export const ClassResultSheet = (props: PropsTypes) => {
     
-    // 66% is the remaining width for dynamic section subjects
+    // 55% is the remaining width for dynamic section subjects
     // tested with 9 subjects, output is fine
-    const widthForSubjectName = 66 / props.examSubjectsWithMarks.size
+    const widthForSubjectName = 55 / props.examSubjectsWithMarks.size
     const formatMarks = (marks_obtained: number) => {
         // if a number is decimal, fix it to only 2 decimal positions
         return marks_obtained % 1 === 0 ? marks_obtained : marks_obtained.toFixed(2)
-    } 
+    }
+
     return (
         <div className="print-table print-page">
             <table className="outer-space">
@@ -29,11 +30,17 @@ export const ClassResultSheet = (props: PropsTypes) => {
                 </caption>
                 <thead>
                     <tr>
-                        <th className="result-sheet" style={{width: "4%"}}>Sr No.</th>
+                        <th className="result-sheet" style={{width: "4%"}}>R No.</th>
                         <th className="result-sheet" style={{width: "15%"}}>Name</th>
+                        <th className="result-sheet" style={{width: "15%"}}>Father Name</th>
                         {
                             Array.from(props.examSubjectsWithMarks)
-								.map((subject, index) => <th className="result-sheet" style={{width: `${widthForSubjectName}}%`}} key={index}> {subject} </th>)
+                                .sort((a, b) => a.localeCompare(b))
+                                .map((subject, index) => <th 
+                                    key={index}
+                                    className="result-sheet"
+                                    style={{width: `${widthForSubjectName}}%`, lineHeight: 1}}> 
+                                    {subject.substr(0, subject.indexOf('('))} <br/> {subject.substr(subject.indexOf('('))}</th>)
                         }
                         <th className="result-sheet row-marks">Obt./total</th>
                         <th className="result-sheet row-grade">Grade</th>
@@ -42,15 +49,16 @@ export const ClassResultSheet = (props: PropsTypes) => {
                 <tbody>
                    {
                     props.students
-                        .map((student, index) => {
+                        .map((student: StudentMarksSheet, index) => {
                             return <tr key={index}>
-                                <td>{props.chunkSize + index + 1}</td>
+                                <td>{student.rollNo || ''}</td>
                                 <td>{student.name}</td>
+                                <td>{student.manName}</td>
                                 {
                                     student.exams.map((exam, i) => <td key={i} className="cell-center"> {exam.stats ? exam.stats.score : 0 } </td>)
                                 }
                                 <td className="cell-center">{`${ formatMarks(student.marks.obtained) }/${ student.marks.total }`}</td>
-                                <td>{ student.grade }</td>
+                                <td className="cell-center">{ student.grade }</td>
                         </tr>})
                     }
                 </tbody>

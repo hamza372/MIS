@@ -261,6 +261,7 @@ class Reports extends Component<propsType, S> {
 								{
 									filtered_exams
 										.filter(exam => exam.name === exam_title)
+										.sort((a, b) => a.subject.localeCompare(b.subject))
 										.map(exam => <div className="table-row" key={exam.id}>
 											<div className="cell">
 												<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>{exam.subject}</Link>
