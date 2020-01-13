@@ -2,6 +2,7 @@ import { v4 } from 'node-uuid'
 
 import { openDB } from 'idb'
 import { defaultExams } from 'modules/Settings';
+import moment from 'moment';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -306,10 +307,32 @@ const reconstructGradesObject = (state: RootReducerState) => {
 
 	return state
 }
+const addSchoolSessionSettings = (state: RootReducerState) => {
+	if(state.db.settings) {
+		
+		if(state.db.settings.schoolSession) {
+			return state
+		}
+		
+		const start_date = moment().startOf("year").unix() * 1000
+		const end_date = moment().add(1, "year").startOf("year").unix() * 1000
+
+		state.db.settings = {
+			...state.db.settings,
+			schoolSession: {
+				start_date,
+				end_date
+			}
+		} 
+	}
+
+	return state
+}
 
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
 	checkGrades,
-	reconstructGradesObject
+	reconstructGradesObject,
+	addSchoolSessionSettings
 ];
