@@ -179,14 +179,19 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 		return grade && grades[grade] ? grades[grade].remarks : ""
 	}
 
+	const { schoolSession } = settings
+
 	const calculateAttendace = (student) => {
 
 		const attendance = student.attendance || {}
 
 		let attendance_status_count = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 }
 
-		for (const [, record] of Object.entries(attendance)) {
-			attendance_status_count[record.status] += 1
+		for (const [date, record] of Object.entries(attendance)) {
+			
+			if(moment(date).isBetween(moment(schoolSession.start_date), moment(schoolSession.end_date))) {
+				attendance_status_count[record.status] += 1
+			}
 		}
 
 		return attendance_status_count
@@ -221,18 +226,18 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			<div className="title">{ examFilter === "" ? "Result Card" : examFilter + " Result Card"}</div>
 			
 			<div className="student-info">
-				<div className="row" style={{justifyContent: "center"}}><b>Session </b> {"____"}-{"____"}</div>
+				<div className="row" style={{justifyContent: "center"}}>Session: {moment(schoolSession.start_date).format("YYYY")}-{moment(schoolSession.end_date).format("YYYY")}</div>
 				<div className="row">
-					<div><b>Class:</b> {curr_section ? curr_section.namespaced_name : "No Class"}</div>
+					<div><b>Class:</b> {curr_section ? curr_section.namespaced_name : "________"}</div>
 					<div><b>Roll No:</b> {student.RollNumber && student.RollNumber !== "" ? student.RollNumber : "________"}</div>
 				</div>
 				<div className="row">
-					<div><b>Admission No:</b> {student.AdmissionNumber}</div>
+					<div><b>Admission No:</b> {student.AdmissionNumber && student.AdmissionNumber !== "" ? student.AdmissionNumber : "________"}</div>
 					<div><b>Date of Birth:</b> { dob !== "Invalid date" ? dob : "________"}</div>
 				</div>
 				<div className="row">
 					<div><b>Student Name:</b> {student.Name}</div>
-					<div><b>Father Name:</b> {student.ManName && student.ManName !== "" ? student.ManName : "_________"}</div>
+					<div><b>Father Name:</b> {student.ManName && student.ManName !== "" ? student.ManName : "____________"}</div>
 				</div>
 			</div>
 			
@@ -280,7 +285,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			
 			<div className="result-stats">
 				<div className="row">Grade: &nbsp; <b>{calculateGrade(marks_obtained, total_marks, grades)}</b></div>
-				<div className="row">Position: __________ </div>
+				<div className="row">Position: ________</div>
 				<div className="attendance-stats">
 					<div className="row">Days Present: {attendance.PRESENT}, Absent: {attendance.ABSENT}, Leave: {total_leave_days}</div>
 					<div className="row">Attendance: {Number.isInteger(attendance_percentage) ? attendance_percentage : attendance_percentage.toFixed(2)}%</div>
