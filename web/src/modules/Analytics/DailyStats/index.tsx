@@ -97,7 +97,7 @@ class DailyStats extends Component<PropsType, S> {
         const { statsDate } = this.state
 
         const today_date = moment(statsDate).format("YYYY-MM-DD")
-        const chunk_size = 32
+        const chunk_size = 21
 
         let total_amount_received = 0
         let total_students_paid = 0
@@ -144,7 +144,7 @@ class DailyStats extends Component<PropsType, S> {
                         </div>
                         {
                             paid_students
-                                .sort((a, b) => (a.section.classYear * 100 + parseInt(a.RollNumber) || 0) - (b.section.classYear * 100 + parseInt(a.RollNumber) || 0))
+                                .sort((a, b) => a.section.classYear - b.section.classYear)
                                 .map(student => <div className="table row" key={student.id}>
                                     {
                                         student.FamilyID ? <Link to={`/families/${student.FamilyID}`}>{student.FamilyID}(F)</Link> : 

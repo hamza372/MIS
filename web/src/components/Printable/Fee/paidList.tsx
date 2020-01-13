@@ -1,5 +1,6 @@
 import React from "react"
 import "./../print.css"
+import moment from "moment"
 
 type PropsTypes = {
     students: AugmentedStudent[]
@@ -16,7 +17,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
         <div className="print-only print-table" style={{width: "90%"}}>
             <table>
                 <caption>
-                    <div>Paid Fee Students List</div>
+                    <div>Paid Fee Students List - {moment().format("DD/MM/YYYY")}</div>
                     <div className="row" style={{justifyContent: "space-between"}}>
                         <div>Total Students: <b>{props.totalStudents}</b></div>
                         <div>Total Amount Received: <b>Rs. {props.totalAmount}</b></div>
@@ -25,10 +26,11 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                 <thead>
                     <tr><th className="row-sr">Adm #</th>
                         <th className="row-name">Name</th>
+                        <th className="row-famid">Family ID</th>
                         <th className="row-class">Class</th>
                         <th className="row-roll">Roll #</th>
-                        <th className="row-amount">Amount Paid</th>
-                        <th className="row-amount">Balance</th>
+                        <th className="row-amount-paid">Amount Paid</th>
+                        <th className="row-amount-balance">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,10 +41,11 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                             .map(student => <tr key={student.id}>
                                 <td className="cell-center">{student.AdmissionNumber || ''}</td>
                                 <td>{student.Name}</td>
+                                <td className="cell-center">{student.FamilyID || ''}</td>
                                 <td>{student.section.namespaced_name || ''}</td>
-                                <td>{student.balance}</td>
-                                <td className="cell-center">{student.RollNumber || ''}</td>
-                                <td className="cell-center">{student.amount_paid}</td>
+                                <td className="cell-center">{student.RollNumber}</td>
+                                <td className="cell-center">{student.amount_paid || ''}</td>
+                                <td className="cell-center">{student.balance}</td>
                             </tr>)
                    }
                 </tbody>

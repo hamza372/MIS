@@ -13,9 +13,9 @@ type PropsTypes = {
 
 export const ClassResultSheet = (props: PropsTypes) => {
     
-    // 55% is the remaining width for dynamic section subjects
+    // 70% is the remaining width for dynamic section subjects
     // tested with 9 subjects, output is fine
-    const widthForSubjectName = 55 / props.examSubjectsWithMarks.size
+    const widthForSubjectName = 70 / props.examSubjectsWithMarks.size
     const formatMarks = (marks_obtained: number) => {
         // if a number is decimal, fix it to only 2 decimal positions
         return marks_obtained % 1 === 0 ? marks_obtained : marks_obtained.toFixed(2)
@@ -32,7 +32,6 @@ export const ClassResultSheet = (props: PropsTypes) => {
                     <tr>
                         <th className="result-sheet" style={{width: "4%"}}>R No.</th>
                         <th className="result-sheet" style={{width: "15%"}}>Name</th>
-                        <th className="result-sheet" style={{width: "15%"}}>Father Name</th>
                         {
                             Array.from(props.examSubjectsWithMarks)
                                 .sort((a, b) => a.localeCompare(b))
@@ -53,7 +52,6 @@ export const ClassResultSheet = (props: PropsTypes) => {
                             return <tr key={index}>
                                 <td>{student.rollNo || ''}</td>
                                 <td>{student.name}</td>
-                                <td>{student.manName}</td>
                                 {
                                     student.exams.map((exam, i) => <td key={i} className="cell-center"> {exam.stats ? exam.stats.score : 0 } </td>)
                                 }

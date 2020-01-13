@@ -91,6 +91,13 @@
         width: 98% !important;
         margin: auto;
     }
+    /* paid student list*/
+    .row-famid {
+        width: 10%;
+    }
+    .row-amount-paid, .row-amount-balance {
+        width: 10%;
+    }
 }
 
 /* print preview result sheet rules*/
