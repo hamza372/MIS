@@ -28,6 +28,7 @@ defmodule Sarkar.MixProject do
 			{:csv, "~> 2.3"},
 			{:google_api_storage, "~> 0.12.0"},
 			{:goth, "~> 1.1.0"},
+			{:poolboy, "~> 1.5.2"},
 			{:nimble_csv, "~> 0.3"},
 			{:distillery, "~> 2.0"},
 			{:cowboy, "~> 2.6.3", override: true, manager: :rebar3},

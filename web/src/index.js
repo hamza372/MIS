@@ -14,13 +14,13 @@ import { saveDb, initState } from './utils/indexedDb'
 import { loadDB, connected, disconnected } from './actions/core'
 import Syncr from '@cerp/syncr'
 
-const debug_host = 'wss://4ec4e66e.ngrok.io';
+window.debug_host = '5abf4722.ngrok.io';
 
-const host = window.api_url || debug_host;
+const host = window.api_url || window.debug_host;
 
 const initialState = initState // loadDB();
 
-const syncr = new Syncr(`${host}/ws`)
+const syncr = new Syncr(`wss://${host}/ws`)
 syncr.on('connect', () => store.dispatch(connected()))
 syncr.on('disconnect', () => store.dispatch(disconnected()))
 syncr.on('message', (msg) => store.dispatch(msg))

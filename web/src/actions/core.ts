@@ -24,6 +24,8 @@ const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['
 	// here we can do stuff to make sure we are not including queued items that are processing.
 	// for now we can make this only for images. in the future we can add support for mutations and analytics as well.
 
+	// for now actually we will take images out of the queue
+	/*
 	const filtered_images = Object.entries(state.queued.images || {})
 		.reduce<ImagesQueuable>((agg, [k, v]) => {
 			if (v.status === "processing") {
@@ -33,10 +35,11 @@ const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['
 			agg[k] = v
 			return agg;
 		}, {})
+	*/
 
 	return {
 		...state.queued,
-		images: filtered_images,
+		images: {},
 		[key]: {
 			...state.queued[key],
 			...payload
@@ -82,23 +85,78 @@ export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) =>
 
 		agg[key] = {
 			...curr,
-			status: syncr.connection_verified ? "processing" : "queued"
+			status: "queued"
 		}
 
 		return agg;
 
 	}, {})
 
-	const rationalized_payload = getRationalizedQueuePayload(queueable, "images", state)
+	dispatch(QueueImages(queueable))
 
-	dispatch(QueueImages(queueable)) // should include status here?
+	dispatch(processImageQueue())
 
-	if (!connection_status) {
-		console.warn("connection not verified")
-		return
+}
+
+const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState();
+
+	console.log('processing image queue')
+
+	// need to know if this processing is already running or not...
+	// if it is running, then we should return early. 
+	// so we need this in reducer state
+
+	// for now, we ignore it.
+
+	console.log(state.queued.images)
+	const [merge_key, image_merge] = Object.entries(state.queued.images || {})
+		.filter(([k, v]) => v.status === "queued")[0]
+
+	if (image_merge === undefined) {
+		console.log('image queue empty')
+		return;
 	}
 
-	dispatch(Sync(rationalized_payload))
+	//@ts-ignore
+	const host = window.api_url || window.debug_host;
+
+	fetch(`https://${host}/upload/image`, {
+		method: 'POST',
+		mode: 'cors',
+		cache: 'no-cache',
+		headers: {
+			'content-type': 'application/json',
+			'token': state.auth.token,
+			'client-id': state.client_id,
+			'school-id': state.auth.school_id,
+			'client-type': client_type
+		},
+		body: JSON.stringify({
+			lastSnapshot: state.lastSnapshot,
+			payload: {
+				image_merge
+			}
+		})
+	})
+		.then(res => {
+			console.log('image uploaded')
+			console.log(res)
+			console.log(res.json())
+
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'processing'))
+
+			// now we should mark this item as 'processing' in the queue.
+			// and progress to the next one.
+			// syncr.on('connect') should kick  
+		})
+		.catch(err => {
+			console.error('image upload failed')
+		})
+
 }
 
 const markImagesInQueue = (images: ImagesQueuable, status: QueueStatus) => (dispatch: (a: any) => any) => {

@@ -21,7 +21,6 @@ defmodule Sarkar.Storage.Google do
 		File.rm!(file_path)
 
 		object.mediaLink
-
 	end
 
 	def upload_image_from_url(bucket_id, img_url) do
