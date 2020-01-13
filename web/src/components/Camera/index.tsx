@@ -19,7 +19,12 @@ export default class Camera extends React.Component<P, S> {
 		super(props);
 
 		this.stream = navigator.mediaDevices.getUserMedia({
-			video: true
+			video: {
+				facingMode: "environment",
+				width: { max: 500 },
+				height: { max: 500 },
+
+			}
 		})
 
 		this.state = {
@@ -44,6 +49,8 @@ export default class Camera extends React.Component<P, S> {
 		this.setState({
 			image_string: data
 		})
+
+		canvas.remove()
 	}
 
 	onImageReject = () => {
