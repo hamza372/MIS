@@ -88,9 +88,7 @@ defmodule Sarkar.School do
 		|> Enum.each(fn task ->
 
 			{merge, url} = Task.await(task)
-			IO.inspect url # this should just return url
 			# then we call sync_changes using the info in the merge + url
-			IO.puts "made it here..."
 			%{"id" => id, "path" => path} = merge
 
 			value = %{
@@ -98,25 +96,18 @@ defmodule Sarkar.School do
 				"url" => url
 			}
 
-			IO.puts "preparing..."
-
 			prepared = prepare_changes([%{
 				"type" => "MERGE",
 				"path" => path,
 				"value" => value
 			}])
 
-			IO.inspect prepared
-
-			IO.puts "here"
-
 			# broadcasts the update to all other clients - but we wont send the result back direct to the client here
 			reply = sync_changes(school_id, client_id, prepared, last_sync_date)
 
-			IO.puts "managed to sync_changes"
-
 			# this action lets the client know that the image has been uploaded, and gives
 			# enough info for the client to take it out of the queue, and update its state with the new value (now, not an image string)
+
 			Registry.lookup(Sarkar.ConnectionRegistry, school_id)
 			|> Enum.filter(fn {pid, cid}-> cid == client_id end)
 			|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, %{

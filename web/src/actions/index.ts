@@ -252,7 +252,7 @@ export const createSignUp = (profile: Profile) => (dispatch: Function, getState:
 
 export const uploadStudentProfilePicture = (student: MISStudent, image_string: string) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
-	const path = ["db", "students", student.id, "profile_picture"]
+	const path = ["db", "students", student.id, "ProfilePicture"]
 	const id = v4();
 
 	const merge_item: ImageMergeItem = {

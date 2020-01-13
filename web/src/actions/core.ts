@@ -78,8 +78,6 @@ export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) =>
 
 	const state = getState();
 
-	const connection_status = syncr.connection_verified
-
 	const queueable = images.reduce<ImagesQueuable>((agg, curr) => {
 		const key = curr.path.join(",")
 
@@ -96,6 +94,17 @@ export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) =>
 
 	dispatch(processImageQueue())
 
+}
+
+export const IMAGE_UPLOAD_CONFIRM = "IMAGE_UPLOAD_CONFIRM"
+export interface ImageUploadConfirmation {
+	type: "IMAGE_UPLOAD_CONFIRM"
+	value: {
+		url: string
+		id: string
+	}
+	path: string[]
+	id: string
 }
 
 const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {

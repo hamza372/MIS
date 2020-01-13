@@ -1,5 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction } from 'actions/core'
+import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction, ImageUploadConfirmation } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
 import { AnyAction } from 'redux'
 
@@ -8,6 +8,14 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 	console.log(action)
 
 	switch (action.type) {
+
+		case "IMAGE_UPLOAD_CONFIRM":
+			const confirmation = action as ImageUploadConfirmation
+			const state_copy: RootReducerState = JSON.parse(JSON.stringify(state))
+			Dynamic.put(state_copy, confirmation.path, confirmation.value)
+			delete state_copy.queued.images[confirmation.path.join(',')]
+
+			return state_copy
 
 		case "CONFIRM_ANALYTICS_SYNC":
 			{

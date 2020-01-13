@@ -22,6 +22,7 @@ import Former from 'utils/former'
 
 import './style.css'
 import { PrintHeader } from 'components/Layout';
+import Camera from 'components/Camera';
 
 // this page will have all the profile info for a student.
 // all this data will be editable.
@@ -64,8 +65,7 @@ const blankStudent = (): MISStudent => ({
 	section_id: "",
 	tags: {},
 	certificates: {},
-	prospective_section_id: ""
-
+	prospective_section_id: "",
 })
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -555,6 +555,16 @@ class SingleStudent extends Component<propTypes, S> {
 			})
 	}
 
+	onImageTaken = (image_string: string) => {
+
+		console.log('image taken: ')
+
+		getDownsizedImage(image_string, 600)
+			.then(img_string => {
+				this.props.uploadImage(this.state.profile, img_string)
+			})
+	}
+
 	render() {
 
 		if (this.state.redirect) {
@@ -581,6 +591,16 @@ class SingleStudent extends Component<propTypes, S> {
 					<label>Profile Picture</label>
 					<input type="file" accept="image/*" onChange={this.uploadProfilePicture} />
 				</div>
+
+				{
+					this.state.profile.ProfilePicture && <div className="row">
+						<label>Current Image</label>
+						<img src={this.state.profile.ProfilePicture.url} crossOrigin="anonymous" />
+					</div>
+				}
+
+				<Camera onImageAccepted={this.onImageTaken} height={500} width={500} />
+
 				<div className="row">
 					<label>Full Name</label>
 					<input type="text"

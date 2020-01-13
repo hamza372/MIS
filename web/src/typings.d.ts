@@ -185,6 +185,11 @@ interface MISStudent {
 	Fee: number;
 	Active: boolean;
 
+	ProfilePicture?: {
+		id: string
+		url: string
+	}
+
 	ManCNIC: string;
 	ManName: string;
 	Birthdate: string;
