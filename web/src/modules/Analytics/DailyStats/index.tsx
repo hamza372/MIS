@@ -5,7 +5,7 @@ import moment from 'moment'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import getSectionFromId from 'utils/getSectionFromId'
-import queryString from 'querystring'
+import queryString from 'query-string'
 import { PaidFeeStudentsPrintableList } from 'components/Printable/Fee/paidList'
 import chunkify from 'utils/chunkify'
 import Former from 'utils/former'
@@ -34,7 +34,7 @@ class DailyStats extends Component<PropsType, S> {
         
         const parsed_query = queryString.parse(this.props.location.search)
 
-		const type = parsed_query["?type"] ? parsed_query["?type"].toString() : ''
+		const type = parsed_query.type ? parsed_query.type.toString() : ''
         
         this.state = {
             statsType: type,

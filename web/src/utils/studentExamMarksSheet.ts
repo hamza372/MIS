@@ -7,7 +7,7 @@ type ExamFilter = {
 }
 
 const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
-    console.log("Students", students)
+    
     const marks_sheet = students
         .reduce((agg, curr) => {
 

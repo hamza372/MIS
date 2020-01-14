@@ -11,7 +11,7 @@ import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
 import chunkify from 'utils/chunkify'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 import { deleteExam } from 'actions'
-import queryString from 'querystring'
+import queryString from 'query-string'
 
 import './style.css'
 
@@ -44,9 +44,9 @@ class Reports extends Component<propsType, S> {
 
 		const parsed_query = queryString.parse(this.props.location.search)
 
-		const section_id = parsed_query["?section_id"] ? parsed_query["?section_id"].toString() : ''
-		const exam_title = parsed_query["exam_title"] ? parsed_query["exam_title"].toString() : ''
-		const year = parsed_query["year"] ? parsed_query["year"].toString() : ''
+		const section_id = parsed_query.section_id ? parsed_query.section_id.toString() : ''
+		const exam_title = parsed_query.exam_title ? parsed_query.exam_title.toString() : ''
+		const year = parsed_query.year ? parsed_query.year.toString() : ''
 
 		this.state = {
 			section_id,
