@@ -1,0 +1,66 @@
+fieldset{
+    border-radius: 5px;
+}
+legend {
+    font-weight: bold;
+}
+@media (max-width: 768px) {
+   .exams-table {
+      overflow-x: scroll;
+   }
+ }
+.table-row {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 2px solid #e0e0e0;
+    border-collapse: collapse;
+    padding-top: 5px;
+ }
+ .cell.thead {
+    font-weight: bold;
+}
+ .cell {
+    white-space: nowrap;
+    width: 30%;
+    line-height: 2.8rem;
+ }
+ .table-row.table-header {
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
+ }
+ .edit-icon, .delete-icon {
+    height: 22px;
+    width: 22px;
+    cursor: pointer;
+ }
+ .edit-icon:hover {
+    height: 24px;
+    width: 24px;
+    transition: 0.5s ease;
+ }
+ .delete-icon:hover {
+    height: 24px;
+    width: 24px;
+    transition: 0.5s ease;
+ }
+.delete-icon {
+    margin-left: 10px;
+ }
+ .reports-page .create-exam {
+    margin-top: 12px;
+ }
+ .reports-page .section .row .button {
+    padding: 10px 15px;
+ }
+ .section.exams-filter, .section.exams-list {
+    width: 90%; 
+    margin: auto;
+ }
+ .section.exams-list {
+    margin-top: 10px;
+ }
+ .section.exams-list .row {
+    margin-top: 15px;
+    justify-content: flex-end;
+ }
