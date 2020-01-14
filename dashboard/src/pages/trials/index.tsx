@@ -140,7 +140,7 @@ class Trial extends Component<propTypes, S> {
 		return `${school_id}${value.notes}${value.area_manager_name}${value.agent_name}${value.owner_phone}${value.city + value.office}${this.daysPassed(value.time) > 15 ? "ENDED-" + (this.daysPassed(value.time) - 15) : "NOT-ENDED"}${value.payment_received ? "paid": ""}`.toLowerCase()
 	}
 
-	getStatusFilter = (time: number) => {
+	getStatusFilter = (time: number, paid: boolean) => {
 		const daysPassed = this.daysPassed(time)
 		const status = this.state.filters.status
 		if (status === "ENDED") {
@@ -148,6 +148,12 @@ class Trial extends Component<propTypes, S> {
 		}
 		else if (status === "NOT_ENDED") {
 			return daysPassed <= 15
+		}
+		else if (status === "PAID") {
+			return paid 
+		}
+		else if (status === "NOT_PAID") {
+			return !paid
 		}
 		else {
 			return true
@@ -180,7 +186,7 @@ class Trial extends Component<propTypes, S> {
 
 		const Items = Object.entries(edits)
 			.filter(([school_id, value]) => {
-				return this.getStatusFilter(value.time)
+				return this.getStatusFilter(value.time, value.payment_received)
 					&& this.getDaysPassedFliter(value.time)
 					&& this.getSearchString(school_id, value).includes(this.state.filters.filterText.toLowerCase())
 			})
@@ -201,6 +207,8 @@ class Trial extends Component<propTypes, S> {
 						<option value="ALL"> ALL</option>
 						<option value="ENDED">Ended</option>
 						<option value="NOT_ENDED">Not Ended</option>
+						<option value="PAID"> Paid</option>
+						<option value="NOT_PAID"> Not Paid</option>
 					</select>
 				</div>
 				<div className="row">
