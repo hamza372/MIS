@@ -1,5 +1,5 @@
 import { Dispatch, AnyAction } from 'redux'
-import Syncr from 'syncr';
+import Syncr from '@cerp/syncr';
 
 const SYNC = "SYNC"
 
@@ -243,16 +243,7 @@ export const connected = () => (dispatch: (a : any) => any, getState: () => Root
 				}
 			})
 			.then(res => {
-				return syncr.send({
-					type: SYNC,
-					client_type: state.auth.client_type,
-					id: state.auth.id,
-					payload: state.queued,
-					last_snapshot: state.last_snapshot
-				})
-			})
-			.then(resp => {
-				dispatch(resp)
+				syncr.verify()
 			})
 			.catch(err => {
 				console.error(err)
@@ -271,12 +262,14 @@ export interface LoginSucceed {
 	type: "LOGIN_SUCCEED",
 	id: string,
 	token: string,
-	sync_state: RootReducerState['sync_state'],
+	role: string,
+	permissions: UserPermissions
 }
 
-export const createLoginSucceed = (id : string, token : string, sync_state: RootReducerState['sync_state']) : LoginSucceed => ({ 
+export const createLoginSucceed = (id : string, token : string, role: string, permissions: UserPermissions ) : LoginSucceed => ({ 
 	type: LOGIN_SUCCEED,
 	id,
 	token,
-	sync_state
+	role,
+	permissions
 })

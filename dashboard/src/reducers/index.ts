@@ -1,7 +1,7 @@
 import Dynamic from '@ironbay/dynamic'
 
-import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF } from 'actions/core'
-import { SCHOOL_INFO, REFERRALS_INFO } from 'actions/index'
+import { MERGES, MergeAction, ON_CONNECT, ON_DISCONNECT, DELETES, DeletesAction, QueueAction, QUEUE, CONFIRM_SYNC_DIFF, ConfirmSyncAction, SnapshotDiffAction, SNAPSHOT_DIFF, LOGIN_SUCCEED, LoginSucceed } from 'actions/core'
+import { SCHOOL_LIST, REFERRALS_INFO, SCHOOL_INFO } from 'actions/index'
 import { AnyAction } from 'redux';
 
 const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerState => {
@@ -24,11 +24,27 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 			}
 		}
 
-		case SCHOOL_INFO:
+		case LOGIN_SUCCEED:
+		{
+			const { id, token, role, permissions } = action as LoginSucceed
+			return {
+				...state,
+				auth: {
+					...state.auth,
+					id,
+					token,
+					role,
+					permissions
+				}
+			}
+		}
+
+		case SCHOOL_LIST:
 		{
 			return {
 				...state,
 				school_Info: {
+					...state.school_Info,
 					school_list: action.school_list
 				}
 			}
@@ -39,6 +55,96 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 			return {
 				...state,
 				trials: action.trials
+			}
+		}
+
+		case SCHOOL_INFO:
+		{
+			return {
+				...state,
+				school_Info: {
+					...state.school_Info,
+					trial_info: (action as SchoolInfoAction).trial_info,
+					student_info: (action as SchoolInfoAction).student_info
+				}
+			}
+		}
+
+			
+		case "STUDENT_ATTENDANCE_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					student_attendance: (action as StudentAttendanceAction).payload
+				}
+			}
+		}
+			
+		case "TEACHER_ATTENDANCE_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					teacher_attendance: (action as TeacherAttendanceAction).payload
+				}
+			}
+		}
+
+		case "FEES_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					fees: (action as FeesAction).payload
+				}
+			}
+		}
+
+		case "EXAMS_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					exams: (action as ExamsAction).payload
+				}
+			}
+		}
+
+		case "EXPENSE_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					expense: (action as ExpenseAction).payload
+				}
+			}
+		}
+
+		case "SMS_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					sms: (action as SmsAction).payload
+				}
+			}
+		}
+
+		case "DIARY_DATA":
+		{
+			return {
+				...state,
+				stats: {
+					...state.stats,
+					diary: (action as DiaryAction).payload
+				}
 			}
 		}
 

@@ -1,71 +1,48 @@
 import * as React from 'react'
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar } from 'recharts'
-
-import { getEndPointResource } from 'utils/getEndPointResource';
 import moment from 'moment'
+import { connect } from 'react-redux';
+import { getEndPointResource } from 'actions';
 
 interface P {
 	school_id: string
 	start_date: number
 	end_date: number
+	sms: RootReducerState["stats"]["sms"]
+	getEndPointResource: ( point: string, school_id: string, start_date: number, end_date: number ) => any
 }
 
-interface DataRow {
-	sms_usage: number
-	date: number
-}
-
-interface S {
-	data: DataRow[],
-	loading: boolean
-}
+interface S {}
 
 class SMS extends React.Component<P, S> {
 
 	constructor(props: P) {
 		super(props);
 
-		this.state = {
-			data: [],
-			loading: false
-		}
+		this.state = {}
 	}
 
 	componentDidMount() {
 
 		const {school_id, start_date, end_date } = this.props
-		
-		getEndPointResource("sms", school_id, start_date, end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		this.props.getEndPointResource("SMS_DATA", school_id, start_date, end_date)
 	}
 
 	componentWillReceiveProps (newProps: P) {
 
-		const {school_id, start_date, end_date } = newProps
+		const { school_id, start_date, end_date } = newProps
 		
-		getEndPointResource("sms", school_id, start_date, end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		if (this.props.school_id !== school_id ||
+			this.props.start_date !== start_date ||
+			this.props.end_date !== end_date
+		) {
+			this.props.getEndPointResource("SMS_DATA", school_id, start_date, end_date)
+		}
 	}
 
 	render() {
 
-		const data = this.state.data
+		const data = this.props.sms && this.props.sms.data
 			.reduce((agg, { sms_usage, date }) => {
 				return [
 					...agg,
@@ -76,9 +53,8 @@ class SMS extends React.Component<P, S> {
 				]
 			},[] as any)
 
-		console.log(data)
 		return <div className="stat-card">
-			{ this.state.loading && <div> Loading....</div> }
+			{ this.props.sms === undefined && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
 				<BarChart data={data} barCategoryGap={0} barGap={0}>
 					<XAxis
@@ -100,4 +76,8 @@ class SMS extends React.Component<P, S> {
 	}
 }
 
-export default SMS;
+export default connect((state: RootReducerState) => ({
+	sms: state.stats.sms
+}), (dispatch: Function) => ({
+	getEndPointResource: (point: string, school_id: string, start_date: number, end_date: number) => dispatch(getEndPointResource(point, school_id, start_date, end_date))
+}))(SMS);
