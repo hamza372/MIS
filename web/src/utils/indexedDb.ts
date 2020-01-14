@@ -19,6 +19,7 @@ export const initState: RootReducerState = {
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	initialized: false,
+	processing_images: false,
 	db: {
 		faculty: {},
 		users: {},
@@ -142,7 +143,8 @@ export const loadDb = async () => {
 				succeed: false,
 				reason: ""
 			},
-			initialized: true
+			initialized: true,
+			processing_images: false
 		}
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {

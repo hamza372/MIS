@@ -11,10 +11,10 @@ import reducer from './reducers'
 
 import Routes from './routes'
 import { saveDb, initState } from './utils/indexedDb'
-import { loadDB, connected, disconnected } from './actions/core'
+import { loadDB, connected, disconnected, processImageQueue } from './actions/core'
 import Syncr from '@cerp/syncr'
 
-window.debug_host = '5abf4722.ngrok.io';
+window.debug_host = 'b0244042.ngrok.io';
 
 const host = window.api_url || window.debug_host;
 
@@ -24,6 +24,7 @@ const syncr = new Syncr(`wss://${host}/ws`)
 syncr.on('connect', () => store.dispatch(connected()))
 syncr.on('disconnect', () => store.dispatch(disconnected()))
 syncr.on('message', (msg) => store.dispatch(msg))
+syncr.on('verify', () => store.dispatch(processImageQueue()))
 
 syncr.message_timeout = 90000;
 

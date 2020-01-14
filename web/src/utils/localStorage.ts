@@ -18,6 +18,7 @@ const initState: RootReducerState = {
 		images: {}
 	},
 	acceptSnapshot: false,
+	processing_images: false,
 	lastSnapshot: 0,
 	db: {
 		faculty: {},

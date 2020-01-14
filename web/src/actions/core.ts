@@ -76,8 +76,6 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 
 export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
-	const state = getState();
-
 	const queueable = images.reduce<ImagesQueuable>((agg, curr) => {
 		const key = curr.path.join(",")
 
@@ -107,9 +105,31 @@ export interface ImageUploadConfirmation {
 	id: string
 }
 
-const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+export const IMAGE_QUEUE_LOCK = "IMAGE_QUEUE_LOCK"
+const lockImageQueue = {
+	type: IMAGE_QUEUE_LOCK
+}
+
+export const IMAGE_QUEUE_UNLOCK = "IMAGE_QUEUE_UNLOCK"
+const unlockImageQueue = {
+	type: IMAGE_QUEUE_UNLOCK
+}
+
+export const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const state = getState();
+
+	if (state.processing_images) {
+		console.log('already processing')
+		return;
+	}
+
+	if (!syncr.connection_verified) {
+		console.log('connection not verified')
+		return;
+	}
+
+	dispatch(lockImageQueue)
 
 	console.log('processing image queue')
 
@@ -120,13 +140,16 @@ const processImageQueue = () => (dispatch: (a: any) => any, getState: () => Root
 	// for now, we ignore it.
 
 	console.log(state.queued.images)
-	const [merge_key, image_merge] = Object.entries(state.queued.images || {})
-		.filter(([k, v]) => v.status === "queued")[0]
+	const items = Object.entries(state.queued.images || {})
+		.filter(([k, v]) => v.status === "queued")
 
-	if (image_merge === undefined) {
-		console.log('image queue empty')
-		return;
+	if (items.length === 0) {
+		console.log('nothing to process in queue')
+		dispatch(unlockImageQueue)
+		return
 	}
+
+	const [merge_key, image_merge] = items[0]
 
 	//@ts-ignore
 	const host = window.api_url || window.debug_host;
@@ -158,12 +181,21 @@ const processImageQueue = () => (dispatch: (a: any) => any, getState: () => Root
 				[merge_key]: image_merge
 			}, 'processing'))
 
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
+
 			// now we should mark this item as 'processing' in the queue.
 			// and progress to the next one.
 			// syncr.on('connect') should kick  
 		})
 		.catch(err => {
 			console.error('image upload failed')
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'queued'))
+
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
 		})
 
 }

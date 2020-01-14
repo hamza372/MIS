@@ -92,6 +92,7 @@ interface RootReducerState {
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;
+	processing_images: boolean
 	db: RootDBState;
 	auth: {
 		school_id: string;
