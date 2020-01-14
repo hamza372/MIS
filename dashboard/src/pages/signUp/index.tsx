@@ -78,9 +78,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value","school_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -121,9 +126,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "agent_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "AGENT"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -228,6 +238,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="FAROOQ">Farooq</option>
 						<option value="KAMRAN">Kamran</option>
 						<option value="NOMAN">Noman</option>
+						<option value="ALI_ZOHAIB"> ALI ZOHAIB</option>
 					</select>
 				</div>
 				<div className="row">
@@ -241,6 +252,8 @@ class SignUp extends Component <propTypes, S> {
 						<option value="FAISALABAD">Faisalabad</option>
 						<option value="ISLAMABAD">Islamabad</option>
 						<option value="RAWALPINDI">Rawalpindi</option>
+						<option value="KASUR"> Kasur</option>
+						<option value="SHEIKHUPURA"> Sheikhupura</option>
 					</select>
 				</div>
 

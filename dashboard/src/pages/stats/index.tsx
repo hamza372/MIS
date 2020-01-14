@@ -9,14 +9,14 @@ import Exams from './Exams';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 import './style.css'
-import { schoolInfo } from 'actions';
+import { getSchoolList } from 'actions';
 import Expense from './Expense';
 import SMS from './SMS';
 import Diary from './Diary';
 
 interface P {
 	school_list: RootReducerState["school_Info"]["school_list"]
-	schoolInfo: () => any
+	getSchoolList: () => any
 }
 
 interface S {
@@ -48,17 +48,8 @@ class Stats extends Component <propTypes, S> {
 		this.former = new Former(this,[])
 	}
 
-	// updateUrlParams = (path: string) => {
-	// 	this.props.history.push({
-	// 		pathname: path,
-	// 		search: ""
-	// 	})
-
-	// 	console.log("sdsdds")
-	// }
-
 	componentDidMount () {
-		this.props.schoolInfo()
+		this.props.getSchoolList()
 	}
 
 	getSchoolId = (): string => this.props.match.params.school_id === "school_id" ? this.state.selected_school : this.props.match.params.school_id
@@ -72,14 +63,6 @@ class Stats extends Component <propTypes, S> {
 		const school_id = this.getSchoolId()
 		const start_date = this.getStartDate()
 		const end_date = this.getEndDate()
-
-		//const path = `/dashboard/${school_id}/${start_date}/${end_date}/`
-
-		/* if (school_id !== "") {
-			
-			this.updateUrlParams(path)
-		} */
-
 
 		return <div className="page stats">
 
@@ -135,5 +118,5 @@ class Stats extends Component <propTypes, S> {
 export default connect((state : RootReducerState) => ({
 	school_list: state.school_Info.school_list
 }), ( dispatch: Function )  => ({
-	schoolInfo: () => dispatch(schoolInfo())
+	getSchoolList: () => dispatch(getSchoolList())
 }))(withRouter(Stats))

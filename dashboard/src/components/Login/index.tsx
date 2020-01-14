@@ -52,7 +52,7 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 			return <div>Connecting...</div>
 		}
 
-		return <div className="login page">
+		return <div className="login">
 
 			<div className="cover" style={{ }}>
 				<div className="title" style={{ fontSize: "3rem" }}>Welcome to MIS Dashboard</div>

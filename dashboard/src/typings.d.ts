@@ -8,9 +8,7 @@ interface RootReducerState {
 		id?: string
 		token?: string
 		role?: string
-		permissions?: {
-			[id: string]: boolean
-		}
+		permissions?: UserPermissions
 		client_type: "dashboard"
 	}
 	client_id: string
@@ -29,8 +27,125 @@ interface RootReducerState {
 	connected: boolean
 	school_Info: {
 		school_list: string[]
+		trial_info: {
+			date: string
+			paid: boolean
+			trial_period: number
+		} | undefined
+		student_info: {
+			max_limit: number
+		} | undefined
 	},
 	trials: TrialsDataRow[]
+	stats: {
+		student_attendance: {
+			data: StudentAttendanceData[]
+			total_students: number
+		} | undefined
+		teacher_attendance: {
+			data: TeacherAttendanceData[]
+			total_teachers: number
+		} | undefined
+		fees: {
+			data: StudentFeesData[]
+			total_students: number
+		} | undefined
+		exams: {
+			data: StudentExamsData[]
+			total_students: number
+		} | undefined
+		expense: {
+			data: ExpenseData[]
+		} | undefined
+		sms: {
+			data: SmsData[]
+		} | undefined
+		diary: {
+			data: DiaryData[]
+		} | undefined
+	}
+}
+
+interface SchoolInfoAction {
+	type: "SCHOOL_INFO",
+	trial_info: RootReducerState["school_Info"]["trial_info"]
+	student_info: RootReducerState["school_Info"]["student_info"]
+}
+
+interface StudentAttendanceAction {
+	type: "STUDENT_ATTENDANCE_DATA"
+	payload: RootReducerState["stats"]["student_attendance"]
+}
+
+interface StudentAttendanceData {
+	date: string
+	school_id: string
+	students_marked: number
+}
+
+interface TeacherAttendanceAction {
+	type: "TEACHER_ATTENDANCE_DATA"
+	payload: RootReducerState["stats"]["teacher_attendance"]
+}
+interface TeacherAttendanceData {
+	date: string
+	school_id: string
+	teachers_marked: number
+}
+
+interface FeesAction {
+	type: "FEES_DATA"
+	payload: RootReducerState["stats"]["fees"]
+}
+
+interface StudentFeesData {
+	date: string
+	num_payments: number
+	school_id: string
+	total: number
+	unique_students: number
+}
+
+interface ExamsAction {
+	type: "EXAMS_DATA"
+	payload: RootReducerState["stats"]["exams"]
+}
+
+interface StudentExamsData {
+	date: string
+	exams: number
+	school_id: string
+	students_graded: number
+}
+
+interface ExpenseAction {
+	type: "EXPENSE_DATA"
+	payload: RootReducerState["stats"]["expense"]
+}
+
+interface ExpenseData {
+	date: string
+	expense_usage: number
+}
+
+interface SmsAction {
+	type: "SMS_DATA"
+	payload: RootReducerState["stats"]["sms"]
+}
+
+interface SmsData {
+	date: string
+	sms_usage: number
+}
+
+interface DiaryAction {
+	type: "DIARY_DATA"
+	payload: RootReducerState["stats"]["diary"]
+}
+
+interface DiaryData {
+	date: string
+	diary_usage: number
 }
 
 interface TrialsDataRow {
@@ -51,6 +166,11 @@ interface TrialsDataRow {
 		type_of_login: string
 		owner_phone: string
 		payment_received: boolean
+		backcheck_status: string
+		warning_status: string
+		follow_up_status: string
+		trial_reset_status: string
+		overall_status: string
 	}
 }
 
@@ -70,4 +190,11 @@ interface SignUpValue {
 	agent_name: string
 
 	notes: string
+}
+
+interface UserPermissions {
+	new_school: boolean
+	new_user: boolean
+	stats: boolean
+	trials: boolean
 }

@@ -27,7 +27,8 @@ interface S {
 }
 
 const roles = [
-	"ADMIN"
+	"ADMIN",
+	"FIELD_MANAGER"
 ];
 
 const permissions = [

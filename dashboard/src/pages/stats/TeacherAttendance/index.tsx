@@ -1,80 +1,48 @@
 import * as React from 'react'
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar } from 'recharts'
-
-import { getEndPointResource } from 'utils/getEndPointResource';
 import moment from 'moment'
+import { connect } from 'react-redux';
+import { getEndPointResource } from 'actions';
 
 interface P {
 	school_id: string
 	start_date: number
 	end_date: number
+	teacher_attendance: RootReducerState["stats"]["teacher_attendance"]
+	getEndPointResource: ( point: string, school_id: string, start_date: number, end_date: number ) => any
 }
 
-interface DataRow {
-	teachers_marked: number
-	school_id: string
-	date: string
-}
-
-interface S {
-	data: DataRow[]
-	loading: boolean
-}
+interface S {}
 
 class TeacherAttendance extends React.Component<P, S> {
 
 	constructor(props: P) {
 		super(props);
 
-		this.state = {
-			data: [],
-			loading: false
-		}
+		this.state = {}
 	}
 
 	componentDidMount() {
 
 		const {school_id, start_date, end_date } = this.props
-
-		getEndPointResource("teacher_attendance",school_id, start_date,end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		this.props.getEndPointResource("TEACHER_ATTENDANCE_DATA", school_id, start_date, end_date)
 	}
 
 	componentWillReceiveProps (newProps: P) {
 
-		const {school_id, start_date, end_date } = newProps
-
-		if(school_id !== this.props.school_id) {
-			this.setState({
-				data: [],
-				loading: true
-			})
+		const { school_id, start_date, end_date } = newProps
+		
+		if (this.props.school_id !== school_id ||
+			this.props.start_date !== start_date ||
+			this.props.end_date !== end_date
+		) {
+			this.props.getEndPointResource("TEACHER_ATTENDANCE_DATA", school_id, start_date, end_date)
 		}
-
-		getEndPointResource("teacher_attendance",school_id, start_date,end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data,
-					loading: false
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
 	}
 
 	render() {
 
-		const data = this.state.data
+		const data = this.props.teacher_attendance && this.props.teacher_attendance.data
 			.reduce((agg, { teachers_marked, date }) => {
 				return [
 					...agg,
@@ -86,7 +54,7 @@ class TeacherAttendance extends React.Component<P, S> {
 			}, [] as any)
 		
 		return <div className="stat-card">
-			{ this.state.loading && <div> Loading....</div> }
+			{ this.props.teacher_attendance && <div> Loading....</div> }
 			<ResponsiveContainer width="90%" height={300}>
 				<BarChart data={data} barCategoryGap={0}>
 					<XAxis
@@ -108,4 +76,8 @@ class TeacherAttendance extends React.Component<P, S> {
 	}
 }
 
-export default TeacherAttendance;
+export default connect((state: RootReducerState) => ({
+	teacher_attendance: state.stats.teacher_attendance
+}), (dispatch: Function) => ({
+	getEndPointResource: (point: string, school_id: string, start_date: number, end_date: number) => dispatch(getEndPointResource(point, school_id, start_date, end_date))
+}))(TeacherAttendance);
