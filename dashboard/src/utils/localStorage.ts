@@ -105,8 +105,19 @@ export const loadDB = () : RootReducerState => {
 		connected: false,
 		sync_state: loadSyncState(),
 		school_Info: {
-			school_list: [""]
+			school_list: [],
+			trial_info: undefined,
+			student_info: undefined
 		},
-		trials: []
+		trials: [],
+		stats: {
+			student_attendance: undefined,
+			teacher_attendance: undefined,
+			fees: undefined,
+			exams: undefined,
+			expense: undefined,
+			sms: undefined,
+			diary: undefined
+		}
 	}
 }

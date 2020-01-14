@@ -1,17 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { schoolInfo, updateSchoolInfo } from 'actions'
+import { getSchoolList, updateSchoolInfo, getSchoolInfo } from 'actions'
 import { RouteComponentProps } from 'react-router'
 import Former from 'former'
 import { hash } from 'utils'
 import moment from 'moment'
-import { getEndPointResourceTrial } from 'utils/getEndPointResource'
 
 
 interface P {
 	schoolList: string[]
-	schoolInfo: () => any
+	trial_info: RootReducerState["school_Info"]["trial_info"]
+	student_info: RootReducerState["school_Info"]["student_info"]
+	getSchoolList: () => any
 	updateSchoolInfo: (school_id: string, student_limit: number, paid: boolean, date: number) => any
+	getSchoolInfo: (school_id: string) => any
 }
 
 interface S {
@@ -24,6 +26,7 @@ interface S {
 	date: number
 	student_limit: number
 	updateMenu: boolean
+	infoMenu: boolean
 }
 
 interface routeInfo {
@@ -58,7 +61,8 @@ class AdminActions extends Component<propTypes, S> {
 			paid: "",
 			date: 0,
 			student_limit: 0,
-			updateMenu: false
+			updateMenu: false,
+			infoMenu: false
 		}
 
 		this.former = new Former(this, [])
@@ -89,7 +93,7 @@ class AdminActions extends Component<propTypes, S> {
 	}
 
 	componentDidMount() {
-		this.props.schoolInfo()
+		this.props.getSchoolList()
 	}
 
 	getCodes = async () => {
@@ -111,20 +115,11 @@ class AdminActions extends Component<propTypes, S> {
 	getSetStuff = () => {
 		this.getCodes()
 
-		getEndPointResourceTrial("school_info", this.state.selectedSchool)
-			.then(res => res.json())
-			.then((res: ServerResp) => {
-				this.setState({
-					trial_period: res.trial_info.trial_period,
-					paid: res.trial_info.paid ? "true" : "false",
-					date: res.trial_info.date,
-					student_limit: res.student_info.max_limit,
-					misPackage: this.getPackageFromLimit(res.student_info.max_limit)
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		this.props.getSchoolInfo(this.state.selectedSchool)
+
+		this.setState({
+			infoMenu: true
+		})
 	}
 
 	onSave = () => {
@@ -132,7 +127,7 @@ class AdminActions extends Component<propTypes, S> {
 		const { selectedSchool, misPackage, paid, date } = this.state
 
 		if (misPackage === "" || paid === "" || !date) {
-			window.alert("INVALID SELECTION")
+			window.alert("Please Fill All info")
 			return
 		}
 
@@ -141,9 +136,17 @@ class AdminActions extends Component<propTypes, S> {
 
 	render() {
 
+		const student_info = this.props.student_info
+		const trial_info = this.props.trial_info
+
+		const trial_period = (trial_info && trial_info.trial_period ) || 0
+		const paid = trial_info && trial_info.paid ? "true" : "false"
+		const date = (trial_info && trial_info.date) || -1
+		const student_limit = (student_info && student_info.max_limit) || 0
+
 		const { schoolList } = this.props
 		const { selectedSchool, resetPassword, purchasePassword } = this.state
-
+		
 		return <div className="page admin-actions">
 			<div className="title"> Admin Actions</div>
 
@@ -156,27 +159,28 @@ class AdminActions extends Component<propTypes, S> {
 							schoolList.map(s => <option value={s} key={s}>{s}</option>)
 						}
 					</datalist>
-					<input list="schools" {...this.former.super_handle(["selectedSchool"], () => true, () => this.getSetStuff())} />
+					<input list="schools" {...this.former.super_handle(["selectedSchool"])} />
 				</div>
+				<div className="button blue" onClick={() => this.getSetStuff()}>LOAD</div>
 			</div>
 
-			{selectedSchool && <div className="section form" style={{ width: "75%" }}>
+			{this.state.infoMenu && <div className="section form" style={{ width: "75%" }}>
 				<div className="divider">School Info</div>
 				<div className="row">
 					<label>Trial Start Date</label>
-					<div>{this.state.date !== -1 ? moment(this.state.date).format("MM-DD-YYYY") : "Not Set"}</div>
+					<div>{ date !== -1 ? moment(date).format("MM-DD-YYYY") : "Not Set"}</div>
 				</div>
 				<div className="row">
 					<label>Status</label>
-					<div>{this.state.paid === "true" ? "PAID Customer" : "Trial User"}</div>
+					<div>{paid === "true" ? "PAID Customer" : "Trial User"}</div>
 				</div>
 				<div className="row">
 					<label>Student Limit</label>
-					<div>{this.state.student_limit === -1 ? "Unlimited" : this.state.student_limit}</div>
+					<div>{student_limit === -1 ? "Unlimited" : this.state.student_limit}</div>
 				</div>
 				<div className="row">
 					<label>Trial Period</label>
-					<div>{this.state.trial_period} Days</div>
+					<div>{trial_period} Days</div>
 				</div>
 				<div className="divider"> Codes </div>
 				<div className="row">
@@ -211,7 +215,7 @@ class AdminActions extends Component<propTypes, S> {
 				</div>
 				<div className="row">
 					<label>Trial Start Date</label>
-					<input type="date" onChange={this.former.handle(["date"])} value={moment(this.state.date).format("YYYY-MM-DD")} />
+					<input type="date" onChange={this.former.handle(["date"])} />
 				</div>
 				<div className="button save" onClick={() => this.onSave()}> Save </div>
 			</div>}
@@ -219,8 +223,11 @@ class AdminActions extends Component<propTypes, S> {
 	}
 }
 export default connect((state: RootReducerState) => ({
-	schoolList: state.school_Info.school_list
+	schoolList: state.school_Info.school_list,
+	trial_info: state.school_Info.trial_info,
+	student_info: state.school_Info.student_info
 }), (dispatch: Function) => ({
-	schoolInfo: () => dispatch(schoolInfo()),
+	getSchoolList: () => dispatch(getSchoolList()),
+	getSchoolInfo: (school_id: string) => dispatch(getSchoolInfo(school_id)),
 	updateSchoolInfo: (school_id: string, student_limit: number, paid: boolean, date: number) => dispatch(updateSchoolInfo(school_id, student_limit, paid, date))
 }))(AdminActions)
