@@ -82,7 +82,7 @@ class Reports extends Component<propsType, S> {
 
 		this.props.deleteExam(students, exam_id)
 
-		setTimeout(() => this.setState({ banner: { active: false } }), 3000);
+		setTimeout(() => this.setState({ banner: { active: false } }), 3000)
 
 	}
 
@@ -175,9 +175,9 @@ class Reports extends Component<propsType, S> {
 		
 		const parsed_query = queryString.parse(nextProps.location.search)
 
-		const section_id = parsed_query["?section_id"] ? parsed_query["?section_id"].toString() : ''
-		const exam_title = parsed_query["exam_title"] ? parsed_query["exam_title"].toString() : ''
-		const year = parsed_query["year"] ? parsed_query["year"].toString() : ''
+		const section_id = parsed_query.section_id ? parsed_query.section_id.toString() : ''
+		const exam_title = parsed_query.exam_title ? parsed_query.exam_title.toString() : ''
+		const year = parsed_query.year ? parsed_query.year.toString() : ''
 
 		this.setState({
 			section_id,

@@ -144,13 +144,13 @@ class DailyStats extends Component<PropsType, S> {
                         </div>
                         {
                             paid_students
-                                .sort((a, b) => a.section.classYear - b.section.classYear)
+                                .sort((a, b) => ((a.section && a.section.classYear) || 0) - ((b.section && b.section.classYear) || 0))
                                 .map(student => <div className="table row" key={student.id}>
                                     {
-                                        student.FamilyID ? <Link to={`/families/${student.FamilyID}`}>{student.FamilyID}(F)</Link> : 
+                                        student.FamilyID && student.FamilyID !== "" ? <Link to={`/families/${student.FamilyID}`}>{student.FamilyID}(F)</Link> : 
                                             <Link to={`/student/${student.id}/payment`}>{student.Name}</Link>
                                     }
-                                    <div>{student.section.namespaced_name}</div>
+                                    <div>{(student.section && student.section.namespaced_name) || ''}</div>
                                     <div>{student.amount_paid}</div>
                                     <div className={student.balance > 0 ? 'pending-amount' : "advance-amount"}>{student.balance}</div>
                                 </div>)

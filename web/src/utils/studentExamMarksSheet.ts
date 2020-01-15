@@ -8,6 +8,9 @@ type ExamFilter = {
 
 const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
     
+    if(section_exams.length === 0)
+        return []
+
     const marks_sheet = students
         .reduce((agg, curr) => {
 

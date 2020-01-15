@@ -246,7 +246,7 @@ class Diary extends Component <propTypes,S> {
 		const diary = this.diaryString()
 		
 		// in case of single student
-		if(phone) {
+		if(phone && phone !== "") {
 			return [{ number: phone, text: diary }]
 		}
 			
@@ -346,7 +346,7 @@ class Diary extends Component <propTypes,S> {
 											.map(([id, student]) => <option key={id} value={student.Phone}>{student.Name}</option>)
 										]}
 									</datalist>
-									<input list="student-list" {...this.former.super_handle(["selected_student_number"])} placeholder="Select Student" />
+									<input list="student-list" {...this.former.super_handle(["selected_student_phone"])} placeholder="Select Student" />
 								</div>
 							}
 						</div>
