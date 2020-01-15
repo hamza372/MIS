@@ -452,7 +452,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			{:ok, token, permissions} -> 
 				{:reply, succeed(%{ id: id, token: token, permissions: permissions }), %{ id: id, client_id: client_id}}
 			{:error, err} -> 
-				{:reply. fail(err), state}
+				{:reply, fail(err), state}
 		end
 	end
 
