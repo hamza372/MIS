@@ -26,7 +26,7 @@ export default class Modal extends React.Component {
 	render() {
 		return ReactDOM.createPortal(
 			<div className="modal-container">
-				{ this.props.children }
+				{this.props.children}
 			</div>,
 			this.el
 		)

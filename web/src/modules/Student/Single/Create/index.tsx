@@ -602,7 +602,7 @@ class SingleStudent extends Component<propTypes, S> {
 
 				<div className="row">
 					<label>Profile Picture</label>
-					<div className="fileContainer button green">
+					<div className="fileContainer button green" style={{ marginBottom: "5px" }}>
 						<div>Upload File</div>
 						<input type="file" accept="image/*" onChange={this.uploadProfilePicture} />
 					</div>
@@ -612,13 +612,13 @@ class SingleStudent extends Component<propTypes, S> {
 				{
 					this.state.profile.ProfilePicture && <div className="row">
 						<label>Current Image</label>
-						<img src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url} crossOrigin="anonymous" style={{ height: "auto", width: "auto" }} />
+						<img className="profile-pic" src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url} crossOrigin="anonymous" style={{ height: "auto", width: "auto" }} />
 					</div>
 				}
 
 				{
 					this.state.show_camera && <Modal>
-						<Camera onImageAccepted={this.onImageTaken} height={100} width={100} format="jpeg" />
+						<Camera onImageAccepted={this.onImageTaken} height={100} width={100} format="jpeg" onClose={() => this.setState({ show_camera: false })} />
 					</Modal>
 				}
 

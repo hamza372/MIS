@@ -7,6 +7,7 @@ interface P {
 	width: number
 	onImageAccepted: (image_string: string) => any
 	format: "jpeg" | "png"
+	onClose: () => void
 }
 
 interface S {
@@ -78,19 +79,22 @@ export default class Camera extends React.Component<P, S> {
 
 		if (this.state.image_string) {
 			return <div className="camera">
+				<div className="title">Camera</div>
 				<img src={this.state.image_string} />
 				<div className="row">
-					<div className="button reject" onClick={this.onImageReject}>Reject Picture</div>
-					<div className="button accept" onClick={this.onImageAccept}>Accept Picture</div>
+					<div className="button red" onClick={this.onImageReject}>✕</div>
+					<div className="button green" onClick={this.onImageAccept}>✓</div>
 				</div>
-			</div>
+			</div >
 		}
 
 		return <div className="camera">
+			<div className="close button red" onClick={this.props.onClose}>✕</div>
+
 			<div className="title">Camera</div>
 			<video id="viewfinder" ref={x => this.video = x} autoPlay={true} height={this.props.height} width={this.props.width} />
 
-			<div className="button" onClick={this.onCameraClick}>Take Picture</div>
+			<div className="button blue" onClick={this.onCameraClick}>Take Picture</div>
 		</div>
 	}
 }
