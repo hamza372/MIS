@@ -19,14 +19,13 @@ export const getImageString = (e: React.ChangeEvent<HTMLInputElement>) => {
 	})
 }
 
-export const getDownsizedImage = (imageDataUrl: string, max_size: number) => {
+export const getDownsizedImage = (imageDataUrl: string, max_size: number, format: "jpeg" | "png") => {
 
 	return new Promise<string>((resolve, reject) => {
 		const image = new Image();
 
 		image.onload = (i) => {
 			const canvas = document.createElement("canvas")
-			const max_size = 544;
 			let width = image.width;
 			let height = image.height;
 			if (width > height) {
@@ -45,7 +44,9 @@ export const getDownsizedImage = (imageDataUrl: string, max_size: number) => {
 			canvas.width = width;
 			canvas.height = height;
 			canvas.getContext('2d').drawImage(image, 0, 0, width, height)
-			const dataUrl = canvas.toDataURL('image/png')
+			const dataUrl = canvas.toDataURL(`image/${format}`)
+
+			console.log(dataUrl)
 
 			resolve(dataUrl)
 

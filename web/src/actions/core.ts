@@ -90,6 +90,18 @@ export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) =>
 
 	dispatch(QueueImages(queueable))
 
+	const local_merges = images.map<Merge>(m => ({
+		path: m.path,
+		value: {
+			image_string: m.image_string
+		}
+	}))
+
+	dispatch({
+		type: MERGES,
+		merges: local_merges
+	})
+
 	dispatch(processImageQueue())
 
 }

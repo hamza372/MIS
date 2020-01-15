@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
+
+import './style.css'
 
 interface P {
 	height: number
 	width: number
 	onImageAccepted: (image_string: string) => any
+	format: "jpeg" | "png"
 }
 
 interface S {
@@ -21,8 +24,8 @@ export default class Camera extends React.Component<P, S> {
 		this.stream = navigator.mediaDevices.getUserMedia({
 			video: {
 				facingMode: "environment",
-				width: { max: 500 },
-				height: { max: 500 },
+				width: { max: props.width, ideal: props.width },
+				height: { max: props.height, ideal: props.height },
 
 			}
 		})
@@ -44,7 +47,7 @@ export default class Camera extends React.Component<P, S> {
 		const ctx = canvas.getContext('2d')
 		ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height)
 
-		const data = canvas.toDataURL('image/png')
+		const data = canvas.toDataURL(`image/${this.props.format}`)
 
 		this.setState({
 			image_string: data
@@ -76,12 +79,15 @@ export default class Camera extends React.Component<P, S> {
 		if (this.state.image_string) {
 			return <div className="camera">
 				<img src={this.state.image_string} />
-				<div className="button reject" onClick={this.onImageReject}>Reject Picture</div>
-				<div className="button accept" onClick={this.onImageAccept}>Accept Picture</div>
+				<div className="row">
+					<div className="button reject" onClick={this.onImageReject}>Reject Picture</div>
+					<div className="button accept" onClick={this.onImageAccept}>Accept Picture</div>
+				</div>
 			</div>
 		}
 
 		return <div className="camera">
+			<div className="title">Camera</div>
 			<video id="viewfinder" ref={x => this.video = x} autoPlay={true} height={this.props.height} width={this.props.width} />
 
 			<div className="button" onClick={this.onCameraClick}>Take Picture</div>

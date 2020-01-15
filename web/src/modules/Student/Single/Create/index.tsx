@@ -17,6 +17,7 @@ import Hyphenator from 'utils/Hyphenator'
 
 import { createStudentMerge, deleteStudent, uploadStudentProfilePicture } from 'actions'
 
+import Modal from 'components/Modal'
 import Banner from 'components/Banner'
 import Former from 'utils/former'
 
@@ -85,6 +86,7 @@ interface P {
 interface S {
 	profile: MISStudent;
 	redirect: false | string;
+	show_camera: boolean
 	banner: {
 		active: boolean;
 		good?: boolean;
@@ -123,6 +125,7 @@ class SingleStudent extends Component<propTypes, S> {
 		this.state = {
 			profile: student,
 			redirect: false,
+			show_camera: false,
 			banner: {
 				active: false,
 				good: true,
@@ -549,7 +552,7 @@ class SingleStudent extends Component<propTypes, S> {
 	uploadProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 		getImageString(e)
-			.then(res => getDownsizedImage(res, 600))
+			.then(res => getDownsizedImage(res, 600, "jpeg"))
 			.then(imgString => {
 				this.props.uploadImage(this.state.profile, imgString)
 			})
@@ -559,10 +562,20 @@ class SingleStudent extends Component<propTypes, S> {
 
 		console.log('image taken: ')
 
-		getDownsizedImage(image_string, 600)
+
+		getDownsizedImage(image_string, 600, "jpeg")
 			.then(img_string => {
+				this.setState({
+					show_camera: false
+				})
 				this.props.uploadImage(this.state.profile, img_string)
 			})
+	}
+
+	toggleCamera = () => {
+		this.setState({
+			show_camera: !this.state.show_camera
+		})
 	}
 
 	render() {
@@ -589,17 +602,25 @@ class SingleStudent extends Component<propTypes, S> {
 
 				<div className="row">
 					<label>Profile Picture</label>
-					<input type="file" accept="image/*" onChange={this.uploadProfilePicture} />
+					<div className="fileContainer button green">
+						<div>Upload File</div>
+						<input type="file" accept="image/*" onChange={this.uploadProfilePicture} />
+					</div>
+					<div className="button blue" onClick={this.toggleCamera}>Take Picture</div>
 				</div>
 
 				{
 					this.state.profile.ProfilePicture && <div className="row">
 						<label>Current Image</label>
-						<img src={this.state.profile.ProfilePicture.url} crossOrigin="anonymous" />
+						<img src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url} crossOrigin="anonymous" style={{ height: "auto", width: "auto" }} />
 					</div>
 				}
 
-				<Camera onImageAccepted={this.onImageTaken} height={500} width={500} />
+				{
+					this.state.show_camera && <Modal>
+						<Camera onImageAccepted={this.onImageTaken} height={100} width={100} format="jpeg" />
+					</Modal>
+				}
 
 				<div className="row">
 					<label>Full Name</label>

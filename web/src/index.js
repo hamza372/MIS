@@ -14,7 +14,7 @@ import { saveDb, initState } from './utils/indexedDb'
 import { loadDB, connected, disconnected, processImageQueue } from './actions/core'
 import Syncr from '@cerp/syncr'
 
-window.debug_host = 'b0244042.ngrok.io';
+window.debug_host = '56755927.ngrok.io';
 
 const host = window.api_url || window.debug_host;
 

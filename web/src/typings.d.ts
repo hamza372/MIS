@@ -187,8 +187,9 @@ interface MISStudent {
 	Active: boolean;
 
 	ProfilePicture?: {
-		id: string
-		url: string
+		id?: string
+		url?: string
+		image_string?: string
 	}
 
 	ManCNIC: string;
