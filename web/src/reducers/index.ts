@@ -10,18 +10,20 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 	switch (action.type) {
 
 		case "IMAGE_UPLOAD_CONFIRM":
-			const confirmation = action as ImageUploadConfirmation
-			const state_copy: RootReducerState = JSON.parse(JSON.stringify(state))
+			{
+				const confirmation = action as ImageUploadConfirmation
+				const state_copy: RootReducerState = JSON.parse(JSON.stringify(state))
 
-			// action tells us the image url and id at the path. so we put it there
-			Dynamic.put(state_copy, confirmation.path, confirmation.value)
+				// action tells us the image url and id at the path. so we put it there
+				Dynamic.put(state_copy, confirmation.path, confirmation.value)
 
-			// we remove the item from the queue
-			const k = confirmation.path.join(',')
-			console.log('existing queue item', state_copy.queued.images, state_copy.queued.images[k])
-			delete state_copy.queued.images[k]
+				// we remove the item from the queue
+				const k = confirmation.path.join(',')
+				console.log('existing queue item', state_copy.queued.images, state_copy.queued.images[k])
+				delete state_copy.queued.images[k]
 
-			return state_copy
+				return state_copy
+			}
 
 		case IMAGE_QUEUE_LOCK:
 			return {
@@ -163,6 +165,8 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						}
 					}
 				}
+
+				break;
 			}
 
 		case CONFIRM_SYNC_DIFF:

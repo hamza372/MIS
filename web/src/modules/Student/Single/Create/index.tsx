@@ -612,13 +612,23 @@ class SingleStudent extends Component<propTypes, S> {
 				{
 					this.state.profile.ProfilePicture && <div className="row">
 						<label>Current Image</label>
-						<img className="profile-pic" src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url} crossOrigin="anonymous" style={{ height: "auto", width: "auto" }} />
+						<img
+							className="profile-pic"
+							src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url}
+							crossOrigin="anonymous"
+							style={{ height: "auto", width: "auto" }}
+							alt="profile" />
 					</div>
 				}
 
 				{
 					this.state.show_camera && <Modal>
-						<Camera onImageAccepted={this.onImageTaken} height={100} width={100} format="jpeg" onClose={() => this.setState({ show_camera: false })} />
+						<Camera
+							onImageAccepted={this.onImageTaken}
+							height={100}
+							width={100}
+							format="jpeg"
+							onClose={() => this.setState({ show_camera: false })} />
 					</Modal>
 				}
 

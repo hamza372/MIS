@@ -80,7 +80,7 @@ export default class Camera extends React.Component<P, S> {
 		if (this.state.image_string) {
 			return <div className="camera">
 				<div className="title">Camera</div>
-				<img src={this.state.image_string} />
+				<img src={this.state.image_string} alt="camera-result" />
 				<div className="row">
 					<div className="button red" onClick={this.onImageReject}>✕</div>
 					<div className="button green" onClick={this.onImageAccept}>✓</div>
