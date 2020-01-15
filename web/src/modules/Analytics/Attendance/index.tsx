@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import queryString from 'querystring'
+import queryString from 'query-string'
 import { PrintHeader } from 'components/Layout'
 import Former from "utils/former"
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
@@ -160,9 +160,9 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 
 		const parsed_query = queryString.parse(this.props.location.search);
 
-		const sd_param = parsed_query["?start_date"] || ""
-		const ed_param = parsed_query["end_date"] || ""
-		const period = parsed_query["period"] || ""
+		const sd_param = parsed_query.start_date || ""
+		const ed_param = parsed_query.end_date || ""
+		const period = parsed_query.period || ""
 
 		const start_date = sd_param !== "" ? moment(sd_param, "MM-DD-YYYY").unix() * 1000 : moment().subtract(1, 'year').unix() * 1000
 		const end_date = ed_param !== "" ? moment(ed_param, "MM-DD-YYYY").unix() * 1000 : moment().unix() * 1000
@@ -221,9 +221,9 @@ class AttendanceAnalytics extends Component<propTypes, S> {
 
 		const parsed_query = queryString.parse(nextProps.location.search);
 
-		const sd_param = parsed_query["?start_date"] || ""
-		const ed_param = parsed_query["end_date"] || ""
-		const period = parsed_query["period"] || ""
+		const sd_param = parsed_query.start_date || ""
+		const ed_param = parsed_query.end_date || ""
+		const period = parsed_query.period || ""
 
 		// set defaults if params are not passed
 		const start_date = sd_param !== "" ? moment(sd_param, "MM-DD-YYYY").unix() * 1000 : moment().subtract(1, 'year').unix() * 1000

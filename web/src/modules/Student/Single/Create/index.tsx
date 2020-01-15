@@ -53,14 +53,7 @@ const blankStudent = (): MISStudent => ({
 	BloodType: "",
 	FamilyID: "",
 
-	fees: {
-		[v4()]: {
-			name: "Monthly Fee",
-			type: "FEE",
-			amount: "",
-			period: "MONTHLY"  // M: MONTHLY, Y: YEARLY 
-		}
-	},
+	fees: {},
 	payments: {},
 	attendance: {},
 	section_id: "",
@@ -186,6 +179,30 @@ class SingleStudent extends Component<propTypes, S> {
 			},
 			edit: rest
 		})
+	}
+
+	onSectionChange = (sections: AugmentedSection[]) => {
+
+		if(this.isNew()) {	
+
+			const { settings } = this.props
+			const { profile } = this.state
+
+			const section_id = profile.section_id
+			const class_id = sections.find(section => section.id === section_id).class_id
+
+			if(settings.classes && settings.classes.defaultFee[class_id]) {
+
+				this.setState({
+					profile: {
+						...profile,
+						fees: {
+							[v4()]: settings.classes.defaultFee[class_id] 
+						}
+					}
+				})
+			}
+		}
 	}
 
 	onSave = () => {
@@ -588,6 +605,8 @@ class SingleStudent extends Component<propTypes, S> {
 		const { students, max_limit } = this.props;
 		const prospective = this.isProspective()
 
+		const sections = getSectionsFromClasses(this.props.classes)
+
 		const oldStudent = students[this.props.match.params.id]
 
 		const { settings, logo } = this.props
@@ -757,27 +776,77 @@ class SingleStudent extends Component<propTypes, S> {
 								<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>
 							</div>)
 						}
+						</div>
+					</React.Fragment> }
+
+					<div className="divider">School Information</div>
+
+					{!prospective ? <div className="row">
+						<label>Active Status</label>
+						<select {...this.former.super_handle(["Active"])} disabled={!admin}>
+							<option value="true">Student Currently goes to this School</option>
+							<option value="false">Student No Longer goes to this School</option>
+						</select>
+					</div> : false}
+
+					{ prospective || !this.state.profile.Active ? false : <div className="row">
+						<label>Class Section</label>
+						<select 
+							{...this.former.super_handle_flex(
+								["section_id"], 
+								{ 
+									styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {},
+									cb: () => this.onSectionChange(sections)
+								})
+							} 
+							disabled={!admin}>
+
+							<option value="">Please Select a Section</option>
+							{
+								getSectionsFromClasses(this.props.classes)
+									.sort((a,b) => a.classYear - b.classYear )
+									.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+							}
+						</select>
 					</div>
-				</React.Fragment>}
+					}
+					{ !prospective ? false : <div className="row">
+						<label>Class Section</label>
+						<select 
+							{...this.former.super_handle_flex(
+								["prospective_section_id"], 
+								{ styles: (val: string) => val === "" ? { borderColor : "#fc6171" } : {} }
+							)} 
+							disabled={!admin}>
 
-				<div className="divider">School Information</div>
+								<option value="">Please Select a Section</option>
+								{
+									sections
+										.sort((a,b) => a.classYear - b.classYear )
+										.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+								}
+						</select>
+					</div>
+					}
 
-				{!prospective ? <div className="row">
-					<label>Active Status</label>
-					<select {...this.former.super_handle(["Active"])} disabled={!admin}>
-						<option value="true">Student Currently goes to this School</option>
-						<option value="false">Student No Longer goes to this School</option>
-					</select>
-				</div> : false}
+					{!prospective ? <div className="row">
+						<label>Roll No</label>
+						<input 
+							type="text" 
+							{...this.former.super_handle(["RollNumber"])}
+							placeholder="Roll Number" disabled={!admin} 
+						/>
+					</div>: false}
 
-				{prospective || !this.state.profile.Active ? false : <div className="row">
-					<label>Class Section</label>
-					<select
-						{...this.former.super_handle_flex(
-							["section_id"],
-							{ styles: (val: string) => val === "" ? { borderColor: "#fc6171" } : {} })
-						}
-						disabled={!admin}>
+					{!prospective ? <div className="row">
+						<label>Admission Date</label>
+						<input type="date" 
+							onChange={this.former.handle(["StartDate"])} 
+							value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")} 
+							placeholder="Admission Date" 
+							disabled={!admin}
+						/>
+					</div> : false}
 
 						<option value="">Please Select a Section</option>
 						{

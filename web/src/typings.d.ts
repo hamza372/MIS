@@ -143,6 +143,11 @@ interface MISSettings {
 			}
 		};
 	};
+	classes: {
+		defaultFee: {
+			[class_id: string]: MISStudentFee
+		}
+	}
 }
 
 interface MISUser {
@@ -269,7 +274,7 @@ interface MISStudentPayment {
 	fee_name?: string;
 }
 
-type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited: boolean }
+type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited?: boolean }
 
 interface AugmentedMISPaymentMap {
 	[pid: string]: AugmentedMISPayment
@@ -365,4 +370,17 @@ interface MISDateSheet {
 		date: number,
 		time: string
 	}
+}
+
+type AugmentedMISExam = MISExam & { stats: MISStudentExam }
+interface StudentMarksSheet {
+	id: MISStudent["id"]
+	name: MISStudent["Name"]
+	manName: MISStudent["ManName"]
+    rollNo: MISStudent["RollNumber"]
+    marks: { total: number, obtained: number }
+    position: number
+    exams: AugmentedMISExam[]
+    grade: string
+    remarks: string
 }

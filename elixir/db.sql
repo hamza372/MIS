@@ -60,3 +60,9 @@ CREATE TABLE mischool_analytics (
 	sync_time timestamp default current_timestamp
 );
 create index on mischool_analytics(school_id);
+
+CREATE TABLE mis_dashboard_auth( 
+	id text unique not null,
+	password text not null,
+	permissions jsonb not null
+);

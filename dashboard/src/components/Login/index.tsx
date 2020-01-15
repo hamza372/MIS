@@ -9,14 +9,13 @@ import './style.css'
 
 interface propTypes {
 	connected: boolean,
-	login: (id : string, password : string, number : string) => void
+	login: (id : string, password : string) => void
 	auth: RootReducerState['auth'],
 }
 
 interface state {
 	username: string
 	password: string
-	number: string
 }
 
 class Login extends Component<propTypes & RouteComponentProps, state>{
@@ -29,14 +28,13 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 		this.state = {
 			username: "",
 			password: "",
-			number: ""
 		}
 
 		this.former = new former(this, [])
 	}
 
 	login = () => {
-		this.props.login(this.state.username, this.state.password, this.state.number)
+		this.props.login(this.state.username, this.state.password)
 	}
 
 	componentWillReceiveProps(nextProps : propTypes) {
@@ -54,10 +52,10 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 			return <div>Connecting...</div>
 		}
 
-		return <div className="login page">
+		return <div className="login">
 
 			<div className="cover" style={{ }}>
-				<div className="title" style={{ fontSize: "3rem" }}>Welcome to IlmExchange</div>
+				<div className="title" style={{ fontSize: "3rem" }}>Welcome to MIS Dashboard</div>
 				<div className="divider"></div>
 				<div className="form">
 					<div className="row">
@@ -66,9 +64,7 @@ class Login extends Component<propTypes & RouteComponentProps, state>{
 					<div className="row">
 						<input type="password" {...this.former.super_handle(["password"])} placeholder="password" />
 					</div>
-					<div className="row">
-						<input type="tel" {...this.former.super_handle(["number"])} placeholder="Your Cellphone Number" />
-					</div>
+	
 					<div className="button blue" onClick={this.login}>Login</div>
 				</div>
 			</div>
@@ -83,5 +79,5 @@ export default connect((state : RootReducerState) => ({
 	connected: state.connected,
 	auth: state.auth
 }), (dispatch : any) => ({
-	login: (username : string, password : string, number : string) => dispatch(createLogin(username, password, number))
+	login: (username : string, password : string) => dispatch(createLogin(username, password))
 }))(withRouter(Login))

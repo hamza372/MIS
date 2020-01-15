@@ -29,7 +29,12 @@ const defaultReferralState = () => ({
 	type_of_login: "",
 	owner_phone: "",
 	ref_code: "",
-	payment_received: false
+	payment_received: false,
+	backcheck_status: "",
+	warning_status: "",
+	follow_up_status: "",
+	trial_reset_status: "",
+	overall_status: ""
 })
 
 type EditsRow = TrialsDataRow["value"] & {
@@ -76,6 +81,20 @@ class Trial extends Component<propTypes, S> {
 		this.props.getReferralsInfo()
 	}
 
+	markPaid = (id: string) => {
+
+		console.log("MARKINKG", this.state.edits)
+		this.setState({
+			edits: {
+				...this.state.edits,
+				[id]: {
+					...this.state.edits[id],
+					payment_received: true
+				}
+			}
+		})
+	}
+
 	componentWillReceiveProps(newProps: propTypes) {
 
 		const edits = newProps.trials.reduce((agg, { school_id, time, value }) => {
@@ -118,10 +137,10 @@ class Trial extends Component<propTypes, S> {
 
 	}
 	getSearchString = (school_id: string, value: EditsRow) => {
-		return `${school_id}${value.notes}${value.area_manager_name}${value.agent_name}${value.owner_phone}${value.city + value.office}${this.daysPassed(value.time) > 15 ? "ENDED-" + (this.daysPassed(value.time) - 15) : "NOT-ENDED"}`.toLowerCase()
+		return `${school_id}${value.notes}${value.area_manager_name}${value.agent_name}${value.owner_phone}${value.city + value.office}${this.daysPassed(value.time) > 15 ? "ENDED-" + (this.daysPassed(value.time) - 15) : "NOT-ENDED"}${value.payment_received ? "paid": ""}`.toLowerCase()
 	}
 
-	getStatusFilter = (time: number) => {
+	getStatusFilter = (time: number, paid: boolean) => {
 		const daysPassed = this.daysPassed(time)
 		const status = this.state.filters.status
 		if (status === "ENDED") {
@@ -129,6 +148,12 @@ class Trial extends Component<propTypes, S> {
 		}
 		else if (status === "NOT_ENDED") {
 			return daysPassed <= 15
+		}
+		else if (status === "PAID") {
+			return paid 
+		}
+		else if (status === "NOT_PAID") {
+			return !paid
 		}
 		else {
 			return true
@@ -161,7 +186,7 @@ class Trial extends Component<propTypes, S> {
 
 		const Items = Object.entries(edits)
 			.filter(([school_id, value]) => {
-				return this.getStatusFilter(value.time)
+				return this.getStatusFilter(value.time, value.payment_received)
 					&& this.getDaysPassedFliter(value.time)
 					&& this.getSearchString(school_id, value).includes(this.state.filters.filterText.toLowerCase())
 			})
@@ -182,6 +207,8 @@ class Trial extends Component<propTypes, S> {
 						<option value="ALL"> ALL</option>
 						<option value="ENDED">Ended</option>
 						<option value="NOT_ENDED">Not Ended</option>
+						<option value="PAID"> Paid</option>
+						<option value="NOT_PAID"> Not Paid</option>
 					</select>
 				</div>
 				<div className="row">
@@ -203,7 +230,11 @@ class Trial extends Component<propTypes, S> {
 						<div>Owner Phone</div>
 						<div>Notes</div>
 						<div>RefCode</div>
-						<div></div>
+						<div>Backcheck Status</div>
+						<div>Warning Status</div>
+						<div>Followup Status</div>
+						<div>Trial Reset Status</div>
+						<div>Overall Status</div>
 					</div>
 
 					{
@@ -213,7 +244,10 @@ class Trial extends Component<propTypes, S> {
 									<div className="serial">{index + 1}</div>
 									<div>{school_id}</div>
 									<div>{value.city}</div>
-									<div>{this.getStatus(value.time)}</div>
+									{!value.payment_received ? <div className="row">
+										<div>{this.getStatus(value.time)}</div>
+										<div className="button blue" onClick={() => this.markPaid(school_id)}>mark paid</div>
+									</div>: <div> Paid </div>}
 									<div>{value.area_manager_name || "-"}</div>
 									<div>{value.agent_name || "-"}</div>
 									<div>
@@ -224,6 +258,21 @@ class Trial extends Component<propTypes, S> {
 									</div>
 									<div>
 										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "ref_code"])} />
+									</div>
+									<div>
+										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "backcheck_status"])} />
+									</div>
+									<div>
+										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "warning_status"])} />
+									</div>
+									<div>
+										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "follow_up_status"])} />
+									</div>
+									<div>
+										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "trial_reset_status"])} />
+									</div>
+									<div>
+										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "overall_status"])} />
 									</div>
 									<div style={{ display: "flex", justifyContent: "center" }}>
 										<div className="button save" onClick={() => this.onSave(school_id)}> Save </div>

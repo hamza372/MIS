@@ -6,21 +6,26 @@ import { applyMiddleware, AnyAction, createStore, Store } from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk'
 
 import Routes from './routes'
-import Syncr from './syncr'
+import Syncr from '@cerp/syncr'
 import reducer from './reducers'
 
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
+import { connected, disconnected } from 'actions/core';
 
 //const debug_url = "wss://mis-socket.metal.fish"
 
-const debug_url = "3cfbb43e.ngrok.io"
+const debug_url = "5982b1ba.ngrok.io"
 
 //@ts-ignore
 const host = window.api_url || debug_url;
 
 const initial_state = loadDB()
-const syncr = new Syncr(`wss://${host}/ws`, msg => store.dispatch(msg))
+const syncr = new Syncr(`wss://${host}/ws`)
+//@ts-ignore
+syncr.on('connect', () => store.dispatch(connected()))
+syncr.on('disconnect', () => store.dispatch(disconnected()))
+syncr.on('message', (msg: any) => store.dispatch(msg))
 //@ts-ignore
 const store : Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
 

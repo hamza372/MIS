@@ -1,69 +1,48 @@
 import * as React from 'react'
 import { ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar } from 'recharts'
-
-import { getEndPointResource } from 'utils/getEndPointResource';
+import { getEndPointResource } from 'actions/index'
 import moment from 'moment';
+import { connect } from 'react-redux';
 
 interface P {
 	school_id: string
 	start_date: number
 	end_date: number
+	diary: RootReducerState["stats"]["diary"]
+	getEndPointResource: ( point: string, school_id: string, start_date: number, end_date: number ) => any
 }
 
-interface DataRow {
-	diary_usage: number
-	date: string
-}
-
-interface S {
-	data: DataRow[]
-}
+interface S {}
 
 class Diary extends React.Component<P, S> {
 
 	constructor(props: P) {
 		super(props);
 
-		this.state = {
-			data: []
-		}
+		this.state = {}
 	}
 
 	componentDidMount() {
 
 		const {school_id, start_date, end_date } = this.props
-
-		getEndPointResource("diary", school_id, start_date, end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		this.props.getEndPointResource("DIARY_DATA", school_id, start_date, end_date)
 	}
 
 	componentWillReceiveProps (newProps: P) {
 
-		const {school_id, start_date, end_date } = newProps
+		const { school_id, start_date, end_date } = newProps
 
-		getEndPointResource("diary", school_id, start_date, end_date)
-			.then(res => res.json())
-			.then(parsed => {
-				this.setState({
-					data: parsed.data
-				})
-			})
-			.catch(err => {
-				console.error(err)
-			})
+		if (this.props.school_id !== school_id ||
+			this.props.start_date !== start_date ||
+			this.props.end_date !== end_date
+		) {
+			this.props.getEndPointResource("DIARY_DATA", school_id, start_date, end_date)
+		}
 	}
 
 	render() {
 
-		const data = this.state.data
+		const data = this.props.diary && this.props.diary.data
 			.reduce((agg, { diary_usage, date }) => {
 				return [
 					...agg,
@@ -96,4 +75,8 @@ class Diary extends React.Component<P, S> {
 	}
 }
 
-export default Diary;
+export default connect(( state: RootReducerState) => ({
+	diary: state.stats.diary
+}), (dispatch: Function) => ({
+	getEndPointResource: (point: string, school_id: string, start_date: number, end_date: number) => dispatch(getEndPointResource(point, school_id, start_date, end_date))
+}))(Diary);
