@@ -27,42 +27,43 @@ interface RootReducerState {
 	connected: boolean
 	school_Info: {
 		school_list: string[]
-		trial_info: {
+		trial_info?: {
 			date: string
 			paid: boolean
 			trial_period: number
-		} | undefined
-		student_info: {
+		}
+		student_info?: {
 			max_limit: number
-		} | undefined
+		}
+		meta?: TrialsDataRow["value"]
 	},
 	trials: TrialsDataRow[]
 	stats: {
-		student_attendance: {
+		student_attendance?: {
 			data: StudentAttendanceData[]
 			total_students: number
-		} | undefined
-		teacher_attendance: {
+		}
+		teacher_attendance?: {
 			data: TeacherAttendanceData[]
 			total_teachers: number
-		} | undefined
-		fees: {
+		}
+		fees?: {
 			data: StudentFeesData[]
 			total_students: number
-		} | undefined
-		exams: {
+		}
+		exams?: {
 			data: StudentExamsData[]
 			total_students: number
-		} | undefined
-		expense: {
+		}
+		expense?: {
 			data: ExpenseData[]
-		} | undefined
-		sms: {
+		}
+		sms?: {
 			data: SmsData[]
-		} | undefined
-		diary: {
+		}
+		diary?: {
 			data: DiaryData[]
-		} | undefined
+		}
 	}
 }
 
@@ -70,6 +71,7 @@ interface SchoolInfoAction {
 	type: "SCHOOL_INFO",
 	trial_info: RootReducerState["school_Info"]["trial_info"]
 	student_info: RootReducerState["school_Info"]["student_info"]
+	meta: TrialsDataRow["value"]
 }
 
 interface StudentAttendanceAction {

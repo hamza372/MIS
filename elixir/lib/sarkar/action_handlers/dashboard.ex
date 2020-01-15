@@ -103,7 +103,21 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				)
 		end
 
-		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit }), state}
+		{:ok, meta} = case Postgrex.query(
+			Sarkar.School.DB,
+			"SELECT
+				value
+			FROM mischool_referrals
+			WHERE id=$1",
+			[school_id]
+		) do
+			{:ok, %Postgrex.Result{num_rows: 0}} -> {:ok, %{}}
+			{:ok, resp} -> 
+				[[ meta ]] = resp.rows
+				{:ok, meta}
+		end
+
+		{:reply, succeed(%{"trial_info" => trial_info, "student_info" => max_limit, "meta" => meta }), state}
 	end
 
 	def handle_action(
@@ -438,7 +452,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			{:ok, token, permissions} -> 
 				{:reply, succeed(%{ id: id, token: token, permissions: permissions }), %{ id: id, client_id: client_id}}
 			{:error, err} -> 
-				{:reply. fail(err), state}
+				{:reply, fail(err), state}
 		end
 	end
 

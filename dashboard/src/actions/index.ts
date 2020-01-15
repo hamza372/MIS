@@ -102,11 +102,12 @@ export const getSchoolInfo = (school_id: string) => (dispatch: Dispatch, getStat
 			school_id
 		}
 	})
-	.then((res: { trial_info: any, student_info: any }) => {
+	.then((res: { trial_info: any, student_info: any, meta: TrialsDataRow["value"] }) => {
 		dispatch({
 			type: SCHOOL_INFO,
 			trial_info: res.trial_info,
-			student_info: res.student_info
+			student_info: res.student_info,
+			meta: res.meta
 		})
 	})
 	.catch(err => {

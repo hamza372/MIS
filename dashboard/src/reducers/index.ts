@@ -65,7 +65,8 @@ const rootReducer = (state: RootReducerState, action : AnyAction) : RootReducerS
 				school_Info: {
 					...state.school_Info,
 					trial_info: (action as SchoolInfoAction).trial_info,
-					student_info: (action as SchoolInfoAction).student_info
+					student_info: (action as SchoolInfoAction).student_info,
+					meta: (action as SchoolInfoAction).meta
 				}
 			}
 		}

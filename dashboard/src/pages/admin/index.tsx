@@ -11,6 +11,7 @@ interface P {
 	schoolList: string[]
 	trial_info: RootReducerState["school_Info"]["trial_info"]
 	student_info: RootReducerState["school_Info"]["student_info"]
+	meta: RootReducerState["school_Info"]["meta"]
 	getSchoolList: () => any
 	updateSchoolInfo: (school_id: string, student_limit: number, paid: boolean, date: number) => any
 	getSchoolInfo: (school_id: string) => any
@@ -31,17 +32,6 @@ interface S {
 
 interface routeInfo {
 
-}
-
-interface ServerResp {
-	trial_info: {
-		trial_period: number
-		paid: boolean
-		date: number
-	}
-	student_info: {
-		max_limit: number
-	}
 }
 
 type propTypes = RouteComponentProps<routeInfo> & P
@@ -138,6 +128,7 @@ class AdminActions extends Component<propTypes, S> {
 
 		const student_info = this.props.student_info
 		const trial_info = this.props.trial_info
+		const meta = this.props.meta
 
 		const trial_period = (trial_info && trial_info.trial_period ) || 0
 		const paid = trial_info && trial_info.paid ? "true" : "false"
@@ -165,6 +156,27 @@ class AdminActions extends Component<propTypes, S> {
 			</div>
 
 			{this.state.infoMenu && <div className="section form" style={{ width: "75%" }}>
+				<div className="divider"> Field Info </div>
+				<div className="row">
+					<label> Field Manager</label>
+					<div>{ meta && meta.area_manager_name }</div>
+				</div>
+				<div className="row">
+					<label> Agent Name </label>
+					<div>{ meta && meta.agent_name }</div>
+				</div>
+				<div className="row">
+					<label> City</label>
+					<div>{ meta && meta.office }</div>
+				</div>
+				<div className="row">
+					<label> Strategy</label>
+					<div>{ meta && meta.type_of_login }</div>
+				</div>
+				<div className="row">
+					<label> Notes</label>
+					<div>{ meta && meta.notes }</div>
+				</div>
 				<div className="divider">School Info</div>
 				<div className="row">
 					<label>Trial Start Date</label>
@@ -225,7 +237,8 @@ class AdminActions extends Component<propTypes, S> {
 export default connect((state: RootReducerState) => ({
 	schoolList: state.school_Info.school_list,
 	trial_info: state.school_Info.trial_info,
-	student_info: state.school_Info.student_info
+	student_info: state.school_Info.student_info,
+	meta: state.school_Info.meta
 }), (dispatch: Function) => ({
 	getSchoolList: () => dispatch(getSchoolList()),
 	getSchoolInfo: (school_id: string) => dispatch(getSchoolInfo(school_id)),
