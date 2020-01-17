@@ -93,9 +93,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "owner_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -103,9 +108,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "owner_easypaisa_number"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
