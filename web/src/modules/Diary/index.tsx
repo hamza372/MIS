@@ -283,7 +283,7 @@ class Diary extends Component <propTypes,S> {
 
 		const { selected_section_id, diary } = this.state
 
-		return  Object.entries(diary[selected_section_id])
+		return  Object.entries(diary[selected_section_id] || {})
 			.reduce((agg, [subject, { homework }]) => {
 				return {
 					...agg,
