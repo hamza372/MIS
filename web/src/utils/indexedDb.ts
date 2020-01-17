@@ -14,11 +14,13 @@ export const initState: RootReducerState = {
 	client_id: localStorage.getItem("client_id") || v4(),
 	queued: {
 		mutations: {},
-		analytics: {}
+		analytics: {},
+		images: {}
 	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	initialized: false,
+	processing_images: false,
 	db: {
 		faculty: {},
 		users: {},
@@ -142,7 +144,8 @@ export const loadDb = async () => {
 				succeed: false,
 				reason: ""
 			},
-			initialized: true
+			initialized: true,
+			processing_images: false
 		}
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {

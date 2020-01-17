@@ -53,20 +53,22 @@ defmodule Sarkar.ActionHandler.Mis do
 		{:reply, succeed(), state}
 	end
 
-	def handle_action(
-		%{
-			"type" => "SYNC",
-			"payload" => %{"analytics" => analytics, "mutations" => mutations },
-			"lastSnapshot" => last_sync_date
-		},
-		%{
-			school_id: school_id,
-			client_id: client_id
-		} = state
-	) do
+	def handle_action(%{ "type" => "SYNC", "payload" => %{"analytics" => analytics, "mutations" => mutations} = payload, "lastSnapshot" => last_sync_date }, %{ school_id: school_id, client_id: client_id } = state) do
+
+		# handle image uploads
+		# actually images may need to be handled differently
+		# we need to add a "processing" state in the image queue. 
+		# because we really don't want to upload an image twice under any circumstance
+		# and currently we'll upload it per navigation event because of our queueing
+
+		# best is to take images out of the queue entirely and handle separately.
+
+		image_merges = Map.get(payload, "images")
 
 		mutation_res = Sarkar.School.sync_changes(school_id, client_id, mutations, last_sync_date)
 		analytics_res = Sarkar.Analytics.record(school_id, client_id, analytics, last_sync_date)
+		# images_res = Sarkar.School.upload_images(school_id, client_id, image_merges, last_sync_date)
+		# this will instantly return an "ok" if everything is in the right shape, and then spawn a process which actually uploads
 
 		res = %{
 			"mutations" => mutation_res,

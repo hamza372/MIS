@@ -66,6 +66,61 @@ defmodule Sarkar.School do
 		GenServer.call(via(school_id), {:get_db})
 	end
 
+	def upload_images(school_id, client_id, image_merges, last_sync_date) do
+		# here, a school could have been offline the entire time and is sending hundreds of images
+		# we ask the images pool to upload the images. as each image completes, we want to issue the sync
+		# and also fire the event back to the original client telling them that the image is finished processing
+
+		# step one, image worker
+
+		image_merges
+		|> Enum.map(fn merge ->
+			Task.async(fn -> 
+				:poolboy.transaction(
+					:image_worker,
+					fn pid -> 
+						url = GenServer.call(pid, {:upload_image, merge}) 
+						{merge, url}
+					end
+				)
+			end)
+		end)
+		|> Enum.each(fn task ->
+
+			{merge, url} = Task.await(task)
+			# then we call sync_changes using the info in the merge + url
+			%{"id" => id, "path" => path} = merge
+
+			value = %{
+				"id" => id,
+				"url" => url
+			}
+
+			prepared = prepare_changes([%{
+				"type" => "MERGE",
+				"path" => path,
+				"value" => value
+			}])
+
+			# broadcasts the update to all other clients - but we wont send the result back direct to the client here
+			reply = sync_changes(school_id, client_id, prepared, last_sync_date)
+
+			# this action lets the client know that the image has been uploaded, and gives
+			# enough info for the client to take it out of the queue, and update its state with the new value (now, not an image string)
+
+			Registry.lookup(Sarkar.ConnectionRegistry, school_id)
+			|> Enum.filter(fn {pid, cid}-> cid == client_id end)
+			|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, %{
+				"type" => "IMAGE_UPLOAD_CONFIRM",
+				"id" => id,
+				"path" => path,
+				"value" => value
+			}}) end)
+
+		end)
+
+end
+
 	def broadcast_all_schools() do
 		{:ok, school_ids} = Sarkar.Store.School.get_school_ids()
 
