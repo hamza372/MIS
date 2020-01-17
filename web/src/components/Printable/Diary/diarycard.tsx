@@ -18,7 +18,7 @@ const DiaryCard = (props: PropsType) => {
 
     return(<div className="printable-diary">
             <fieldset>
-                <legend>{props.schoolName} Diary - {props.diaryDate}</legend>
+                <legend>{props.schoolName} | {props.sectionName} Diary - {props.diaryDate}</legend>
                 <div className="print-table">
                     <table>
                         <thead>

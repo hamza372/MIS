@@ -14,14 +14,12 @@ interface Diary {
 
 const DiaryPrintable = (props: PropsType) => {
 
-
     return(<div className="print-only" style={{width: "95%", marginTop: 10}}>
             <DiaryCard {...props} />
             <DiaryCard {...props} />
             <DiaryCard {...props} />
             <DiaryCard {...props} />
-        </div>
-        );
+        </div>);
 }
 
 export default DiaryPrintable

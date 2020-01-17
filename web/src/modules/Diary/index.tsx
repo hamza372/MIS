@@ -18,7 +18,6 @@ interface P {
 	students: RootDBState["students"];
 	classes: RootDBState["classes"];
 	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
 	faculty_id: string;
 	diary: RootDBState["diary"];
 
@@ -295,7 +294,7 @@ class Diary extends Component <propTypes,S> {
 	}
 
 	render() {
-		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
+		const { classes, sendBatchMessages, settings } = this.props;
 		
 		// ascending order of classes/sections
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
@@ -418,8 +417,7 @@ export default connect((state: RootReducerState) => ({
 	diary: state.db.diary,
 	students: state.db.students,
 	classes: state.db.classes,
-	settings: state.db.settings,	
-	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
+	settings: state.db.settings
 }), (dispatch: Function) => ({
 	sendMessage : (text: string, number: string) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages)),
