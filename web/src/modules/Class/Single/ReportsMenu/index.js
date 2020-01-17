@@ -48,7 +48,7 @@ class ClassReportMenu extends Component {
 
 	render() {
 
-		const { students, exams, classes, settings, sms_templates, curr_section_id, curr_class_id } = this.props
+		const { students, exams, classes, settings, sms_templates, curr_section_id, curr_class_id, grades } = this.props
 
 		const curr_section = getSectionsFromClasses(classes).filter( section  => section.id === curr_section_id)[0]
 
@@ -107,14 +107,15 @@ class ClassReportMenu extends Component {
 				}
 
 				const grade = calculateGrade(temp_marks.obtained, temp_marks.total, this.props.grades)
-				const remarks = grade && this.props.grades[grade] ? this.props.grades[grade].remarks : ""
+				const remarks = grade && grades && grades[grade] ? grades[grade].remarks : ""
 
 				return [
 					...agg,
 					{
 						id: curr.id,
 						name: curr.Name,
-						roll: curr.RollNumber ? curr.RollNumber : "",
+						rollNo: curr.RollNumber ? curr.RollNumber : "",
+						manName: curr.manName,
 						marks: temp_marks,
 						position: 0,
 						exams: new_exams,

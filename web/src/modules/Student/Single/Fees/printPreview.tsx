@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import qs from 'querystring'
+import queryString from 'query-string'
 import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
 import { getFilteredPayments } from 'utils/getFilteredPayments'
 import { StudentLedgerPage } from './StudentLedgerPage';
@@ -24,8 +24,8 @@ type propTypes = RouteComponentProps<RouteInfo> & P
 
 class printPreview extends Component <propTypes>{
 
-	month = (): string => qs.parse(this.props.location.search)["?month"].toString() || ""
-	year = (): string => qs.parse(this.props.location.search)["year"].toString() || ""
+	month = (): string => queryString.parse(this.props.location.search).month.toString() || ""
+	year = (): string => queryString.parse(this.props.location.search).year.toString() || ""
 
 	studentID = (): string =>  this.props.match.params.id
 	

@@ -33,3 +33,7 @@
 	.subject.row>*:last-child, .student.row>*:last-child {
 		margin-left: auto;
 	}
+
+	.single-class .default-fee {
+		margin-top: 20px;
+	}

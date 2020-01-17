@@ -105,8 +105,9 @@ export const loadDB = () : RootReducerState => {
 		connected: false,
 		sync_state: loadSyncState(),
 		school_Info: {
-			school_list: [""]
+			school_list: [],
 		},
-		trials: []
+		trials: [],
+		stats: {}
 	}
 }

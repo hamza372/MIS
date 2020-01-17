@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { RouteComponentProps } from 'react-router';
 
 import { createTemplateMerges } from 'actions'
 import { mergeSettings, addLogo } from 'actions'
@@ -12,6 +13,41 @@ import { openDB } from 'idb'
 //import newBadge from "Landing/icons/New/new.svg";
 
 import './style.css'
+interface P {
+	settings: RootDBState["settings"],
+	students: RootDBState["students"], 
+	user: RootDBState["faculty"]["MISTeacher"], 
+	sms_templates: RootDBState["sms_templates"]
+	schoolLogo: string,
+	max_limit: number
+
+	saveTemplates: (templates: RootDBState["sms_templates"]) => void
+	saveSettings: (settings: RootDBState["settings"]) => void,
+	addLogo: (logo_string: string) => void
+}
+interface S {
+	templates: RootDBState["sms_templates"]
+	settings: RootDBState["settings"]
+	templateMenu: boolean
+	permissionMenu: boolean
+	gradeMenu: boolean
+	banner: {
+		active: boolean
+		good?: boolean
+		text?: string
+	},
+	client_id : string
+	schoolLogo: string
+	addGrade: boolean
+	newGrade: NewGrade
+}
+interface NewGrade {
+	grade: string
+	percent: string
+	remarks: string
+}
+
+type propsType = RouteComponentProps & P
 
 export const defaultPermissions = {
 	fee:  { teacher: true },
@@ -73,12 +109,15 @@ const defaultSettings = {
 	sendSMSOption: "SIM", // API
 	permissions: defaultPermissions,
 	devices: {},
-	exams: defaultExams	
+	exams: defaultExams,
+	classes: {
+		defaultFee: {}
+	} 
 }
-
-class Settings extends Component {
-
-	constructor(props){ 
+class Settings extends Component <propsType, S>{
+	
+	former: Former
+	constructor(props: propsType){ 
 		super(props);
 
 		const aggGrades = this.reconstructGradesObject()
@@ -98,8 +137,11 @@ class Settings extends Component {
 				grades: {
 					...aggGrades
 				}
+			},
+			classes: {
+				...(props.settings || defaultSettings).classes
 			}
-		}
+		} as RootDBState["settings"]
 
 		this.state = {
 			templates: this.props.sms_templates,
@@ -163,43 +205,43 @@ class Settings extends Component {
 			<div className="row">
 				<label> Allow teacher to view Fee Information ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
-							<option value={true}>Yes</option>
-							<option value={false}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Daily Statistics ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "dailyStats","teacher"])}>
-							<option value={true}>Yes</option>
-							<option value={false}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Setup Page ? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "setupPage","teacher"])}>
-							<option value={true}>Yes</option>
-							<option value={false}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Expense Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
-					<option value={true}>Yes</option>
-					<option value={false}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Family Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "family","teacher"])}>
-					<option value={true}>Yes</option>
-					<option value={false}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Prospective Information? </label>
 				<select {...this.former.super_handle(["settings", "permissions", "prospective","teacher"])}>
-					<option value={true}>Yes</option>
-					<option value={false}>No</option>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
 				</select>
 			</div>
 		</div>
@@ -334,7 +376,7 @@ class Settings extends Component {
 			}
 		})
 	}
-	removeGrade = (x) => {
+	removeGrade = (x: string) => {
 
 		const { grades } = this.state.settings.exams
 
@@ -368,13 +410,8 @@ class Settings extends Component {
 			}
 		})
 
-		setTimeout(() => {
-			this.setState({
-				banner: {
-					active: false
-				}
-			})
-		}, 2000);
+		setTimeout(() => this.setState({ banner: { active: false } }), 2000);
+
 	}
 	onLogoRemove = () => {
 		this.setState({
@@ -389,29 +426,24 @@ class Settings extends Component {
 			}
 		})
 
-		setTimeout(() => {
-			this.setState({
-				banner: {
-					active: false
-				}
-			})
-		}, 1000);
+		setTimeout(() => this.setState({ banner: { active: false } }), 2000);
+
 	}
 
-	logoHandler = (e) => {
+	logoHandler = (e: any) => {
 
 		const file = e.target.files[0];
 		const reader = new FileReader();
 		
 		reader.onloadend = () => {
 			this.setState({
-				schoolLogo: reader.result
+				schoolLogo: reader.result as string
 			})
 		}
 		reader.readAsDataURL(file);
 	}
 
-	componentWillReceiveProps(nextProps) {
+	componentWillReceiveProps(nextProps: propsType) {
 		console.log(nextProps)
 
 		const settings = {
@@ -421,7 +453,7 @@ class Settings extends Component {
 				...(nextProps.settings || defaultSettings).permissions
 			},
 			devices: (nextProps.settings ? (nextProps.settings.devices || {}) : {})
-		}
+		} as RootDBState["settings"]
 
 		this.setState({
 			settings
@@ -476,6 +508,9 @@ class Settings extends Component {
         .filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
 		).length
 		
+		//@ts-ignore
+		const mis_version = window.version || "no version set"
+	
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
 			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
@@ -553,8 +588,8 @@ class Settings extends Component {
 					<div className="row">
 						<label>Data Sharing</label>
 						<select {...this.former.super_handle(["settings", "shareData"])}>
-							<option value={true}>Yes</option>
-							<option value={false}>No</option>
+							<option value="true">Yes</option>
+							<option value="false">No</option>
 						</select>
 					</div>
 
@@ -565,7 +600,7 @@ class Settings extends Component {
 
 					<div className="row">
 						<label>MISchool Version</label>
-						<label>{window.version || "no version set"}</label>
+						<label>{mis_version}</label>
 					</div>
 
 					<div className="row">
@@ -605,7 +640,8 @@ class Settings extends Component {
 					{
 						this.state.gradeMenu && this.gradeMenu()
 					}
-					
+
+					<Link className="button grey" to="settings/class">Class Settings</Link>
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
 					<Link className="button grey" to="/settings/excel-import/students">Import From Excel</Link>
@@ -624,8 +660,7 @@ class Settings extends Component {
 	}
 }
 
-export default connect(
-	state => ({ 
+export default connect((state: RootReducerState) => ({ 
 		settings: state.db.settings,
 		students: state.db.students, 
 		user: state.db.faculty[state.auth.faculty_id], 
@@ -633,8 +668,8 @@ export default connect(
 		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 		max_limit: state.db.max_limit || -1
 	}), 
-	dispatch => ({
-		saveTemplates: templates => dispatch(createTemplateMerges(templates)),
-		saveSettings: settings => dispatch(mergeSettings(settings)),
-		addLogo: logo_string => dispatch(addLogo(logo_string))
+	(dispatch: Function) => ({
+		saveTemplates: (templates: RootDBState["sms_templates"]) => dispatch(createTemplateMerges(templates)),
+		saveSettings: (settings: RootDBState["settings"]) => dispatch(mergeSettings(settings)),
+		addLogo: (logo_string: string) => dispatch(addLogo(logo_string))
 }))(Settings);

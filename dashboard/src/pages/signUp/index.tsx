@@ -78,9 +78,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value","school_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -88,9 +93,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "owner_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -98,9 +108,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "owner_easypaisa_number"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "SCHOOL_REFERRAL"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -121,9 +136,14 @@ class SignUp extends Component <propTypes, S> {
 				path:["value", "agent_name"],
 				value: "",
 				depends: [
+					"OR",
 					{
 						path: ["value", "type_of_login"],
 						value: "AGENT"
+					},
+					{
+						path: ["value", "type_of_login"],
+						value: "AGENT_SCHOOL"
 					}
 				]
 			},
@@ -228,6 +248,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="FAROOQ">Farooq</option>
 						<option value="KAMRAN">Kamran</option>
 						<option value="NOMAN">Noman</option>
+						<option value="ALI_ZOHAIB"> Ali Zohaib</option>
 					</select>
 				</div>
 				<div className="row">
@@ -241,11 +262,13 @@ class SignUp extends Component <propTypes, S> {
 						<option value="FAISALABAD">Faisalabad</option>
 						<option value="ISLAMABAD">Islamabad</option>
 						<option value="RAWALPINDI">Rawalpindi</option>
+						<option value="KASUR"> Kasur</option>
+						<option value="SHEIKHUPURA"> Sheikhupura</option>
 					</select>
 				</div>
 
 				<div className="row">
-					<label>City</label>
+					<label>City/Area</label>
 					<input type="text" {...this.former.super_handle(["value","city"])} placeholder="city"/>
 				</div>
 
@@ -259,7 +282,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="EDFIN">EdFin</option>
 						<option value="SCHOOL_REFERRAL">School Referrals</option>
 						<option value="INDIVIDUAL">Individual </option>
-						<option value="PLATFORM">Platform</option>
+						<option value="ILM_EXCHANGE">Ilm Exchange</option>
 					</select>
 				</div>
 			</div>

@@ -176,7 +176,7 @@ export const StudentMarks = ({student, exams, settings, startDate=0, endDate=mom
 			return remarks
 		}
 
-		return grade && grades[grade] ? grades[grade].remarks : ""
+		return grade && grades && grades[grade] ? grades[grade].remarks : ""
 	}
 
 	const { schoolSession } = settings

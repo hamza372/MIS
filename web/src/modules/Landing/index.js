@@ -24,7 +24,7 @@ import prospective from './icons/Prospective/prospective.svg'
 import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
 import expense from './icons/Expense/expense.svg'
-import newBadge from "./icons/New/new.svg";
+// import newBadge from "./icons/New/new.svg";
 import family from "./icons/family/family.svg"
 
 import Help from './icons/Help/help.svg'
@@ -395,7 +395,7 @@ class Landing extends Component {
 
 							<Link
 								className="box no-underline bg-green"
-								to = {this.getDailyStatsRoute('fees')}>
+								to = '/analytics/daily-stats?type=paid_students'>
 								<div>{today_payment_students}</div>
 								<div>Students</div>
 							</Link>

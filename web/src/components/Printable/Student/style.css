@@ -1,0 +1,76 @@
+/* standard credit card size */
+/* https://helpdesk.rs2tech.com/kb/article/317-id-card-sizes/ */
+.student-card {
+    background-color: white;
+    border-radius: 5px;
+    border: 2px solid;
+    width: 85.6mm;
+    height: 54mm;
+}
+.card-school-title {
+    padding: 5px;
+    margin: 0px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    white-space: normal;
+    word-break: normal;
+}
+.card-school-logo {
+    border-radius: 2px;
+    width: 64px;
+    height: 64px;
+}
+.card-school-info {
+    padding: 5px 5px;
+    padding-bottom: 0px;
+}
+.card-student-profile {
+    width: 100px;
+    height: 100px;
+    border: 0.5px solid;
+}
+.card-student-info {
+    padding: 5px;
+    padding-top: 0px;
+    white-space: normal;
+    word-break: normal;
+}
+.card-student-info div {
+    font-weight: bold;
+    padding: 2px;
+    margin: 0px;
+}
+.card-student-info span {
+    font-weight: normal;
+}
+.card-signature {
+    border-top: 1px solid;
+    font-size: 0.7rem;
+    width: fit-content;
+}
+.card-valid-date {
+    font-size: 0.8rem;
+    text-align: right;
+    font-weight: bold;
+}
+.card-row {
+    display: flex;
+}
+.student-card .card-row.first {
+    padding: 2px 5px;
+}
+.student-card .card-row.last {
+    padding: 0px 5px;
+    margin-top: 10px;
+}
+.card-column {
+    flex: 1;
+}
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    grid-gap: 20px;
+}
+.student-id-card.print-table table {
+    margin-bottom: 3.6cm;
+}

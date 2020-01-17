@@ -37,10 +37,16 @@
     }
     /* outstanding fee css rules*/
     .row-sr {
-        width: 10%;
+        width: 8%;
     }
     .row-roll {
-        width: 14%;
+        width: 8%;
+    }
+    .row-adm {
+        width: 8%;
+    }
+    .row-adm-date, .row-dob {
+        width: 10%
     }
     .row-amount {
         width: 16%;
@@ -49,10 +55,10 @@
         width: 16%;
     }
     .row-phone {
-        width: 20%
+        width: 12%
     }
-    .row-name {
-        width: 24%;
+    .row-name, .row-fname {
+        width: 18%;
     }
     /* expense module css rules*/
     .row-quantity {
@@ -85,14 +91,21 @@
         width: 98% !important;
         margin: auto;
     }
+    /* paid student list*/
+    .row-famid {
+        width: 10%;
+    }
+    .row-amount-paid, .row-amount-balance {
+        width: 10%;
+    }
 }
 
 /* print preview result sheet rules*/
 .row-marks {
-    width: 10%;
+    width: 7%;
 }
 .row-grade {
-    width: 5%;
+    width: 4%;
 }
 .outer-space .result-sheet {
     font-size: .65em;
