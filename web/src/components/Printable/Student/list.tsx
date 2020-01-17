@@ -39,8 +39,8 @@ export const StudentPrintableList = (props: PropsTypes) => {
                             <td className="cell-center">{i + props.chunkSize + 1}</td>
                             <td>{student.Name}</td>
                             <td>{student.ManName}</td>
-                            <td className="cell-center">{student.Birthdate ? moment(student.Birthdate).format("DD-MM-YYYYY") : '-'}</td>
-                            <td className="cell-center">{student.StartDate ? moment(student.StartDate).format("DD-MM-YYYYY") : '-'}</td>
+                            <td className="cell-center">{student.Birthdate ? moment(student.Birthdate).format("DD-MM-YYYY") : '-'}</td>
+                            <td className="cell-center">{student.StartDate ? moment(student.StartDate).format("DD-MM-YYYY") : '-'}</td>
                             <td className="cell-center">{student.AdmissionNumber}</td>
                             <td className="cell-center">{student.RollNumber}</td>
                             <td className="cell-center">{student.Phone}</td>

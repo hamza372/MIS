@@ -47,7 +47,7 @@ const AdmissionForm = (props: PropsType) => {
                 </div>
                 <div className="row">
                     <label>Date of Birth:</label>
-                    <div>{student.Birthdate !== "" ? moment(student.Birthdate).format("DD, MMMM YYYY") : ""}</div>
+                    <div>{student.Birthdate ? moment(student.Birthdate).format("DD, MMMM YYYY") : ""}</div>
                 </div>
                 <div className="row" style={{marginBottom: "2.5mm"}}>
                     <label>Gender:</label>
@@ -92,7 +92,7 @@ const AdmissionForm = (props: PropsType) => {
                 <legend>For Office Use Only</legend>
                 <div className="row" style={{marginTop: "5mm"}}>
                     <label>Admission Date:</label>
-                    <div>{moment(student.StartDate).format("DD, MMMM YYYY")}</div>
+                    <div>{student.StartDate ? moment(student.StartDate).format("DD, MMMM YYYY") : ""}</div>
                 </div>
                 <div className="row">
                     <label>Admission No:</label>
