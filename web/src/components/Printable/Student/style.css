@@ -12,6 +12,8 @@
     margin: 0px;
     font-weight: bold;
     font-size: 1.2rem;
+    white-space: normal;
+    word-break: normal;
 }
 .card-school-logo {
     border-radius: 2px;
@@ -30,6 +32,8 @@
 .card-student-info {
     padding: 5px;
     padding-top: 0px;
+    white-space: normal;
+    word-break: normal;
 }
 .card-student-info div {
     font-weight: bold;
