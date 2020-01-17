@@ -123,6 +123,10 @@ interface MISSettings {
 	schoolName: string
 	schoolAddress: string
 	schoolPhoneNumber: string
+	schoolSession: {
+		start_date: number
+		end_date: number
+	}
 	schoolCode: string
 	vouchersPerPage: string
 	sendSMSOption: "SIM" | "API"
