@@ -11,6 +11,7 @@ import reducer from './reducers'
 
 import Routes from './routes'
 import { saveDb, initState } from './utils/indexedDb'
+import debounce from 'utils/debounce'
 import { loadDB, connected, disconnected } from './actions/core'
 import Syncr from '@cerp/syncr'
 
@@ -32,10 +33,10 @@ const store = createStore(reducer, initialState, applyMiddleware(thunkMiddleware
 
 store.dispatch(loadDB())
 
-store.subscribe(() => {
+store.subscribe(debounce(() => {
 	const state = store.getState();
 	saveDb(state);
-})
+}, 1000))
 
 ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 registerServiceWorker();

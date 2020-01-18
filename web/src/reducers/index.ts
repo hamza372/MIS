@@ -1,4 +1,4 @@
-import Dynamic from '@ironbay/dynamic'
+import Dynamic from '@cerp/dynamic'
 import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
 import { AnyAction } from 'redux'
@@ -69,9 +69,9 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 
 		case MERGES:
 			{
-				const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
-					return Dynamic.put(agg, curr.path, curr.value)
-				}, JSON.parse(JSON.stringify(state)))
+				const nextState = (action as MergeAction).merges.reduce<RootReducerState>((agg, curr) => {
+					return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+				}, state)
 
 				// we shouldn't accept snapshots until we get a confirm....
 
@@ -84,12 +84,12 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 		case DELETES:
 			{
 
-				const state_copy = JSON.parse(JSON.stringify(state)) as RootReducerState;
+				//const state_copy = JSON.parse(JSON.stringify(state)) as RootReducerState;
 
-				(action as DeletesAction).paths.forEach(a => Dynamic.delete(state_copy, a.path));
+				const nextState = (action as DeletesAction).paths.reduce<RootReducerState>((agg, curr) => Dynamic.delete(agg, curr.path) as RootReducerState, state);
 
 				return {
-					...state_copy,
+					...nextState,
 					acceptSnapshot: false
 				}
 			}
@@ -151,10 +151,10 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					const nextState = Object.values(diff_action.new_writes)
 						.reduce((agg, curr) => {
 							if (curr.type === "DELETE") {
-								return Dynamic.delete(agg, curr.path)
+								return Dynamic.delete(agg, curr.path) as RootReducerState
 							}
-							return Dynamic.put(agg, curr.path, curr.value)
-						}, JSON.parse(JSON.stringify(state)))
+							return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+						}, state)
 
 					return {
 						...nextState,
@@ -185,12 +185,12 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				if (Object.keys(snapshot.new_writes).length > 0) {
 
 					const nextState = Object.values(snapshot.new_writes)
-						.reduce((agg, curr) => {
+						.reduce<RootReducerState>((agg, curr) => {
 							if (curr.type === "DELETE") {
-								return Dynamic.delete(agg, curr.path);
+								return Dynamic.delete(agg, curr.path) as RootReducerState;
 							}
-							return Dynamic.put(agg, curr.path, curr.value)
-						}, JSON.parse(JSON.stringify(state)))
+							return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+						}, state)
 
 					return {
 						...nextState,

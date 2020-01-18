@@ -1,4 +1,4 @@
-import Dynamic from '@ironbay/dynamic'
+import Dynamic from '@cerp/dynamic'
 import moment from 'moment'
 
 export default class Former {
@@ -13,12 +13,12 @@ export default class Former {
 
 	}
 
-	handle(path: Array<string>, validate = (x: any) => true, cb = () => {}) {
+	handle(path: Array<string>, validate = (x: any) => true, cb = () => { }) {
 
 		return (e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = this._getValue(e);
 			const full_path = [...this.base_path, ...path]
-			if(validate(value)) {
+			if (validate(value)) {
 				this._component.setState((state: any) => Dynamic.put(state, full_path, value), cb);
 			}
 		}
@@ -26,11 +26,11 @@ export default class Former {
 
 	super_handle(path: Array<string>, validate = (x: any) => true, cb = () => { }) {
 		const full_path = [...this.base_path, ...path];
-		
+
 		return {
 			onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
 				const value = this._getValue(e);
-				if(validate(value)) {
+				if (validate(value)) {
 					this._component.setState((state: any) => Dynamic.put(state, full_path, value), cb)
 				}
 			},
@@ -43,17 +43,17 @@ export default class Former {
 		const default_args = {
 			validate: (val: any) => true,
 			cb: () => { },
-			styles: (val: any) => ({ })
+			styles: (val: any) => ({})
 		}
 
-		const { validate, cb, styles } = {...default_args, ...args}
+		const { validate, cb, styles } = { ...default_args, ...args }
 		const full_path = [...this.base_path, ...path]
 
 
 		return {
 			onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
 				const value = this._getValue(e)
-				if(validate(value)) {
+				if (validate(value)) {
 					this._component.setState((state: any) => Dynamic.put(state, full_path, value), cb)
 				}
 			},
@@ -65,21 +65,21 @@ export default class Former {
 
 	_getValue(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
 
-		if(isChecked(event)) {
+		if (isChecked(event)) {
 			return event.target.checked;
 		}
 
-		if(event.target.type === "date") {
+		if (event.target.type === "date") {
 			return moment(event.target.value, "YYYY-MM-DD").unix() * 1000;
 		}
 
-		let val: string|boolean = event.target.value;
+		let val: string | boolean = event.target.value;
 
-		if(val === "true") {
+		if (val === "true") {
 			val = true
 		}
 
-		if(val === "false") {
+		if (val === "false") {
 			val = false;
 		}
 
