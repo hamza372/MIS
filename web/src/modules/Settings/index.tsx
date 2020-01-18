@@ -124,9 +124,7 @@ class Settings extends Component <propsType, S>{
 
 		const settings = {
 			...(props.settings || defaultSettings),
-			schoolSession: {
-				...(props.settings.schoolSession || defaultSettings.schoolSession)
-			},
+			schoolSession: props.settings ? (props.settings.schoolSession || defaultSettings.schoolSession) : defaultSettings.schoolSession,
 			permissions: {
 				...defaultPermissions,
 				...(props.settings || defaultSettings).permissions
@@ -138,9 +136,7 @@ class Settings extends Component <propsType, S>{
 					...aggGrades
 				}
 			},
-			classes: {
-				...(props.settings || defaultSettings).classes
-			}
+			classes: props.settings ? (props.settings.classes || defaultSettings.classes) : defaultSettings.classes
 		} as RootDBState["settings"]
 
 		this.state = {
