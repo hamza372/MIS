@@ -2,19 +2,54 @@ import React, { Component } from 'react'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import Former from 'utils/former'
-import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { smsIntentLink } from 'utils/intent'
+import { RouteComponentProps } from 'react-router'
 import { logSms } from 'actions'
-import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
 import chunkify from 'utils/chunkify'
+import calculateGrade from 'utils/calculateGrade'
+import { getSectionsFromClasses } from 'utils/getSectionsFromClasses'
+import { StudentMarks, reportStringForStudent } from 'modules/Student/Single/Marks'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 
 import './style.css'
-import calculateGrade from 'utils/calculateGrade'
 
-class ClassReportMenu extends Component {
+type PropsType = {
+	curr_class_id: string,
+	curr_section_id: string,
+	faculty_id: string,
+	classes: RootDBState["classes"],
+	students: RootDBState["students"],
+	settings: RootDBState["settings"],
+	exams: RootDBState["exams"],
+	grades: RootDBState["settings"]["exams"]["grades"],
+	schoolLogo: string
+	sms_templates: RootDBState["sms_templates"]
 
-	constructor(props) {
+	logSms: (history: MISSMSHistory) => any
+
+} & RouteComponentProps<RouteInfo>
+
+interface S {
+	report_filters: {
+		start: number
+		end: number
+		exam_name: string
+		examFilterText: string
+		subjectFilterText: string
+		dateOrSerial: string
+		printable_type: string
+	}
+}
+
+interface RouteInfo {
+	class_id: string
+	section_id: string
+}
+
+class ClassReportMenu extends Component<PropsType, S> {
+
+	former: Former
+	constructor(props: PropsType) {
 		super(props);
 
 		this.state = {
@@ -28,10 +63,10 @@ class ClassReportMenu extends Component {
 				printable_type: "Class Result Cards"
 			}
 		}
-		this.report_former = new Former(this, ["report_filters"])
+		this.former = new Former(this, ["report_filters"])
 	}
 
-	logSms = (messages) => {
+	logSms = (messages: MISSms[]) => {
 		if (messages.length === 0) {
 			console.log("No Message to Log")
 			return
@@ -46,33 +81,43 @@ class ClassReportMenu extends Component {
 		this.props.logSms(historyObj)
 	}
 
+	getSectionIdFromParams = (): string => {
+		return this.props.match.params.section_id
+	}
+
+	getClassIdFromParams = (): string => {
+		return this.props.match.params.class_id
+	}
+
 	render() {
 
-		const { students, exams, classes, settings, sms_templates, curr_section_id, curr_class_id, grades } = this.props
+		const { students, exams, classes, settings, sms_templates, grades } = this.props
+		const section_id = this.getSectionIdFromParams()
+		const class_id = this.getClassIdFromParams()
 
-		const curr_section = getSectionsFromClasses(classes).filter( section  => section.id === curr_section_id)[0]
+		const curr_section = getSectionsFromClasses(classes).filter(section => section.id === section_id)[0]
 
 		// no. of records per chunk
 		const chunkSize = 22;
 		const start = moment(this.state.report_filters.start);
-		const end = moment(this.state.report_filters.end);	
+		const end = moment(this.state.report_filters.end);
 
 		const relevant_students = Object.values(students)
-			.filter(s => s.Name && s.exams && s.section_id !== undefined && s.section_id === curr_section_id)
-			.sort((a, b) => (a.RollNumber || 0) - (b.RollNumber || 0))
-		
+			.filter((s: MISStudent) => s.Name && s.exams && s.section_id !== undefined && s.section_id === section_id)
+			.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
+
 		const relevant_exams = Object.values(exams)
-			.filter(e => e.class_id === curr_class_id &&
+			.filter(e => e.class_id === class_id &&
 				e.section_id !== undefined &&
-				e.section_id === curr_section_id)
-		
-		const examSubjectsWithMarks = new Set()
-		const examSet = new Set()
-		const subjects = new Set()
-		
+				e.section_id === section_id)
+
+		const examSubjectsWithMarks = new Set<string>()
+		const examSet = new Set<string>()
+		const subjects = new Set<string>()
+
 		for (const e of relevant_exams) {
 			// show only subjects and marks for selected exam else all subjects
-			if((this.state.report_filters.examFilterText !== "" ? e.name === this.state.report_filters.examFilterText : true) && moment(e.date).isBetween(start, end)) {
+			if ((this.state.report_filters.examFilterText !== "" ? e.name === this.state.report_filters.examFilterText : true) && moment(e.date).isBetween(start, end)) {
 				examSubjectsWithMarks.add(`${e.subject} ( ${e.total_score} )`)
 				subjects.add(e.subject)
 			}
@@ -82,10 +127,10 @@ class ClassReportMenu extends Component {
 
 		// sorted marks sheet
 		const marksSheet = relevant_students
-			.reduce((agg, curr) => { 
+			.reduce((agg, curr) => {
 
 				let new_exams = []
-				let temp_marks = { total: 0, obtained: 0}
+				let temp_marks = { total: 0, obtained: 0 }
 				/**
 				 *  check the relevant exam exists in student.exams, if exists create a new object
 				 *  with all information of relevant exam from this.props.exams and also containing
@@ -99,10 +144,10 @@ class ClassReportMenu extends Component {
 				for (const e of relevant_exams) {
 					const stats = curr.exams[e.id] || { score: 0, remarks: "", grade: "" }
 
-					if(e.name === this.state.report_filters.examFilterText && moment(e.date).isBetween(start, end)) {
+					if (e.name === this.state.report_filters.examFilterText && moment(e.date).isBetween(start, end)) {
 						new_exams.push({ ...exams[e.id], stats })
-						temp_marks.obtained += parseFloat(stats.score || 0)
-						temp_marks.total += parseFloat(e.total_score || 0)
+						temp_marks.obtained += parseFloat(stats.score.toString() || "0")
+						temp_marks.total += parseFloat(e.total_score.toString() || "0")
 					}
 				}
 
@@ -115,7 +160,7 @@ class ClassReportMenu extends Component {
 						id: curr.id,
 						name: curr.Name,
 						rollNo: curr.RollNumber ? curr.RollNumber : "",
-						manName: curr.manName,
+						manName: curr.ManName,
 						marks: temp_marks,
 						position: 0,
 						exams: new_exams,
@@ -123,7 +168,7 @@ class ClassReportMenu extends Component {
 						remarks
 					}
 				]
-			}, [])
+			}, [] as StudentMarksSheet[])
 			.sort((a, b) => b.marks.obtained - a.marks.obtained)
 
 		const messages = relevant_students
@@ -132,7 +177,7 @@ class ClassReportMenu extends Component {
 				number: student.Phone,
 				text: sms_templates.result
 					.replace(/\$NAME/g, student.Name)
-					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start), moment(this.state.report_filters.end), this.state.report_filters.examFilterText, this.state.report_filters.subjectFilterText))
+					.replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.report_filters.start).unix() * 100, moment(this.state.report_filters.end).unix() * 1000, this.state.report_filters.examFilterText, this.state.report_filters.subjectFilterText))
 			}))
 
 		const url = smsIntentLink({
@@ -146,16 +191,16 @@ class ClassReportMenu extends Component {
 			<div className="form no-print">
 				<div className="row">
 					<label>Start Date</label>
-					<input type="date" onChange={this.report_former.handle(["start"])} value={moment(this.state.report_filters.start).format("YYYY-MM-DD")} placeholder="Start Date" />
+					<input type="date" onChange={this.former.handle(["start"])} value={moment(this.state.report_filters.start).format("YYYY-MM-DD")} placeholder="Start Date" />
 				</div>
 				<div className="row">
 					<label>End Date</label>
-					<input type="date" onChange={this.report_former.handle(["end"])} value={moment(this.state.report_filters.end).format("YYYY-MM-DD")} placeholder="End Date" />
+					<input type="date" onChange={this.former.handle(["end"])} value={moment(this.state.report_filters.end).format("YYYY-MM-DD")} placeholder="End Date" />
 				</div>
 
 				<div className="row">
 					<label>Exam Name</label>
-					<select {...this.report_former.super_handle(["examFilterText"])}>
+					<select {...this.former.super_handle(["examFilterText"])}>
 						<option value="">Select Exam</option>
 						{
 							Array.from(examSet)
@@ -168,7 +213,7 @@ class ClassReportMenu extends Component {
 				</div>
 				<div className="row">
 					<label>Subject Name</label>
-					<select {...this.report_former.super_handle(["subjectFilterText"])}>
+					<select {...this.former.super_handle(["subjectFilterText"])}>
 						<option value="">Select Subject</option>
 						{
 							Array.from(subjects)
@@ -181,7 +226,7 @@ class ClassReportMenu extends Component {
 				</div>
 				<div className="row">
 					<label>Print</label>
-					<select {...this.report_former.super_handle(["printable_type"])}>
+					<select {...this.former.super_handle(["printable_type"])}>
 						<option value="">Select Print</option>
 						<option value="Class Result Cards">Class Result Cards</option>
 						<option value="Class Result Sheet"> Class Result Sheet</option>
@@ -189,7 +234,7 @@ class ClassReportMenu extends Component {
 				</div>
 				<div className="row">
 					<label>Show Date/Serial No.</label>
-					<select {...this.report_former.super_handle(["dateOrSerial"])}>
+					<select {...this.former.super_handle(["dateOrSerial"])}>
 						<option value="Date">Date</option>
 						<option value="Serial No.">Serial No.</option>
 					</select>
@@ -203,17 +248,17 @@ class ClassReportMenu extends Component {
 			</div>
 
 			<div className="class-report print-page" style={{ height: "100%" }}>
-				{ 	
+				{
 					this.state.report_filters.printable_type === "Class Result Sheet" && this.state.report_filters.examFilterText !== "" ?
 						chunkify(marksSheet, chunkSize)
-							.map((chunkItems, index) => <ClassResultSheet key={index}
-								sectionName={ curr_section.namespaced_name }
-								examSubjectsWithMarks={ examSubjectsWithMarks }
-								examName={ this.state.report_filters.examFilterText }
-								schoolName={ this.props.settings.schoolName }
-								students={ chunkItems }
-								chunkSize={ index === 0 ? 0 : chunkSize * index }/>) :
-								
+							.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
+								sectionName={curr_section.namespaced_name}
+								examSubjectsWithMarks={examSubjectsWithMarks}
+								examName={this.state.report_filters.examFilterText}
+								schoolName={this.props.settings.schoolName}
+								students={chunkItems}
+								chunkSize={index === 0 ? 0 : chunkSize * index} />) :
+
 						relevant_students.map(s => <div className="student-report" key={s.id} style={{ height: "100%" }}>
 							<StudentMarks
 								student={s}
@@ -226,7 +271,7 @@ class ClassReportMenu extends Component {
 								curr_section={curr_section}
 								logo={this.props.schoolLogo}
 								grades={this.props.grades}
-								dateOrSerial={this.state.report_filters.dateOrSerial}/>
+								dateOrSerial={this.state.report_filters.dateOrSerial} />
 						</div>)
 				}
 			</div>
@@ -235,9 +280,7 @@ class ClassReportMenu extends Component {
 	}
 }
 
-export default connect((state, { match: { params: { class_id, section_id } } }) => ({
-	curr_class_id: class_id,
-	curr_section_id: section_id,
+export default connect((state: RootReducerState) => ({
 	faculty_id: state.auth.faculty_id,
 	classes: state.db.classes,
 	students: state.db.students,
@@ -246,6 +289,6 @@ export default connect((state, { match: { params: { class_id, section_id } } }) 
 	grades: state.db.settings.exams.grades,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 	sms_templates: state.db.sms_templates
-}), dispatch => ({
-	logSms: (history) => dispatch(logSms(history))
+}), (dispatch: Function) => ({
+	logSms: (history: MISSMSHistory) => dispatch(logSms(history))
 }))(ClassReportMenu)
