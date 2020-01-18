@@ -22,6 +22,12 @@ defmodule Sarkar.Application do
 					types: Sarkar.PostgrexTypes,
 					pool_size: 10
 			},
+			:poolboy.child_spec(:image_worker, [
+				{:name, {:local, :image_worker}},
+				{:worker_module, Sarkar.Image.Worker},
+				{:size, 5},
+				{:max_overflow, 5}
+			]),
 			Sarkar.Server
 		]
 

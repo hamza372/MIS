@@ -7,19 +7,22 @@ import Dynamic from '@cerp/dynamic'
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
+import { getDownsizedImage, getImageString } from 'utils/image'
 
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 import getStudentLimit from 'utils/getStudentLimit'
 
 import Hyphenator from 'utils/Hyphenator'
 
-import { createStudentMerge, deleteStudent } from 'actions'
+import { createStudentMerge, deleteStudent, uploadStudentProfilePicture } from 'actions'
 
+import Modal from 'components/Modal'
 import Banner from 'components/Banner'
 import Former from 'utils/former'
 
 import './style.css'
 import { PrintHeader } from 'components/Layout';
+import Camera from 'components/Camera';
 
 // this page will have all the profile info for a student.
 // all this data will be editable.
@@ -55,8 +58,7 @@ const blankStudent = (): MISStudent => ({
 	section_id: "",
 	tags: {},
 	certificates: {},
-	prospective_section_id: ""
-
+	prospective_section_id: "",
 })
 // should be a dropdown of choices. not just teacher or admin.
 
@@ -70,11 +72,13 @@ interface P {
 	user: MISTeacher;
 	save: (student: MISStudent) => any;
 	delete: (student: MISStudent) => any;
+	uploadImage: (student: MISStudent, image_string: string) => any
 }
 
 interface S {
 	profile: MISStudent;
 	redirect: false | string;
+	show_camera: boolean
 	banner: {
 		active: boolean;
 		good?: boolean;
@@ -113,6 +117,7 @@ class SingleStudent extends Component<propTypes, S> {
 		this.state = {
 			profile: student,
 			redirect: false,
+			show_camera: false,
 			banner: {
 				active: false,
 				good: true,
@@ -560,6 +565,35 @@ class SingleStudent extends Component<propTypes, S> {
 		})
 	}
 
+	uploadProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+		getImageString(e)
+			.then(res => getDownsizedImage(res, 600, "jpeg"))
+			.then(imgString => {
+				this.props.uploadImage(this.state.profile, imgString)
+			})
+	}
+
+	onImageTaken = (image_string: string) => {
+
+		console.log('image taken: ')
+
+
+		getDownsizedImage(image_string, 600, "jpeg")
+			.then(img_string => {
+				this.setState({
+					show_camera: false
+				})
+				this.props.uploadImage(this.state.profile, img_string)
+			})
+	}
+
+	toggleCamera = () => {
+		this.setState({
+			show_camera: !this.state.show_camera
+		})
+	}
+
 	render() {
 
 		if (this.state.redirect) {
@@ -583,6 +617,38 @@ class SingleStudent extends Component<propTypes, S> {
 
 			<div className="form">
 				<div className="divider">Personal Information</div>
+
+				<div className="row">
+					<label>Profile Picture</label>
+					<div className="fileContainer button green" style={{ marginBottom: "5px" }}>
+						<div>Upload File</div>
+						<input type="file" accept="image/*" onChange={this.uploadProfilePicture} />
+					</div>
+					<div className="button blue" onClick={this.toggleCamera}>Take Picture</div>
+				</div>
+
+				{
+					this.state.profile.ProfilePicture && <div className="row">
+						<label>Current Image</label>
+						<img
+							className="profile-pic"
+							src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url}
+							crossOrigin="anonymous"
+							style={{ height: "auto", width: "auto" }}
+							alt="profile" />
+					</div>
+				}
+
+				{
+					this.state.show_camera && <Modal>
+						<Camera
+							onImageAccepted={this.onImageTaken}
+							height={100}
+							width={100}
+							format="jpeg"
+							onClose={() => this.setState({ show_camera: false })} />
+					</Modal>
+				}
 
 				<div className="row">
 					<label>Full Name</label>
@@ -781,6 +847,44 @@ class SingleStudent extends Component<propTypes, S> {
 					/>
 				</div> : false}
 
+				{!prospective ? false : <div className="row">
+					<label>Class Section</label>
+					<select
+						{...this.former.super_handle_flex(
+							["prospective_section_id"],
+							{ styles: (val: string) => val === "" ? { borderColor: "#fc6171" } : {} }
+						)}
+						disabled={!admin}>
+
+						<option value="">Please Select a Section</option>
+						{
+							getSectionsFromClasses(this.props.classes)
+								.sort((a, b) => a.classYear - b.classYear)
+								.map(c => <option key={c.id} value={c.id}>{c.namespaced_name}</option>)
+						}
+					</select>
+				</div>
+				}
+
+				{!prospective ? <div className="row">
+					<label>Roll No</label>
+					<input
+						type="text"
+						{...this.former.super_handle(["RollNumber"])}
+						placeholder="Roll Number" disabled={!admin}
+					/>
+				</div> : false}
+
+				{!prospective ? <div className="row">
+					<label>Admission Date</label>
+					<input type="date"
+						onChange={this.former.handle(["StartDate"])}
+						value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")}
+						placeholder="Admission Date"
+						disabled={!admin}
+					/>
+				</div> : false}
+
 				{!prospective ? <div className="row">
 					<label>Admission Number</label>
 					<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={!admin} />
@@ -913,7 +1017,9 @@ export default connect((state: RootReducerState) => ({
 	permissions: state.db.settings.permissions,
 	max_limit: state.db.max_limit || -1,
 	user: state.db.faculty[state.auth.faculty_id]
-}), (dispatch: Function) => ({
-	save: (student: MISStudent) => dispatch(createStudentMerge(student)),
-	delete: (student: MISStudent) => dispatch(deleteStudent(student)),
-}))(SingleStudent);
+}),
+	(dispatch: Function) => ({
+		uploadImage: (student: MISStudent, image_string: string) => dispatch(uploadStudentProfilePicture(student, image_string)),
+		save: (student: MISStudent) => dispatch(createStudentMerge(student)),
+		delete: (student: MISStudent) => dispatch(deleteStudent(student)),
+	}))(SingleStudent);
