@@ -20,7 +20,8 @@ defmodule Sarkar.Server do
 				{"/", Sarkar.Server.OK, []},
 				{"/utils/:method", Sarkar.Server.Utils, []},
 				{"/analytics/:type", Sarkar.Server.Analytics, []},
-				{"/dashboard/:type", Sarkar.Server.Dashboard, []}
+				{"/dashboard/:type", Sarkar.Server.Dashboard, []},
+				{"/upload/:type", Sarkar.Server.Upload, []}
 			]}
 		])
 	end

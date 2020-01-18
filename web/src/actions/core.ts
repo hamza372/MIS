@@ -19,6 +19,34 @@ export interface MergeAction {
 	merges: Merge[];
 }
 
+const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['queued'], state: RootReducerState): RootReducerState['queued'] => {
+
+	// here we can do stuff to make sure we are not including queued items that are processing.
+	// for now we can make this only for images. in the future we can add support for mutations and analytics as well.
+
+	// for now actually we will take images out of the queue
+	/*
+	const filtered_images = Object.entries(state.queued.images || {})
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			if (v.status === "processing") {
+				return agg
+			}
+
+			agg[k] = v
+			return agg;
+		}, {})
+	*/
+
+	return {
+		...state.queued,
+		images: {},
+		[key]: {
+			...state.queued[key],
+			...payload
+		}
+	}
+}
+
 export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
 	const event_payload = event.reduce((agg, curr) => {
@@ -33,21 +61,8 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 	}, {} as { [id: string]: RouteAnalyticsEvent })
 
 	const state = getState();
-	const rationalized_event_payload = {
-		...state.queued,
-		analytics: {
-			...state.queued.analytics,
-			...event_payload
-		}
-	}
 
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type: client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_event_payload
-	}
+	const rationalized_event_payload = getRationalizedQueuePayload(event_payload, "analytics", state)
 
 	dispatch(QueueAnalytics(event_payload))
 
@@ -56,19 +71,196 @@ export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Functi
 		return
 	}
 
-	syncr.send(payload)
+	dispatch(Sync(rationalized_event_payload))
+}
+
+export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const queueable = images.reduce<ImagesQueuable>((agg, curr) => {
+		const key = curr.path.join(",")
+
+		agg[key] = {
+			...curr,
+			status: "queued"
+		}
+
+		return agg;
+
+	}, {})
+
+	dispatch(QueueImages(queueable))
+
+	const local_merges = images.map<Merge>(m => ({
+		path: m.path,
+		value: {
+			image_string: m.image_string
+		}
+	}))
+
+	dispatch({
+		type: MERGES,
+		merges: local_merges
+	})
+
+	dispatch(processImageQueue())
+
+}
+
+export const IMAGE_UPLOAD_CONFIRM = "IMAGE_UPLOAD_CONFIRM"
+export interface ImageUploadConfirmation {
+	type: "IMAGE_UPLOAD_CONFIRM"
+	value: {
+		url: string
+		id: string
+	}
+	path: string[]
+	id: string
+}
+
+export const IMAGE_QUEUE_LOCK = "IMAGE_QUEUE_LOCK"
+const lockImageQueue = {
+	type: IMAGE_QUEUE_LOCK
+}
+
+export const IMAGE_QUEUE_UNLOCK = "IMAGE_QUEUE_UNLOCK"
+const unlockImageQueue = {
+	type: IMAGE_QUEUE_UNLOCK
+}
+
+export const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState();
+
+	if (state.processing_images) {
+		console.log('already processing')
+		return;
+	}
+
+	if (!syncr.connection_verified) {
+		console.log('connection not verified')
+		return;
+	}
+
+	dispatch(lockImageQueue)
+
+	console.log('processing image queue')
+
+	// need to know if this processing is already running or not...
+	// if it is running, then we should return early. 
+	// so we need this in reducer state
+
+	// for now, we ignore it.
+
+	console.log(state.queued.images)
+	const items = Object.entries(state.queued.images || {})
+		.filter(([k, v]) => v.status === "queued")
+
+	if (items.length === 0) {
+		console.log('nothing to process in queue')
+		dispatch(unlockImageQueue)
+		return
+	}
+
+	const [merge_key, image_merge] = items[0]
+
+	//@ts-ignore
+	const host = window.api_url || window.debug_host;
+
+	fetch(`https://${host}/upload/image`, {
+		method: 'POST',
+		mode: 'cors',
+		cache: 'no-cache',
+		headers: {
+			'content-type': 'application/json',
+			'token': state.auth.token,
+			'client-id': state.client_id,
+			'school-id': state.auth.school_id,
+			'client-type': client_type
+		},
+		body: JSON.stringify({
+			lastSnapshot: state.lastSnapshot,
+			payload: {
+				image_merge
+			}
+		})
+	})
 		.then(res => {
+			console.log('image uploaded')
+			console.log(res)
+			console.log(res.json())
+
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'processing'))
+
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
+
+			// now we should mark this item as 'processing' in the queue.
+			// and progress to the next one.
+			// syncr.on('connect') should kick  
+		})
+		.catch(err => {
+			console.error('image upload failed')
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'queued'))
+
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
+		})
+
+}
+
+const markImagesInQueue = (images: ImagesQueuable, status: QueueStatus) => (dispatch: (a: any) => any) => {
+
+	const mapped = Object.entries(images)
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			return {
+				...agg,
+				[k]: {
+					...v,
+					status
+				}
+			}
+		}, {})
+
+	dispatch(QueueImages(mapped))
+
+}
+
+const Sync = (payload: RootReducerState['queued']) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState()
+	syncr.send({
+		type: SYNC,
+		school_id: state.auth.school_id,
+		client_type: client_type,
+		lastSnapshot: state.lastSnapshot,
+		payload
+	})
+		.then(res => {
+			// dispatch multiaction
 			dispatch(multiAction(res))
 		})
 		.catch(err => {
-			dispatch(QueueAnalytics(event_payload))
+			// go through payload, mark all images as error
+			// may need to handle specific errors here.
+			// really should have different timeout if there are images here
+			// uploading will be slow
+			// and really it could be happening over a different channel altogether.
+			// this could be http
+			// for now this should work.
 
-			console.error("analytics error:", err)
+			dispatch(markImagesInQueue(payload.images, "queued"))
+
+			console.error("sync error:", err)
 
 			if (state.connected && err !== "timeout") {
 				alert("Syncing Error: " + err)
 			}
 		})
+
 }
 
 export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
@@ -94,21 +286,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 	}), {})
 
 	const state = getState();
-	const rationalized_merges = {
-		...state.queued,
-		mutations: {
-			...state.queued.mutations,
-			...new_merges
-		}
-	}
-
-	const payload = {
-		type: SYNC,
-		school_id: state.auth.school_id,
-		client_type: client_type,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_merges
-	}
+	const rationalized_merges = getRationalizedQueuePayload(new_merges, "mutations", state)
 
 	dispatch(QueueMutations(new_merges))
 
@@ -117,18 +295,7 @@ export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, get
 		return;
 	}
 
-	syncr.send(payload)
-		.then(res => {
-			dispatch(multiAction(res))
-		})
-		.catch(err => {
-			console.error("create merges error: ", err)
-			dispatch(QueueMutations(new_merges))
-
-			if (state.connected && err !== "timeout") {
-				alert("Syncing Error: " + err)
-			}
-		})
+	dispatch(Sync(rationalized_merges))
 }
 
 export const SMS = "SMS"
@@ -229,13 +396,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 		}
 	}), {})
 
-	const rationalized_deletes = {
-		...state.queued,
-		mutations: {
-			...state.queued.mutations,
-			...payload
-		}
-	}
+	const rationalized_deletes = getRationalizedQueuePayload(payload, "mutations", state)
 
 	dispatch(QueueMutations(payload))
 
@@ -244,24 +405,7 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 		return;
 	}
 
-	syncr.send({
-		type: SYNC,
-		client_type: client_type,
-		school_id: state.auth.school_id,
-		lastSnapshot: state.lastSnapshot,
-		payload: rationalized_deletes
-	})
-		.then(res => {
-			dispatch(multiAction(res))
-		})
-		.catch(err => {
-
-			dispatch(QueueMutations(payload))
-
-			if (state.connected && err !== "timeout") {
-				alert("Syncing Error: " + err)
-			}
-		})
+	dispatch(Sync(rationalized_deletes))
 
 }
 
@@ -327,7 +471,13 @@ export interface QueueMutationsAction extends BaseQueueAction {
 	queue_type: "mutations";
 	payload: MutationsQueueable;
 }
-export type QueueAction = QueueMutationsAction | QueueAnalyticsAction
+
+export interface QueueImagesAction extends BaseQueueAction {
+	queue_type: "images"
+	payload: ImagesQueuable
+}
+
+export type QueueAction = QueueMutationsAction | QueueAnalyticsAction | QueueImagesAction
 
 export interface ConfirmAnalyticsSyncAction {
 	type: "CONFIRM_ANALYTICS_SYNC";
@@ -347,6 +497,14 @@ export const QueueAnalytics = (action: AnalyticsQueuable): QueueAnalyticsAction 
 		type: QUEUE,
 		payload: action,
 		queue_type: "analytics"
+	}
+}
+
+export const QueueImages = (action: ImagesQueuable): QueueImagesAction => {
+	return {
+		type: QUEUE,
+		payload: action,
+		queue_type: "images"
 	}
 }
 
@@ -372,17 +530,11 @@ export const connected = () => (dispatch: (a: any) => any, getState: () => RootR
 			})
 			.then(res => {
 
+				console.log("VERIFYY")
 				syncr.verify()
 
-				return syncr.send({
-					type: SYNC,
-					client_type: client_type,
-					school_id: state.auth.school_id,
-					payload: state.queued,
-					lastSnapshot: state.lastSnapshot
-				})
+				dispatch(Sync(state.queued))
 			})
-			.then(resp => dispatch(multiAction(resp)))
 			.catch(err => {
 				console.error(err)
 				alert("Authorization Failed. Log out and Log in again.")
@@ -432,18 +584,10 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 				})
 				.then(res => {
 
+					console.log("VERIFYYYY")
 					syncr.verify()
 
-					return syncr.send({
-						type: SYNC,
-						client_type: client_type,
-						school_id: state.auth.school_id,
-						payload: state.queued,
-						lastSnapshot: state.lastSnapshot
-					})
-				})
-				.then(resp => {
-					dispatch(multiAction(resp))
+					dispatch(Sync(state.queued))
 				})
 				.catch(err => {
 					console.error(err)

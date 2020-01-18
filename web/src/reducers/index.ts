@@ -1,5 +1,5 @@
 import Dynamic from '@ironbay/dynamic'
-import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction } from 'actions/core'
+import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction, ImageUploadConfirmation, IMAGE_QUEUE_LOCK, IMAGE_QUEUE_UNLOCK } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
 import { AnyAction } from 'redux'
 
@@ -8,6 +8,34 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 	console.log(action)
 
 	switch (action.type) {
+
+		case "IMAGE_UPLOAD_CONFIRM":
+			{
+				const confirmation = action as ImageUploadConfirmation
+				const state_copy: RootReducerState = JSON.parse(JSON.stringify(state))
+
+				// action tells us the image url and id at the path. so we put it there
+				Dynamic.put(state_copy, confirmation.path, confirmation.value)
+
+				// we remove the item from the queue
+				const k = confirmation.path.join(',')
+				console.log('existing queue item', state_copy.queued.images, state_copy.queued.images[k])
+				delete state_copy.queued.images[k]
+
+				return state_copy
+			}
+
+		case IMAGE_QUEUE_LOCK:
+			return {
+				...state,
+				processing_images: true
+			}
+
+		case IMAGE_QUEUE_UNLOCK:
+			return {
+				...state,
+				processing_images: false
+			}
 
 		case "CONFIRM_ANALYTICS_SYNC":
 			{
@@ -110,17 +138,35 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 						}
 					}
 				}
-				return {
-					...state,
-					queued: {
-						...state.queued,
-						mutations: {
-							...state.queued.mutations,
-							...actionType.payload
-						}
-					},
-					acceptSnapshot: false
+
+				if (actionType.queue_type === "mutations") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							mutations: {
+								...state.queued.mutations,
+								...actionType.payload
+							}
+						},
+						acceptSnapshot: false
+					}
 				}
+
+				if (actionType.queue_type === "images") {
+					return {
+						...state,
+						queued: {
+							...state.queued,
+							images: {
+								...state.queued.images,
+								...actionType.payload
+							}
+						}
+					}
+				}
+
+				break;
 			}
 
 		case CONFIRM_SYNC_DIFF:
