@@ -18,7 +18,7 @@ export default connect(state => ({
 		const setupPage = props.permissions && props.permissions.setupPage ? props.permissions.setupPage.teacher : true
 		
 return <Layout history={props.history}>
-		<div className="single-class-container">
+		<div className="single-class-container" style={{overflow: "hidden"}}>
 
 			{loc === "new" || isPrintPage ? false : 
 				setupPage ? <div className="row tabs">

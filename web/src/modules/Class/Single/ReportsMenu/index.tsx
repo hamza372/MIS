@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import moment, { months } from 'moment'
+import moment from 'moment'
 import { connect } from 'react-redux'
 import Former from 'utils/former'
 import { smsIntentLink } from 'utils/intent'
@@ -33,9 +33,10 @@ type PropsType = {
 interface S {
 	year: string
 	exam_title: string
-	dateOrSerial: string
-	printable_type: string
+	exams_list_by: string
+	print_type: string
 }
+
 
 interface RouteInfo {
 	class_id: string
@@ -51,8 +52,8 @@ class ClassReportMenu extends Component<PropsType, S> {
 		this.state = {
 			exam_title: "Final-Term",
 			year: moment().format("YYYY"),
-			dateOrSerial: "Date",
-			printable_type: "Class Result Cards"
+			exams_list_by: "Sr No.",
+			print_type: "Cards"
 		}
 		this.former = new Former(this, [])
 	}
@@ -86,7 +87,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 
 	render() {
 
-		const { exam_title, year, printable_type, dateOrSerial } = this.state
+		const { exam_title, year, print_type, exams_list_by } = this.state
 		const { students, exams, classes, settings, sms_templates, grades } = this.props
 		
 		const section_id = this.getSectionIdFromParams()
@@ -145,61 +146,58 @@ class ClassReportMenu extends Component<PropsType, S> {
 			return_link: window.location.href
 		})
 
-
-		return <div className="class-report-menu" style={{ width: "100%" }}>
-			<div className="title no-print">Print {printable_type} for { section_name }</div>
-			<div className="form no-print">
-				
-				<div className="row">
-				<label>Exams for Year</label>
-				<select {...this.former.super_handle(["year"])}>
-						<option value="">Select Year</option>
-						{
-							Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
-						}
-					</select>
+		return <div className="class-report-menu">
+			<div className="title no-print">Result Cards for { section_name }</div>
+			<div className="section-container section no-print">
+				<div className="form">
+					<div className="row">
+					<label>Exams for Year</label>
+						<select {...this.former.super_handle(["year"])}>
+								<option value="">Select Year</option>
+								{
+									Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+								}
+						</select>
+					</div>
+					<div className="row">
+						<label>Exam Name</label>
+						<select {...this.former.super_handle(["exam_title"])}>
+							<option value="">Select Exam</option>
+							{
+								Array.from(exam_titles)
+									.sort((a, b) => a.localeCompare(b))
+									.map(title => {
+										return <option key={title} value={title}>{title}</option>
+									})
+							}
+						</select>
+					</div>
+					<div className="row">
+						<label>Print</label>
+						<select {...this.former.super_handle(["print_type"])}>
+							<option value="">Select Print</option>
+							<option value="Cards">Class Result Cards</option>
+							<option value="Sheet">Class Result Sheet</option>
+						</select>
+					</div>
+					<div className="row">
+						<label>Exam List By</label>
+						<select {...this.former.super_handle(["exams_list_by"])}>
+							<option value="">Select List By</option>
+							<option value="Date">Date</option>
+							<option value="Sr No.">Serial No</option>
+						</select>
+					</div>
 				</div>
-
-				<div className="row">
-					<label>Exam Name</label>
-					<select {...this.former.super_handle(["exam_title"])}>
-						<option value="">Select Exam</option>
-						{
-							Array.from(exam_titles)
-								.sort((a, b) => a.localeCompare(b))
-								.map(title => {
-									return <option key={title} value={title}>{title}</option>
-								})
-						}
-					</select>
+				<div className="md-form">
+				{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
+					<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Class Result {this.state.print_type}</div>
 				</div>
-
-				<div className="row">
-					<label>Print</label>
-					<select {...this.former.super_handle(["printable_type"])}>
-						<option value="">Select Print</option>
-						<option value="Class Result Cards">Class Result Cards</option>
-						<option value="Class Result Sheet"> Class Result Sheet</option>
-					</select>
-				</div>
-				<div className="row">
-					<label>Show Date/Serial No.</label>
-					<select {...this.former.super_handle(["dateOrSerial"])}>
-						<option value="Date">Date</option>
-						<option value="Sr No.">Serial No.</option>
-					</select>
-				</div>
-
-			</div>
-
-			<div className="table btn-section">
-				{settings.sendSMSOption === "SIM" ? <a className="row button blue sms" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
-				<div className="row print button" onClick={() => window.print()} style={{ marginTop: " 10px" }}>Print {this.state.printable_type}</div>
 			</div>
 
 			<div className="class-report print-page" style={{ height: "100%" }}>
 				{
-					printable_type === "Class Result Sheet" && exam_title !== "" ?
+					print_type === "Sheet" && exam_title !== "" ?
 						chunkify(marksSheet, chunkSize)
 							.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
 								sectionName={ section_name }
@@ -218,7 +216,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 									examFilter={exam_filter}
 									logo={this.props.schoolLogo}
 									sectionName={section_name}
-									listBy={this.state.dateOrSerial}
+									listBy={exams_list_by}
 								/>))
 				}
 			</div>
