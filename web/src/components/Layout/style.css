@@ -650,3 +650,22 @@ input::-webkit-inner-spin-button {
 	background-color: #ff6b68;
 	color: #fafafa;
 }
+.bold {
+	font-weight: bold;
+}
+.text-center {
+	text-align: center;
+}
+.text-uppercase {
+	text-transform: uppercase;
+}
+.text-lowercase {
+	text-transform: lowercase;
+}
+.text-underline {
+	text-decoration: underline;
+}
+.section-container {
+	width: 90%;
+	margin: auto;
+}
