@@ -30,35 +30,42 @@ const AdmissionForm = (props: PropsType) => {
                         <div className="title school-title">{school.name || ""}</div>
                         <div className="address">{school.address || ""}</div>
                         <div className="phone-number"> Tel: {school.phone || ""}</div>
-                        <div className="school-code"> School Code: {school.code || "_______"} </div>
+                        {school.code && <div className="school-code"> School Code: {school.code || "_______"} </div>}
                     </div>
                 </div>
             </div>
             <div className="admission-title title">Admission Form </div>
             <fieldset>
                 <legend>Student Personal Information</legend>
-                <div className="row" style={{marginTop: "5mm"}}>
-                    <label>Full Name:</label>
-                    <div>{student.Name}</div>
-                </div>
-                <div className="row">
-                    <label>Form (B) No:</label>
-                    <div>{student.BForm}</div>
-                </div>
-                <div className="row">
-                    <label>Date of Birth:</label>
-                    <div>{student.Birthdate ? moment(student.Birthdate).format("DD, MMMM YYYY") : ""}</div>
-                </div>
-                <div className="row" style={{marginBottom: "2.5mm"}}>
-                    <label>Gender:</label>
-                    <div className="gender">
-                        <input type="checkbox" checked={student.Gender === "male"}/><span>Male</span>
-                        <input type="checkbox" checked={student.Gender === "female"}/><span>Female</span>
+                <div className="student-info-card">
+                    <div className="student-info">
+                        <div className="row" style={{marginTop: "5mm"}}>
+                            <label>Full Name:</label>
+                            <div>{student.Name}</div>
+                        </div>
+                        <div className="row">
+                            <label>Form (B) No:</label>
+                            <div>{student.BForm}</div>
+                        </div>
+                        <div className="row">
+                            <label>Date of Birth:</label>
+                            <div>{student.Birthdate ? moment(student.Birthdate).format("DD, MMMM YYYY") : ""}</div>
+                        </div>
+                        <div className="row" style={{marginBottom: "2.5mm"}}>
+                            <label>Gender:</label>
+                            <div className="gender">
+                                <input type="checkbox" checked={student.Gender === "male"}/><span>Male</span>
+                                <input type="checkbox" checked={student.Gender === "female"}/><span>Female</span>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <label>Blood Type:</label>
+                            <div>{student.BloodType}</div>
+                        </div>
                     </div>
-                </div>
-                <div className="row">
-                    <label>Blood Type:</label>
-                    <div>{student.BloodType}</div>
+                    <div className="profile-picture">
+                        <img alt="student-profile" />
+                    </div>
                 </div>
             </fieldset>
             <fieldset style={{marginTop: 5}}>
@@ -99,7 +106,7 @@ const AdmissionForm = (props: PropsType) => {
                     <div>{student.AdmissionNumber || ""}</div>
                 </div>
                 <div className="row">
-                    <label>Class/Section:</label>
+                    <label>Class-Section:</label>
                     <div>{section && section.namespaced_name ? section.namespaced_name : ""}</div>
                 </div>
                 <div className="row">

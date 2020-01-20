@@ -73,7 +73,6 @@
 .admission-form {
     width: 95%;
 }
-
 .admission-form .header-section {
     font-weight: bold;
     text-align: center;
@@ -87,10 +86,12 @@
     width: 20%;
 }
 .admission-form .header-style {
- padding-bottom: 20px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    padding-bottom: 20px;
 }
 .admission-form .header-style .school-title {
     margin-bottom: 10px;
+    font-size: 1.4rem;
     text-transform: uppercase;
 }
 .admission-form .header-style .address {
@@ -98,7 +99,7 @@
 }
 .admission-form .admission-title {
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     text-decoration: underline;
 }
 .admission-form fieldset {
@@ -131,4 +132,21 @@
 .admission-form .row.signature-section .left, .right {
     border-top: 1px solid #bebebe;
     padding: 10px 0px;
+}
+.admission-form .student-info-card {
+    display: flex;
+    flex-direction: row ;
+}
+.admission-form .student-info-card .student-info {
+    flex-direction: column;
+    width: 80%;
+    padding-right: 10px;
+}
+.admission-form .student-info-card .profile-picture {
+    flex-direction: column;
+    margin-top: 32px;
+    margin-left: 15px;
+    height: 100px;
+    width: 100px;
+    border: 1px solid black;
 }
