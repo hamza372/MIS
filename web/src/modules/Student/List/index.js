@@ -11,49 +11,65 @@ import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist
 import {chunkify} from 'utils/chunkify'
 import Card from 'components/Card'
 import moment from 'moment'
+import { StudentIcon } from 'assets/icons'
 
 import './style.css'
 
-const StudentItem = (S) => {
-	const cname = S.relevant_section ? S.relevant_section.className : "no class";
-	const tags = S.tags !== undefined && Object.keys(S.tags).length > 0 ? Object.keys(S.tags) : false
-	return <div className="icon-card">
-				<div className="icard-title">
-					<Link style={{textDecoration:"none"}} to={`/student/${S.id}/${S.forwardTo}`} key={S.id}>
-					{S.Name}
+const StudentItem = (student) => {
+	
+	const section_name = student.relevant_section ? student.relevant_section.namespaced_name: "No Class"
+	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
+	
+	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
+
+	return <div className="profile-card-wrapper">
+			<div className="profile">
+				<img src={avatar} className="thumbnail" alt="profile"/>
+				<div className="name">
+					<Link style={{textDecoration:"none"}} to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
+						{student.Name}
 					</Link>
 				</div>
-				<div className="icard-para">
-					{S.ManName ? <div className="para-row"> {S.ManName} </div> : ""}
-					{ S.forwardTo !== "prospective-student" && <div className="para-row"><b></b> {cname /*+ "/" + sname */}</div> }
-					{ S.forwardTo !== "prospective-student" && S.AdmissionNumber && 
-						<div className="para-row">
-							<b>{`Adm #: `}</b>{S.AdmissionNumber}
-						</div>}
-					{
-						<div className="para-row">
-							<b>{`Phone:`}</b>{S.Phone}
-						</div>
-					}	
-					{ tags && 
-						<div className="tags row">
-						{
-							 tags
-							 .filter(t => t !== "FINISHED_SCHOOL") 
-							 .map((t, i) => <div className="tag" key={i}> {t}</div>) 
-						}
-						</div>
-					}
+				<div className="row info">
+					<label>F.Name </label>
+					<div>{student.ManName || ""}</div>
 				</div>
+				<div className="row info">
+					<label>Class </label>
+					<div>{section_name}</div>
+				</div>
+				<div className="row info">
+					<label>Adm No </label>
+					<div>{(student.forwardTo !== "prospective-student" && student.AdmissionNumber) || ""}</div>
+				</div>
+				<div className="row info">
+					<label>Roll No </label>
+					<div>{(student.forwardTo !== "prospective-student" &&student.RollNumber) || ""}</div>
+				</div>
+				<div className="row info">
+					<label>Phone </label>
+					<div>{student.Phone || ""}</div>
+				</div>
+				<div className={`row tags ${tags.length > 0 ? 'scroll' : ''}`}>
+				{
+					tags
+						.filter(tag => tag !== "FINISHED_SCHOOL") 
+						.map((tag, i) => <div className="tag" key={i}> {tag}</div>) 
+				}
+				</div>
+				<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
+					Edit
+				</Link>
 			</div>
+		</div>
 }
 
-const toLabel = (S) => {
+const toLabel = (student) => {
 	
-	const cname = S.relevant_section ? S.relevant_section.className : "no class";
-	const admissionNumber = S.AdmissionNumber ? `a${S.AdmissionNumber}` : "";
-	const Phone = S.Phone;
-	return S.Name + S.ManName + cname + admissionNumber + Phone;
+	const section_name = student.relevant_section ? student.relevant_section.className : "No Class";
+	const admissionNumber = student.AdmissionNumber ? `a${student.AdmissionNumber}` : "";
+	const phone = student.Phone;
+	return student.Name + student.ManName + section_name + admissionNumber + phone;
 
 }
 
