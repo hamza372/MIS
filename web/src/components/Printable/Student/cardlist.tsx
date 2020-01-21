@@ -8,29 +8,37 @@ type PropsTypes = {
   students: MISStudent[]
   schoolName: string
   schoolLogo: string
+  schoolSession: {
+    startYear: string
+    endYear: string
+  }
   studentClass: string
 }
 
 export const StudenPrintableIDCardList = (props: PropsTypes) => {
-  const students = props.studentClass !== "" ?
-    props.students.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0)) :
-    props.students
+
+  const { students, studentClass, schoolName, schoolLogo, schoolSession } = props
+
+  const sorted_students = studentClass !== "" ?
+    students.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0)) :
+    students
 
   return (
     <div className="student-id-card print-only print-table" style={{ width: "90%" }}>
       <table>
         <caption>
-            <div className="text-uppercase">{ props.schoolName ? props.schoolName : "" }</div>
-            <div>Students Cards for { props.studentClass }</div>
+            <div className="text-uppercase">{ schoolName ? schoolName : "" }</div>
+            <div>Students Cards for { studentClass }</div>
         </caption>
         <tbody>
             <div className="card-grid">
               {
-                students.map(student => ( <StudentIDCard key={ student.id }
+                sorted_students.map(student => ( <StudentIDCard key={ student.id }
                       student={ student }
-                      schoolName={ props.schoolName }
-                      studentClass={ props.studentClass }
-                      schoolLogo={ props.schoolLogo }/>))
+                      schoolName={ schoolName }
+                      studentClass={ studentClass }
+                      schoolLogo={ schoolLogo }
+                      schoolSession={ schoolSession }/>))
               }
             </div>
         </tbody>

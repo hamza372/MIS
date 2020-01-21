@@ -10,6 +10,7 @@ import { StudentPrintableList } from 'components/Printable/Student/list';
 import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist';
 import {chunkify} from 'utils/chunkify'
 import Card from 'components/Card'
+import moment from 'moment'
 
 import './style.css'
 
@@ -147,6 +148,11 @@ export class StudentList extends Component {
 	render (){
 		const { classes, students, settings, forwardTo, max_limit } = this.props
 
+		const schoolSession = {
+			startYear: settings && settings.schoolSession ? moment(settings.schoolSession.start_date).format("YYYY") : "",
+			endYear: settings && settings.schoolSession ? moment(settings.schoolSession.end_date).format("YYYY") : ""
+		}
+
 		const sections = getSectionsFromClasses(classes)
 		const curr_section = this.getSectionName(sections)
 		const chunkSize = 21 // students per page on printsheet
@@ -254,7 +260,8 @@ export class StudentList extends Component {
 					.map((chunkItems, index) => <StudenPrintableIDCardList students={chunkItems} key={index}
 						schoolName={ settings.schoolName }
 						schoolLogo={ this.props.schoolLogo }
-						studentClass={ curr_section }/>)
+						studentClass={ curr_section }
+						schoolSession={ schoolSession }/>)
 			}
 			
 			<div className="print button" onClick={() => window.print()}>{ this.state.printStudentCard ? "Print ID Cards" : "Print Students List"}</div>
