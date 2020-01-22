@@ -21,6 +21,12 @@
 		color: #fc6171;
 	}
 
+.single-student .profile-pic {
+	border: 2px solid #333;
+	border-radius: 100%;
+	margin-left: auto;
+}
+
 .call-link {
 	width: 10% !important;
 	margin: 5px !important;

@@ -59,6 +59,18 @@ interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
 	meta: { route: string };
 }
 
+type QueueStatus = "queued" | "processing" | "failed"
+
+interface ImageMergeItem {
+	id: string
+	image_string: string
+	path: string[]
+}
+
+interface ImagesQueuable {
+	[path: string]: ImageMergeItem & { status: QueueStatus }
+}
+
 interface RootReducerState {
 	client_id: string;
 	initialized: boolean;
@@ -72,13 +84,15 @@ interface RootReducerState {
 				};
 				date: number;
 			}
-		},
+		}
 		analytics: {
 			[id: string]: RouteAnalyticsEvent
 		}
+		images: ImagesQueuable
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;
+	processing_images: boolean
 	db: RootDBState;
 	auth: {
 		school_id: string;
@@ -109,6 +123,10 @@ interface MISSettings {
 	schoolName: string
 	schoolAddress: string
 	schoolPhoneNumber: string
+	schoolSession: {
+		start_date: number
+		end_date: number
+	}
 	schoolCode: string
 	vouchersPerPage: string
 	sendSMSOption: "SIM" | "API"
@@ -176,6 +194,12 @@ interface MISStudent {
 	Phone: string;
 	Fee: number;
 	Active: boolean;
+
+	ProfilePicture?: {
+		id?: string
+		url?: string
+		image_string?: string
+	}
 
 	ManCNIC: string;
 	ManName: string;

@@ -1,5 +1,5 @@
 import { hash } from 'utils'
-import { createMerges, createDeletes, createLoginFail, analyticsEvent } from './core'
+import { createMerges, createDeletes, createLoginFail, analyticsEvent, uploadImages } from './core'
 import moment from 'moment'
 import { v4 } from "node-uuid"
 import Syncr from '@cerp/syncr';
@@ -250,6 +250,20 @@ export const createSignUp = (profile: Profile) => (dispatch: Function, getState:
 
 }
 
+export const uploadStudentProfilePicture = (student: MISStudent, image_string: string) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const path = ["db", "students", student.id, "ProfilePicture"]
+	const id = v4();
+
+	const merge_item: ImageMergeItem = {
+		path,
+		image_string,
+		id
+	}
+
+	dispatch(uploadImages([merge_item]))
+}
+
 export const SCHOOL_LOGIN = "SCHOOL_LOGIN"
 export const createSchoolLogin = (school_id: string, password: string) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
@@ -271,6 +285,8 @@ export const createSchoolLogin = (school_id: string, password: string) => (dispa
 		}
 	})
 		.then(res => {
+
+			syncr.verify()
 
 			dispatch({
 				type: "GETTING_DB"

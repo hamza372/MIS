@@ -101,6 +101,10 @@ const defaultSettings = {
 	schoolAddress: "",
 	schoolPhoneNumber: "",
 	schoolCode: "",
+	schoolSession: {
+		start_date: moment().startOf("year").unix() * 1000,
+		end_date: moment().add(1, "year").startOf("year").unix() * 1000
+	},
 	vouchersPerPage: "1",
 	sendSMSOption: "SIM", // API
 	permissions: defaultPermissions,
@@ -120,6 +124,7 @@ class Settings extends Component <propsType, S>{
 
 		const settings = {
 			...(props.settings || defaultSettings),
+			schoolSession: props.settings ? (props.settings.schoolSession || defaultSettings.schoolSession) : defaultSettings.schoolSession,
 			permissions: {
 				...defaultPermissions,
 				...(props.settings || defaultSettings).permissions
@@ -131,9 +136,7 @@ class Settings extends Component <propsType, S>{
 					...aggGrades
 				}
 			},
-			classes: {
-				...(props.settings || defaultSettings).classes
-			}
+			classes: props.settings ? (props.settings.classes || defaultSettings.classes) : defaultSettings.classes
 		} as RootDBState["settings"]
 
 		this.state = {
@@ -546,6 +549,19 @@ class Settings extends Component <propsType, S>{
 					<div className="row">
 						<label>School Code (Optional)</label>
 						<input type="text" {...this.former.super_handle(["settings", "schoolCode"])} placeholder="School Code" />
+					</div>
+
+					<div className="row">
+						<label>School Session Start Period</label>
+						<input type="date" {...this.former.super_handle(["settings", "schoolSession", "start_date"])}
+									value={moment(this.state.settings.schoolSession.start_date).format("YYYY-MM-DD")}
+									placeholder="session start" />
+					</div>
+					<div className="row">
+						<label>School Session End Period</label>
+						<input type="date" {...this.former.super_handle(["settings", "schoolSession", "end_date"])}
+							value={moment(this.state.settings.schoolSession.end_date).format("YYYY-MM-DD")}
+							placeholder="session end" />
 					</div>
 
 					<div className="row">

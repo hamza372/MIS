@@ -2,6 +2,7 @@ import { v4 } from 'node-uuid'
 
 import { openDB } from 'idb'
 import { defaultExams } from 'modules/Settings';
+import moment from 'moment';
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
@@ -13,11 +14,13 @@ export const initState: RootReducerState = {
 	client_id: localStorage.getItem("client_id") || v4(),
 	queued: {
 		mutations: {},
-		analytics: {}
+		analytics: {},
+		images: {}
 	},
 	acceptSnapshot: false,
 	lastSnapshot: 0,
 	initialized: false,
+	processing_images: false,
 	db: {
 		faculty: {},
 		users: {},
@@ -141,7 +144,8 @@ export const loadDb = async () => {
 				succeed: false,
 				reason: ""
 			},
-			initialized: true
+			initialized: true,
+			processing_images: false
 		}
 
 		const updatedDB = onLoadScripts.reduce((agg, curr) => {
@@ -306,10 +310,32 @@ const reconstructGradesObject = (state: RootReducerState) => {
 
 	return state
 }
+const addSchoolSessionSettings = (state: RootReducerState) => {
+	if(state.db.settings) {
+		
+		if(state.db.settings.schoolSession) {
+			return state
+		}
+		
+		const start_date = moment().startOf("year").unix() * 1000
+		const end_date = moment().add(1, "year").startOf("year").unix() * 1000
+
+		state.db.settings = {
+			...state.db.settings,
+			schoolSession: {
+				start_date,
+				end_date
+			}
+		} 
+	}
+
+	return state
+}
 
 const onLoadScripts = [
 	addFacultyID,
 	checkPermissions,
 	checkGrades,
-	reconstructGradesObject
+	reconstructGradesObject,
+	addSchoolSessionSettings
 ];

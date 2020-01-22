@@ -96,6 +96,9 @@
 	.result-stats.row {
 		margin-bottom: 4px;
 	}
+	.result-stats .attendance-stats {
+		margin-top: 2px;
+	}
 
 	.remarks {
 		text-align: start;
