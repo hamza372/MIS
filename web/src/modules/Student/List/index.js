@@ -22,9 +22,13 @@ const StudentItem = (student) => {
 	
 	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
 
-	return <div className="profile-card-wrapper">
+	return <div className="profile-card-wrapper" key={Math.random()}>
 			<div className="profile">
-				<img src={avatar} className="thumbnail" alt="profile"/>
+				<img
+					className="thumbnail"
+					src={avatar} 
+					crossOrigin="anonymous"
+					alt="profile"/>	
 				<div className="name">
 					<Link style={{textDecoration:"none"}} to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
 						{student.Name}
@@ -216,7 +220,6 @@ export class StudentList extends Component {
 			<div className="title no-print">All Students</div>
 			<div className="no-print">
 				<Card
-					key = {Math.random()}
 					items = {items}
 					Component = {StudentItem}
 					create = {create}

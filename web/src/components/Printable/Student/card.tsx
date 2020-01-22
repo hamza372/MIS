@@ -25,7 +25,13 @@ const StudentIDCard = (props: PropsTypes) => {
         </div>
         <div className="card-row first">
             <div className={ avatar ? "" : "card-student-profile"}>
-                { avatar && <img src={avatar} alt="profile" height={100} width={100}/>}
+            { 
+                avatar && <img 
+                    src={avatar}
+                    crossOrigin="anonymous"
+                    style={{ height:100, width: 100 }}
+                    alt="profile" />
+            }
             </div>
             <div className="card-student-info">
                 <div>Name: <span>{ student.Name }</span></div>

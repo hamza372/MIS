@@ -635,7 +635,7 @@ class SingleStudent extends Component<propTypes, S> {
 							className="profile-pic"
 							src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url}
 							crossOrigin="anonymous"
-							style={{ height: "auto", width: "auto" }}
+							style={{ height:100, width: 100 }}
 							alt="profile" />
 					</div>
 				}
