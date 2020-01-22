@@ -14,10 +14,12 @@ type PropsType = {
     }
 }
 
+
 const AdmissionForm = (props: PropsType) => {
     
     const { student, classes, school } = props
 
+    const avatar = student.ProfilePicture ? (student.ProfilePicture.url || student.ProfilePicture.image_string) : undefined
     const section = getSectionFromId(student.section_id, classes)
 
     return(<div className="print-only admission-form">
@@ -63,8 +65,13 @@ const AdmissionForm = (props: PropsType) => {
                             <div>{student.BloodType}</div>
                         </div>
                     </div>
-                    <div className="profile-picture">
-                        <img alt="student-profile" />
+                    <div className="profile-picture" style={{border: avatar ? "none" : "1px solid black"}}>
+                        { avatar && <img
+                            src={avatar}
+                            crossOrigin="anonymous"
+                            style={{height: 100, width: 100}}
+                            alt="student-profile" />
+                        }
                     </div>
                 </div>
             </fieldset>

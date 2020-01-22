@@ -609,9 +609,9 @@ class SingleStudent extends Component<propTypes, S> {
 
 		return <div className="single-student">
 			{this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
-			<div className="title">Edit Student</div>
+			<div className="title no-print">Edit Student</div>
 
-			<div className="form">
+			<div className="form no-print">
 				<div className="divider">Personal Information</div>
 
 				<div className="row">
@@ -1000,18 +1000,17 @@ class SingleStudent extends Component<propTypes, S> {
 					{prospective && !this.isNew() && !getStudentLimit(students, max_limit) ? <div className="button green" onClick={this.onEnrolled}>Enroll</div> : false}
 					<div className="button blue" onClick={() => window.print()}> Print</div>
 				</div>
-				<AdmissionForm 
-					student = {this.state.profile}
-					school = {{ 
-						name: this.props.settings.schoolName,
-						code: this.props.settings.schoolCode,
-						logo: this.props.logo,
-						phone: this.props.settings.schoolPhoneNumber,
-						address: this.props.settings.schoolAddress
-					}}
-					classes = {this.props.classes}
-				/>
 			</div>
+			<AdmissionForm 
+				student = {this.state.profile}
+				school = {{ 
+					name: this.props.settings.schoolName,
+					code: this.props.settings.schoolCode,
+					logo: this.props.logo,
+					phone: this.props.settings.schoolPhoneNumber,
+					address: this.props.settings.schoolAddress
+				}}
+				classes = {this.props.classes}/>
 		</div>
 	}
 }
