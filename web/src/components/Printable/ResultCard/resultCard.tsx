@@ -10,6 +10,7 @@ type PropsType = {
     settings: RootDBState["settings"]
     exams: RootDBState["exams"]
     sectionName: string
+    sectionTeacher: string
     logo: string
     grades: RootDBState["settings"]["exams"]["grades"]
     listBy: string
@@ -28,9 +29,11 @@ type PropsType = {
 
 const ResultCard = (props: PropsType) => {
 
-    const { student, settings, exams, sectionName, logo, grades, listBy, examFilter } = props
+    const { student, settings, exams, sectionName, sectionTeacher, logo, grades, listBy, examFilter } = props
 
-	const { schoolSession } = settings
+    const { schoolSession } = settings
+    
+    const avatar = student.ProfilePicture ? (student.ProfilePicture.url || student.ProfilePicture.image_string) : undefined
 
     const formatNumber = (val: number): string | number => {
         return Number.isInteger(val) ? val : val.toFixed(2)
@@ -80,7 +83,7 @@ const ResultCard = (props: PropsType) => {
     const attendance_percentage = (attendance.PRESENT / total_attendance_days) * 100
     
     return(<div className="school-result-card">
-            <div className="school-header">
+            <div className="school-header" style={{maxHeight: "40mm"}}>
                 <PrintHeader settings={settings} logo={logo}></PrintHeader>
             </div>
             <div className="no-print" style={{marginBottom: "20mm"}}/>
@@ -114,7 +117,7 @@ const ResultCard = (props: PropsType) => {
                     </div>
                     <div className="row">
                         <div className="label">Class Teacher:</div>
-                        <div className="bold text-underline"></div>
+                        <div className="bold text-underline">{sectionTeacher}</div>
                     </div>
                     <div className="row">
                         <div className="label">Attendance %:</div>
@@ -122,7 +125,12 @@ const ResultCard = (props: PropsType) => {
                     </div>
                 </div>
                 <div className="student-profile">
-                    
+                    { avatar && <img
+                        src={avatar}
+                        crossOrigin="anonymous"
+                        style={{height: 100, width: 100}}
+                        alt="profile"/>
+                    }
                 </div>
             </div>
             <div className="print-table" style={{height: "100mm"}}>

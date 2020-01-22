@@ -9,7 +9,7 @@ import chunkify from 'utils/chunkify'
 import getSectionFromId from 'utils/getSectionFromId'
 import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
 import ResultCard from 'components/Printable/ResultCard/resultCard'
-
+import getFacultyNameFromId from 'utils/getFacultyNameFromId'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 
 import './style.css'
@@ -18,11 +18,12 @@ type PropsType = {
 	curr_class_id: string,
 	curr_section_id: string,
 	faculty_id: string,
-	classes: RootDBState["classes"],
-	students: RootDBState["students"],
-	settings: RootDBState["settings"],
-	exams: RootDBState["exams"],
-	grades: RootDBState["settings"]["exams"]["grades"],
+	faculty: RootDBState["faculty"]
+	classes: RootDBState["classes"]
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
+	exams: RootDBState["exams"]
+	grades: RootDBState["settings"]["exams"]["grades"]
 	schoolLogo: string
 	sms_templates: RootDBState["sms_templates"]
 
@@ -88,13 +89,15 @@ class ClassReportMenu extends Component<PropsType, S> {
 	render() {
 
 		const { exam_title, year, print_type, exams_list_by } = this.state
-		const { students, exams, classes, settings, sms_templates, grades } = this.props
+		const { students, exams, classes, settings, sms_templates, grades, faculty } = this.props
 		
 		const section_id = this.getSectionIdFromParams()
 		const class_id = this.getClassIdFromParams()
 		
 		const section = getSectionFromId(section_id, classes)
 		const section_name  = this.getSectionName(section)
+
+		const section_teacher = getFacultyNameFromId(section.faculty_id, faculty)
 
 		// no. of records per chunk
 		const chunkSize = 22;
@@ -196,29 +199,28 @@ class ClassReportMenu extends Component<PropsType, S> {
 			</div>
 
 			<div className="class-report print-page" style={{ height: "100%" }}>
-				{
-					print_type === "Sheet" && exam_title !== "" ?
-						chunkify(marksSheet, chunkSize)
-							.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
-								sectionName={ section_name }
-								examSubjectsWithMarks={examSubjectsWithMarks}
-								examName={exam_title}
-								schoolName={this.props.settings.schoolName}
-								students={chunkItems}
-								chunkSize={index === 0 ? 0 : chunkSize * index} />) :
-
-						relevant_students.map(student => (
-								<ResultCard key={student.id}
-									student={student}
-									settings={settings}
-									exams={exams}
-									grades={grades}
-									examFilter={exam_filter}
-									logo={this.props.schoolLogo}
-									sectionName={section_name}
-									listBy={exams_list_by}
-								/>))
-				}
+			{
+				print_type === "Sheet" && exam_title !== "" ?
+					chunkify(marksSheet, chunkSize)
+						.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
+							sectionName={ section_name }
+							examSubjectsWithMarks={examSubjectsWithMarks}
+							examName={exam_title}
+							schoolName={this.props.settings.schoolName}
+							students={chunkItems}
+							chunkSize={index === 0 ? 0 : chunkSize * index} />) :
+				relevant_students
+					.map(student => <ResultCard key={student.id}
+						student={student}
+						settings={settings}
+						exams={exams}
+						grades={grades}
+						examFilter={exam_filter}
+						logo={this.props.schoolLogo}
+						sectionName={section_name}
+						sectionTeacher={section_teacher}
+						listBy={exams_list_by}/>)
+			}
 			</div>
 
 		</div>
@@ -227,6 +229,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 
 export default connect((state: RootReducerState) => ({
 	faculty_id: state.auth.faculty_id,
+	faculty: state.db.faculty,
 	classes: state.db.classes,
 	students: state.db.students,
 	settings: state.db.settings,
