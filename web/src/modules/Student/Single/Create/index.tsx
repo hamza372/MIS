@@ -3,7 +3,7 @@ import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps, Link } from 'react-router-dom';
-import Dynamic from '@ironbay/dynamic'
+import Dynamic from '@cerp/dynamic'
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
