@@ -3,8 +3,7 @@ import moment from 'moment';
 import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps, Link } from 'react-router-dom';
-import Dynamic from '@ironbay/dynamic'
-
+import Dynamic from '@cerp/dynamic'
 
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import { checkStudentDuesReturning } from 'utils/checkStudentDues'
@@ -635,7 +634,7 @@ class SingleStudent extends Component<propTypes, S> {
 							className="profile-pic"
 							src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url}
 							crossOrigin="anonymous"
-							style={{ height: "auto", width: "auto" }}
+							style={{ height:100, width: 100 }}
 							alt="profile" />
 					</div>
 				}

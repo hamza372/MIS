@@ -1,4 +1,4 @@
-import Dynamic from '@ironbay/dynamic'
+import Dynamic from '@cerp/dynamic'
 import { MERGES, DELETES, CONFIRM_SYNC_DIFF, QUEUE, SNAPSHOT, ON_CONNECT, ON_DISCONNECT, LOGIN_FAIL, LOGIN_SUCCEED, SNAPSHOT_DIFF, MergeAction, DeletesAction, ConfirmSyncAction, SnapshotDiffAction, ConfirmAnalyticsSyncAction, QueueAction, ImageUploadConfirmation, IMAGE_QUEUE_LOCK, IMAGE_QUEUE_UNLOCK } from 'actions/core'
 import { LOCAL_LOGIN, SCHOOL_LOGIN, LOCAL_LOGOUT, SIGN_UP_FAILED, SIGN_UP_SUCCEED, SIGN_UP_LOADING } from 'actions'
 import { AnyAction } from 'redux'
@@ -12,17 +12,16 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 		case "IMAGE_UPLOAD_CONFIRM":
 			{
 				const confirmation = action as ImageUploadConfirmation
-				const state_copy: RootReducerState = JSON.parse(JSON.stringify(state))
 
 				// action tells us the image url and id at the path. so we put it there
-				Dynamic.put(state_copy, confirmation.path, confirmation.value)
+				const nextState = Dynamic.put(state, confirmation.path, confirmation.value)
 
 				// we remove the item from the queue
 				const k = confirmation.path.join(',')
-				console.log('existing queue item', state_copy.queued.images, state_copy.queued.images[k])
-				delete state_copy.queued.images[k]
+				console.log('existing queue item', nextState.queued.images, nextState.queued.images[k])
+				delete nextState.queued.images[k]
 
-				return state_copy
+				return nextState
 			}
 
 		case IMAGE_QUEUE_LOCK:
@@ -97,9 +96,9 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 
 		case MERGES:
 			{
-				const nextState = (action as MergeAction).merges.reduce((agg, curr) => {
-					return Dynamic.put(agg, curr.path, curr.value)
-				}, JSON.parse(JSON.stringify(state)))
+				const nextState = (action as MergeAction).merges.reduce<RootReducerState>((agg, curr) => {
+					return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+				}, state)
 
 				// we shouldn't accept snapshots until we get a confirm....
 
@@ -112,12 +111,12 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 		case DELETES:
 			{
 
-				const state_copy = JSON.parse(JSON.stringify(state)) as RootReducerState;
+				//const state_copy = JSON.parse(JSON.stringify(state)) as RootReducerState;
 
-				(action as DeletesAction).paths.forEach(a => Dynamic.delete(state_copy, a.path));
+				const nextState = (action as DeletesAction).paths.reduce<RootReducerState>((agg, curr) => Dynamic.delete(agg, curr.path) as RootReducerState, state);
 
 				return {
-					...state_copy,
+					...nextState,
 					acceptSnapshot: false
 				}
 			}
@@ -183,7 +182,8 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					})
 					.reduce((agg, curr) => {
 						return Dynamic.put(agg,
-							[state.queued.mutations[curr].action.path], state.queued.mutations[curr])
+							state.queued.mutations[curr].action.path,
+							state.queued.mutations[curr])
 					}, {})
 
 				const newQ = {
@@ -197,10 +197,10 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					const nextState = Object.values(diff_action.new_writes)
 						.reduce((agg, curr) => {
 							if (curr.type === "DELETE") {
-								return Dynamic.delete(agg, curr.path)
+								return Dynamic.delete(agg, curr.path) as RootReducerState
 							}
-							return Dynamic.put(agg, curr.path, curr.value)
-						}, JSON.parse(JSON.stringify(state)))
+							return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+						}, state)
 
 					return {
 						...nextState,
@@ -231,12 +231,12 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 				if (Object.keys(snapshot.new_writes).length > 0) {
 
 					const nextState = Object.values(snapshot.new_writes)
-						.reduce((agg, curr) => {
+						.reduce<RootReducerState>((agg, curr) => {
 							if (curr.type === "DELETE") {
-								return Dynamic.delete(agg, curr.path);
+								return Dynamic.delete(agg, curr.path) as RootReducerState;
 							}
-							return Dynamic.put(agg, curr.path, curr.value)
-						}, JSON.parse(JSON.stringify(state)))
+							return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+						}, state)
 
 					return {
 						...nextState,
