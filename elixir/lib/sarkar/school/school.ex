@@ -1,19 +1,26 @@
 defmodule Sarkar.School do
 	use GenServer
 
-	def init(args) do
-		{:ok, args}
+	@timeout :infinity
+
+	def init({school_id}) do
+
+		IO.puts "loading school #{school_id}..."
+		{db, writes} = Sarkar.Store.School.load(school_id)
+		IO.puts "loaded #{school_id}"
+
+		{:ok, {school_id, writes, db}, @timeout}
+	end
+
+	def terminate(reason, state) do
+		# no cleanup to do... just want to remove from memory
 	end
 
 	def start_link({school_id}) do
 		IO.puts "initting school #{school_id}"
-
-		# state is school_id, map of writes, map of db.
-		# TODO: map of writes: (path) -> date
-		{db, writes} = Sarkar.Store.School.load(school_id)
 		GenServer.start_link(
 			__MODULE__,
-			{school_id, writes, db},
+			{school_id},
 			name: via(school_id)
 		)
 	end
@@ -150,10 +157,16 @@ end
 
 	# SERVER
 
+	def handle_info(:timeout, {school_id, db, writes} = state) do
+		IO.puts "terminating #{school_id}"
+
+		{:stop, :normal, state}
+	end
+
 	def handle_call({:reload_db}, _from, {school_id, writes, db} = state) do
 		{new_db, new_writes} = Sarkar.Store.School.load(school_id)
 
-		{:reply, new_db, {school_id, new_writes, new_db}}
+		{:reply, new_db, {school_id, new_writes, new_db}, @timeout}
 	end
 
 	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {school_id, writes, db} = state) do
@@ -319,19 +332,19 @@ end
 		
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
+			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}, @timeout}
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
 				Sarkar.Store.School.save(school_id, new_writes)
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
+				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}, @timeout}
 		end
 	end
 
 	def handle_call({:get_db}, _from, {school_id, writes, db} = state) do
-		{:reply, db, state}
+		{:reply, db, state, @timeout}
 	end
 
 	def handle_call(a, b, c) do 
@@ -339,7 +352,7 @@ end
 		IO.inspect b
 		IO.inspect c
 
-		{:reply, "no match...", c}
+		{:reply, "no match...", c, @timeout}
 	end
 
 	# generates action
