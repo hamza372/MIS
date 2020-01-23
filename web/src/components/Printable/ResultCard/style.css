@@ -83,7 +83,7 @@
     display: flex;
 }
 .school-result-card .student-info {
-    width: 70%;
+    width: 80%;
 }
 .school-result-card .student-info .row {
     justify-content: left;

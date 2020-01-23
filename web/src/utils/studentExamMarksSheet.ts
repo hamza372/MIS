@@ -1,14 +1,9 @@
 import moment from 'moment'
 import calculateGrade from 'utils/calculateGrade'
 
-type ExamFilter = {
-    exam_title: string
-    year: string
-}
-
-const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
+const getStudentExamMarksSheet = (students: MISStudent[], exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
     
-    if(section_exams.length === 0)
+    if(exams.length === 0)
         return []
 
     const marks_sheet = students
@@ -26,7 +21,7 @@ const getStudentExamMarksSheet = (students: MISStudent[], section_exams: MISExam
              * 	which is make sure, if a student didn't attempt the exam so that he must have default value to avoid calculations
              * 	error or property accessing issues while printing record of student
              */
-            for (const exam of section_exams) {
+            for (const exam of exams) {
                 const stats = curr.exams[exam.id] || { score: 0, remarks: "", grade: "" }
 
                 if(exam.name === filter.exam_title && moment(exam.date).format("YYYY") === filter.year) {

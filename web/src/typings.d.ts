@@ -388,3 +388,10 @@ interface StudentMarksSheet {
     grade: string
     remarks: string
 }
+
+interface ExamFilter {
+	month?: string
+	year: string
+	subject?: string
+	exam_title: string
+}

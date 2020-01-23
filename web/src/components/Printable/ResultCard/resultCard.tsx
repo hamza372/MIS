@@ -9,16 +9,12 @@ type PropsType = {
     student: MISStudent
     settings: RootDBState["settings"]
     exams: RootDBState["exams"]
-    sectionName: string
+    section: AugmentedSection
     sectionTeacher: string
     logo: string
     grades: RootDBState["settings"]["exams"]["grades"]
     listBy: string
-    examFilter: {
-        exam_title: string
-        month?: string
-        year: string
-    }
+    examFilter: ExamFilter
     styles?: {
         showBorder: boolean
         showProfile: boolean
@@ -29,10 +25,13 @@ type PropsType = {
 
 const ResultCard = (props: PropsType) => {
 
-    const { student, settings, exams, sectionName, sectionTeacher, logo, grades, listBy, examFilter } = props
+    const { student, settings, exams, section, sectionTeacher, logo, grades, listBy, examFilter } = props
 
     const { schoolSession } = settings
-    
+
+    const { exam_title, subject, month, year } = examFilter
+
+    const result_card_title = exam_title === "Test" && month !== "" ? `${exam_title}-${month}` : exam_title
     const avatar = student.ProfilePicture ? (student.ProfilePicture.url || student.ProfilePicture.image_string) : undefined
 
     const formatNumber = (val: number): string | number => {
@@ -67,12 +66,13 @@ const ResultCard = (props: PropsType) => {
 	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
 		.filter(exam_id => exams[exam_id])
 		.map(exam_id => exams[exam_id])
-        .filter(exam => moment(exam.date).format("YYYY") === examFilter.year &&
-            exam.name === examFilter.exam_title &&
-            student.exams[exam.id].grade !== "Absent")
+        .filter(exam => exam.name === exam_title &&
+            moment(exam.date).format("YYYY") === year &&
+            (exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true) &&
+            (exam_title === "Test" && subject !=="" ? exam.subject === subject : true ))
 		.reduce((agg, curr) => ({
-			total_marks: agg.total_marks + parseFloat(curr.total_score.toString()) || 0,
-			marks_obtained: agg.marks_obtained + parseFloat(student.exams[curr.id].score.toString()) || 0
+			total_marks: agg.total_marks + parseFloat(curr.total_score.toString() || '0'),
+			marks_obtained: agg.marks_obtained + parseFloat(student.exams[curr.id].score.toString() || '0')
         }), { total_marks: 0, marks_obtained: 0 })
         
     const attendance = calculateAttendace(student)
@@ -90,7 +90,7 @@ const ResultCard = (props: PropsType) => {
             <div className="result-card-header">
                 <div className="row">
                     <div className="school-session"> Session: {moment(schoolSession.start_date).format("YYYY")} - {moment(schoolSession.end_date).format("YYYY")} </div>
-                    <div className="exam-title">Exam Term: {examFilter.exam_title}</div>
+                    <div className="exam-title">Exam: { result_card_title }</div>
                 </div>
             </div>
             <div className="student-info-card">
@@ -113,7 +113,7 @@ const ResultCard = (props: PropsType) => {
                     </div>
                     <div className="row">
                         <div className="label">Class-Section:</div>
-                        <div className="bold text-underline">{sectionName}</div>
+                        <div className="bold text-underline">{section.namespaced_name}</div>
                     </div>
                     <div className="row">
                         <div className="label">Class Teacher:</div>
@@ -151,8 +151,11 @@ const ResultCard = (props: PropsType) => {
                         Object.keys(student.exams || {})
                             .filter(exam_id => exams[exam_id])
                             .map(exam_id => exams[exam_id])
-                            .filter(exam => moment(exam.date).format("YYYY") === examFilter.year && exam.name === examFilter.exam_title)
-                            .sort((a, b) => examFilter.exam_title === "" ? (a.date - b.date) : a.subject.localeCompare(b.subject))
+                            .filter(exam => exam.name === exam_title &&
+                                moment(exam.date).format("YYYY") === year &&
+                                (exam_title === "Test" && month !=="" ? moment(exam.date).format("MMMM") === month : true) &&
+                                (exam_title === "Test" && subject !=="" ? exam.subject === subject : true ))
+                            .sort((a, b) => exam_title === "" ? (a.date - b.date) : a.subject.localeCompare(b.subject))
                             .map((exam, i) => <tr key={exam.id}>
                                     <td className="text-center">{ listBy === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</td>
                                     <td>{exam.subject}</td>

@@ -11,6 +11,8 @@ import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
 import ResultCard from 'components/Printable/ResultCard/resultCard'
 import getFacultyNameFromId from 'utils/getFacultyNameFromId'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
+import Months from 'constants/months'
+import getReportStringForStudent from 'utils/getReportStringForStudent'
 
 import './style.css'
 
@@ -33,11 +35,12 @@ type PropsType = {
 
 interface S {
 	year: string
+	month: string
 	exam_title: string
+	subject: string
 	exams_list_by: string
 	print_type: string
 }
-
 
 interface RouteInfo {
 	class_id: string
@@ -53,6 +56,8 @@ class ClassReportMenu extends Component<PropsType, S> {
 		this.state = {
 			exam_title: "Final-Term",
 			year: moment().format("YYYY"),
+			month: moment().format("MMMM"),
+			subject: "",
 			exams_list_by: "Sr No.",
 			print_type: "Cards"
 		}
@@ -88,8 +93,10 @@ class ClassReportMenu extends Component<PropsType, S> {
 
 	render() {
 
-		const { exam_title, year, print_type, exams_list_by } = this.state
+		const { exam_title, subject, year, month, print_type, exams_list_by } = this.state
 		const { students, exams, classes, settings, sms_templates, grades, faculty } = this.props
+		
+		const exam_filter = { exam_title, year, month, subject }
 		
 		const section_id = this.getSectionIdFromParams()
 		const class_id = this.getClassIdFromParams()
@@ -103,37 +110,31 @@ class ClassReportMenu extends Component<PropsType, S> {
 		const chunkSize = 22;
 
 		const relevant_students = Object.values(students)
-			.filter((student: MISStudent) => student.Name &&
-				student.exams &&
-				student.section_id &&
+			.filter((student: MISStudent) => student.Name && student.exams &&
 				student.section_id === section_id)
 			.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
 
-		const section_exams = Object.values(exams)
-			.filter(e => e.class_id === class_id &&
-				e.section_id !== undefined &&
-				e.section_id === section_id)
-
 		const years = new Set<string>()
 		const exam_titles = new Set<string>()
+		const subjects = new Set<string>()
 		const examSubjectsWithMarks = new Set<string>()
 		
-		for (const exam of section_exams) {
-			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year) {
+		for (const exam of Object.values(exams)) {
+			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
+				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true) &&
+				(exam_title === "Test" && subject ? exam.subject === subject : true)) {
 				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
-		}
-		for(const [, exam] of Object.entries(exams)) {
-			if(exam && exam.id && exam.section_id === section_id) {
-				exam_titles.add(exam.name)
-				years.add(moment(exam.date).format("YYYY"))
+			// show all subjects of class in the list
+			if(exam.section_id === section_id && exam.class_id === class_id) {
+				subjects.add(exam.subject)
 			}
+			exam_titles.add(exam.name)
+			years.add(moment(exam.date).format("YYYY"))
 		}
-
-		const exam_filter = { exam_title, year}
 
 		// sorted marks sheet
-		const marksSheet = getStudentExamMarksSheet(relevant_students, section_exams, grades, exam_filter)
+		const marksSheet = getStudentExamMarksSheet(relevant_students, Object.values(exams), grades, exam_filter)
 
 		const messages = relevant_students
 			.filter(s => s.Phone !== "")
@@ -141,7 +142,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 				number: student.Phone,
 				text: sms_templates.result
 					.replace(/\$NAME/g, student.Name)
-					// .replace(/\$REPORT/g, reportStringForStudent(student, exams, moment(this.state.start).unix() * 100, moment(this.state.report_filters.end).unix() * 1000, this.state.report_filters.examFilterText, this.state.report_filters.subjectFilterText))
+					.replace(/\$REPORT/g, getReportStringForStudent(student, exams, exam_filter, grades))
 			}))
 
 		const url = smsIntentLink({
@@ -154,12 +155,12 @@ class ClassReportMenu extends Component<PropsType, S> {
 			<div className="section-container section no-print">
 				<div className="form">
 					<div className="row">
-					<label>Exams for Year</label>
+						<label>Exams for Year</label>
 						<select {...this.former.super_handle(["year"])}>
-								<option value="">Select Year</option>
-								{
-									Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
-								}
+							<option value="">Select Year</option>
+							{
+								Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+							}
 						</select>
 					</div>
 					<div className="row">
@@ -175,6 +176,30 @@ class ClassReportMenu extends Component<PropsType, S> {
 							}
 						</select>
 					</div>
+					{
+						exam_title === "Test" &&
+							<div className="row">
+								<label>Select Test Month</label>
+								<select {...this.former.super_handle(["month"])}>
+									<option value="">Select Month</option>
+									{
+										Months.map(month => <option key={month} value={month}>{month}</option>)
+									}
+								</select>
+							</div>
+					}
+					{
+						exam_title === "Test" &&
+							<div className="row">
+								<label>Select Test Subject</label>
+								<select {...this.former.super_handle(["subject"])}>
+									<option value="">Select Select</option>
+									{
+										Array.from(subjects).map(subject => <option key={subject} value={subject}>{subject}</option>)
+									}
+								</select>
+							</div>
+					}
 					<div className="row">
 						<label>Print</label>
 						<select {...this.former.super_handle(["print_type"])}>
@@ -217,7 +242,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 						grades={grades}
 						examFilter={exam_filter}
 						logo={this.props.schoolLogo}
-						sectionName={section_name}
+						section={section}
 						sectionTeacher={section_teacher}
 						listBy={exams_list_by}/>)
 			}
