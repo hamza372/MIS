@@ -35,14 +35,14 @@ defmodule Sarkar.Store.Supplier do
 
 	# modify this to return db + (last 50) writes writes map of path, value, data, type
 	def handle_call({:load, id}, _from, state) do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT sync_state from suppliers where id=$1", [id]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:reply, {%{}, %{}}, state}
 				{:ok, resp} ->
 					[[sync_state]] = resp.rows
 
-					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM platform_writes WHERE id=$1 ORDER BY time desc limit $2", [id, 50]) do
+					case Sarkar.DB.Postgres.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM platform_writes WHERE id=$1 ORDER BY time desc limit $2", [id, 50]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
 								|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
@@ -61,7 +61,7 @@ defmodule Sarkar.Store.Supplier do
 	end
 
 	def handle_call({:get_writes, id, last_sync_date}, _from, state) do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT path, value, time, type, client_id FROM platform_writes where id=$1 AND time > $2 ORDER BY time desc", 
 			[id, last_sync_date]) do
@@ -80,7 +80,7 @@ defmodule Sarkar.Store.Supplier do
 	end
 
 	def handle_call({:get_ids}, _from, state) do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT id from suppliers", []) do
 				{:ok, resp} -> 
@@ -97,7 +97,7 @@ defmodule Sarkar.Store.Supplier do
 
 	def handle_cast({:save, id, sync_state}, state) do
 
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"INSERT INTO suppliers (id, sync_state) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET sync_state=$2",
 			[id, sync_state]) do
@@ -122,7 +122,7 @@ defmodule Sarkar.Store.Supplier do
 			end)
 			|> Enum.reduce([], fn curr, agg -> Enum.concat(agg, curr) end)
 
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"INSERT INTO platform_writes (id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings, ",")}", 
 			flattened_writes) do

@@ -3,7 +3,7 @@ defmodule Sarkar.Auth.Dashboard do
 	def login({id, client_id, password}) do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT * from mis_dashboard_auth where id=$1 AND password=$2", 
 			[id, hash(password, 52)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid login"}
@@ -20,7 +20,7 @@ defmodule Sarkar.Auth.Dashboard do
 	end
 
 	def create ({id, password, permissions }) do
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"INSERT INTO mis_dashboard_auth (id, password, permissions) values ($1, $2, $3)", 
 			[id, hash(password, 52), permissions]) do
 				{:ok, _res} -> 

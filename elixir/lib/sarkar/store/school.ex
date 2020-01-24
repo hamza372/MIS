@@ -21,7 +21,7 @@ defmodule Sarkar.Store.School do
 				"($#{x}, $#{x + 1}, $#{x + 2}, $#{x + 3}, $#{x + 4}, $#{x + 5})" 
 			end)
 
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"INSERT INTO writes (school_id, path, value, time, type, client_id) VALUES #{Enum.join(gen_value_strings_writes, ",")}", 
 			flattened_writes) do
@@ -100,7 +100,7 @@ defmodule Sarkar.Store.School do
 								ON CONFLICT (school_id, path) DO UPDATE set value=excluded.value, time=excluded.time"
 
 							arguments = chunked_muts |> Enum.reduce([], fn (a, collect) -> collect ++ a end)
-							{:ok, res }= Postgrex.query(conn, query_string, arguments)
+							{:ok, res }= Sarkar.DB.Postgres.query(conn, query_string, arguments)
 							res
 
 						"DELETE" -> 
@@ -115,17 +115,17 @@ defmodule Sarkar.Store.School do
 								} end)
 							
 							query_string = "DELETE FROM flattened_schools WHERE school_id = $1 and #{Enum.join(query_section, " OR ")}"
-							{:ok, res} = Postgrex.query(conn, query_string, [school_id | arguments])
+							{:ok, res} = Sarkar.DB.Postgres.query(conn, query_string, [school_id | arguments])
 							res
 					end
 				end)
 			end)
-		end)
+		end, pool: DBConnection.Poolboy)
 
 	end
 
 	def load(school_id) do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT path, value FROM flattened_schools WHERE school_id=$1 ORDER BY time asc", [school_id]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {%{}, %{}}
@@ -136,7 +136,7 @@ defmodule Sarkar.Store.School do
 						Dynamic.put(agg, path, v)
 					end)
 
-					case Postgrex.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
+					case Sarkar.DB.Postgres.query(Sarkar.School.DB, "SELECT path, value, time, type, client_id FROM writes WHERE school_id=$1 ORDER BY time desc limit $2", [school_id, 50]) do
 						{:ok, writes_resp} ->
 							write_formatted = writes_resp.rows
 								|> Enum.map(fn([ [_ | p] = path, value, time, type, client_id]) -> {Enum.join(p, ","), %{
@@ -155,7 +155,7 @@ defmodule Sarkar.Store.School do
 	end
 
 	def get_school_ids() do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT school_id from flattened_schools", []) do
 				{:ok, resp} -> 
@@ -166,7 +166,7 @@ defmodule Sarkar.Store.School do
 	end
 
 	def get_writes(school_id, last_sync_date) do
-		case Postgrex.query(
+		case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT path, value, time, type, client_id FROM writes where school_id=$1 AND time > $2 ORDER BY time desc", 
 			[school_id, last_sync_date], timeout: 30000) do
