@@ -11,7 +11,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		state
 	) do
 
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				DISTINCT school_id
@@ -34,7 +34,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		},
 		state
 	) do
-		{:ok, resp } = Postgrex.query(
+		{:ok, resp } = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT * FROM mischool_referrals", 
 			[]
@@ -60,7 +60,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		state
 	) do
 		# SCHOOL_INFO
-		{:ok, student_limit} = Postgrex.query(
+		{:ok, student_limit} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				value
@@ -69,7 +69,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			[school_id,"max_limit"]
 		)
 
-		{:ok, package_info} = Postgrex.query(
+		{:ok, package_info} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				value,
@@ -103,7 +103,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				)
 		end
 
-		{:ok, meta} = case Postgrex.query(
+		{:ok, meta} = case Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				value
@@ -133,7 +133,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		state
 	) do
 		
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
@@ -171,7 +171,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		},
 		state
 	) do
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
@@ -210,7 +210,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		},
 		state
 	) do
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
@@ -246,7 +246,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		state
 	) do
 
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as d,
@@ -268,7 +268,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			end
 		)
 
-		{:ok, resp2} = Postgrex.query(
+		{:ok, resp2} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT count(*)
 			FROM (
@@ -296,7 +296,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		state
 	) do
 
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as d,
@@ -318,7 +318,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			end
 		)
 
-		{:ok, resp2} = Postgrex.query(
+		{:ok, resp2} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT count(*)
 			FROM (
@@ -345,7 +345,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		},
 		state
 	) do
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as d,
@@ -372,7 +372,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			end
 		)
 
-		{:ok, resp2} = Postgrex.query(
+		{:ok, resp2} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT count(*)
 			FROM (
@@ -399,7 +399,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		},
 		state
 	) do 
-		{:ok, resp} = Postgrex.query(
+		{:ok, resp} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT 
 				to_timestamp(time/1000)::date as d,
@@ -422,7 +422,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			end
 		)
 
-		{:ok, resp2} = Postgrex.query(
+		{:ok, resp2} = Sarkar.DB.Postgres.query(
 			Sarkar.School.DB,
 			"SELECT count(*)
 			FROM (

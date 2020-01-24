@@ -20,6 +20,7 @@ defmodule Sarkar.Application do
 					database: "postgres",
 					port: System.get_env("POSTGRES_PORT") || "5432",
 					types: Sarkar.PostgrexTypes,
+					pool: DBConnection.Poolboy,
 					pool_size: 10
 			},
 			:poolboy.child_spec(:image_worker, [

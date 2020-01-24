@@ -9,7 +9,7 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "devices.csv"}} = req, state) do
 
-		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
+		{:ok, data} = case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT school_id, client_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
 		FROM writes
 		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
@@ -37,7 +37,7 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
 
-		{:ok, data} = case Postgrex.query(Sarkar.School.DB,
+		{:ok, data} = case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
 		FROM writes
 		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
@@ -80,7 +80,7 @@ defmodule Sarkar.Server.Analytics do
 		Postgrex.transaction(Sarkar.School.DB, fn(conn) ->
 			stream = Postgrex.stream(conn,
 				"SELECT school_id, path, value, time, type, client_id, sync_time 
-				FROM writes", [])
+				FROM writes", [], pool: DBConnection.Poolboy)
 
 			stream
 			|> Stream.map(fn res ->
@@ -90,7 +90,7 @@ defmodule Sarkar.Server.Analytics do
 			end)
 			|> Enum.to_list
 
-		end, timeout: :infinity)
+		end, pool: DBConnection.Poolboy)
 
 		:cowboy_req.stream_body("", :fin, req1)
 
@@ -99,7 +99,7 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "fees.csv"}} = req, state) do
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT 
 				to_timestamp(time/1000)::date::text as d, 
 				school_id, 
@@ -127,7 +127,7 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "exams.csv"}} = req, state) do
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT 
 				to_timestamp(time/1000)::date::text as d,
 				school_id,
@@ -154,7 +154,7 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "sign_ups.csv"}} = req, state) do
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				form ->> 'name' as Name,
 				form ->> 'schoolName' as School,
@@ -180,7 +180,7 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "attendance.csv"}} = req, state) do
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date::text as d, 
 				school_id,
@@ -205,7 +205,7 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "teacher_attendance.csv"}} = req, state) do
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date::text as d, 
 				school_id,
@@ -231,7 +231,7 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "sms.csv"}} = req, state) do
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date::text as d, 
 				school_id, 
@@ -266,7 +266,7 @@ defmodule Sarkar.Server.Analytics do
 	end
 
 	def init(%{bindings: %{type: "expense.csv"}} = req, state) do 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT 
 				to_timestamp(time/1000)::date::text as d,
 				school_id,
@@ -293,7 +293,7 @@ defmodule Sarkar.Server.Analytics do
 
 	def init(%{bindings: %{type: "referrals.csv"}} = req, state) do 
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB, 
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB, 
 		"SELECT
 			to_timestamp(time/1000)::date::text as Date,
 			id,
