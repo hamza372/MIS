@@ -52,8 +52,10 @@ export const ClassResultSheet = (props: PropsTypes) => {
                             return <tr key={index}>
                                 <td>{student.rollNo || ''}</td>
                                 <td>{student.name}</td>
-                                {
-                                    student.exams.map((exam, i) => <td key={i} className="cell-center"> {exam.stats ? exam.stats.score : 0 } </td>)
+                                {   
+                                    student.exams
+                                        .sort((a, b) => a.subject.localeCompare(b.subject))
+                                        .map((exam, i) => <td key={i} className="cell-center"> {exam.stats ? exam.stats.score : 0 } </td>)
                                 }
                                 <td className="cell-center">{`${ formatMarks(student.marks.obtained) }/${ student.marks.total }`}</td>
                                 <td className="cell-center">{ student.grade }</td>
