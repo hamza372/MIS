@@ -182,7 +182,7 @@ const rootReducer = (state: RootReducerState, action: AnyAction): RootReducerSta
 					})
 					.reduce((agg, curr) => {
 						return Dynamic.put(agg,
-							state.queued.mutations[curr].action.path,
+							[state.queued.mutations[curr].action.path.join(',')],
 							state.queued.mutations[curr])
 					}, {})
 

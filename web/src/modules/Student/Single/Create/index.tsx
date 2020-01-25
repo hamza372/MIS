@@ -15,14 +15,13 @@ import getStudentLimit from 'utils/getStudentLimit'
 import Hyphenator from 'utils/Hyphenator'
 
 import { createStudentMerge, deleteStudent, uploadStudentProfilePicture } from 'actions'
-
+import Camera from 'components/Camera';
 import Modal from 'components/Modal'
 import Banner from 'components/Banner'
 import Former from 'utils/former'
+import AdmissionForm from 'components/Printable/Student/admissionform'
 
 import './style.css'
-import { PrintHeader } from 'components/Layout';
-import Camera from 'components/Camera';
 
 // this page will have all the profile info for a student.
 // all this data will be editable.
@@ -608,14 +607,11 @@ class SingleStudent extends Component<propTypes, S> {
 
 		const oldStudent = students[this.props.match.params.id]
 
-		const { settings, logo } = this.props
-
 		return <div className="single-student">
 			{this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
-			<PrintHeader settings={settings} logo={logo} />
-			<div className="title">Edit Student</div>
+			<div className="title no-print">Edit Student</div>
 
-			<div className="form">
+			<div className="form no-print">
 				<div className="divider">Personal Information</div>
 
 				<div className="row">
@@ -986,6 +982,16 @@ class SingleStudent extends Component<propTypes, S> {
 					<div className="button blue" onClick={() => window.print()}> Print</div>
 				</div>
 			</div>
+			<AdmissionForm 
+				student = {this.state.profile}
+				school = {{ 
+					name: this.props.settings.schoolName,
+					code: this.props.settings.schoolCode,
+					logo: this.props.logo,
+					phone: this.props.settings.schoolPhoneNumber,
+					address: this.props.settings.schoolAddress
+				}}
+				classes = {this.props.classes}/>
 		</div>
 	}
 }
