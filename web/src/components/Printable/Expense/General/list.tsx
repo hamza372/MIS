@@ -40,7 +40,7 @@ export const GeneralExpensePrintableList = (props: PropsTypes) => {
                             <td className="cell-center">{exp.amount - exp.deduction}</td>
                         </tr>
                     } else {
-                        return <tr>
+                        return <tr key={id}>
                             <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
                             <td>{exp.label}</td>
                             <td>{exp.category}</td>
