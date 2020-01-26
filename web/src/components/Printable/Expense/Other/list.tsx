@@ -31,11 +31,11 @@ export const IncomeExpenditurePrintableList = (props: PropsTypes) => {
                 <tbody>
                 {
                     props.items.map(([id, exp]: any, i: number) => <tr key={id}>
-                    <td>{moment(exp.date).format(dateView)}</td>
+                    <td className="cell-center">{moment(exp.date).format(dateView)}</td>
 					<td> {exp.label}</td>
 					<td> {exp.category}</td>
-					<td> {exp.quantity} {exp.quantity !== 1 ? "Entries" : "Entry"}</td>
-					<td> {exp.amount}</td>
+					<td className="cell-center"> {exp.quantity} {exp.quantity !== 1 ? "Entries" : "Entry"}</td>
+					<td className="cell-center"> {exp.amount}</td>
                     </tr>)
                 }
                 </tbody>

@@ -1,27 +1,23 @@
-
 .list-wrap {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 	align-items: center;
 }
-
-	.list-wrap .search-bar {
-		display: flex;
-		flex-direction: column;
-		border: 1px solid black;
-		width: 90%;
-		margin-top: 15px;
-		border-radius: 5px;
-		padding-left: 5px;
-		margin-bottom: 10px;
-	}
-
-	.list-wrap .button {
-		align-self: flex-end;
-		margin-right: 5%;
-	}
-
+.list-wrap .search-bar {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	width: 90%;
+	margin-top: 15px;
+	border-radius: 5px;
+	padding-left: 5px;
+	margin-bottom: 10px;
+}
+.list-wrap .button {
+	align-self: flex-end;
+	margin-right: 5%;
+}
 .list {
 	display: flex;
 	flex-direction: column;
@@ -29,10 +25,8 @@
 	border: 1px solid #777;
 	width: 90%;
 	margin-top: 15px;
-	/*border-radius: 20px 20px 0 0;*/
 	border-radius: 4px;
 }
-
 .list>* {
 	display: flex;
 	flex-direction: row;
@@ -45,14 +39,12 @@
 	page-break-after: always;
 	page-break-inside: avoid;
 }
-	.list>*:last-child {
-		border-bottom: none;
-	}
-
+.list>*:last-child {
+	border-bottom: none;
+}
 .list-row>* {
 	margin: 0 10px;
 }
-
 .list-row>a {
 	display: flex;
 	align-items: center;
@@ -60,19 +52,16 @@
 	height: 100%;
 	flex-shrink: 1000000000;
 }
-
 .list .table.row>*:first-child {
 	margin-left: 10px;
 }
 .list .table.row>*:last-child {
 	margin-right: 10px;
 }
-
 .list .create {
 	justify-content: center;
 	cursor: pointer;
 }
-
 .list .create a {
 	text-decoration: none;
 	color: black;
@@ -84,40 +73,38 @@
 	/*border-radius: 20px 20px 0 0;*/
 	transition: all .2s ease-in;
 }
+.list .create a:hover {
+	background-color: black;
+	color: white;
+}
+.total {
+	flex-direction: row;
+	display: flex;
+	width: 90%;
+	align-items: center;
+}
+.total .label {
+	width: 100%;
+	font-size: 1.2rem;
+}
+.total .button.blue {
+	width: 20%;
+	margin-right: auto;
+	font-size: 1rem;
+}
+.list>* {
+	font-size: 1.2rem 
+}
 
-	.list .create a:hover {
-		background-color: black;
-		color: white;
-	}
+@media (max-width: 768px) {
 
-	.total {
-		flex-direction: row;
-		display: flex;
-		width: 90%;
-		align-items: center;
+	.total .label{
+		width: 100%;
+		font-size: 1.2rem;
 	}
-		.total .label{
-			width: 100%;
-			font-size: 1.2rem;
-		}
-		.total .button.blue{
-			width: 60%;
-			margin-right: auto;
-			font-size: 0.9rem;
-		}
-	
-	@media only screen and (min-width: 768px) {
-		
-			.total .label{
-				width: 100%;
-				font-size: 1.2rem;
-			}
-			.total .button.blue{
-				width: 20%;
-				margin-right: auto;
-				font-size: 1rem;
-			}
-			.list>*{
-				font-size: 1.2rem 
-			}
+	.total .button.blue{
+		width: 80%;
+		margin-right: auto;
+		font-size: 1rem;
 	}
+}

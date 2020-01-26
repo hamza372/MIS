@@ -21,7 +21,7 @@ export const GeneralExpensePrintableList = (props: PropsTypes) => {
                         <th className="row-date">Date</th>
                         <th className="row-label">Label</th>
                         <th className="row-category">Category</th>
-                        <th className="row-quantity">Quant.</th>
+                        <th className="row-quantity">Quantity</th>
                         <th className="row-deduction">Deduction</th>
                         <th className="row-amount">Amount</th>
                     </tr>
