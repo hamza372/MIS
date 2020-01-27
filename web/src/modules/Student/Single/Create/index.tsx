@@ -863,25 +863,6 @@ class SingleStudent extends Component<propTypes, S> {
 				}
 
 				{!prospective ? <div className="row">
-					<label>Roll No</label>
-					<input
-						type="text"
-						{...this.former.super_handle(["RollNumber"])}
-						placeholder="Roll Number" disabled={!admin}
-					/>
-				</div> : false}
-
-				{!prospective ? <div className="row">
-					<label>Admission Date</label>
-					<input type="date"
-						onChange={this.former.handle(["StartDate"])}
-						value={moment(this.state.profile.StartDate).format("YYYY-MM-DD")}
-						placeholder="Admission Date"
-						disabled={!admin}
-					/>
-				</div> : false}
-
-				{!prospective ? <div className="row">
 					<label>Admission Number</label>
 					<input type="text" {...this.former.super_handle(["AdmissionNumber"])} placeholder="Admission Number" disabled={!admin} />
 				</div> : false}

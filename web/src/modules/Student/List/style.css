@@ -9,20 +9,15 @@
 	border: 3px solid rgba(0,0,0,0.2);
 }
 
-.student-list .print{
-	margin-top: 15px;
-	margin-left: auto;
-	margin-right: 5%;
-}
-
-.filter-container{
+.filter-container {
 	width: 90%;
 	align-items: center;
-	margin-bottom: 4px
+	margin-bottom: 4px;
+	justify-content: space-between;
 }
 
-.filter-container .checkbox-container{
-	width: 80%;
+.filter-container .checkbox-container {
+	width: 40%;
 	align-items: center;
 }
 
@@ -33,26 +28,36 @@
 }
 
 .list-select {
-	width: 50%;
-	height: 40px
+	width: 40%;
+	height: 40px;
+	margin: .2rem;
 }
 
-@media (max-width: 600px) {
+.student-list .print.button {
+	width: 15%;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	margin: .2rem;
+	margin-right: 0;
+}
+
+@media (max-width: 768px) {
 	.filter-container {
 		flex-wrap: wrap;
 	}
 	.checkbox-container {
 		flex: 1 0 33%;
 	}
+
 }
 .profile-card-wrapper {
-    width: 220px;
+    width: 240px;
 	height: 420px;
 	margin: 0.5rem;
     background: #FDFEFF;
     transition: background .6s ease;
     border-radius: 10px;
-    padding: 20px 20px 20px 20px;
+    padding: 20px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
 }
 .profile-card-wrapper .profile {
@@ -79,7 +84,7 @@
 }
 .profile-card-wrapper .profile .name {
     color: rgb(14, 138, 240);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
 	text-align: center;
 	margin-bottom: 10px;

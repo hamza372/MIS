@@ -5,7 +5,7 @@ import "./../print.css"
 import "./style.css"
 
 type PropsTypes = {
-  students: MISStudent[]
+  students: AugmentedStudents[]
   schoolName: string
   schoolLogo: string
   schoolSession: {
@@ -14,6 +14,8 @@ type PropsTypes = {
   }
   studentClass: string
 }
+
+type AugmentedStudents = MISStudent & { section: AugmentedSection }
 
 export const StudenPrintableIDCardList = (props: PropsTypes) => {
 
@@ -26,19 +28,15 @@ export const StudenPrintableIDCardList = (props: PropsTypes) => {
   return (
     <div className="student-id-card print-only print-table" style={{ width: "90%" }}>
       <table>
-        <caption>
-            <div className="text-uppercase">{ schoolName ? schoolName : "" }</div>
-            <div>Students Cards for { studentClass }</div>
-        </caption>
         <tbody>
             <div className="card-grid">
               {
                 sorted_students.map(student => ( <StudentIDCard key={ student.id }
-                      student={ student }
-                      schoolName={ schoolName }
-                      studentClass={ studentClass }
-                      schoolLogo={ schoolLogo }
-                      schoolSession={ schoolSession }/>))
+                    student={ student }
+                    schoolName={ schoolName }
+                    studentClass={ student.section && student.section.namespaced_name ? student.section.namespaced_name : ""}
+                    schoolLogo={ schoolLogo }
+                    schoolSession={ schoolSession }/>))
               }
             </div>
         </tbody>

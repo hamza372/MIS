@@ -17,7 +17,7 @@ import './style.css'
 
 const StudentItem = (student) => {
 	
-	const section_name = student.relevant_section ? student.relevant_section.namespaced_name: "No Class"
+	const section_name = student.section ? student.section.namespaced_name: "No Class"
 	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
 	
 	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
@@ -48,7 +48,7 @@ const StudentItem = (student) => {
 				</div>
 				<div className="row info">
 					<label>Roll No </label>
-					<div>{(student.forwardTo !== "prospective-student" &&student.RollNumber) || ""}</div>
+					<div>{(student.forwardTo !== "prospective-student" && student.RollNumber) || ""}</div>
 				</div>
 				<div className="row info">
 					<label>Phone </label>
@@ -62,7 +62,7 @@ const StudentItem = (student) => {
 				}
 				</div>
 				<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-					Edit
+					{student.forwardTo === "payment" ? "View Payments" : "Edit Student"}
 				</Link>
 			</div>
 		</div>
@@ -70,7 +70,7 @@ const StudentItem = (student) => {
 
 const toLabel = (student) => {
 	
-	const section_name = student.relevant_section ? student.relevant_section.className : "No Class";
+	const section_name = student.section ? student.section.namespaced_name : "No Class";
 	const admissionNumber = student.AdmissionNumber ? `a${student.AdmissionNumber}` : "";
 	const phone = student.Phone;
 	return student.Name + student.ManName + section_name + admissionNumber + phone;
@@ -174,8 +174,8 @@ export class StudentList extends Component {
 		}
 
 		const sections = getSectionsFromClasses(classes)
-		const curr_section = this.getSectionName(sections)
-		const chunkSize = 21 // students per page on printsheet
+		const section_name = this.getSectionName(sections)
+		const chunkSize = 29 // students per page on printsheet
 	
 		let items = Object.entries(students)
 		.filter(([, s]) => s.id && s.Name && 
@@ -186,11 +186,20 @@ export class StudentList extends Component {
 			const relevant_section = sections.find(section => student.section_id === section.id);
 			return { 
 				...student,
-				relevant_section,
+				section: relevant_section,
 				id,
 				forwardTo
 			} 
-		});	
+		});
+
+		if(this.state.selected_section_id.length === 0) {
+			items = items.sort((a, b) => {
+				const aYear = a.section ? a.section.classYear : 0
+				const bYear = b.section ? b.section.classYear : 0
+
+				return aYear - bYear
+			})
+		}
 	
 		let create = '/student/new' 
 		let createText = "Add new Student"
@@ -241,8 +250,8 @@ export class StudentList extends Component {
 								ID Cards
 							</div>
 						</div>
-						<div>
-							<select className="list-select" {...this.former.super_handle(["tag"])}>
+						<div className="row">
+							<select className="list-select" {...this.former.super_handle(["tag"])} style={{marginLeft: 0}}>
 								<option value="">Select Tag</option>
 								{
 									[...this.uniqueTags(students).keys()]
@@ -259,6 +268,7 @@ export class StudentList extends Component {
 										.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
 								}
 							</select>
+							<div className="print button" onClick={() => window.print()}>Print</div>
 						</div>
 					</div>}
 				</Card>
@@ -272,18 +282,17 @@ export class StudentList extends Component {
 					.map((chunkItems, index) => <StudentPrintableList students={chunkItems} key={index} 
 						chunkSize={ index === 0 ? 0 : chunkSize * index }
 						schoolName={ settings.schoolName }
-						studentClass={ curr_section }/>)
+						studentClass={ section_name }/>)
                                               :
-                // print 8 students ID cards per page
-				chunkify(items, 8)
+                // print 10 students ID cards per page
+				chunkify(items, 10)
 					.map((chunkItems, index) => <StudenPrintableIDCardList students={chunkItems} key={index}
 						schoolName={ settings.schoolName }
 						schoolLogo={ this.props.schoolLogo }
-						studentClass={ curr_section }
+						studentClass={ section_name }
 						schoolSession={ schoolSession }/>)
 			}
 			
-			<div className="print button" onClick={() => window.print()}>{ this.state.printStudentCard ? "Print ID Cards" : "Print Students List"}</div>
 		</div>
 	}
 }

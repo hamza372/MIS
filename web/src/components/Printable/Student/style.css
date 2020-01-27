@@ -69,11 +69,21 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2,1fr);
-    grid-gap: 20px;
+    grid-gap: 12px;
 }
 .student-id-card.print-table table {
-    margin-bottom: 3.6cm;
+    margin-bottom: 0.372cm;
 }
+.student-info-list.print-table table {
+    margin-bottom: 6.10mm;
+}
+.student-info-list.print-table table tbody {
+    font-size: 0.85rem;
+}
+.student-info-list.print-table .row-sr {
+    width: 4%;
+}
+
 .admission-form {
     width: 95%;
 }
