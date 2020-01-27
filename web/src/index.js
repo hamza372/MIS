@@ -15,7 +15,8 @@ import debounce from 'utils/debounce'
 import { loadDB, connected, disconnected, processImageQueue } from './actions/core'
 import Syncr from '@cerp/syncr'
 
-window.debug_host = '83cb1449.ngrok.io';
+//window.debug_host = '6be4f963.ngrok.io';
+window.debug_host = 'mis-socket.metal.fish'
 
 const host = window.api_url || window.debug_host;
 
