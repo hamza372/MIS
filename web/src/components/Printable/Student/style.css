@@ -69,8 +69,97 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2,1fr);
-    grid-gap: 20px;
+    grid-gap: 12px;
 }
 .student-id-card.print-table table {
-    margin-bottom: 3.6cm;
+    margin-bottom: 0.372cm;
+}
+.student-info-list.print-table table {
+    margin-bottom: 6.10mm;
+}
+.student-info-list.print-table table tbody {
+    font-size: 0.85rem;
+}
+.student-info-list.print-table .row-sr {
+    width: 4%;
+}
+
+.admission-form {
+    width: 95%;
+}
+.admission-form .header-section {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 30px;
+}
+.admission-form .header-body {
+    display: flex;
+    border: 1px solid black;
+}
+.admission-form .logo-container {
+    width: 20%;
+}
+.admission-form .header-style {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    padding-bottom: 20px;
+}
+.admission-form .header-style .school-title {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+}
+.admission-form .header-style .address {
+    margin-bottom: 4px;
+}
+.admission-form .admission-title {
+    font-weight: bold;
+    font-size: 1.4rem;
+    text-decoration: underline;
+}
+.admission-form fieldset {
+    border-radius: 0;
+    border: 1px solid black;
+}
+.admission-form fieldset .row {
+    justify-content: space-between;
+    margin-bottom: 4mm;
+}
+.admission-form fieldset .row .gender {
+  display: flex;
+  border-bottom: none;   
+}
+.admission-form fieldset .row .gender input {
+    margin-top: 5px;
+}
+.admission-form fieldset .row div {
+    width: 50%;
+    border-bottom: 1px dotted black;
+}
+.admission-form input[type="checkbox"] {
+    width: 30px;
+    height: 15px;
+}
+.admission-form .row.signature-section {
+    justify-content: space-between;
+    margin-top: 8mm;
+}
+.admission-form .row.signature-section .left, .right {
+    border-top: 1px solid #bebebe;
+    padding: 10px 0px;
+}
+.admission-form .student-info-card {
+    display: flex;
+    flex-direction: row ;
+}
+.admission-form .student-info-card .student-info {
+    flex-direction: column;
+    width: 80%;
+    padding-right: 10px;
+}
+.admission-form .student-info-card .profile-picture {
+    flex-direction: column;
+    margin-top: 32px;
+    margin-left: 15px;
+    height: 100px;
+    width: 100px;
 }

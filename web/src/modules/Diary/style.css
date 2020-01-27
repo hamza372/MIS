@@ -1,29 +1,7 @@
 .diary .form {
 	width: 90%;
 }
-@media print {
-	@page {
-		size: auto;
-		margin: 4px;
-	}
-	.section {
-		border-radius: 4px;
-	}
-	.section div {
-		font-weight: bold;
-	}
-	
-	.section input {
-		border: 0px;
-		padding: 0px !important;
-	}
-	.diary .section .row {
-		border-bottom: 1px solid;
-	}
-}
-.diary .no-print {
-	width: unset;
-}
+
 .signature {
 	margin-top: 20px !important;
 	margin-bottom: 20px !important;

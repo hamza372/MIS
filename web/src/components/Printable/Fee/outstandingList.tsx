@@ -5,18 +5,9 @@ type PropsTypes = {
     items: any
     chunkSize: number
     schoolName: string
-    sections: SectionItem[]
+    sections: AugmentedSection[]
 }
 
-type SectionItem = {
-    id: string;
-    class_id: string;
-    namespaced_name: string;
-    className: string;
-    classYear: number;
-    name: string;
-    faculty_id?: string;
-}
 interface Payment {
 	SUBMITTED: number
 	SCHOLARSHIP: number
@@ -30,15 +21,13 @@ type itemsType = {
 	familyId?: string
 }
 
-
-
 export const OutstandingFeePrintableList = (props: PropsTypes) => {
 
     const calculateDebt = ({ SUBMITTED, FORGIVEN, OWED, SCHOLARSHIP }: Payment) => (SUBMITTED + FORGIVEN + SCHOLARSHIP - OWED) * -1;
 
     const getStudentSection = (id: string): string => {
         const section =  props.sections.filter(section => section.id === id)[0]
-        return section !==undefined ? section.namespaced_name : "-"
+        return section ? section.namespaced_name : "No Class"
     } 
 
     return (
@@ -62,12 +51,12 @@ export const OutstandingFeePrintableList = (props: PropsTypes) => {
                 <tbody>
                    {
                     props.items.map(({ student, debt, familyId }:itemsType, i: number) => <tr key={student.id}>
-                        <td style={{textAlign: "center"}}>{i + props.chunkSize + 1}</td>
+                        <td className="cell-center">{i + props.chunkSize + 1}</td>
                         <td>{familyId ? `${familyId}(F)` : student.Name}</td>
                         <td>{familyId ? "(Family)" : getStudentSection(student.section_id)}</td>
-                        <td style={{textAlign: "center"}}>{student.RollNumber}</td>
-                        <td style={{textAlign: "center"}}>{student.Phone}</td>
-                        <td>{calculateDebt(debt)}</td>
+                        <td className="cell-center">{student.RollNumber}</td>
+                        <td className="cell-center">{student.Phone}</td>
+                        <td className="cell-center">Rs. {calculateDebt(debt)}</td>
                     </tr>) 
                    }
                 </tbody>

@@ -14,8 +14,8 @@ type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, sec
 export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
 
     return (
-        <div className="print-only print-table" style={{width: "90%"}}>
-            <table>
+        <div className="print-only print-table" style={{width: "95%"}}>
+            <table style={{marginBottom: "1cm"}}>
                 <caption>
                     <div>Paid Fee Students List - {moment().format("DD/MM/YYYY")}</div>
                     <div className="row" style={{justifyContent: "space-between"}}>

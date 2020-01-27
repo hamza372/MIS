@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Layout from 'components/Layout'
-import {PrintHeader} from 'components/Layout'
 import {connect} from 'react-redux'
 import { sendSMS, sendBatchSMS } from 'actions/core'
 import { logSms, addDiary } from 'actions'
@@ -10,6 +9,8 @@ import {getSectionsFromClasses} from 'utils/getSectionsFromClasses'
 import { RouteComponentProps } from 'react-router-dom'
 import former from 'utils/former'
 import moment from 'moment'
+import getSectionFromId from 'utils/getSectionFromId'
+import DiaryPrintable from 'components/Printable/Diary/diary'
 
 import './style.css'
 
@@ -17,7 +18,6 @@ interface P {
 	students: RootDBState["students"];
 	classes: RootDBState["classes"];
 	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
 	faculty_id: string;
 	diary: RootDBState["diary"];
 
@@ -236,9 +236,14 @@ class Diary extends Component <propTypes,S> {
 		}
 	}
 
-	getSelectedSectionName = () => getSectionsFromClasses(this.props.classes)
-		.filter(s => s.id === this.state.selected_section_id)
-		.map (s => s.namespaced_name)[0]
+	getSelectedSectionName = (): string => {
+		const { selected_section_id } = this.state
+		const { classes } = this.props
+
+		const section = getSectionFromId(selected_section_id, classes)
+
+		return section && section.namespaced_name ? section.namespaced_name : ""
+	}
 	
 	getMessages = (): MISSms[] => {
 		
@@ -274,14 +279,26 @@ class Diary extends Component <propTypes,S> {
 		return messages
 	}
 
-	render() {
+	getSelectedSectionDiary = () => {
 
-		const { classes, sendBatchMessages, settings, schoolLogo } = this.props;
+		const { selected_section_id, diary } = this.state
+
+		return  Object.entries(diary[selected_section_id] || {})
+			.reduce((agg, [subject, { homework }]) => {
+				return {
+					...agg,
+					[subject]: homework
+				}
+
+			}, {} as {[id: string]: string})
+	}
+
+	render() {
+		const { classes, sendBatchMessages, settings } = this.props;
 		
 		// ascending order of classes/sections
 		const sortedSections = getSectionsFromClasses(classes).sort((a, b) => (a.classYear || 0) - (b.classYear || 0));
-		const selected_section_name  = this.getSelectedSectionName();
-		
+
 		const messages = this.getMessages()
 
 		const subjects = new Set<string>()
@@ -295,16 +312,11 @@ class Diary extends Component <propTypes,S> {
 
 		return <Layout history={this.props.history}>
 			<div className="diary">
-				<PrintHeader settings={settings} logo={schoolLogo}/>
 				{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
-					<div className="title">School Diary</div>
-					<div className="form">
-						<div className="no-print divider">Send Diary for {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
-						<div className ="print-only row">
-							<div><b>Date:</b> {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
-							<div><b>Class:</b> {selected_section_name}</div>
-						</div>
-						<div className="no-print section">
+					<div className="no-print title">School Diary</div>
+					<div className="no-print form">
+						<div className="divider">Send Diary for {moment(this.state.selected_date).format("DD-MMMM-YYYY")}</div>
+						<div className="section">
 							<div className="row">
 								<label>Diary Date</label>
 								<input 	type="date" 
@@ -389,14 +401,13 @@ class Diary extends Component <propTypes,S> {
 					}
 					
 				</div>
-				<div className="print-only form">
-					<div className="row signature">
-						<div>Teacher's Signature: ___________________</div>
-					</div>
-					<div className="row signature">
-						<div>Parents' Signature: ___________________</div>
-					</div>
-				</div>
+				{ this.state.selected_section_id && <DiaryPrintable
+						schoolName = {this.props.settings.schoolName}
+						sectionName = {this.getSelectedSectionName()}
+						diaryDate = {moment(this.state.selected_date).format("DD, MMMM YYYY")}
+						schoolDiary = {this.getSelectedSectionDiary()}
+					/>
+				}
 			</div>
 		</Layout>
   	}
@@ -406,8 +417,7 @@ export default connect((state: RootReducerState) => ({
 	diary: state.db.diary,
 	students: state.db.students,
 	classes: state.db.classes,
-	settings: state.db.settings,	
-	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "", 
+	settings: state.db.settings
 }), (dispatch: Function) => ({
 	sendMessage : (text: string, number: string) => dispatch(sendSMS(text, number)),
 	sendBatchMessages: (messages: MISSms[]) => dispatch(sendBatchSMS(messages)),

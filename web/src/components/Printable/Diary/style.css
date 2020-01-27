@@ -1,0 +1,23 @@
+@media print {
+    .printable-diary fieldset {
+        max-height: 60mm;
+        margin-top: 3mm;
+        margin-bottom: 3mm;
+    }
+    .printable-diary .print-table {
+        font-size: 0.70rem;
+    }
+    .printable-diary .print-table table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+    .printable-diary .print-table table thead th {
+        font-size: 0.85rem;
+    }
+    .printable-diary.print-table table tr {
+        padding: .175em;
+        line-height: 0.2;
+    }
+}
