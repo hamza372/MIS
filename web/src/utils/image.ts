@@ -34,9 +34,6 @@ export const getDownsizedImage = (imageDataUrl: string, max_size: number, format
 		image.onload = (i) => {
 			const canvas = document.createElement("canvas")
 			let width = image.width;
-			console.log('downsizing: ')
-			console.log('width: ', image.width)
-			console.log('height: ', image.height)
 			let height = image.height;
 			if (width > height) {
 				if (width > max_size) {
@@ -51,14 +48,12 @@ export const getDownsizedImage = (imageDataUrl: string, max_size: number, format
 				}
 			}
 
-			console.log('new: ', width, height)
-
 			canvas.width = width;
 			canvas.height = height;
 			canvas.getContext('2d').drawImage(image, 0, 0, width, height)
 			const dataUrl = canvas.toDataURL(`image/${format}`)
 
-			console.log(dataUrl)
+			canvas.remove()
 
 			resolve(dataUrl)
 
