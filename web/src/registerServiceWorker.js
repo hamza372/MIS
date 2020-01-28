@@ -65,7 +65,7 @@ function registerValidSW(swUrl) {
 							// the fresh content will have been added to the cache.
 							// It's the perfect time to display a "New content is
 							// available; please refresh." message in your web app.
-							navigator.serviceWorker.controller.postMessage({
+							installingWorker.postMessage({
 								type: "SKIP_WAITING"
 							})
 							alert("New update is available! Close app and reopen to update.")
@@ -77,6 +77,7 @@ function registerValidSW(swUrl) {
 							console.log('Content is cached for offline use.');
 						}
 					}
+
 				};
 			};
 		})
