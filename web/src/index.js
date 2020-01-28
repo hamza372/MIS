@@ -1,22 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import registerServiceWorker from './registerServiceWorker';
-
-import 'core-js/features/object'
-
+import Syncr from '@cerp/syncr'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import reducer from './reducers'
+import 'core-js/features/object'
 
+import registerServiceWorker from './registerServiceWorker';
+import reducer from './reducers'
 import Routes from './routes'
 import { saveDb, initState } from './utils/indexedDb'
 import debounce from 'utils/debounce'
 import { loadDB, connected, disconnected, processImageQueue } from './actions/core'
-import Syncr from '@cerp/syncr'
 
-//window.debug_host = '6be4f963.ngrok.io';
-window.debug_host = 'mis-socket.metal.fish'
+import './index.css';
+
+window.debug_host = '6be4f963.ngrok.io';
+//window.debug_host = 'mis-socket.metal.fish'
 
 const host = window.api_url || window.debug_host;
 
