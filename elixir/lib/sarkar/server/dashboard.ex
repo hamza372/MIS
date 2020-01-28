@@ -18,7 +18,7 @@ defmodule Sarkar.Server.Dashboard do
 
 	def init(%{bindings: %{type: "referrals"}} = req, state) do
 		
-		{:ok, resp } = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp } = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT * FROM mischool_referrals", [])
 
 		referrals = resp.rows
@@ -37,7 +37,7 @@ defmodule Sarkar.Server.Dashboard do
 	end
 
 	def init(%{bindings: %{type: "school_list"}} = req, state) do
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT
 			DISTINCT school_id
 		FROM flattened_schools",[])
@@ -63,7 +63,7 @@ defmodule Sarkar.Server.Dashboard do
 
 		school_id = Map.get(decoded_params, "school_id")
 
-		{:ok, student_limit} = Postgrex.query(Sarkar.School.DB,
+		{:ok, student_limit} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				value
 			FROM flattened_schools
@@ -71,7 +71,7 @@ defmodule Sarkar.Server.Dashboard do
 			[school_id,"max_limit"]
 		)
 
-		{:ok, package_info} = Postgrex.query(Sarkar.School.DB,
+		{:ok, package_info} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				value,
 				path
@@ -127,7 +127,7 @@ defmodule Sarkar.Server.Dashboard do
 		end_date = Map.get(decoded_params, "end_date")
 			|> String.to_integer
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
 				count(distinct path[3]) as expense_usage
@@ -166,7 +166,7 @@ defmodule Sarkar.Server.Dashboard do
 		end_date = Map.get(decoded_params, "end_date")
 					|> String.to_integer
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
 				count(value ->> 'count') as sms_usage
@@ -206,7 +206,7 @@ defmodule Sarkar.Server.Dashboard do
 		end_date = Map.get(decoded_params, "end_date")
 			|> String.to_integer
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as date,
 				count(distinct path[3]) as diary_usage
@@ -240,7 +240,7 @@ defmodule Sarkar.Server.Dashboard do
 			|> String.to_integer
 		school_id = Map.get(decoded_params, "school_id")
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT
 			to_timestamp(time/1000)::date as d,
 			school_id,
@@ -253,7 +253,7 @@ defmodule Sarkar.Server.Dashboard do
 		coordinates = resp.rows 
 		|> Enum.map(fn [date, school_id, students_marked] -> %{"date" => date, "school_id" => school_id, "students_marked" => students_marked} end)
 
-		{:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp2} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 
 		"SELECT count(*)
 		FROM (
@@ -289,7 +289,7 @@ defmodule Sarkar.Server.Dashboard do
 
 		school_id = Map.get(decoded_params, "school_id")
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as d,
 				school_id,
@@ -303,7 +303,7 @@ defmodule Sarkar.Server.Dashboard do
 		coordinates = resp.rows
 		|> Enum.map(fn[date, school_id, teachers_marked] -> %{"date" => date, "school_id" => school_id, "teachers_marked" => teachers_marked} end)
 
-		{:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp2} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"
 		SELECT count(*)
 		FROM (
@@ -338,7 +338,7 @@ defmodule Sarkar.Server.Dashboard do
 		school_id = Map.get(decoded_params, "school_id")
 
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT
 				to_timestamp(time/1000)::date as d,
 				school_id,
@@ -355,7 +355,7 @@ defmodule Sarkar.Server.Dashboard do
 		coordinates = resp.rows
 		|> Enum.map(fn [date, school_id, unique_students, num_payments, total] -> %{ "date" => date, "school_id" => school_id, "unique_students" => unique_students, "num_payments" => num_payments, "total" => total} end)
 
-		{:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp2} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"
 			SELECT count(*)
 			FROM (
@@ -388,7 +388,7 @@ defmodule Sarkar.Server.Dashboard do
 			|> String.to_integer
 		school_id = Map.get(decoded_params, "school_id")
 
-		{:ok, resp} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT 
 				to_timestamp(time/1000)::date as d,
 				school_id,
@@ -401,7 +401,7 @@ defmodule Sarkar.Server.Dashboard do
 		coordinates = resp.rows
 		|> Enum.map(fn [date, school_id, students_graded, exams] -> %{ "date" => date, "school_id" => school_id, "students_graded" => students_graded,  "exams" => exams} end)
 
-		{:ok, resp2} = Postgrex.query(Sarkar.School.DB,
+		{:ok, resp2} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"
 		SELECT count(*)
 		FROM (

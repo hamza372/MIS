@@ -1,7 +1,7 @@
 defmodule Sarkar.Auth do
 
 	def create({id, password}) do
-		{:ok, confirm_text } = case Postgrex.query(Sarkar.School.DB,
+		{:ok, confirm_text } = case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"INSERT INTO auth (id, password) values ($1, $2)", 
 			[id, hash(password, 52)]) do
 				{:ok, _res} -> 
@@ -24,7 +24,7 @@ defmodule Sarkar.Auth do
 		case Postgrex.transaction(
 			Sarkar.School.DB,
 			fn(conn) ->
-				case Postgrex.query(
+				case Sarkar.DB.Postgres.query(
 					conn,
 					"INSERT INTO auth (id, password) values ($1, $2)",
 					[id, hash(password, 52)]
@@ -37,7 +37,7 @@ defmodule Sarkar.Auth do
 						)
 				end
 
-				case Postgrex.query(
+				case Sarkar.DB.Postgres.query(
 					conn,
 					"INSERT INTO mischool_referrals (id, time, value) VALUES ($1, $2, $3)",
 					[id, time, value]
@@ -49,7 +49,8 @@ defmodule Sarkar.Auth do
 							err
 						)
 				end
-			end
+			end,
+			pool: DBConnection.Poolboy
 		) do
 			{:ok, _resp} ->
 				start_school(id)
@@ -85,7 +86,7 @@ defmodule Sarkar.Auth do
 	def login({id, client_id, password}) do
 		# first check if password is correct.
 		# if correct, generate a new token, put in db
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"SELECT * from auth where id=$1 AND password=$2", 
 			[id, hash(password, 52)]) do
 				{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid login"}
@@ -97,7 +98,7 @@ defmodule Sarkar.Auth do
 	end
 
 	def updatePassword({id, password}) do
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"UPDATE auth SET password=$2 WHERE id=$1", 
 			[id, hash(password, 52)]) do
 				{:ok, _res} -> 
@@ -110,7 +111,7 @@ defmodule Sarkar.Auth do
 
 	def update_referrals_info({ school_id, value}) do
 
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"UPDATE mischool_referrals SET value=$2 WHERE id=$1",
 		[school_id,value]) do
 			{:ok, _res} ->
@@ -123,7 +124,7 @@ defmodule Sarkar.Auth do
 	end
 
 	def verify({id, client_id, token}) do
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 		"SELECT * FROM tokens WHERE id=$1 AND token=$2 AND client_id=$3",
 		[id, hash(token, 12), client_id]) do
 			{:ok, %Postgrex.Result{num_rows: 0}} -> {:error, "invalid token"}
@@ -139,7 +140,7 @@ defmodule Sarkar.Auth do
 			|> Base.url_encode64
 			|> binary_part(0, 12)
 		
-		case Postgrex.query(Sarkar.School.DB, "INSERT INTO tokens (id, token, client_id) values ($1, $2, $3)", [id, hash(token, 12), client_id]) do
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB, "INSERT INTO tokens (id, token, client_id) values ($1, $2, $3)", [id, hash(token, 12), client_id]) do
 			{:ok, _res} -> {:ok, token}
 			{:error, err} -> 
 				IO.inspect err

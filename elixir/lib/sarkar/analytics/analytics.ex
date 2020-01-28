@@ -48,14 +48,15 @@ defmodule Sarkar.Analytics do
 
 							query_string = "INSERT INTO mischool_analytics ( id, school_id, value, time, type, client_id) VALUES #{value_string} ON CONFLICT DO NOTHING"
 
-							{:ok, _resp} = Postgrex.query(
+							{:ok, _resp} = Sarkar.DB.Postgres.query(
 								conn,
 								query_string,
 								arguments
 							)
 						end
 					)
-			end
+			end,
+			pool: DBConnection.Poolboy
 		) do
 			{:ok,resp} ->
 				%{"type" => "CONFIRM_ANALYTICS_SYNC", "time" => latest_time}

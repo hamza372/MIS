@@ -1,141 +1,120 @@
-	.card-list{
-		display: flex;
+.card-list {
+	display: flex;
+	flex-direction: row;
+	width: 90%;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.card-list .icon-card {
+	width: 30%;
+	flex-direction: row;
+	margin: 10px;
+}
+.icard-title {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	width: 40%;
+	font-size: 2vw;
+	flex-shrink: 1;
+	height: 100%;
+	justify-content: center;
+	text-transform: capitalize;
+}
+.card-list .icon-card .icard-para {
+	display: flex;
+	flex-direction: column;
+	border-left: none;
+	width: 60%;
+	height: 100%;
+	align-items: flex-start;
+	font-size: 1.1rem;
+	margin: 0 5px;
+	border-left: 1px solid rgb(218, 218, 218);
+	color: #555;
+}
+.card-list .icon-card .icard-para .row {
+	width: 100%;
+	overflow: auto;
+}
+.card-list .icon-card .icard-para .para-row{
+	margin: 2px 0;
+	width: 100%;
+	text-align: left;
+	text-transform: capitalize;
+	border-bottom: 1px solid rgb(241, 239, 239);
+}
+.card-list .icon-card .icard-para .para-row:last-child {
+	border-bottom: none;
+}		
+.card-list .icon-card .icard-image-container{
+	width: 20%
+}
+.card-wrap {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	align-items: center;
+}
+.card-wrap .total {
+	width: 90%
+}
+.card-wrap .label {
+	width: 100%
+}
+.card-wrap .search-bar {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	width: 90%;
+	margin-top: 15px;
+	border-radius: 5px;
+	padding-left: 5px;
+	margin-bottom: 10px;
+}
+.card-wrap .button {
+	align-self: flex-end;
+	margin-right: 5%;
+}
+
+@media (max-width: 768px) {
+
+	.card-list {
 		flex-direction: row;
 		width: 90%;
-		justify-content: center;
+		justify-content: space-evenly;
 		align-items: center;
 		flex-wrap: wrap;
 	}
-
 	.card-list .icon-card {
-		width: 30%;
-		flex-direction: row;
-		margin: 10px;
-	}
-
-		.icard-title {
-			display: flex;
-			flex-direction: column;
-			text-align: center;
-			width: 40%;
-			font-size: 2vw;
-			flex-shrink: 1;
-			height: 100%;
-			justify-content: center;
-			text-transform: capitalize;
-		}
-
-		.card-list .icon-card .icard-para {
-			display: flex;
-			flex-direction: column;
-			border-left: none;
-			width: 60%;
-			height: 100%;
-			align-items: flex-start;
-			font-size: 1.1rem;
-			margin: 0 5px;
-			border-left: 1px solid rgb(218, 218, 218);
-			color: #555;
-
-		}
-			.card-list .icon-card .icard-para .row {
-				width: 100%;
-				overflow: auto;
-			}
-
-			.card-list .icon-card .icard-para .para-row{
-				margin: 2px 0;
-				width: 100%;
-				text-align: left;
-				text-transform: capitalize;
-				border-bottom: 1px solid rgb(241, 239, 239);
-			}
-
-			.card-list .icon-card .icard-para .para-row:last-child {
-				border-bottom: none;
-			}
-			
-	.card-list .icon-card .icard-image-container{
-		width: 20%
-	}
-
-	.card-wrap {
-		display: flex;
+		width: 40%;
 		flex-direction: column;
+		height: fit-content;
+	}
+	.icard-title {
 		width: 100%;
-		align-items: center;
+		font-size: 1.5rem;
+		border-bottom: 1px solid #bbb;
+		border-right: none;
+		height: 30%;
+		justify-content: center
 	}
-
-	.card-wrap .total {
-		width: 90%
+	.card-list .icon-card .icard-para {
+		width: 100%;
+		height: 70%;
+		margin-left: none;
+		border-left: none;
 	}
-
-	.card-wrap .label {
-		width: 100%
+	.card-list .icon-card .icard-para .para-row {
+		text-align: left;
+		padding: 5px 0;
 	}
-
-	.card-wrap .search-bar {
-		display: flex;
-		flex-direction: column;
-		border: 1px solid black;
-		width: 90%;
-		margin-top: 15px;
-		border-radius: 5px;
-		padding-left: 5px;
-		margin-bottom: 10px;
+	.total .label {
+		width: 100%;
+		font-size: 1.2rem;
 	}
-
-	.card-wrap .button {
-		align-self: flex-end;
-		margin-right: 5%;
+	.list>* {
+		font-size: 1.2rem 
 	}
-
-	@media only screen and (max-width: 768px) {
-
-		.card-list{
-			flex-direction: row;
-			width: 90%;
-			justify-content: space-evenly;
-			align-items: center;
-			flex-wrap: wrap;
-		}
-	
-		.card-list .icon-card {
-			width: 40%;
-			flex-direction: column;
-			height: fit-content;
-		}
-			.icard-title {
-				width: 100%;
-				font-size: 1.5rem;
-				border-right: none;
-				border-bottom: 1px solid #bbb;
-				height: 30%;
-				justify-content: center
-	
-			}
-			.card-list .icon-card .icard-para {
-				width: 100%;
-				height: 70%;
-				margin-left: none;
-				border-left: none;
-			}
-
-				.card-list .icon-card .icard-para .para-row{
-					text-align: left;
-					padding: 5px 0;
-				}
-
-		.total .label{
-			width: 100%;
-			font-size: 1.2rem;
-		}
-		.total .button.blue{
-			width: 20%;
-			margin-right: auto;
-			font-size: 1rem;
-		}
-		.list>*{
-			font-size: 1.2rem 
-		}
-	}
+}
