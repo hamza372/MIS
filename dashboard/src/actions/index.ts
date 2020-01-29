@@ -228,7 +228,8 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 			username,
 			password,
 			limit,
-			value
+			value,
+			role: state.auth.role
 		}
 	})
 	.then((res)=> {

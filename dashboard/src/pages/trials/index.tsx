@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createSchoolLogin, updateReferralInformation, getReferralsInfo } from 'actions/index'
+import { updateReferralInformation, getReferralsInfo } from 'actions/index'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
@@ -10,7 +10,6 @@ import moment from 'moment';
 interface P {
 	trials: RootReducerState["trials"]
 	getReferralsInfo: () => any
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
 	updateReferralInformation: (school_id: string, value: any) => any
 }
 
@@ -290,7 +289,6 @@ class Trial extends Component<propTypes, S> {
 export default connect((state: RootReducerState) => ({
 	trials: state.trials
 }), (dispatch: Function) => ({
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
 	updateReferralInformation: (school_id: string, value: any) => dispatch(updateReferralInformation(school_id, value)),
 	getReferralsInfo: () => dispatch(getReferralsInfo())
 }))(Trial)
