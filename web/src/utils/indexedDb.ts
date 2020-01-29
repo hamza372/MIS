@@ -1,7 +1,8 @@
 import { v4 } from 'node-uuid'
 
-import { openDB } from 'idb'
+import { openDB, IDBPDatabase, IDBPTransaction } from 'idb'
 import { defaultExams } from 'modules/Settings';
+import Dynamic from '@cerp/dynamic'
 import moment from 'moment';
 
 const defaultTemplates = () => ({
@@ -64,21 +65,81 @@ export const initState: RootReducerState = {
 	},
 }
 
+const upgradeOneToTwo = (db: IDBPDatabase<unknown>, oldVersion: number, newVersion: number, transaction: IDBPTransaction<unknown, string[]>) => {
+
+	try {
+		db.createObjectStore('root-state')
+	}
+	catch (e) {
+		console.error(e)
+	}
+
+	try {
+		db.createObjectStore('flattened-state')
+	}
+	catch (e) {
+		console.error(e)
+	}
+
+	// get data from 1, put it into 2
+	console.log('returning transaction promise')
+	return transaction.db.get('root-state', 'db')
+		.then(oldDb => {
+			const parsed: RootReducerState = JSON.parse(oldDb)
+
+			return db.put('root-state', parsed)
+		})
+		.then(res => {
+			console.log("COMPLETED migration")
+			transaction.db.close()
+		})
+		.catch(err => {
+			console.error('migration error: ', err)
+		})
+
+}
+
 export const loadDb = async () => {
 
 	//console.log("Runing Load DB from indexed")
 
 	try {
 
-		const db = await openDB('db', 1, {
-			upgrade(db) {
-				db.createObjectStore('root-state')
+		const db = await openDB('db', 2, {
+			upgrade(db, oldVersion, newVersion, transaction) {
+				console.log('upgrading from ', oldVersion, 'to ', newVersion)
+
+				if (oldVersion === 1) {
+					return upgradeOneToTwo(db, oldVersion, newVersion, transaction)
+				}
+
 			}
 		})
 
 		const localData = localStorage.getItem('db')
 
-		let serialized = await db.get('root-state', 'db')
+		// let serialized = await db.get('root-state', 'db')
+
+		const tx = db.transaction('flattened-state', 'readonly')
+		const store = tx.objectStore('flattened-state')
+
+		console.time('inflate')
+		const serialized = await store.openCursor()
+			.then(function inflate(cursor, agg = {}): any {
+				if (!cursor) {
+					return agg;
+				}
+
+				console.time('get-path')
+				const path = cursor.key.toString().split(',')
+				const value = cursor.value
+				const next = Dynamic.put(agg, path, value)
+				console.timeEnd('get-path')
+
+				return cursor.continue().then(c => inflate(c, next))
+			})
+
+		console.timeEnd('inflate')
 
 		if (!serialized && localData) {
 
@@ -99,7 +160,7 @@ export const loadDb = async () => {
 					console.error("ERROR WHILE TRANFERING LOCAL DATA TO IDB", err)
 				})
 
-			serialized = await db.get('root-state', 'db')
+			const res = await db.getAll('flattened-state')
 
 		} else {
 			// console.log("Not Tranferring Local Data to IDB")
@@ -112,7 +173,15 @@ export const loadDb = async () => {
 			}
 		}
 
-		let prev: RootReducerState = JSON.parse(serialized)
+		let prev: RootReducerState;
+		if (typeof serialized === "string") {
+			prev = JSON.parse(serialized)
+		}
+		else {
+
+			prev = serialized
+		}
+
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
 
 		if (prev.queued && (!prev.queued.mutations || !prev.queued.analytics)) {
@@ -208,17 +277,31 @@ export const saveDb = (state: RootReducerState) => {
 	const s1 = new Date().getTime();
 	console.log("SAVING IDB-START")
 
-	const json = JSON.stringify(state)
 	// console.log("IN SAVE DB FUNCTION INDEXED DB", state)
 
-	openDB('db', 1, {
-		upgrade(db) {
-			db.createObjectStore('root-state')
+	const flattened = Dynamic.flatten(state)
+
+	openDB('db', 2, {
+		upgrade(db, oldVersion, newVersion, transaction) {
+			if (oldVersion === 1) {
+				return upgradeOneToTwo(db, oldVersion, newVersion, transaction)
+			}
 		}
 	})
 		.then(db => {
 			// console.log('putting db')
-			db.put('root-state', json, "db")
+
+			/*
+			const tx = db.transaction('flattened-state', "readwrite")
+			flattened.forEach(({ path, value }) => {
+				tx.db.put('flattened-state', value, path.join(','))
+			})
+			tx.done.then(r => {
+				console.log('done with saving flattened state')
+			})
+			*/
+
+			db.put('root-state', state, "db")
 			const s2 = new Date().getTime()
 			console.log("SAVING IDB-END", s2 - s1, "milliseconds");
 		})
@@ -311,12 +394,12 @@ const reconstructGradesObject = (state: RootReducerState) => {
 	return state
 }
 const addSchoolSessionSettings = (state: RootReducerState) => {
-	if(state.db.settings) {
-		
-		if(state.db.settings.schoolSession) {
+	if (state.db.settings) {
+
+		if (state.db.settings.schoolSession) {
 			return state
 		}
-		
+
 		const start_date = moment().startOf("year").unix() * 1000
 		const end_date = moment().add(1, "year").startOf("year").unix() * 1000
 
@@ -326,7 +409,7 @@ const addSchoolSessionSettings = (state: RootReducerState) => {
 				start_date,
 				end_date
 			}
-		} 
+		}
 	}
 
 	return state
