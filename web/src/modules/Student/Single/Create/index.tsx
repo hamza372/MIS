@@ -101,6 +101,7 @@ class SingleStudent extends Component<propTypes, S> {
 	former: Former
 	siblings: MISStudent[]
 
+
 	constructor(props: propTypes) {
 		super(props);
 
@@ -436,24 +437,6 @@ class SingleStudent extends Component<propTypes, S> {
 			},
 			edit: rest
 		})
-	}
-
-	componentWillReceiveProps(newProps: propTypes) {
-		// this means every time students upgrades, we will change the fields to whatever was just sent.
-		// this means it will be very annoying for someone to edit the user at the same time as someone else
-		// which is probably a good thing. 
-
-		const nextStudent = newProps.students[newProps.match.params.id]
-
-		if (nextStudent) {
-			this.setState({
-				profile: {
-					...nextStudent,
-					tags: nextStudent.tags || {}
-				}
-			})
-		}
-
 	}
 
 	addHyphens = (path: string[]) => () => {
@@ -996,6 +979,8 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 }
 
+const Wrapper = (props: propTypes) => <SingleStudent key={JSON.stringify(props.students[props.match.params.id])} {...props} />
+
 export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes,
@@ -1009,4 +994,4 @@ export default connect((state: RootReducerState) => ({
 		uploadImage: (student: MISStudent, image_string: string) => dispatch(uploadStudentProfilePicture(student, image_string)),
 		save: (student: MISStudent) => dispatch(createStudentMerge(student)),
 		delete: (student: MISStudent) => dispatch(deleteStudent(student)),
-	}))(SingleStudent);
+	}))(Wrapper);

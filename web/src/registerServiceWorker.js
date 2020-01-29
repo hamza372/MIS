@@ -68,7 +68,6 @@ function registerValidSW(swUrl) {
 							installingWorker.postMessage({
 								type: "SKIP_WAITING"
 							})
-							alert("New update is available! Close app and reopen to update.")
 							console.log('New content is available; please refresh.');
 						} else {
 							// At this point, everything has been precached.
