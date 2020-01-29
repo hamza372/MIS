@@ -333,7 +333,7 @@ class Expenses extends Component<propTypes, S> {
 
 		const { expenses, teachers, settings } = this.props
 
-		const chunkSize = 21 // records per table
+		const chunkSize = 22 // records per table
 
 		let Months  = new Set([])
 		let Years = new Set([])
@@ -461,7 +461,7 @@ class Expenses extends Component<propTypes, S> {
 
 			<div className="button save" style={{ marginTop: "5px" }} onClick={() => this.onSave()}> Save </div>
 
-			<div className="form">
+			<div className="form no-print">
 				<div className={`button ${this.state.payment.active ? "orange" : "green"}`} style={{ marginTop: "10px" }} onClick={this.newPayment}>{this.state.payment.active ? "Cancel" : "New Entry"}</div>
 
 				{this.state.payment.active && <div className="new-payment">
@@ -529,17 +529,17 @@ class Expenses extends Component<propTypes, S> {
 				</div>
 				}
 
-				{
-					chunkify(filtered_expenses, chunkSize)
-						.map((itemsChunk: any, index: number) => <GeneralExpensePrintableList key={index}
-							items={itemsChunk}
-							chunkSize={index === 0 ? 0 : chunkSize * index}
-							schoolName={settings.schoolName}/>)
-				}
-
 				<div className="print button" style={{marginTop:"5px"}} onClick={() => window.print()}> Print </div>
 			</div>
+			{
+				chunkify(filtered_expenses, chunkSize)
+					.map((itemsChunk: any, index: number) => <GeneralExpensePrintableList key={index}
+						items={itemsChunk}
+						chunkSize={index === 0 ? 0 : chunkSize * index}
+						schoolName={settings.schoolName}/>)
+			}
 		</div>
+		
 	}
 }
 

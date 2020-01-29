@@ -406,7 +406,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 
 	render() {
 
-	const chunkSize = 32
+	const chunkSize = 22
 
 	// first make sure all students payments have been calculated... (this is for dues)
 
@@ -515,7 +515,7 @@ class FeeAnalytics extends Component<propTypes, S> {
 				{...this.former.super_handle(["filterText"])}
 				placeholder = "search"
 			/>
-			<select {...this.former.super_handle(["classFilter"])}>
+			<select {...this.former.super_handle(["classFilter"])} style={{marginBottom: "10px"}}>
 				<option value=""> Select Class </option>
 				{
 					sections

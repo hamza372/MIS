@@ -37,28 +37,28 @@
     }
     /* outstanding fee css rules*/
     .row-sr {
-        width: 8%;
+        width: 4%;
     }
     .row-roll {
-        width: 8%;
+        width: 5%;
     }
     .row-adm {
-        width: 8%;
+        width: 5%;
     }
     .row-adm-date, .row-dob {
-        width: 10%
+        width: 6%
     }
     .row-amount {
-        width: 16%;
+        width: 12%;
     }
     .row-class {
-        width: 16%;
+        width: 12%;
     }
     .row-phone {
-        width: 12%
+        width: 8%
     }
     .row-name, .row-fname {
-        width: 18%;
+        width: 12%;
     }
     /* expense module css rules*/
     .row-quantity {
@@ -68,10 +68,7 @@
         width: 10%;
     }
     .row-deduction {
-        width: 25%;
-    }
-    .row-amount {
-        width: 15%;
+        width: 20%;
     }
     .row-category {
         width: 20%;
@@ -96,7 +93,7 @@
         width: 10%;
     }
     .row-amount-paid, .row-amount-balance {
-        width: 10%;
+        width: 8%;
     }
 }
 

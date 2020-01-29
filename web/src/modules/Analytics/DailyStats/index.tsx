@@ -97,7 +97,7 @@ class DailyStats extends Component<PropsType, S> {
         const { statsDate } = this.state
 
         const today_date = moment(statsDate).format("YYYY-MM-DD")
-        const chunk_size = 21
+        const chunk_size = 22
 
         let total_amount_received = 0
         let total_students_paid = 0

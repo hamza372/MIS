@@ -28,9 +28,11 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 		.map(c => ({...c, forwardTo}))
 	
 	let create = '/class/new'
+	let createText = 'Add new class'
 
-	if(forwardTo === 'fee-menu'){
-		create = ''
+	if(forwardTo === 'fee-menu') {
+		create = '/fees/manage'
+		createText = "Manage Fees"
 	}
 
 	if(forwardTo === 'report-menu'){
@@ -45,9 +47,9 @@ export const ClassListModule = ({ classes, forwardTo }) => {
 		
 		<List
 			items={items}
-			Component={ forwardTo === "report-menu" ? SectionItem : ClassItem}
+			Component={forwardTo === "report-menu" ? SectionItem : ClassItem}
 			create={create} 
-			createText={"Add new Class"} 
+			createText={createText} 
 			toLabel={c => {return c.name !== undefined ? c.name : c.namespaced_name}} 
 			/>
 	</div>

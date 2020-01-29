@@ -1,19 +1,26 @@
 defmodule Sarkar.School do
 	use GenServer
 
-	def init(args) do
-		{:ok, args}
+	@timeout :infinity
+
+	def init({school_id}) do
+
+		IO.puts "loading school #{school_id}..."
+		{db, writes} = Sarkar.Store.School.load(school_id)
+		IO.puts "loaded #{school_id}"
+
+		{:ok, {school_id, writes, db}, @timeout}
+	end
+
+	def terminate(reason, state) do
+		# no cleanup to do... just want to remove from memory
 	end
 
 	def start_link({school_id}) do
 		IO.puts "initting school #{school_id}"
-
-		# state is school_id, map of writes, map of db.
-		# TODO: map of writes: (path) -> date
-		{db, writes} = Sarkar.Store.School.load(school_id)
 		GenServer.start_link(
 			__MODULE__,
-			{school_id, writes, db},
+			{school_id},
 			name: via(school_id)
 		)
 	end
@@ -66,6 +73,61 @@ defmodule Sarkar.School do
 		GenServer.call(via(school_id), {:get_db})
 	end
 
+	def upload_images(school_id, client_id, image_merges, last_sync_date) do
+		# here, a school could have been offline the entire time and is sending hundreds of images
+		# we ask the images pool to upload the images. as each image completes, we want to issue the sync
+		# and also fire the event back to the original client telling them that the image is finished processing
+
+		# step one, image worker
+
+		image_merges
+		|> Enum.map(fn merge ->
+			Task.async(fn -> 
+				:poolboy.transaction(
+					:image_worker,
+					fn pid -> 
+						url = GenServer.call(pid, {:upload_image, merge}) 
+						{merge, url}
+					end
+				)
+			end)
+		end)
+		|> Enum.each(fn task ->
+
+			{merge, url} = Task.await(task)
+			# then we call sync_changes using the info in the merge + url
+			%{"id" => id, "path" => path} = merge
+
+			value = %{
+				"id" => id,
+				"url" => url
+			}
+
+			prepared = prepare_changes([%{
+				"type" => "MERGE",
+				"path" => path,
+				"value" => value
+			}])
+
+			# broadcasts the update to all other clients - but we wont send the result back direct to the client here
+			reply = sync_changes(school_id, client_id, prepared, last_sync_date)
+
+			# this action lets the client know that the image has been uploaded, and gives
+			# enough info for the client to take it out of the queue, and update its state with the new value (now, not an image string)
+
+			Registry.lookup(Sarkar.ConnectionRegistry, school_id)
+			|> Enum.filter(fn {pid, cid}-> cid == client_id end)
+			|> Enum.map(fn {pid, _} -> send(pid, {:broadcast, %{
+				"type" => "IMAGE_UPLOAD_CONFIRM",
+				"id" => id,
+				"path" => path,
+				"value" => value
+			}}) end)
+
+		end)
+
+end
+
 	def broadcast_all_schools() do
 		{:ok, school_ids} = Sarkar.Store.School.get_school_ids()
 
@@ -95,10 +157,16 @@ defmodule Sarkar.School do
 
 	# SERVER
 
+	def handle_info(:timeout, {school_id, db, writes} = state) do
+		IO.puts "terminating #{school_id}"
+
+		{:stop, :normal, state}
+	end
+
 	def handle_call({:reload_db}, _from, {school_id, writes, db} = state) do
 		{new_db, new_writes} = Sarkar.Store.School.load(school_id)
 
-		{:reply, new_db, {school_id, new_writes, new_db}}
+		{:reply, new_db, {school_id, new_writes, new_db}, @timeout}
 	end
 
 	def handle_call({:sync_changes, client_id, changes, last_sync_date}, _from, {school_id, writes, db} = state) do
@@ -189,7 +257,7 @@ defmodule Sarkar.School do
 									agg_db,
 									agg_writes,
 									agg_new_writes,
-									max_date
+									max(date, max_date)
 								}
 							other -> 
 								IO.puts "OTHER!!!!!!!!!!!!!"
@@ -223,7 +291,7 @@ defmodule Sarkar.School do
 									agg_db,
 									agg_writes,
 									agg_new_writes,
-									max_date
+									max(date, max_date)
 								}
 							other ->
 								IO.puts "OTHER!!!!!!!!!!!"
@@ -264,19 +332,19 @@ defmodule Sarkar.School do
 		
 		case map_size(new_writes) do
 			# 0 -> {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
+			0 -> {:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}, @timeout}
 			_ -> 
 				#broadcast(school_id, client_id, snapshot(nextDb))
 				broadcast(school_id, client_id, snapshot_diff(new_writes))
 				Sarkar.Store.School.save(school_id, new_writes)
 				# what do we do about attendance?? there are so many paths...
 				# {:reply, confirm_sync(last_date, nextDb), {school_id, nextWrites, nextDb}}
-				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}}
+				{:reply, confirm_sync_diff(last_date, relevant), {school_id, nextWrites, nextDb}, @timeout}
 		end
 	end
 
 	def handle_call({:get_db}, _from, {school_id, writes, db} = state) do
-		{:reply, db, state}
+		{:reply, db, state, @timeout}
 	end
 
 	def handle_call(a, b, c) do 
@@ -284,7 +352,7 @@ defmodule Sarkar.School do
 		IO.inspect b
 		IO.inspect c
 
-		{:reply, "no match...", c}
+		{:reply, "no match...", c, @timeout}
 	end
 
 	# generates action
