@@ -563,7 +563,9 @@ export const createLoginSucceed = (school_id: string, db: RootReducerState['db']
 
 export const loadDB = () => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
 
+	console.time('load-db')
 	loadDb().then(res => {
+		console.timeEnd('load-db')
 		dispatch({
 			type: "LOAD_DB",
 			res

@@ -14,8 +14,8 @@ import { loadDB, connected, disconnected, processImageQueue } from './actions/co
 
 import './index.css';
 
-window.debug_host = '6be4f963.ngrok.io';
-//window.debug_host = 'mis-socket.metal.fish'
+//window.debug_host = '69def37f.ngrok.io';
+window.debug_host = 'mis-socket.metal.fish'
 
 const host = window.api_url || window.debug_host;
 
