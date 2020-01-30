@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createSchoolLogin } from 'actions/index'
+import { createSchoolLogin, getSchoolList } from 'actions/index'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
@@ -9,6 +9,8 @@ import './style.css'
 
 interface P {
 	auth: RootReducerState["auth"]
+	schoolList: RootReducerState["school_Info"]["school_list"]
+	getSchoolList: () => any
 	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
 }
 
@@ -95,21 +97,6 @@ class SignUp extends Component <propTypes, S> {
 				]
 			},
 			{
-				path:["value", "owner_name"],
-				value: "",
-				depends: [
-					"OR",
-					{
-						path: ["value", "type_of_login"],
-						value: "SCHOOL_REFERRAL"
-					},
-					{
-						path: ["value", "type_of_login"],
-						value: "AGENT_SCHOOL"
-					}
-				]
-			},
-			{
 				path:["value", "owner_easypaisa_number"],
 				value: "",
 				depends: [
@@ -154,6 +141,9 @@ class SignUp extends Component <propTypes, S> {
 			},
 		])
 	}
+	componentDidMount () {
+		this.props.getSchoolList()
+	}
 
 	getLimitFromPackage = (package_name: string) => {
 		switch (package_name) {
@@ -184,7 +174,8 @@ class SignUp extends Component <propTypes, S> {
 				["office"],
 				["city"],
 				["type_of_login"],
-				["owner_phone"]
+				["owner_phone"],
+				["owner_name"]
 			]
 		)
 
@@ -199,7 +190,6 @@ class SignUp extends Component <propTypes, S> {
 			const compulsory_fields = checkCompulsoryFields(this.state.value,
 				[
 					["school_name"],
-					["owner_name"],
 					["owner_easypaisa_number"]
 				]
 			)
@@ -293,18 +283,17 @@ class SignUp extends Component <propTypes, S> {
 				</div>
 			</div>
 
-			
 			{ this.former.check(["value","school_name"]) && <div className="section form">
 				<div className="divider"> Referral School Information </div>
 				
 				<div className="row">
 					<label>School Name</label>
-					<input type="text" {...this.former.super_handle(["value","school_name"])} placeholder="school name"/>
-				</div>
-				
-				<div className="row">
-					<label>Owner Name:</label>
-					<input type="text" {...this.former.super_handle(["value","owner_name"])} placeholder="name"/>
+					<input list="schl-list" {...this.former.super_handle(["value", "school_name"])} placeholder="school name" />
+					<datalist id="schl-list">
+					{
+						this.props.schoolList.map(s => <option value={s}/> )
+					}
+					</datalist>
 				</div>
 
 				<div className="row">
@@ -351,7 +340,7 @@ class SignUp extends Component <propTypes, S> {
 			<div className="section form">
 				<div className="divider">SignUp Information</div>
 				<div className="row">
-					<label>School Name:</label>
+					<label>School ID:</label>
 					<input type="text" {...this.former.super_handle(["username"])} placeholder="username"/>
 				</div>
 				<div className="row">
@@ -366,6 +355,11 @@ class SignUp extends Component <propTypes, S> {
 						<option value="TALEEM2">Taleem-2</option>
 						<option value="TALEEM3">Taleem-3</option>
 					</select>
+					</div>
+
+				<div className="row">
+					<label>Owner Name:</label>
+					<input type="text" {...this.former.super_handle(["value","owner_name"])} placeholder="name"/>
 				</div>
 				<div className="row">
 					<label>Owner Phone</label>
@@ -383,7 +377,9 @@ class SignUp extends Component <propTypes, S> {
 }
 
 export default connect((state: RootReducerState) => ({
-	auth: state.auth
+	auth: state.auth,
+	schoolList: state.school_Info.school_list
 }), ( dispatch: Function ) => ({
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value))
+	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
+	getSchoolList: () => dispatch(getSchoolList())
 }))(SignUp)
