@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createSchoolLogin, updateReferralInformation, getReferralsInfo } from 'actions/index'
+import { updateReferralInformation, getReferralsInfo } from 'actions/index'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
@@ -10,7 +10,6 @@ import moment from 'moment';
 interface P {
 	trials: RootReducerState["trials"]
 	getReferralsInfo: () => any
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
 	updateReferralInformation: (school_id: string, value: any) => any
 }
 
@@ -49,7 +48,8 @@ interface S {
 		status: string
 		daysPassed: string
 		filterText: string
-	}
+	},
+	filterMenu: boolean
 }
 
 interface Routeinfo {
@@ -71,7 +71,8 @@ class Trial extends Component<propTypes, S> {
 				status: "ALL",
 				daysPassed: "",
 				filterText: ""
-			}
+			},
+			filterMenu: false
 		}
 
 		this.former = new Former(this, [])
@@ -182,7 +183,7 @@ class Trial extends Component<propTypes, S> {
 		}
 	}
 	render() {
-		const { edits } = this.state
+		const { edits, filterMenu } = this.state
 
 		const Items = Object.entries(edits)
 			.filter(([school_id, value]) => {
@@ -197,25 +198,29 @@ class Trial extends Component<propTypes, S> {
 			<div className="title"> Trial Information</div>
 
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
-				<div className="row">
-					<label>Total</label>
-					<div style={{ fontWeight: "bold", color: "grey", fontSize: "2em" }}>{Items.length}</div>
-				</div>
-				<div className="row">
-					<label>Status</label>
-					<select {...this.former.super_handle(["filters", "status"])}>
-						<option value="ALL"> ALL</option>
-						<option value="ENDED">Ended</option>
-						<option value="NOT_ENDED">Not Ended</option>
-						<option value="PAID"> Paid</option>
-						<option value="NOT_PAID"> Not Paid</option>
-					</select>
-				</div>
-				<div className="row">
-					<label>Days Passed since Login</label>
-					<input type="text" {...this.former.super_handle(["filters", "daysPassed"])} placeholder="Day-Day" />
-				</div>
-				<input type="text" {...this.former.super_handle(["filters", "filterText"])} placeholder="Search" style={{ width: "100%" }} />
+				
+				<div className={!filterMenu ? "button blue" : "button red"} onClick={() => this.setState({ filterMenu: !filterMenu })}>{!filterMenu ? "Filters" : "Close"}</div>
+				{filterMenu && <>
+					<div className="row">
+						<label>Total</label>
+						<div style={{ fontWeight: "bold", color: "grey", fontSize: "2em" }}>{Items.length}</div>
+					</div>
+					<div className="row">
+						<label>Status</label>
+						<select {...this.former.super_handle(["filters", "status"])}>
+							<option value="ALL"> ALL</option>
+							<option value="ENDED">Ended</option>
+							<option value="NOT_ENDED">Not Ended</option>
+							<option value="PAID"> Paid</option>
+							<option value="NOT_PAID"> Not Paid</option>
+						</select>
+					</div>
+					<div className="row">
+						<label>Days Passed since Login</label>
+						<input type="text" {...this.former.super_handle(["filters", "daysPassed"])} placeholder="Day-Day" />
+					</div>
+					<input type="text" {...this.former.super_handle(["filters", "filterText"])} placeholder="Search" style={{ width: "100%" }} />
+				</>}
 			</div>
 
 			<div className="section" style={{ overflow: "auto" }}>
@@ -290,7 +295,6 @@ class Trial extends Component<propTypes, S> {
 export default connect((state: RootReducerState) => ({
 	trials: state.trials
 }), (dispatch: Function) => ({
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
 	updateReferralInformation: (school_id: string, value: any) => dispatch(updateReferralInformation(school_id, value)),
 	getReferralsInfo: () => dispatch(getReferralsInfo())
 }))(Trial)

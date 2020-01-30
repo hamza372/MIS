@@ -28,7 +28,7 @@ interface S {
 
 const roles = [
 	"ADMIN",
-	"FIELD_MANAGER"
+	"AREA_MANAGER",
 ];
 
 const permissions = [
@@ -76,7 +76,7 @@ class newUser extends Component<propTypes, S> {
 			return
 		}
 
-		if (!window.confirm("Are you sure you want to create this User ?")) {
+		if (!window.confirm("Have you Double Checked the Information you provided and still want to create this User ?")) {
 			return
 		}
 
@@ -98,15 +98,7 @@ class newUser extends Component<propTypes, S> {
 	render() {
 		return <div className="page new-user">
 			<div className="title"> New User</div>
-			<div className="form section" style={{ width:"75%"}}>
-				<div className="row">
-					<label>Name:</label>
-					<input type="text" placeholder="Name" {...this.former.super_handle(["name"])}/>
-				</div>
-				<div className="row">
-					<label>Password:</label>
-					<input type="text" placeholder="Password" {...this.former.super_handle(["password"])}/>
-				</div>
+			<div className="form section" style={{ width: "75%" }}>
 				<div className="row">
 					<label>Role:</label>
 					<select {...this.former.super_handle(["role"])}>
@@ -115,6 +107,29 @@ class newUser extends Component<propTypes, S> {
 					}
 					</select>
 				</div>
+				{
+					this.state.role === "AREA_MANAGER" ? <div className="row">
+						<label>Name</label>
+						<select {...this.former.super_handle(["name"])}>
+							<option value="">Select</option>
+							<option value="AYESHA">Ayesha</option>
+							<option value="UMER">Umer</option>
+							<option value="ZAHID"> Zahid </option>
+							<option value="FAROOQ">Farooq</option>
+							<option value="KAMRAN">Kamran</option>
+							<option value="NOMAN">Noman</option>
+							<option value="ALI_ZOHAIB"> Ali Zohaib</option>
+						</select>
+					</div> : <div className="row">
+						<label>Name:</label>
+						<input type="text" placeholder="Name" {...this.former.super_handle(["name"])} />
+					</div>
+				}
+				<div className="row">
+					<label>Password:</label>
+					<input type="text" placeholder="Password" {...this.former.super_handle(["password"])}/>
+				</div>
+
 				{
 					this.state.role !== "ADMIN" && <div>
 						<div>User Permissions</div>

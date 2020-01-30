@@ -8,6 +8,7 @@ import checkCompulsoryFields from 'utils/checkCompulsoryFields';
 import './style.css'
 
 interface P {
+	auth: RootReducerState["auth"]
 	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
 }
 
@@ -32,16 +33,18 @@ class SignUp extends Component <propTypes, S> {
 	constructor(props: propTypes) {
 		super(props)
 
+		const area_manager_name = (props.auth.role && props.auth.role === "AREA_MANAGER" ? (props.auth.id || "") : "") as SignUpValue["area_manager_name"]
+		const user = props.auth.id || ""
+
 		this.state = {
 			username: "",
 			password: "",
 			value: {
 				package_name: "FREE_TRIAL",
-				area_manager_name: "",
+				area_manager_name,
 				office: "",
 				city: "",
 				type_of_login: "",
-		
 				school_name: "",
 				owner_name: "",
 				owner_easypaisa_number: "",
@@ -49,7 +52,9 @@ class SignUp extends Component <propTypes, S> {
 				association_name: "",
 		
 				agent_name: "",
-				notes: ""
+				notes: "",
+				owner_phone: "",
+				user
 			},
 			agents: [
 				"M. Shahbaz",
@@ -179,6 +184,7 @@ class SignUp extends Component <propTypes, S> {
 				["office"],
 				["city"],
 				["type_of_login"],
+				["owner_phone"]
 			]
 		)
 
@@ -232,13 +238,13 @@ class SignUp extends Component <propTypes, S> {
 	render() {
 
 		const { agents } = this.state
-
+		const { role } = this.props.auth
 
  		return <div className="school-sign-up page">
 			<div className="title"> New School</div>
 
 			<div className="section form">
-				<div className="row">
+				{ role !== "AREA_MANAGER" && <div className="row">
 					<label>Name</label>
 					<select {...this.former.super_handle(["value","area_manager_name"])}>
 						<option value="">Select</option>
@@ -250,7 +256,7 @@ class SignUp extends Component <propTypes, S> {
 						<option value="NOMAN">Noman</option>
 						<option value="ALI_ZOHAIB"> Ali Zohaib</option>
 					</select>
-				</div>
+				</div>}
 				<div className="row">
 					<label>Office</label>
 					<select {...this.former.super_handle(["value","office"])}>
@@ -350,7 +356,7 @@ class SignUp extends Component <propTypes, S> {
 				</div>
 				<div className="row">
 					<label>Password:</label>
-					<input type="text" {...this.former.super_handle(["password"])} placeholder="Password"/>
+					<input type="text" {...this.former.super_handle(["password"])} placeholder="password"/>
 				</div>
 				<div className="row">
 					<label>Package</label>
@@ -361,10 +367,14 @@ class SignUp extends Component <propTypes, S> {
 						<option value="TALEEM3">Taleem-3</option>
 					</select>
 				</div>
+				<div className="row">
+					<label>Owner Phone</label>
+					<input type="number" placeholder="number" {...this.former.super_handle(["value","owner_phone"])}/>
+				</div>
 
 				<div className="row">
 					<label>Notes:</label>
-					<textarea {...this.former.super_handle(["value","notes"])} placeholder="Notes"/>
+					<textarea {...this.former.super_handle(["value","notes"])} placeholder="Additional Info (If Any)"/>
 				</div>
 				<div className="button save" onClick={() => this.onSave()}> SignUp</div>
 			</div>
@@ -372,6 +382,8 @@ class SignUp extends Component <propTypes, S> {
 	}
 }
 
-export default connect( state => ({}), ( dispatch: Function ) => ({
+export default connect((state: RootReducerState) => ({
+	auth: state.auth
+}), ( dispatch: Function ) => ({
 	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value))
 }))(SignUp)

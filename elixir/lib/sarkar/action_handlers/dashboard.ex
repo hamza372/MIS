@@ -485,8 +485,8 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		end
 	end
 
-	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value }}, state) do		
-		case Sarkar.Auth.createTracked({username, password, limit, value }) do 
+	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value, "role" => role }}, state) do		
+		case Sarkar.Auth.createTracked({username, password, limit, value, role }) do 
 			{:ok, resp} ->
 				IO.inspect resp
 				{:reply, succeed(resp), state}
@@ -516,6 +516,22 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				Sarkar.School.sync_changes(school_id,"backend", merge, :os.system_time(:millisecond))
 			end)
 		
+		# Update referrals table to add payment received to value
+		case Postgrex.query(Sarkar.School.DB,
+			"UPDATE 
+				mischool_referrals 
+			SET 
+				value=jsonb_set(value,'{payment_received}','true') 
+			WHERE id=$1",
+			[school_id]
+		)do
+			{:ok, resp} ->
+				{:reply, succeed("Successful"), state}
+			{:error, err} ->
+				IO.inspect err
+				{:reply, fail("Auto Update Failed, Please Mark Paid Manually"), state}
+		end 
+
 			{:reply, succeed("Successful"), state}
 
 	end

@@ -105,6 +105,9 @@
 			grid-column-gap: 10px;
 			transition: all 1s ease-in;
 		}
+		.header {
+			font-size: 1.5em;
+		}
 
 		.root-page.double {
 			grid-template-columns: 25% auto;
@@ -113,5 +116,8 @@
 
 		.root-page.double .burger-stub {
 			display: none;
+		}
+		.title, .divider {
+			font-size: 1em;
 		}
 	}

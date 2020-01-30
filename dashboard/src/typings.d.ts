@@ -192,6 +192,8 @@ interface SignUpValue {
 	agent_name: string
 
 	notes: string
+	user: string
+	owner_phone: string
 }
 
 interface UserPermissions {
