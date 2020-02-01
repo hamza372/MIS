@@ -189,7 +189,7 @@ class SingleStudent extends Component<propTypes, S> {
 			const section_id = profile.section_id
 			const class_id = sections.find(section => section.id === section_id).class_id
 
-			if (settings.classes && settings.classes.defaultFee[class_id]) {
+			if (settings.classes && settings.classes.defaultFee && settings.classes.defaultFee[class_id]) {
 
 				this.setState({
 					profile: {
