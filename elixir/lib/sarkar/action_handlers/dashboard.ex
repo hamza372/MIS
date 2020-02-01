@@ -517,7 +517,8 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			end)
 		
 		# Update referrals table to add payment received to value
-		case Postgrex.query(Sarkar.School.DB,
+		case Sarkar.DB.Postgres.query(
+			Sarkar.School.DB,
 			"UPDATE 
 				mischool_referrals 
 			SET 
