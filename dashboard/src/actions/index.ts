@@ -153,7 +153,8 @@ export const updateSchoolInfo = (school_id: string, student_limit: number, paid:
 		id: state.auth.id,
 		payload: {
 			school_id,
-			merges
+			merges,
+			paid
 		}
 	})
 	.then((res: {token: string, sync_state: SyncState }) => {
