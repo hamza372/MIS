@@ -1,15 +1,15 @@
-import moment from 'moment'
 import calculateGrade from 'utils/calculateGrade'
+type AugmentedExams = MISStudentExam & MISExam
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
 
-const getStudentExamMarksSheet = (students: MISStudent[], exams: MISExam[], grades: MISSettings["exams"]["grades"], filter: ExamFilter) => {
+const getStudentExamMarksSheet = (students: MergeStudentsExams[], grades: MISSettings["exams"]["grades"]) => {
     
-    if(exams.length === 0)
+    if(students.length === 0)
         return []
 
     const marks_sheet = students
         .reduce((agg, curr) => {
 
-            let new_exams = []
             let temp_marks = { total: 0, obtained: 0 }
             /**
              *  check the relevant exam exists in student.exams, if exists create a new object
@@ -21,14 +21,9 @@ const getStudentExamMarksSheet = (students: MISStudent[], exams: MISExam[], grad
              * 	which is make sure, if a student didn't attempt the exam so that he must have default value to avoid calculations
              * 	error or property accessing issues while printing record of student
              */
-            for (const exam of exams) {
-                const stats = curr.exams[exam.id] || { score: 0, remarks: "", grade: "" }
-
-                if(exam.name === filter.exam_title && moment(exam.date).format("YYYY") === filter.year) {
-                    new_exams.push({ ...exam, stats })
-                    temp_marks.obtained += parseFloat(stats.score.toString() || '0')
-                    temp_marks.total += parseFloat(exam.total_score.toString() || '0')
-                }
+            for (const exam of curr.merge_exams) {
+                temp_marks.obtained += parseFloat(exam.score.toString() || '0')
+                temp_marks.total += parseFloat(exam.total_score.toString() || '0')
             }
 
             const grade = calculateGrade(temp_marks.obtained, temp_marks.total, grades)
@@ -43,7 +38,7 @@ const getStudentExamMarksSheet = (students: MISStudent[], exams: MISExam[], grad
                     rollNo: curr.RollNumber ? curr.RollNumber : "",
                     marks: temp_marks,
                     position: 0,
-                    exams: new_exams,
+                    merge_exams: curr.merge_exams,
                     grade,
                     remarks
                 } as StudentMarksSheet

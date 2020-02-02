@@ -12,7 +12,9 @@ import ResultCard from 'components/Printable/ResultCard/resultCard'
 import getFacultyNameFromId from 'utils/getFacultyNameFromId'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 import Months from 'constants/months'
+import { ExamTitles } from 'constants/exam'
 import getReportStringForStudent from 'utils/getReportStringForStudent'
+import { Link } from 'react-router-dom'
 
 import './style.css'
 
@@ -33,20 +35,18 @@ type PropsType = {
 
 } & RouteComponentProps<RouteInfo>
 
-interface S {
-	year: string
-	month: string
-	exam_title: string
-	subject: string
+type S = {
 	exams_list_by: string
 	print_type: string
-}
+} & ExamFilter
 
 interface RouteInfo {
 	class_id: string
 	section_id: string
 }
 
+type AugmentedExams = MISStudentExam & MISExam
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
 class ClassReportMenu extends Component<PropsType, S> {
 
 	former: Former
@@ -54,9 +54,9 @@ class ClassReportMenu extends Component<PropsType, S> {
 		super(props);
 
 		this.state = {
-			exam_title: "Final-Term",
+			exam_title: "",
 			year: moment().format("YYYY"),
-			month: moment().format("MMMM"),
+			month: "",
 			subject: "",
 			exams_list_by: "Sr No.",
 			print_type: "Cards"
@@ -99,50 +99,67 @@ class ClassReportMenu extends Component<PropsType, S> {
 		const exam_filter = { exam_title, year, month, subject }
 		
 		const section_id = this.getSectionIdFromParams()
-		const class_id = this.getClassIdFromParams()
-		
 		const section = getSectionFromId(section_id, classes)
 		const section_name  = this.getSectionName(section)
-
 		const section_teacher = getFacultyNameFromId(section.faculty_id, faculty)
+		const class_id = this.getClassIdFromParams()
 
 		// no. of records per chunk
 		const chunkSize = 22;
 
-		const relevant_students = Object.values(students)
-			.filter((student: MISStudent) => student.Name && student.exams &&
-				student.section_id === section_id)
-			.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
-
 		const years = new Set<string>()
-		const exam_titles = new Set<string>()
+		const filtered_exams: MISExam[] = []
 		const subjects = new Set<string>()
 		const examSubjectsWithMarks = new Set<string>()
 		
 		for (const exam of Object.values(exams)) {
+			
+			years.add(moment(exam.date).format("YYYY"))
+
 			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
+				exam.section_id === section_id &&
 				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true) &&
 				(exam_title === "Test" && subject ? exam.subject === subject : true)) {
-				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
+					filtered_exams.push(exam)
+					examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
 			// show all subjects of class in the list
 			if(exam.section_id === section_id && exam.class_id === class_id) {
 				subjects.add(exam.subject)
 			}
-			exam_titles.add(exam.name)
-			years.add(moment(exam.date).format("YYYY"))
 		}
 
-		// sorted marks sheet
-		const marksSheet = getStudentExamMarksSheet(relevant_students, Object.values(exams), grades, exam_filter)
+		const exam_students = Object.values(students)
+			.filter(student => student && student.Name && student.section_id && student.exams)
+			.reduce((agg, curr) => {
+				
+				let merge_exams: AugmentedExams[] = []
+				
+				for (const exam of filtered_exams) {
+					const stats = curr.exams[exam.id]
+					if(stats != null) {
+						merge_exams.push({ ...exam, ...stats})
+					}
+				}
+				
+				// in case there is no exams for the curr student, no need to put into list
+				if(merge_exams.length === 0)
+					return agg
+				
+				return [...agg, { ...curr, merge_exams}]
 
-		const messages = relevant_students
+			}, [] as MergeStudentsExams[])
+
+		// sorted marks sheet
+		const marksSheet = getStudentExamMarksSheet(exam_students, grades)
+
+		const messages = exam_students
 			.filter(s => s.Phone !== "")
 			.map(student => ({
 				number: student.Phone,
 				text: sms_templates.result
 					.replace(/\$NAME/g, student.Name)
-					.replace(/\$REPORT/g, getReportStringForStudent(student, exams, exam_filter, grades))
+					.replace(/\$REPORT/g, getReportStringForStudent(student, exam_title ,grades))
 			}))
 
 		const url = smsIntentLink({
@@ -168,18 +185,16 @@ class ClassReportMenu extends Component<PropsType, S> {
 						<select {...this.former.super_handle(["exam_title"])}>
 							<option value="">Select Exam</option>
 							{
-								Array.from(exam_titles)
-									.sort((a, b) => a.localeCompare(b))
-									.map(title => {
-										return <option key={title} value={title}>{title}</option>
-									})
+								ExamTitles.map(title => {
+									return <option key={title} value={title}>{title}</option>
+								})
 							}
 						</select>
 					</div>
 					{
 						exam_title === "Test" &&
 							<div className="row">
-								<label>Select Test Month</label>
+								<label>Test Month</label>
 								<select {...this.former.super_handle(["month"])}>
 									<option value="">Select Month</option>
 									{
@@ -191,9 +206,9 @@ class ClassReportMenu extends Component<PropsType, S> {
 					{
 						exam_title === "Test" &&
 							<div className="row">
-								<label>Select Test Subject</label>
+								<label>Test Subject</label>
 								<select {...this.former.super_handle(["subject"])}>
-									<option value="">Select Select</option>
+									<option value="">Select Subject</option>
 									{
 										Array.from(subjects).map(subject => <option key={subject} value={subject}>{subject}</option>)
 									}
@@ -218,8 +233,10 @@ class ClassReportMenu extends Component<PropsType, S> {
 					</div>
 				</div>
 				<div className="md-form">
-				{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
+				{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
 					<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Class Result {this.state.print_type}</div>
+					<Link className="md-button grey btn-edit-exam" 
+						to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
 				</div>
 			</div>
 
@@ -234,11 +251,10 @@ class ClassReportMenu extends Component<PropsType, S> {
 							schoolName={this.props.settings.schoolName}
 							students={chunkItems}
 							chunkSize={index === 0 ? 0 : chunkSize * index} />) :
-				relevant_students
-					.map(student => <ResultCard key={student.id}
+				exam_students
+					.map((student: MergeStudentsExams) => <ResultCard key={student.id}
 						student={student}
 						settings={settings}
-						exams={exams}
 						grades={grades}
 						examFilter={exam_filter}
 						logo={this.props.schoolLogo}
@@ -247,7 +263,6 @@ class ClassReportMenu extends Component<PropsType, S> {
 						listBy={exams_list_by}/>)
 			}
 			</div>
-
 		</div>
 	}
 }

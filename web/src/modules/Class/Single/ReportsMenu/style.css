@@ -19,16 +19,20 @@
 	margin: auto;
 	margin-top: 0;
 }
-.class-report-menu .md-form {
+.md-form {
 	display: flex;
 	flex-wrap: wrap;
 }
-.class-report-menu .md-form a {
-	flex: 1 1 50ch;
+.md-form .btn-sm {
+	flex: 1 1 45ch;
 	margin: .2rem;
  }
 .md-form .btn-result-card {
-	flex: 1 1 50ch;
+	flex: 1 1 45ch;
+	margin: .2rem;
+}
+.md-form .btn-edit-exam {
+	flex: 2 1 10ch;
 	margin: .2rem;
 }
 .md-button {

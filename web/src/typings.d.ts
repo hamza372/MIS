@@ -376,7 +376,7 @@ interface MISDateSheet {
 	}
 }
 
-type AugmentedMISExam = MISExam & { stats: MISStudentExam }
+type AugmentedMISExam = MISExam & MISStudentExam
 interface StudentMarksSheet {
 	id: MISStudent["id"]
 	name: MISStudent["Name"]
@@ -384,7 +384,7 @@ interface StudentMarksSheet {
     rollNo: MISStudent["RollNumber"]
     marks: { total: number, obtained: number }
     position: number
-    exams: AugmentedMISExam[]
+    merge_exams: AugmentedMISExam[]
     grade: string
     remarks: string
 }

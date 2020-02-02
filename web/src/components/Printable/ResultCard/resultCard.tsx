@@ -6,9 +6,8 @@ import { PrintHeader } from 'components/Layout'
 import './style.css'
 
 type PropsType = {
-    student: MISStudent
+    student: MergeStudentsExams
     settings: RootDBState["settings"]
-    exams: RootDBState["exams"]
     section: AugmentedSection
     sectionTeacher: string
     logo: string
@@ -23,13 +22,17 @@ type PropsType = {
     }
 }
 
+type AugmentedExams = MISStudentExam & MISExam
+
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
+
 const ResultCard = (props: PropsType) => {
 
-    const { student, settings, exams, section, sectionTeacher, logo, grades, listBy, examFilter } = props
+    const { student, settings, section, sectionTeacher, logo, grades, listBy, examFilter } = props
 
     const { schoolSession } = settings
 
-    const { exam_title, subject, month, year } = examFilter
+    const { exam_title, month } = examFilter
 
     const result_card_title = exam_title === "Test" && month !== "" ? `${exam_title}-${month}` : exam_title
     const avatar = student.ProfilePicture ? (student.ProfilePicture.url || student.ProfilePicture.image_string) : undefined
@@ -63,16 +66,10 @@ const ResultCard = (props: PropsType) => {
 		return attendance_status_count
 	}
 
-	const { total_marks, marks_obtained } = Object.keys(student.exams || {})
-		.filter(exam_id => exams[exam_id])
-		.map(exam_id => exams[exam_id])
-        .filter(exam => exam.name === exam_title &&
-            moment(exam.date).format("YYYY") === year &&
-            (exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true) &&
-            (exam_title === "Test" && subject !=="" ? exam.subject === subject : true ))
+	const { total_marks, marks_obtained } = student.merge_exams
 		.reduce((agg, curr) => ({
 			total_marks: agg.total_marks + parseFloat(curr.total_score.toString() || '0'),
-			marks_obtained: agg.marks_obtained + parseFloat(student.exams[curr.id].score.toString() || '0')
+			marks_obtained: agg.marks_obtained + parseFloat(curr.score.toString() || '0')
         }), { total_marks: 0, marks_obtained: 0 })
         
     const attendance = calculateAttendace(student)
@@ -113,7 +110,7 @@ const ResultCard = (props: PropsType) => {
                     </div>
                     <div className="row">
                         <div className="label">Class-Section:</div>
-                        <div className="bold text-underline">{section.namespaced_name}</div>
+                        <div className="bold text-underline">{section ? section.namespaced_name : ""}</div>
                     </div>
                     <div className="row">
                         <div className="label">Class Teacher:</div>
@@ -148,22 +145,15 @@ const ResultCard = (props: PropsType) => {
                     </thead>
                     <tbody>
                     {
-                        Object.keys(student.exams || {})
-                            .filter(exam_id => exams[exam_id])
-                            .map(exam_id => exams[exam_id])
-                            .filter(exam => exam.name === exam_title &&
-                                moment(exam.date).format("YYYY") === year &&
-                                (exam_title === "Test" && month !=="" ? moment(exam.date).format("MMMM") === month : true) &&
-                                (exam_title === "Test" && subject !=="" ? exam.subject === subject : true ))
-                            .sort((a, b) => exam_title === "" ? (a.date - b.date) : a.subject.localeCompare(b.subject))
+                        student.merge_exams
                             .map((exam, i) => <tr key={exam.id}>
                                     <td className="text-center">{ listBy === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</td>
                                     <td>{exam.subject}</td>
                                     <td className="text-center">{exam.total_score}</td>
-                                    <td className="text-center">{student.exams[exam.id].grade !== "Absent" ? student.exams[exam.id].score: "N/A"}</td>
-                                    <td className="text-center">{student.exams[exam.id].grade !== "Absent" ? (formatNumber(student.exams[exam.id].score / exam.total_score * 100)) : "N/A"}</td>
-                                    <td className="text-center">{student.exams[exam.id].grade}</td>
-                                    <td>{getRemarks(student.exams[exam.id].remarks, student.exams[exam.id].grade)}</td>
+                                    <td className="text-center">{exam.grade !== "Absent" ? exam.score: "N/A"}</td>
+                                    <td className="text-center">{exam.grade !== "Absent" ? (formatNumber(exam.score / exam.total_score * 100)) : "N/A"}</td>
+                                    <td className="text-center">{exam.grade}</td>
+                                    <td>{getRemarks(exam.remarks, exam.grade)}</td>
                                 </tr>)
                     }
                     </tbody>

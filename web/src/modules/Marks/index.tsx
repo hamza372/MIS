@@ -12,6 +12,8 @@ import chunkify from 'utils/chunkify'
 import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
 import { deleteExam } from 'actions'
 import queryString from 'query-string'
+import months from 'constants/months'
+import { ExamTitles } from 'constants/exam'
 
 import './style.css'
 
@@ -30,12 +32,17 @@ type S = {
 	section_id: string
 	exam_title: string
 	year: string
+	month: string
 	banner: {
 		active: boolean
 		good?: boolean
 		text?: string
 	}
 }
+
+type AugmentedExams = MISStudentExam & MISExam
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
+
 class Reports extends Component<propsType, S> {
 
 	former: Former
@@ -47,11 +54,13 @@ class Reports extends Component<propsType, S> {
 		const section_id = parsed_query.section_id ? parsed_query.section_id.toString() : ''
 		const exam_title = parsed_query.exam_title ? parsed_query.exam_title.toString() : ''
 		const year = parsed_query.year ? parsed_query.year.toString() : ''
+		const month = parsed_query.month? parsed_query.month.toString() : ''
 
 		this.state = {
 			section_id,
 			exam_title,
 			year,
+			month,
 			banner: {
 				active: false,
 				good: false,
@@ -117,38 +126,45 @@ class Reports extends Component<propsType, S> {
 			.find(c => c.sections[section_id] ? true : false).id
 	}
 
-	getFilteredExams = (): MISExam[] => {
-		const { section_id, year } = this.state
-		const { exams } = this.props
-
-		const filtered_exams = Object.entries(exams)
-			.filter(([, exam]) =>  exam && exam.id && exam.section_id === section_id && moment(exam.date).format("YYYY") === year)
-			.map(([id, exam]) => ({...exam, id}))
-		
-		return filtered_exams
-	}
-
 	renderClassResultSheet = (section: AugmentedSection) => {
 
-		const { section_id, exam_title, year } = this.state
-		const { students, exams, grades, schoolName } = this.props
-		const filter = { exam_title, year }
-		const chunkSize  = 22
-		const section_students = Object.values(students)
-			.filter(s => s && s.id && s.exams && s.section_id === section_id )
+		const { exam_title, year, month, section_id } = this.state
+		const { exams, students, grades, schoolName } = this.props
 		
-		const section_exams = Object.values(exams)
-			.filter(exam => exam && exam.section_id && exam.section_id === section_id)
-
+		const chunkSize = 22
+		const filtered_exams: MISExam[] = []
 		const examSubjectsWithMarks = new Set<string>()
 		
-		for (const exam of section_exams) {
-			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year) {
-				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
+		for (const exam of Object.values(exams)) {
+
+			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year && exam.section_id === section_id &&
+				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true)) {
+					filtered_exams.push(exam)
+					examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
 		}
 
-		const marks_sheet = getStudentExamMarksSheet(section_students, section_exams, grades, filter)
+		const exam_students = Object.values(students)
+			.filter(student => student && student.Name && student.section_id && student.exams)
+			.reduce((agg, curr) => {
+				
+				let merge_exams: AugmentedExams[] = []
+				
+				for (const exam of filtered_exams) {
+					const stats = curr.exams[exam.id]
+					if(stats != null) {
+						merge_exams.push({ ...exam, ...stats})
+					}
+				}
+				// in case there is no exams for the curr student, no need to put into list
+				if(merge_exams.length === 0)
+					return agg
+				
+				return [...agg, { ...curr, merge_exams}]
+
+			}, [] as MergeStudentsExams[])
+
+		const marks_sheet = getStudentExamMarksSheet(exam_students, grades)
 		
 		return chunkify(marks_sheet, chunkSize)
 			.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
@@ -163,10 +179,13 @@ class Reports extends Component<propsType, S> {
 
 	onStateChange = () => {
 
-		const { section_id, exam_title, year  } = this.state
+		const { section_id, exam_title, year, month } = this.state
 
 		const url = '/reports'
-		const params = `section_id=${section_id}&exam_title=${exam_title}&year=${year}`
+		let params = `section_id=${section_id}&exam_title=${exam_title}&year=${year}`
+
+		if(exam_title === "Test")
+			params = params + `&month=${month}`
 
 		window.history.replaceState(this.state, "Grade Book", `${url}?${params}`)
 	}
@@ -178,33 +197,37 @@ class Reports extends Component<propsType, S> {
 		const section_id = parsed_query.section_id ? parsed_query.section_id.toString() : ''
 		const exam_title = parsed_query.exam_title ? parsed_query.exam_title.toString() : ''
 		const year = parsed_query.year ? parsed_query.year.toString() : ''
+		const month = parsed_query.month ? parsed_query.month.toString() : ''
 
 		this.setState({
 			section_id,
 			exam_title,
-			year
+			year,
+			month
 		})
 	}
 
 	render() {
 
-		const { section_id, exam_title, year } = this.state
+		const { section_id, exam_title, year, month } = this.state
 		const { classes, exams } = this.props
 
 		const sections = getSectionsFromClasses(classes)
 			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		
-		const filtered_exams = this.getFilteredExams()
+		let filtered_exams: MISExam[] = []
 		
 		const curr_section = sections.find( section => section.id === section_id)
 
 		const years = new Set<string>()
-		const exam_titles = new Set<string>()
 
 		for(const [, exam] of Object.entries(exams)) {
-			if(exam && exam.id && exam.section_id === section_id) {
-				exam_titles.add(exam.name)
-				years.add(moment(exam.date).format("YYYY"))
+
+			years.add(moment(exam.date).format("YYYY"))
+
+			if(exam && exam.id && exam.section_id === section_id && moment(exam.date).format("YYYY") === year &&
+				(exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true)) {
+				filtered_exams.push(exam)
 			}
 		}
 
@@ -236,12 +259,21 @@ class Reports extends Component<propsType, S> {
 							<select {...this.former.super_handle(["exam_title"], () => true, this.onStateChange)}>
 								<option value="">Select Exam</option>
 								{
-									Array.from(exam_titles)
-										.sort((a, b) => a.localeCompare(b))
-										.map(title => <option key={title} value={title}>{title}</option>)
+									ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
 								}
 							</select>
 						</div>
+						{
+							this.state.exam_title === "Test" && <div className="row">
+								<label>Test Month</label>
+								<select {...this.former.super_handle(["month"], () => true, this.onStateChange)}>
+									<option value="">Select Month</option>
+									{
+										months.map(month => <option key={month} value={month}>{month}</option>)
+									}
+								</select>
+							</div>
+						}
 					</div>
 					<div className="row create-exam">
 						<div className="button blue create-exam" onClick={() => this.createNewExam()}>Create New Exam</div>
