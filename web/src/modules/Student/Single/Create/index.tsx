@@ -690,7 +690,13 @@ class SingleStudent extends Component<propTypes, S> {
 						<option value="female">Female</option>
 					</select>
 				</div>
-
+				<div className="row">
+					<label>Religion</label>
+					<input type="text"
+						{...this.former.super_handle(["Religion"])}
+						placeholder="Religion"
+					/>
+				</div>
 				{!prospective ? <div className="row">
 					<label>Blood Type</label>
 					<select {...this.former.super_handle(["BloodType"])}>

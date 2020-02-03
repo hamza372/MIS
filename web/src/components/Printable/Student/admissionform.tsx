@@ -61,6 +61,10 @@ const AdmissionForm = (props: PropsType) => {
                             </div>
                         </div>
                         <div className="row">
+                            <label>Religion:</label>
+                            <div>{student.Religion}</div>
+                        </div>
+                        <div className="row">
                             <label>Blood Type:</label>
                             <div>{student.BloodType}</div>
                         </div>

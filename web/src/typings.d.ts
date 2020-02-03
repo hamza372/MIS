@@ -210,7 +210,7 @@ interface MISStudent {
 	AdmissionNumber: string;
 	BloodType?: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 	FamilyID?: string;
-
+	Religion?: string
 	section_id: string;
 	prospective_section_id?: string;
 
@@ -289,7 +289,7 @@ interface BaseMISExpense {
 	amount: number;
 	label: string;
 	type: string;
-	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | "";
+	category: "SALARY" | "BILLS" | "STATIONERY" | "REPAIRS" | "RENT" | "ACTIVITY" | "DAILY" | "PETTY_CASH" | "OTHER" | "" | string;
 	date: number;
 	time: number;
 }

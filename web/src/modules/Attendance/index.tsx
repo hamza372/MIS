@@ -254,7 +254,10 @@ class Attendance extends Component <propTypes, S> {
 
 				return [...agg, {
 					number: student.Phone,
-					text: `Date: ${moment().format("DD/MM/YYYY")}\n${this.props.attendance_message_template.replace(/\$NAME/g, student.Name).replace(/\$STATUS/g, att.status)}`
+					text: `Date: ${moment().format("DD/MM/YYYY")}\n${this.props.attendance_message_template
+							.replace(/\$FNAME/g, student.ManName)
+							.replace(/\$NAME/g, student.Name)
+							.replace(/\$STATUS/g, att.status)}`
 				}]
 
 			}, [])

@@ -135,7 +135,9 @@ class Login extends Component {
 						<select {...this.former.super_handle(["name"])}>
 							<option value="" disabled>Select a User</option>
 						{
-							Object.entries(this.props.users).map(([uid, u]) => <option key={uid} value={u.name}>{u.name}</option>)
+							Object.entries(this.props.users)
+								.sort(([, a], [, b]) => a.name.localeCompare(b.name))
+								.map(([uid, u]) => <option key={uid} value={u.name}>{u.name}</option>)
 						}
 						</select>
 					</div>
