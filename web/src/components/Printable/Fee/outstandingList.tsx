@@ -1,5 +1,6 @@
 import React from "react"
 import "./../print.css"
+import toTitleCase from "utils/toTitleCase"
 
 type PropsTypes = {
     items: any
@@ -52,7 +53,7 @@ export const OutstandingFeePrintableList = (props: PropsTypes) => {
                    {
                     props.items.map(({ student, debt, familyId }:itemsType, i: number) => <tr key={student.id}>
                         <td className="cell-center">{i + props.chunkSize + 1}</td>
-                        <td>{familyId ? `${familyId}(F)` : student.Name}</td>
+                        <td>{familyId ? `${familyId}(F)` : toTitleCase(student.Name)}</td>
                         <td>{familyId ? "(Family)" : getStudentSection(student.section_id)}</td>
                         <td className="cell-center">{student.RollNumber}</td>
                         <td className="cell-center">{student.Phone}</td>

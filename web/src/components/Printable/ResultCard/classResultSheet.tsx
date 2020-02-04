@@ -1,6 +1,8 @@
 import React from "react"
-import "./../print.css"
 import moment from "moment"
+import toTitleCase from "utils/toTitleCase"
+
+import "./../print.css"
 
 type PropsTypes = {
     students: StudentMarksSheet[]
@@ -51,7 +53,7 @@ export const ClassResultSheet = (props: PropsTypes) => {
                         .map((student: StudentMarksSheet, index) => {
                             return <tr key={index}>
                                 <td>{student.rollNo || ''}</td>
-                                <td>{student.name}</td>
+                                <td>{toTitleCase(student.name)}</td>
                                 {   
                                     student.exams
                                         .sort((a, b) => a.subject.localeCompare(b.subject))

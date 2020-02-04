@@ -1,6 +1,8 @@
 import React from "react"
-import "./../print.css"
 import moment from "moment"
+import toTitleCase from "utils/toTitleCase"
+
+import "./../print.css"
 
 type PropsTypes = {
     students: AugmentedStudent[]
@@ -40,7 +42,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
                             .sort((a, b) => ((a.section && a.section.classYear) || 0) - ((b.section && b.section.classYear) || 0))
                             .map(student => <tr key={student.id}>
                                 <td className="cell-center">{student.AdmissionNumber || ''}</td>
-                                <td>{student.Name}</td>
+                                <td>{toTitleCase(student.Name)}</td>
                                 <td className="cell-center">{student.FamilyID || ''}</td>
                                 <td>{(student.section && student.section.namespaced_name) || ''}</td>
                                 <td className="cell-center">{student.RollNumber || ''}</td>
