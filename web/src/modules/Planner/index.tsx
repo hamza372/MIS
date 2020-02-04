@@ -5,6 +5,7 @@ import Layout from 'components/Layout'
 import { PrintHeader } from 'components/Layout'
 import Former from 'utils/former'
 import moment from 'moment';
+import getSectionFromId from 'utils/getSectionFromId'
 
 import { logSms, dateSheetMerges, removeSubjectFromDatesheet } from 'actions'
 import { smsIntentLink } from 'utils/intent';
@@ -268,11 +269,10 @@ class Planner extends Component <propTypes, S> {
 	}
 
 	render() {
-		const {students, classes, settings, schoolLogo, history} = this.props
-		const { class_id, section_id } = this.props.match.params
+		const { students, classes, settings, schoolLogo, history } = this.props
+		const { section_id } = this.props.match.params
 
-		const curr_class = classes[class_id]
-		const curr_section  = curr_class.sections[section_id]
+		const curr_section  = getSectionFromId(section_id, classes)
 
 		const text = this.dateSheetString()
 
@@ -318,7 +318,7 @@ class Planner extends Component <propTypes, S> {
 				<div className="row input info"> 
 					<div className="row" style={{justifyContent:"flex-start"}}>
 						<label style={{marginRight:"2px"}}> <b> Class-Section: </b> </label>
-						<div>{`${curr_class.name +"-"+ curr_section.name}`} </div>
+						<div>{curr_section ? curr_section.namespaced_name : ""} </div>
 					</div>
 					
 					<div className="row" style={{justifyContent:"flex-end"}}>
