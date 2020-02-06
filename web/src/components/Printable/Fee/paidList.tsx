@@ -1,5 +1,4 @@
 import React from "react"
-import moment from "moment"
 import toTitleCase from "utils/toTitleCase"
 
 import "./../print.css"
@@ -9,6 +8,7 @@ type PropsTypes = {
     totalAmount: number
     totalStudents: number
     chunkSize: number
+    paidDate: string
 }
 
 type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
@@ -19,7 +19,7 @@ export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
         <div className="print-only print-table" style={{width: "95%"}}>
             <table style={{marginBottom: "1cm"}}>
                 <caption>
-                    <div>Paid Fee Students List - {moment().format("DD/MM/YYYY")}</div>
+                    <div>Paid Fee Students List - {props.paidDate}</div>
                     <div className="row" style={{justifyContent: "space-between"}}>
                         <div>Total Students: <b>{props.totalStudents}</b></div>
                         <div>Total Amount Received: <b>Rs. {props.totalAmount}</b></div>

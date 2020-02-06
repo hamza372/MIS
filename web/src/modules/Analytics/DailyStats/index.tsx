@@ -167,6 +167,7 @@ class DailyStats extends Component<PropsType, S> {
                             chunkSize={ index === 0 ? 0 : chunk_size * index }
                             totalAmount={ total_amount_received }
                             totalStudents={ total_students_paid }
+                            paidDate={ moment(statsDate).format("DD/MM/YYYY") }
                             />)
                 }
             </>);

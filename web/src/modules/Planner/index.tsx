@@ -129,11 +129,12 @@ class Planner extends Component <propTypes, S> {
 
 	dateSheetString = (): string => {
 
-		const header = `Date: ${moment().format("DD MMMM YYYY")}\nDate Sheet of ${this.props.classes[this.class_id()].name}\n`
+		const header = `Date: ${moment().format("DD MMMM, YYYY")}\nDate Sheet of ${this.props.classes[this.class_id()].name}\n`
 
 		const dateSheet_message = Object.entries(this.state.datesheet)
-				.map( ([ subject, {date, time} ]) => {
-					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM-YYYY")}( ${moment(date).format("dddd")} )`
+				.sort(([, a], [, b]) => a.date - b.date)
+				.map(([subject, { date, time }]) => {
+					return `${subject}: ${moment(time, "hh:mm").format("hh:mm A")} / ${moment(date).format("DD-MM")}( ${moment(date).format("dddd")} )`
 			})
 		return header + dateSheet_message.join("\n") + "\n" + this.state.notes
 	}
