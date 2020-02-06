@@ -20,6 +20,17 @@ const StudentItem = (student) => {
 	
 	const section_name = student.section ? student.section.namespaced_name: "No Class"
 	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
+	let card_button_text = "Edit Student"
+
+	if(student.forwardTo === 'payment') {
+		card_button_text = "View Payments"
+	}
+	if(student.forwardTo === 'certificates') {
+		card_button_text = "View Certificate"
+	}
+	if(student.forwardTo === 'marks') {
+		card_button_text = "View Marks"
+	}
 	
 	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
 
@@ -63,7 +74,7 @@ const StudentItem = (student) => {
 				}
 				</div>
 				<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-					{student.forwardTo === "payment" ? "View Payments" : "Edit Student"}
+					{card_button_text}
 				</Link>
 			</div>
 		</div>

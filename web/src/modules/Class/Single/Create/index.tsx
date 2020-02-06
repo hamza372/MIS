@@ -308,7 +308,7 @@ class SingleClass extends Component<propsType, S> {
 						.sort((a, b) => a.localeCompare(b))
 						.map(subject => <div className="subject row" key={subject}>
 							<div>{subject}</div>
-							<div className="button red" onClick={this.removeSubject(subject)}>Remove</div>
+							<div className="button red" style={{width: "initial"}} onClick={this.removeSubject(subject)}>x</div>
 						</div>)
 				}
 
@@ -321,7 +321,7 @@ class SingleClass extends Component<propsType, S> {
 						.map(subj => <option key={subj} value={subj} />)
 					}
 					</datalist>
-					<div className="button green" onClick={this.addSubject}>+</div>
+					<div className="button green" style={{width: "initial"}} onClick={this.addSubject}>+</div>
 				</div>
 
 				{ Object.values(this.state.class.sections).length === 1 ? false : <div className="divider">Sections</div> }
@@ -357,7 +357,7 @@ class SingleClass extends Component<propsType, S> {
 											.map(student => {
 												return <div className="student row" key={student.id}>
 													<Link to={`/student/${student.id}/profile`}>{student.RollNumber} {student.Name}</Link>
-													<div className="button red" onClick={() => this.removeStudent(student)}>Remove</div>
+													<div className="button red" style={{width: "initial"}} onClick={() => this.removeStudent(student)}>x</div>
 												</div>
 											})
 									}
