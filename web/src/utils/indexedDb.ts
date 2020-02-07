@@ -112,7 +112,14 @@ export const loadDb = async () => {
 			}
 		}
 
-		let prev: RootReducerState = JSON.parse(serialized)
+		let prev: RootReducerState
+		if (typeof serialized === "string") {
+			prev = JSON.parse(serialized)
+		}
+		else {
+			prev = serialized
+		}
+
 		const client_id = localStorage.getItem('client_id') || prev.client_id || v4()
 
 		if (prev.queued && (!prev.queued.mutations || !prev.queued.analytics)) {
@@ -205,11 +212,7 @@ checkPersistent();
 
 export const saveDb = (state: RootReducerState) => {
 
-	const s1 = new Date().getTime();
-	console.log("SAVING IDB-START")
-
-	const json = JSON.stringify(state)
-	// console.log("IN SAVE DB FUNCTION INDEXED DB", state)
+	console.time("save-db")
 
 	openDB('db', 1, {
 		upgrade(db) {
@@ -218,9 +221,8 @@ export const saveDb = (state: RootReducerState) => {
 	})
 		.then(db => {
 			// console.log('putting db')
-			db.put('root-state', json, "db")
-			const s2 = new Date().getTime()
-			console.log("SAVING IDB-END", s2 - s1, "milliseconds");
+			db.put('root-state', state, "db")
+			console.timeEnd('save-db')
 		})
 		.catch(err => {
 			console.error(err)
@@ -311,12 +313,12 @@ const reconstructGradesObject = (state: RootReducerState) => {
 	return state
 }
 const addSchoolSessionSettings = (state: RootReducerState) => {
-	if(state.db.settings) {
-		
-		if(state.db.settings.schoolSession) {
+	if (state.db.settings) {
+
+		if (state.db.settings.schoolSession) {
 			return state
 		}
-		
+
 		const start_date = moment().startOf("year").unix() * 1000
 		const end_date = moment().add(1, "year").startOf("year").unix() * 1000
 
@@ -326,7 +328,7 @@ const addSchoolSessionSettings = (state: RootReducerState) => {
 				start_date,
 				end_date
 			}
-		} 
+		}
 	}
 
 	return state

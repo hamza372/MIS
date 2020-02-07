@@ -567,7 +567,7 @@ class SingleStudent extends Component<propTypes, S> {
 	uploadProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 		getImageString(e)
-			.then(res => getDownsizedImage(res, 600, "jpeg"))
+			.then(res => getDownsizedImage(res, 100, "jpeg"))
 			.then(imgString => {
 				this.props.uploadImage(this.state.profile, imgString)
 			})
@@ -630,7 +630,7 @@ class SingleStudent extends Component<propTypes, S> {
 							className="profile-pic"
 							src={this.state.profile.ProfilePicture.image_string || this.state.profile.ProfilePicture.url}
 							crossOrigin="anonymous"
-							style={{ height:100, width: 100 }}
+							style={{ height: 100, width: 100 }}
 							alt="profile" />
 					</div>
 				}
@@ -690,7 +690,13 @@ class SingleStudent extends Component<propTypes, S> {
 						<option value="female">Female</option>
 					</select>
 				</div>
-
+				<div className="row">
+					<label>Religion</label>
+					<input type="text"
+						{...this.former.super_handle(["Religion"])}
+						placeholder="Religion"
+					/>
+				</div>
 				{!prospective ? <div className="row">
 					<label>Blood Type</label>
 					<select {...this.former.super_handle(["BloodType"])}>
@@ -982,16 +988,16 @@ class SingleStudent extends Component<propTypes, S> {
 					<div className="button blue" onClick={() => window.print()}> Print</div>
 				</div>
 			</div>
-			<AdmissionForm 
-				student = {this.state.profile}
-				school = {{ 
+			<AdmissionForm
+				student={this.state.profile}
+				school={{
 					name: this.props.settings.schoolName,
 					code: this.props.settings.schoolCode,
 					logo: this.props.logo,
 					phone: this.props.settings.schoolPhoneNumber,
 					address: this.props.settings.schoolAddress
 				}}
-				classes = {this.props.classes}/>
+				classes={this.props.classes} />
 		</div>
 	}
 }

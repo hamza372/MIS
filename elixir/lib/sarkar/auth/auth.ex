@@ -17,7 +17,7 @@ defmodule Sarkar.Auth do
 		{:ok, confirm_text}
 	end
 
-	def createTracked({ id, password, limit, value}) do 
+	def createTracked({ id, password, limit, value, role}) do 
 
 		time = :os.system_time(:millisecond)
 
@@ -68,7 +68,18 @@ defmodule Sarkar.Auth do
 					})
 				end
 
-				confirm_text = "created #{id} with password #{password}"
+				area_manager = Map.get(value,"area_manager_name")
+				strategy = Map.get(value,"type_of_login")
+				user = Map.get(value, "user")
+
+				confirm_text = case role do
+					"AREA_MANAGER" ->
+						"Area Manager #{area_manager} created login #{id} with password #{password} and Strategy #{strategy}"
+					"ADMIN"->
+						"Admin #{user} created login #{id} with password #{password} and Strategy #{strategy}"
+					_ ->
+						"#{user} created #{id} with password #{password}"
+				end
 
 				alert_message = Poison.encode!(%{"text" => confirm_text })
 				{:ok, _resp} = Sarkar.Slack.send_alert(alert_message)

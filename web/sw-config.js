@@ -6,7 +6,7 @@ workbox.routing.registerRoute(
 			url.host === "www.googleapis.com"
 		return match
 	},
-	new workbox.strategies.StaleWhileRevalidate({
+	new workbox.strategies.CacheFirst({
 		cacheName: 'images',
 		plugins: [
 			new workbox.expiration.Plugin({

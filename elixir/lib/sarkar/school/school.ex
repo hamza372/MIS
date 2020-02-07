@@ -257,7 +257,7 @@ end
 									agg_db,
 									agg_writes,
 									agg_new_writes,
-									max_date
+									max(date, max_date)
 								}
 							other -> 
 								IO.puts "OTHER!!!!!!!!!!!!!"
@@ -291,7 +291,7 @@ end
 									agg_db,
 									agg_writes,
 									agg_new_writes,
-									max_date
+									max(date, max_date)
 								}
 							other ->
 								IO.puts "OTHER!!!!!!!!!!!"

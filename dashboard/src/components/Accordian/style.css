@@ -29,7 +29,12 @@
 	align-items: center;
 	font-size: 2.5rem;
 	letter-spacing: .05em;
-	padding-left: 20px;
+	padding: 0px 10px;
+}
+
+.header .icon {
+	width: 50px;
+	height: 50px;
 }
 
 .burger {
@@ -71,6 +76,9 @@
 	flex-direction: column;
 	overflow-y: auto;
 }
+	.burger-stub.full-view {
+		grid-area: burger / burger / main / panel;
+	}
 
 .info-panel {
 	grid-area: panel;
@@ -105,6 +113,9 @@
 			grid-column-gap: 10px;
 			transition: all 1s ease-in;
 		}
+		.header {
+			font-size: 1.5em;
+		}
 
 		.root-page.double {
 			grid-template-columns: 25% auto;
@@ -113,5 +124,8 @@
 
 		.root-page.double .burger-stub {
 			display: none;
+		}
+		.title, .divider {
+			font-size: 1em;
 		}
 	}

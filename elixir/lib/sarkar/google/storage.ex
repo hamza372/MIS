@@ -12,13 +12,17 @@ defmodule Sarkar.Storage.Google do
 			conn,
 			bucket_id,
 			"multipart",
-			%{name: Path.basename(file_path)},
+			%{
+				name: Path.basename(file_path),
+				contentType: "image/jpeg",
+				cacheControl: "private"
+			},
 			file_path
 		)
 
 		File.rm(file_path)
 
-		object.mediaLink
+		"https://storage.googleapis.com/#{bucket_id}/#{imageId}.jpg"
 	end
 
 	def upload_image(bucket_id, imageId, "data:image/png;base64," <> dataString) do
@@ -34,13 +38,16 @@ defmodule Sarkar.Storage.Google do
 			conn,
 			bucket_id,
 			"multipart",
-			%{name: Path.basename(file_path)},
+			%{
+				name: Path.basename(file_path),
+				contentType: "image/png",
+				cacheControl: "private"
+			},
 			file_path
 		)
 
 		File.rm(file_path)
-
-		object.mediaLink
+		"https://storage.googleapis.com/#{bucket_id}/#{imageId}.png"
 	end
 
 	def upload_image_from_url(bucket_id, img_url) do
