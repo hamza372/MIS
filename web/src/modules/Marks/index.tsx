@@ -18,30 +18,28 @@ import { ExamTitles } from 'constants/exam'
 import './style.css'
 
 type propsType = {
-	classes: RootDBState["classes"]
-	students: RootDBState["students"]
-	exams: RootDBState["exams"]
-	grades: RootDBState["settings"]["exams"]["grades"]
-	schoolName: string
+	classes: RootDBState["classes"];
+	students: RootDBState["students"];
+	exams: RootDBState["exams"];
+	grades: RootDBState["settings"]["exams"]["grades"];
+	schoolName: string;
 
-	deleteExam: (students: Array<string>, exam_id: string) => void
+	deleteExam: (students: Array<string>, exam_id: string) => void;
 
 } & RouteComponentProps
 
 type S = {
-	section_id: string
-	exam_title: string
-	year: string
-	month: string
+	section_id: string;
+	exam_title: string;
+	year: string;
+	month: string;
 	banner: {
-		active: boolean
-		good?: boolean
-		text?: string
-	}
+		active: boolean;
+		good?: boolean;
+		text?: string;
+	};
 }
 
-type AugmentedExams = MISStudentExam & MISExam
-type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
 
 class Reports extends Component<propsType, S> {
 
@@ -146,14 +144,14 @@ class Reports extends Component<propsType, S> {
 
 		const exam_students = Object.values(students)
 			.filter(student => student && student.Name && student.section_id && student.exams)
-			.reduce((agg, curr) => {
+			.reduce<MergeStudentsExams[]>((agg, curr) => {
 				
-				let merge_exams: AugmentedExams[] = []
+				const merge_exams: AugmentedMISExam[] = []
 				
 				for (const exam of filtered_exams) {
 					const stats = curr.exams[exam.id]
 					if(stats != null) {
-						merge_exams.push({ ...exam, ...stats})
+						merge_exams.push({ ...exam, stats })
 					}
 				}
 				// in case there is no exams for the curr student, no need to put into list
@@ -162,7 +160,7 @@ class Reports extends Component<propsType, S> {
 				
 				return [...agg, { ...curr, merge_exams}]
 
-			}, [] as MergeStudentsExams[])
+			}, [])
 
 		const marks_sheet = getStudentExamMarksSheet(exam_students, grades)
 		
@@ -215,7 +213,7 @@ class Reports extends Component<propsType, S> {
 		const sections = getSectionsFromClasses(classes)
 			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 		
-		let filtered_exams: MISExam[] = []
+		const filtered_exams: MISExam[] = []
 		
 		const curr_section = sections.find( section => section.id === section_id)
 
@@ -225,9 +223,12 @@ class Reports extends Component<propsType, S> {
 
 			years.add(moment(exam.date).format("YYYY"))
 
-			if(exam && exam.id && exam.section_id === section_id && moment(exam.date).format("YYYY") === year &&
-				(exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true)) {
-				filtered_exams.push(exam)
+			if(exam 
+				&& exam.id 
+				&& exam.section_id === section_id 
+				&& moment(exam.date).format("YYYY") === year 
+				&& (exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true)) {
+					filtered_exams.push(exam)
 			}
 		}
 

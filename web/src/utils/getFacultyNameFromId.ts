@@ -1,9 +1,6 @@
 const getFacultyNameFromId = (fid: string, faculty: RootDBState["faculty"]): string => {
-    
-    const teacher = faculty && faculty[fid] ? faculty[fid] : undefined
-    const teacher_name = teacher && teacher.Name ? teacher.Name : ""
-    
-    return teacher_name
+
+    return faculty && faculty[fid] && faculty[fid].Name ? faculty[fid].Name : ""
 }
 
 export default getFacultyNameFromId

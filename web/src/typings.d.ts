@@ -26,27 +26,27 @@ interface RootDBState {
 	};
 	analytics: {
 		sms_history: {
-			[id: string]: MISSMSHistory
-		}
-	}
+			[id: string]: MISSMSHistory;
+		};
+	};
 	assets: {
-		schoolLogo: string
-	}
-	max_limit: number
+		schoolLogo: string;
+	};
+	max_limit: number;
 	package_info: {
-		date: number
-		trial_period: number
-		paid: boolean
-	}
-	diary: MISDiary
+		date: number;
+		trial_period: number;
+		paid: boolean;
+	};
+	diary: MISDiary;
 	planner: {
 		// Will be able to add more planner stuff here i.e Teacher/Class shedule e.t.c 
 		datesheet: {
 			[section_id: string]: {
-				[id: string]: MISDateSheet
-			}
-		}
-	}
+				[id: string]: MISDateSheet;
+			};
+		};
+	};
 }
 
 interface BaseAnalyticsEvent {
@@ -62,13 +62,13 @@ interface RouteAnalyticsEvent extends BaseAnalyticsEvent {
 type QueueStatus = "queued" | "processing" | "failed"
 
 interface ImageMergeItem {
-	id: string
-	image_string: string
-	path: string[]
+	id: string;
+	image_string: string;
+	path: string[];
 }
 
 interface ImagesQueuable {
-	[path: string]: ImageMergeItem & { status: QueueStatus }
+	[path: string]: ImageMergeItem & { status: QueueStatus };
 }
 
 interface RootReducerState {
@@ -83,16 +83,16 @@ interface RootReducerState {
 					type: "MERGE" | "DELETE";
 				};
 				date: number;
-			}
-		}
+			};
+		};
 		analytics: {
-			[id: string]: RouteAnalyticsEvent
-		}
-		images: ImagesQueuable
+			[id: string]: RouteAnalyticsEvent;
+		};
+		images: ImagesQueuable;
 	};
 	acceptSnapshot: boolean;
 	lastSnapshot: number;
-	processing_images: boolean
+	processing_images: boolean;
 	db: RootDBState;
 	auth: {
 		school_id: string;
@@ -119,17 +119,17 @@ interface MISSMSHistory {
 
 
 interface MISSettings {
-	shareData: boolean
-	schoolName: string
-	schoolAddress: string
-	schoolPhoneNumber: string
+	shareData: boolean;
+	schoolName: string;
+	schoolAddress: string;
+	schoolPhoneNumber: string;
 	schoolSession: {
-		start_date: number
-		end_date: number
-	}
-	schoolCode: string
-	vouchersPerPage: string
-	sendSMSOption: "SIM" | "API"
+		start_date: number;
+		end_date: number;
+	};
+	schoolCode: string;
+	vouchersPerPage: string;
+	sendSMSOption: "SIM" | "API";
 	permissions: {
 		fee: { teacher: boolean };
 		dailyStats: { teacher: boolean };
@@ -142,16 +142,16 @@ interface MISSettings {
 	exams: {
 		grades: {
 			[grade: string]: {
-				percent: string
-				remarks: string
-			}
+				percent: string;
+				remarks: string;
+			};
 		};
 	};
 	classes: {
 		defaultFee: {
-			[class_id: string]: MISStudentFee
-		}
-	}
+			[class_id: string]: MISStudentFee;
+		};
+	};
 }
 
 interface MISUser {
@@ -196,10 +196,10 @@ interface MISStudent {
 	Active: boolean;
 
 	ProfilePicture?: {
-		id?: string
-		url?: string
-		image_string?: string
-	}
+		id?: string;
+		url?: string;
+		image_string?: string;
+	};
 
 	ManCNIC: string;
 	ManName: string;
@@ -210,7 +210,7 @@ interface MISStudent {
 	AdmissionNumber: string;
 	BloodType?: "" | "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 	FamilyID?: string;
-	Religion?: string
+	Religion?: string;
 	section_id: string;
 	prospective_section_id?: string;
 
@@ -278,10 +278,10 @@ interface MISStudentPayment {
 	fee_name?: string;
 }
 
-type AugmentedMISPayment = MISStudentPayment & { student_id: string, edited?: boolean }
+type AugmentedMISPayment = MISStudentPayment & { student_id: string; edited?: boolean }
 
 interface AugmentedMISPaymentMap {
-	[pid: string]: AugmentedMISPayment
+	[pid: string]: AugmentedMISPayment;
 }
 
 interface BaseMISExpense {
@@ -371,27 +371,28 @@ interface MISDiary {
 }
 interface MISDateSheet {
 	[subject: string]: {
-		date: number,
-		time: string
-	}
+		date: number;
+		time: string;
+	};
 }
 
-type AugmentedMISExam = MISExam & MISStudentExam
+type AugmentedMISExam = MISExam & { stats: MISStudentExam }
 interface StudentMarksSheet {
-	id: MISStudent["id"]
-	name: MISStudent["Name"]
-	manName: MISStudent["ManName"]
-    rollNo: MISStudent["RollNumber"]
-    marks: { total: number, obtained: number }
-    position: number
-    merge_exams: AugmentedMISExam[]
-    grade: string
-    remarks: string
+	id: MISStudent["id"];
+	name: MISStudent["Name"];
+	manName: MISStudent["ManName"];
+    rollNo: MISStudent["RollNumber"];
+    marks: { total: number; obtained: number };
+    position: number;
+    merge_exams: AugmentedMISExam[];
+    grade: string;
+    remarks: string;
 }
 
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam[] }
 interface ExamFilter {
-	month?: string
-	year: string
-	subject?: string
-	exam_title: string
+	month?: string;
+	year: string;
+	subject?: string;
+	exam_title: string;
 }

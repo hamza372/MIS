@@ -6,9 +6,6 @@ import { logSms } from 'actions'
 import { smsIntentLink } from 'utils/intent'
 import Former from 'utils/former'
 import { RouteComponentProps } from 'react-router'
-
-
-import './style.css'
 import { ExamTitles } from 'constants/exam'
 import ResultCard from 'components/Printable/ResultCard/resultCard'
 import getReportStringForStudent from 'utils/getReportStringForStudent'
@@ -16,30 +13,31 @@ import getSectionFromId from 'utils/getSectionFromId'
 import getFacultyNameFromId from 'utils/getFacultyNameFromId'
 import months from 'constants/months'
 
-type PropsType = {
-	faculty_id: string,
-	faculty: RootDBState["faculty"]
-	classes: RootDBState["classes"]
-	students: RootDBState["students"]
-	settings: RootDBState["settings"]
-	exams: RootDBState["exams"]
-	grades: RootDBState["settings"]["exams"]["grades"]
-	schoolLogo: string
-	sms_templates: RootDBState["sms_templates"]
+import './style.css'
 
-	logSms: (history: MISSMSHistory) => any
+type PropsType = {
+	faculty_id: string;
+	faculty: RootDBState["faculty"];
+	classes: RootDBState["classes"];
+	students: RootDBState["students"];
+	settings: RootDBState["settings"];
+	exams: RootDBState["exams"];
+	grades: RootDBState["settings"]["exams"]["grades"];
+	schoolLogo: string;
+	sms_templates: RootDBState["sms_templates"];
+
+	logSms: (history: MISSMSHistory) => void;
 } & RouteComponentProps<RouteInfo>
 
 type S = {
-	exams_list_by: string
+	exams_list_by: string;
 } & ExamFilter
 
 interface RouteInfo {
-	id: string
+	id: string;
 }
 
-type AugmentedExams = MISStudentExam & MISExam
-type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam []}
 
 class StudentMarksContainer extends Component<PropsType, S> {
 
@@ -57,7 +55,7 @@ class StudentMarksContainer extends Component<PropsType, S> {
 		this.former = new Former(this, [])
 	}
 
-	logSms = () =>{
+	logSms = (): void => {
 
 		const historyObj = {
 			faculty: this.props.faculty_id,
@@ -83,9 +81,9 @@ class StudentMarksContainer extends Component<PropsType, S> {
 		let section_id = ""
 		const student = students[id]
 
-		let years = new Set<string>()
-		let subjects = new Set<string>()
-		let filtered_exams: MISExam[] = []
+		const years = new Set<string>()
+		const subjects = new Set<string>()
+		const filtered_exams: MISExam[] = []
 
 		for(const [exam_id, exam] of Object.entries(exams)) {
 			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
@@ -102,18 +100,18 @@ class StudentMarksContainer extends Component<PropsType, S> {
 			years.add(moment(exam.date).format("YYYY"))
 		}
 
-		let merge_exams: AugmentedExams[] = []
+		const merge_exams: AugmentedMISExam[] = []
 
 		for (const exam of filtered_exams) {
 			const stats = student.exams[exam.id]
 			if(stats != null) {
-				merge_exams.push({ ...exam, ...stats})
+				merge_exams.push({ ...exam, stats })
 				// getting section id from exam in case of student promoted
 				section_id = exam.section_id
 			}
 		}
 
-		const student_exams: MergeStudentsExams = {...student, merge_exams }		
+		const student_exams: MergeStudentsExams = { ...student, merge_exams }		
 		
 		const section = getSectionFromId(section_id, classes)
 		const faculty_id = section ? section.faculty_id : undefined
@@ -210,5 +208,5 @@ export default connect((state: RootReducerState) => ({
 	sms_templates: state.db.sms_templates,
 	schoolLogo: state.db.assets ? (state.db.assets.schoolLogo || "") : "" 
 }), (dispatch: Function) => ({
-	logSms: (history: MISSMSHistory)=> dispatch(logSms(history)),
+	logSms: (history: MISSMSHistory): void => dispatch(logSms(history)),
 }))(StudentMarksContainer)

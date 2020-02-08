@@ -19,34 +19,32 @@ import { Link } from 'react-router-dom'
 import './style.css'
 
 type PropsType = {
-	curr_class_id: string,
-	curr_section_id: string,
-	faculty_id: string,
-	faculty: RootDBState["faculty"]
-	classes: RootDBState["classes"]
-	students: RootDBState["students"]
-	settings: RootDBState["settings"]
-	exams: RootDBState["exams"]
-	grades: RootDBState["settings"]["exams"]["grades"]
-	schoolLogo: string
-	sms_templates: RootDBState["sms_templates"]
+	curr_class_id: string;
+	curr_section_id: string;
+	faculty_id: string;
+	faculty: RootDBState["faculty"];
+	classes: RootDBState["classes"];
+	students: RootDBState["students"];
+	settings: RootDBState["settings"];
+	exams: RootDBState["exams"];
+	grades: RootDBState["settings"]["exams"]["grades"];
+	schoolLogo: string;
+	sms_templates: RootDBState["sms_templates"];
 
-	logSms: (history: MISSMSHistory) => any
+	logSms: (history: MISSMSHistory) => any;
 
 } & RouteComponentProps<RouteInfo>
 
 type S = {
-	exams_list_by: string
-	print_type: string
+	exams_list_by: string;
+	print_type: string;
 } & ExamFilter
 
 interface RouteInfo {
-	class_id: string
-	section_id: string
+	class_id: string;
+	section_id: string;
 }
 
-type AugmentedExams = MISStudentExam & MISExam
-type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
 class ClassReportMenu extends Component<PropsType, S> {
 
 	former: Former
@@ -91,7 +89,8 @@ class ClassReportMenu extends Component<PropsType, S> {
 		return section && section.namespaced_name ? section.namespaced_name : ""
 	}
 
-	render() {
+	render() 
+	{
 
 		const { exam_title, subject, year, month, print_type, exams_list_by } = this.state
 		const { students, exams, classes, settings, sms_templates, grades, faculty } = this.props
@@ -131,14 +130,14 @@ class ClassReportMenu extends Component<PropsType, S> {
 
 		const exam_students = Object.values(students)
 			.filter(student => student && student.Name && student.section_id && student.exams)
-			.reduce((agg, curr) => {
+			.reduce<MergeStudentsExams[]>((agg, curr) => {
 				
-				let merge_exams: AugmentedExams[] = []
+				const merge_exams: AugmentedMISExam[] = []
 				
 				for (const exam of filtered_exams) {
 					const stats = curr.exams[exam.id]
 					if(stats != null) {
-						merge_exams.push({ ...exam, ...stats})
+						merge_exams.push({ ...exam, stats})
 					}
 				}
 				
@@ -148,7 +147,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 				
 				return [...agg, { ...curr, merge_exams}]
 
-			}, [] as MergeStudentsExams[])
+			}, [])
 
 		// sorted marks sheet
 		const marksSheet = getStudentExamMarksSheet(exam_students, grades)

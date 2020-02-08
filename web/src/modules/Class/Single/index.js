@@ -1,11 +1,11 @@
 import React from 'react'
-import {Route, Link} from 'react-router-dom'
+import { Route, Link } from 'react-router-dom'
 import Layout from 'components/Layout'
 
 import Create from './Create'
 import ReportMenu from './ReportsMenu'
 import FeeMenu from './ClassFeeMenu'
-import connect from 'react-redux/lib/connect/connect';
+import { connect } from 'react-redux'
 
 import './style.css'
 

@@ -6,25 +6,21 @@ import { PrintHeader } from 'components/Layout'
 import './style.css'
 
 type PropsType = {
-    student: MergeStudentsExams
-    settings: RootDBState["settings"]
-    section: AugmentedSection
-    sectionTeacher: string
-    logo: string
-    grades: RootDBState["settings"]["exams"]["grades"]
-    listBy: string
-    examFilter: ExamFilter
+    student: MergeStudentsExams;
+    settings: RootDBState["settings"];
+    section: AugmentedSection;
+    sectionTeacher: string;
+    logo: string;
+    grades: RootDBState["settings"]["exams"]["grades"];
+    listBy: string;
+    examFilter: ExamFilter;
     styles?: {
-        showBorder: boolean
-        showProfile: boolean
-        showAttendance: boolean
-        showOverallRemarks: boolean
-    }
+        showBorder: boolean;
+        showProfile: boolean;
+        showAttendance: boolean;
+        showOverallRemarks: boolean;
+    };
 }
-
-type AugmentedExams = MISStudentExam & MISExam
-
-type MergeStudentsExams = MISStudent & { merge_exams: AugmentedExams []}
 
 const ResultCard = (props: PropsType) => {
 
@@ -37,14 +33,14 @@ const ResultCard = (props: PropsType) => {
     const result_card_title = exam_title === "Test" && month !== "" ? `${exam_title}-${month}` : exam_title
     const avatar = student.ProfilePicture ? (student.ProfilePicture.url || student.ProfilePicture.image_string) : undefined
 
-    const formatNumber = (val: number): string | number => {
-        return Number.isInteger(val) ? val : val.toFixed(2)
+    const formatNumber = (val: number): string => {
+        return Number.isInteger(val) ? val.toString() : val.toFixed(2)
     }
 
-    const getRemarks = (remarks: string, grade: string) => {
+    const getRemarks = (remarks: string, grade: string): string => {
         
         if(remarks !== "") {
-			return remarks
+            return remarks
 		}
 
 		return grade && grades && grades[grade] ? grades[grade].remarks : ""
@@ -54,7 +50,7 @@ const ResultCard = (props: PropsType) => {
 
 		const attendance = student.attendance || {}
 
-		let attendance_status_count = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 }
+		const attendance_status_count = { PRESENT: 0, LEAVE: 0, ABSENT: 0, SICK_LEAVE: 0, SHORT_LEAVE: 0, CASUAL_LEAVE: 0 }
 
 		for (const [date, record] of Object.entries(attendance)) {
 			
@@ -66,11 +62,12 @@ const ResultCard = (props: PropsType) => {
 		return attendance_status_count
 	}
 
-	const { total_marks, marks_obtained } = student.merge_exams
-		.reduce((agg, curr) => ({
-			total_marks: agg.total_marks + parseFloat(curr.total_score.toString() || '0'),
-			marks_obtained: agg.marks_obtained + parseFloat(curr.score.toString() || '0')
-        }), { total_marks: 0, marks_obtained: 0 })
+	const marks = { total: 0, obtained: 0 }
+
+    for(const exam of student.merge_exams) {
+        marks.obtained += parseFloat(exam.stats.score.toString()) || 0
+        marks.total += parseFloat(exam.total_score.toString()) || 0
+    }
         
     const attendance = calculateAttendace(student)
 
@@ -150,25 +147,25 @@ const ResultCard = (props: PropsType) => {
                                     <td className="text-center">{ listBy === "Date" ? moment(exam.date).format("MM/DD") : i + 1 }</td>
                                     <td>{exam.subject}</td>
                                     <td className="text-center">{exam.total_score}</td>
-                                    <td className="text-center">{exam.grade !== "Absent" ? exam.score: "N/A"}</td>
-                                    <td className="text-center">{exam.grade !== "Absent" ? (formatNumber(exam.score / exam.total_score * 100)) : "N/A"}</td>
-                                    <td className="text-center">{exam.grade}</td>
-                                    <td>{getRemarks(exam.remarks, exam.grade)}</td>
+                                    <td className="text-center">{exam.stats.grade !== "Absent" ? exam.stats.score: "N/A"}</td>
+                                    <td className="text-center">{exam.stats.grade !== "Absent" ? (formatNumber(exam.stats.score / exam.total_score * 100)) : "N/A"}</td>
+                                    <td className="text-center">{exam.stats.grade}</td>
+                                    <td>{getRemarks(exam.stats.remarks, exam.stats.grade)}</td>
                                 </tr>)
                     }
                     </tbody>
                     <tfoot>
                         <tr className="bold" style={{height: 0.8}}>
                             <td colSpan={2} className="text-center">Grand Total</td>
-                            <td className="text-center">{total_marks}</td>
-                            <td className="text-center">{formatNumber(marks_obtained)}</td>
-                            <td className="text-center">{formatNumber(marks_obtained/total_marks * 100)}%</td>
+                            <td className="text-center">{marks.total}</td>
+                            <td className="text-center">{formatNumber(marks.obtained)}</td>
+                            <td className="text-center">{formatNumber(marks.obtained/marks.total * 100)}%</td>
                             <td colSpan={2}></td>
                         </tr>
                     </tfoot>				
                 </table>
                 <div className="result-stats">
-                    <div className="row">Grade: &nbsp; <b>{calculateGrade(marks_obtained, total_marks, grades)}</b></div>
+                    <div className="row">Grade: &nbsp; <b>{calculateGrade(marks.obtained, marks.obtained, grades)}</b></div>
                     <div className="row">Position: ________</div>
                 </div>
             </div>
