@@ -19,30 +19,30 @@ import { Link } from 'react-router-dom'
 import './style.css'
 
 type PropsType = {
-	curr_class_id: string;
-	curr_section_id: string;
-	faculty_id: string;
-	faculty: RootDBState["faculty"];
-	classes: RootDBState["classes"];
-	students: RootDBState["students"];
-	settings: RootDBState["settings"];
-	exams: RootDBState["exams"];
-	grades: RootDBState["settings"]["exams"]["grades"];
-	schoolLogo: string;
-	sms_templates: RootDBState["sms_templates"];
+	curr_class_id: string
+	curr_section_id: string
+	faculty_id: string
+	faculty: RootDBState["faculty"]
+	classes: RootDBState["classes"]
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
+	exams: RootDBState["exams"]
+	grades: RootDBState["settings"]["exams"]["grades"]
+	schoolLogo: string
+	sms_templates: RootDBState["sms_templates"]
 
-	logSms: (history: MISSMSHistory) => any;
+	logSms: (history: MISSMSHistory) => void
 
 } & RouteComponentProps<RouteInfo>
 
 type S = {
-	exams_list_by: string;
-	print_type: string;
+	exams_list_by: string
+	print_type: string
 } & ExamFilter
 
 interface RouteInfo {
-	class_id: string;
-	section_id: string;
+	class_id: string
+	section_id: string
 }
 
 class ClassReportMenu extends Component<PropsType, S> {
@@ -62,7 +62,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 		this.former = new Former(this, [])
 	}
 
-	logSms = (messages: MISSms[]) => {
+	logSms = (messages: MISSms[]): void => {
 		if (messages.length === 0) {
 			console.log("No Message to Log")
 			return
@@ -89,41 +89,40 @@ class ClassReportMenu extends Component<PropsType, S> {
 		return section && section.namespaced_name ? section.namespaced_name : ""
 	}
 
-	render() 
-	{
+	render() {
 
 		const { exam_title, subject, year, month, print_type, exams_list_by } = this.state
 		const { students, exams, classes, settings, sms_templates, grades, faculty } = this.props
-		
+
 		const exam_filter = { exam_title, year, month, subject }
-		
+
 		const section_id = this.getSectionIdFromParams()
 		const section = getSectionFromId(section_id, classes)
-		const section_name  = this.getSectionName(section)
+		const section_name = this.getSectionName(section)
 		const section_teacher = getFacultyNameFromId(section.faculty_id, faculty)
 		const class_id = this.getClassIdFromParams()
 
 		// no. of records per chunk
 		const chunkSize = 22;
 
-		const years = new Set<string>()
-		const filtered_exams: MISExam[] = []
-		const subjects = new Set<string>()
-		const examSubjectsWithMarks = new Set<string>()
-		
+		let years = new Set<string>()
+		let filtered_exams: MISExam[] = []
+		let subjects = new Set<string>()
+		let examSubjectsWithMarks = new Set<string>()
+
 		for (const exam of Object.values(exams)) {
-			
+
 			years.add(moment(exam.date).format("YYYY"))
 
-			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
+			if (exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
 				exam.section_id === section_id &&
 				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true) &&
 				(exam_title === "Test" && subject ? exam.subject === subject : true)) {
-					filtered_exams.push(exam)
-					examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
+				filtered_exams.push(exam)
+				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
 			// show all subjects of class in the list
-			if(exam.section_id === section_id && exam.class_id === class_id) {
+			if (exam.section_id === section_id && exam.class_id === class_id) {
 				subjects.add(exam.subject)
 			}
 		}
@@ -131,21 +130,21 @@ class ClassReportMenu extends Component<PropsType, S> {
 		const exam_students = Object.values(students)
 			.filter(student => student && student.Name && student.section_id && student.exams)
 			.reduce<MergeStudentsExams[]>((agg, curr) => {
-				
+
 				const merge_exams: AugmentedMISExam[] = []
-				
+
 				for (const exam of filtered_exams) {
 					const stats = curr.exams[exam.id]
-					if(stats != null) {
-						merge_exams.push({ ...exam, stats})
+					if (stats != null) {
+						merge_exams.push({ ...exam, stats })
 					}
 				}
-				
+
 				// in case there is no exams for the curr student, no need to put into list
-				if(merge_exams.length === 0)
+				if (merge_exams.length === 0)
 					return agg
-				
-				return [...agg, { ...curr, merge_exams}]
+
+				return [...agg, { ...curr, merge_exams }]
 
 			}, [])
 
@@ -158,7 +157,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 				number: student.Phone,
 				text: sms_templates.result
 					.replace(/\$NAME/g, student.Name)
-					.replace(/\$REPORT/g, getReportStringForStudent(student, exam_title ,grades))
+					.replace(/\$REPORT/g, getReportStringForStudent(student, exam_title, grades))
 			}))
 
 		const url = smsIntentLink({
@@ -167,7 +166,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 		})
 
 		return <div className="class-report-menu">
-			<div className="title no-print">Result Cards for { section_name }</div>
+			<div className="title no-print">Result Cards for {section_name}</div>
 			<div className="section-container section no-print">
 				<div className="form">
 					<div className="row">
@@ -192,27 +191,27 @@ class ClassReportMenu extends Component<PropsType, S> {
 					</div>
 					{
 						exam_title === "Test" &&
-							<div className="row">
-								<label>Test Month</label>
-								<select {...this.former.super_handle(["month"])}>
-									<option value="">Select Month</option>
-									{
-										Months.map(month => <option key={month} value={month}>{month}</option>)
-									}
-								</select>
-							</div>
+						<div className="row">
+							<label>Test Month</label>
+							<select {...this.former.super_handle(["month"])}>
+								<option value="">Select Month</option>
+								{
+									Months.map(month => <option key={month} value={month}>{month}</option>)
+								}
+							</select>
+						</div>
 					}
 					{
 						exam_title === "Test" &&
-							<div className="row">
-								<label>Test Subject</label>
-								<select {...this.former.super_handle(["subject"])}>
-									<option value="">Select Subject</option>
-									{
-										Array.from(subjects).map(subject => <option key={subject} value={subject}>{subject}</option>)
-									}
-								</select>
-							</div>
+						<div className="row">
+							<label>Test Subject</label>
+							<select {...this.former.super_handle(["subject"])}>
+								<option value="">Select Subject</option>
+								{
+									Array.from(subjects).map(subject => <option key={subject} value={subject}>{subject}</option>)
+								}
+							</select>
+						</div>
 					}
 					<div className="row">
 						<label>Print</label>
@@ -232,35 +231,35 @@ class ClassReportMenu extends Component<PropsType, S> {
 					</div>
 				</div>
 				<div className="md-form">
-				{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
+					{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
 					<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Class Result {this.state.print_type}</div>
-					<Link className="md-button grey btn-edit-exam" 
+					<Link className="md-button grey btn-edit-exam"
 						to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
 				</div>
 			</div>
 
 			<div className="class-report print-page" style={{ height: "100%" }}>
-			{
-				print_type === "Sheet" && exam_title !== "" ?
-					chunkify(marksSheet, chunkSize)
-						.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
-							sectionName={ section_name }
-							examSubjectsWithMarks={examSubjectsWithMarks}
-							examName={exam_title}
-							schoolName={this.props.settings.schoolName}
-							students={chunkItems}
-							chunkSize={index === 0 ? 0 : chunkSize * index} />) :
-				exam_students
-					.map((student: MergeStudentsExams) => <ResultCard key={student.id}
-						student={student}
-						settings={settings}
-						grades={grades}
-						examFilter={exam_filter}
-						logo={this.props.schoolLogo}
-						section={section}
-						sectionTeacher={section_teacher}
-						listBy={exams_list_by}/>)
-			}
+				{
+					print_type === "Sheet" && exam_title !== "" ?
+						chunkify(marksSheet, chunkSize)
+							.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
+								sectionName={section_name}
+								examSubjectsWithMarks={examSubjectsWithMarks}
+								examName={exam_title}
+								schoolName={this.props.settings.schoolName}
+								students={chunkItems}
+								chunkSize={index === 0 ? 0 : chunkSize * index} />) :
+						exam_students
+							.map((student: MergeStudentsExams) => <ResultCard key={student.id}
+								student={student}
+								settings={settings}
+								grades={grades}
+								examFilter={exam_filter}
+								logo={this.props.schoolLogo}
+								section={section}
+								sectionTeacher={section_teacher}
+								listBy={exams_list_by} />)
+				}
 			</div>
 		</div>
 	}
@@ -277,5 +276,5 @@ export default connect((state: RootReducerState) => ({
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 	sms_templates: state.db.sms_templates
 }), (dispatch: Function) => ({
-	logSms: (history: MISSMSHistory) => dispatch(logSms(history))
+	logSms: (history: MISSMSHistory): void => dispatch(logSms(history))
 }))(ClassReportMenu)

@@ -1,18 +1,18 @@
 import calculateGrade from 'utils/calculateGrade'
 
 const getStudentExamMarksSheet = (students: MergeStudentsExams[], grades: MISSettings["exams"]["grades"]): StudentMarksSheet[] => {
-    
-    if(students.length === 0)
+
+    if (students.length === 0)
         return []
 
     const marks_sheet = students
         .reduce<StudentMarksSheet[]>((agg, curr) => {
 
-            const marks = { total: 0, obtained: 0 }
+            let marks = { total: 0, obtained: 0 }
 
-            for(const exam of curr.merge_exams) {
-                marks.obtained += parseFloat(exam.stats.score.toString()) || 0
-                marks.total += parseFloat(exam.total_score.toString()) || 0
+            for (const exam of curr.merge_exams) {
+                marks.obtained += parseFloat(exam.stats.score.toString() || '0')
+                marks.total += parseFloat(exam.total_score.toString() || '0')
             }
 
             const grade = calculateGrade(marks.obtained, marks.total, grades)
@@ -33,7 +33,7 @@ const getStudentExamMarksSheet = (students: MergeStudentsExams[], grades: MISSet
                 } as StudentMarksSheet
             ]
         }, [])
-    .sort((a, b) => b.marks.obtained - a.marks.obtained)
+        .sort((a, b) => b.marks.obtained - a.marks.obtained)
 
     return marks_sheet
 }

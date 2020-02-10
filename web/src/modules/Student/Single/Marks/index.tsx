@@ -37,7 +37,7 @@ interface RouteInfo {
 	id: string;
 }
 
-type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam []}
+type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam[] }
 
 class StudentMarksContainer extends Component<PropsType, S> {
 
@@ -73,7 +73,7 @@ class StudentMarksContainer extends Component<PropsType, S> {
 
 	render() {
 
-		const { exam_title, exams_list_by, year, month, subject } =  this.state
+		const { exam_title, exams_list_by, year, month, subject } = this.state
 
 		const { students, settings, sms_templates, exams, classes, grades, faculty } = this.props
 
@@ -81,16 +81,16 @@ class StudentMarksContainer extends Component<PropsType, S> {
 		let section_id = ""
 		const student = students[id]
 
-		const years = new Set<string>()
-		const subjects = new Set<string>()
-		const filtered_exams: MISExam[] = []
+		let years = new Set<string>()
+		let subjects = new Set<string>()
+		let filtered_exams: MISExam[] = []
 
-		for(const [exam_id, exam] of Object.entries(exams)) {
-			if(exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
+		for (const [exam_id, exam] of Object.entries(exams)) {
+			if (exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
 				student.exams && student.exams[exam_id] &&
 				(exam_title === "Test" && month !== "" ? moment(exam.date).format("MMMM") === month : true)) {
 				// check is subject selected
-				if( exam_title === "Test" && subject !== "" ? exam.subject === subject : true) {
+				if (exam_title === "Test" && subject !== "" ? exam.subject === subject : true) {
 					filtered_exams.push(exam)
 				}
 				// still filter the exam's subjects, to fill the drop down
@@ -100,19 +100,19 @@ class StudentMarksContainer extends Component<PropsType, S> {
 			years.add(moment(exam.date).format("YYYY"))
 		}
 
-		const merge_exams: AugmentedMISExam[] = []
+		let merge_exams: AugmentedMISExam[] = []
 
 		for (const exam of filtered_exams) {
 			const stats = student.exams[exam.id]
-			if(stats != null) {
+			if (stats != null) {
 				merge_exams.push({ ...exam, stats })
 				// getting section id from exam in case of student promoted
 				section_id = exam.section_id
 			}
 		}
 
-		const student_exams: MergeStudentsExams = { ...student, merge_exams }		
-		
+		const student_exams: MergeStudentsExams = { ...student, merge_exams }
+
 		const section = getSectionFromId(section_id, classes)
 		const faculty_id = section ? section.faculty_id : undefined
 		const section_teacher = getFacultyNameFromId(faculty_id, faculty)
@@ -124,76 +124,76 @@ class StudentMarksContainer extends Component<PropsType, S> {
 		const url = smsIntentLink({ messages: [{ number: student.Phone, text: text }], return_link: window.location.href })
 
 		return <div className="student-marks-container">
-				<div className="no-print">
-					<div className="section form">
-						<div className="row">
-							<label>Exams for Year</label>
-							<select {...this.former.super_handle(["year"])}>
-								<option value="">Select Year</option>
+			<div className="no-print">
+				<div className="section form">
+					<div className="row">
+						<label>Exams for Year</label>
+						<select {...this.former.super_handle(["year"])}>
+							<option value="">Select Year</option>
+							{
+								Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+							}
+						</select>
+					</div>
+					<div className="row">
+						<label>Exam Name</label>
+						<select {...this.former.super_handle(["exam_title"])}>
+							<option value="">Select Exam</option>
+							{
+								ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
+							}
+						</select>
+					</div>
+					{
+						exam_title === "Test" && <div className="row">
+							<label>Test Subject</label>
+							<select {...this.former.super_handle(["subject"])}>
+								<option value="">Select Subject</option>
 								{
-									Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+									Array.from(subjects)
+										.sort((a, b) => a.localeCompare(b))
+										.map(subject => <option key={subject} value={subject}>{subject}</option>)
 								}
 							</select>
 						</div>
-						<div className="row">
-							<label>Exam Name</label>
-							<select {...this.former.super_handle(["exam_title"])}> 
-								<option value="">Select Exam</option>
+					}
+					{
+						exam_title === "Test" && <div className="row">
+							<label>Test Month</label>
+							<select {...this.former.super_handle(["subject"])}>
+								<option value="">Select Month</option>
 								{
-									ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
+									months.map(month => <option key={month} value={month}>{month}</option>)
 								}
 							</select>
 						</div>
-						{
-							exam_title === "Test" && <div className="row">
-								<label>Test Subject</label>
-								<select {...this.former.super_handle(["subject"])}> 
-									<option value="">Select Subject</option>
-									{
-										Array.from(subjects)
-											.sort((a, b) => a.localeCompare(b))
-											.map(subject => <option key={subject} value={subject}>{subject}</option>)
-									}
-								</select>
-							</div>
-						}
-						{
-							exam_title === "Test" && <div className="row">
-								<label>Test Month</label>
-								<select {...this.former.super_handle(["subject"])}> 
-									<option value="">Select Month</option>
-									{
-										months.map(month => <option key={month} value={month}>{month}</option>)
-									}
-								</select>
-							</div>
-						}
-						<div className="row">
-							<label>Exam List By</label>
-							<select {...this.former.super_handle(["exams_list_by"])}>
-								<option value="">Select List By</option>
-								<option value="Date">Date</option>
-								<option value="Sr No.">Serial No</option>
-							</select>
-						</div>
-						<div className="md-form">
-							{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms} href={url}>Send Reports using SMS</a> : false}
-								<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Result Card</div>
-								<Link className="md-button grey btn-edit-exam"
-									to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
-						</div>
+					}
+					<div className="row">
+						<label>Exam List By</label>
+						<select {...this.former.super_handle(["exams_list_by"])}>
+							<option value="">Select List By</option>
+							<option value="Date">Date</option>
+							<option value="Sr No.">Serial No</option>
+						</select>
+					</div>
+					<div className="md-form">
+						{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms} href={url}>Send Reports using SMS</a> : false}
+						<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Result Card</div>
+						<Link className="md-button grey btn-edit-exam"
+							to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
 					</div>
 				</div>
-				<ResultCard key={student.id}
-					student={student_exams}
-					settings={settings}
-					grades={grades}
-					examFilter={{exam_title, year, month}}
-					logo={this.props.schoolLogo}
-					section={section}
-					sectionTeacher={section_teacher}
-					listBy={exams_list_by}/>
 			</div>
+			<ResultCard key={student.id}
+				student={student_exams}
+				settings={settings}
+				grades={grades}
+				examFilter={{ exam_title, year, month }}
+				logo={this.props.schoolLogo}
+				section={section}
+				sectionTeacher={section_teacher}
+				listBy={exams_list_by} />
+		</div>
 	}
 }
 
@@ -206,7 +206,7 @@ export default connect((state: RootReducerState) => ({
 	grades: state.db.settings.exams.grades,
 	settings: state.db.settings,
 	sms_templates: state.db.sms_templates,
-	schoolLogo: state.db.assets ? (state.db.assets.schoolLogo || "") : "" 
+	schoolLogo: state.db.assets ? (state.db.assets.schoolLogo || "") : ""
 }), (dispatch: Function) => ({
 	logSms: (history: MISSMSHistory): void => dispatch(logSms(history)),
 }))(StudentMarksContainer)
