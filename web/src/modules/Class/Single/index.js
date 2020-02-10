@@ -1,13 +1,13 @@
 import React from 'react'
-import {Route, Link} from 'react-router-dom'
+import { Route, Link } from 'react-router-dom'
 import Layout from 'components/Layout'
 
 import Create from './Create'
 import ReportMenu from './ReportsMenu'
 import FeeMenu from './ClassFeeMenu'
+import { connect } from 'react-redux'
 
 import './style.css'
-import connect from 'react-redux/lib/connect/connect';
 
 export default connect(state => ({ 
 	permissions: state.db.settings.permissions
@@ -18,7 +18,7 @@ export default connect(state => ({
 		const setupPage = props.permissions && props.permissions.setupPage ? props.permissions.setupPage.teacher : true
 		
 return <Layout history={props.history}>
-		<div className="single-class-container">
+		<div className="single-class-container" style={{display: "block", overflow: "hidden"}}>
 
 			{loc === "new" || isPrintPage ? false : 
 				setupPage ? <div className="row tabs">
