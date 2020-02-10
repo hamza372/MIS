@@ -2,16 +2,29 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router-dom'
 import { createSchoolLogin } from 'actions'
+import { RouteComponentProps } from 'react-router'
 import Former from 'utils/former'
 import Layout from 'components/Layout'
-import downloadIcon from './icons/download.svg'
-import eyeOpen from './icons/eye_open.svg'
-import eyeClosed from './icons/eye_closed.svg'
+import { EyeOpenIcon, EyeClosedIcon, DownloadIcon } from 'assets/icons'
 
-class SchoolLogin extends Component {
 
-	constructor(props) {
-		super(props);
+type PropsType = {
+	login: (school_id: string, password: string) => void
+} & RootReducerState & RouteComponentProps
+
+type S = {
+	loading: boolean
+	school: string
+	password: string
+	errorMessage: string
+	showPassword: boolean
+}
+
+class SchoolLogin extends Component<PropsType, S> {
+
+	former: Former
+	constructor(props: PropsType) {
+		super(props)
 
 		this.state = {
 			loading: false,
@@ -25,28 +38,28 @@ class SchoolLogin extends Component {
 	}
 
 	getPasswordInputType = () => this.state.showPassword ? "text" : "password"
-	getShowHideIcon = () => this.state.showPassword ? eyeOpen : eyeClosed
+	getShowHideIcon = () => this.state.showPassword ? EyeOpenIcon : EyeClosedIcon
 
 	onLogin = () => {
 		this.props.login(this.state.school, this.state.password);
 	}
 
-	handleKeyDown = (e) => {
+	handleKeyDown = (e: React.KeyboardEvent) => {
 		// check 'enter' key pressed
-		if(e.keyCode === 13) {
+		if (e.keyCode === 13) {
 			this.onLogin()
 		}
 	}
 
-	componentWillReceiveProps(newProps) {
+	componentWillReceiveProps(newProps: PropsType) {
 
-		if(newProps.auth.attempt_failed) {
+		if (newProps.auth.attempt_failed) {
 			this.setState({
 				errorMessage: "Login failed"
 			})
 		}
 
-		if(newProps.auth.token !== undefined && newProps.auth.token !== this.props.auth.token) {
+		if (newProps.auth.token !== undefined && newProps.auth.token !== this.props.auth.token) {
 			this.props.history.push('/login')
 		}
 	}
@@ -61,8 +74,7 @@ class SchoolLogin extends Component {
 
 	render() {
 
-		if(this.props.auth.faculty_id)
-		{
+		if (this.props.auth.faculty_id) {
 			return <Redirect to="/landing" />
 		}
 
@@ -72,7 +84,7 @@ class SchoolLogin extends Component {
 
 		if (!this.props.initialized) {
 			return <div className="downloading">
-				<img className="bounce" src={downloadIcon} alt="download-icon" />
+				<img className="bounce" src={DownloadIcon} alt="download-icon" />
 				<div style={{ marginTop: "10px" }}>Downloading Database, Please wait...</div>
 			</div>
 		}
@@ -87,36 +99,36 @@ class SchoolLogin extends Component {
 					</div>
 					<div className="row">
 						<label>Password</label>
-						<div style={{ display:"flex"}}>
+						<div style={{ display: "flex" }}>
 							<input
 								type={`${this.getPasswordInputType()}`}
 								{...this.former.super_handle(["password"])}
 								onKeyDown={this.handleKeyDown}
 								placeholder="Password"
-								style={{ borderRadius:"5px 0px 0px 5px"}}
+								style={{ borderRadius: "5px 0px 0px 5px" }}
 							/>
 							<div className="show-hide-container">
 								<img
 									src={this.getShowHideIcon()}
 									onClick={() => this.setState({ showPassword: !this.state.showPassword })}
-									alt="eye-icon"/>
+									alt="eye-icon" />
 							</div>
 						</div>
 					</div>
 					<div className="button save" onClick={this.onLogin}>Login</div>
 				</div>
-				{ this.props.auth.loading ? <div>Signing in....</div> : false }
-				{ this.props.auth.attempt_failed ? <div>{ this.state.errorMessage }</div> : false }
-				{ this.state.errorMessage !== "" ? this.removeErrorMessage() : false }
+				{this.props.auth.loading ? <div>Signing in....</div> : false}
+				{this.props.auth.attempt_failed ? <div>{this.state.errorMessage}</div> : false}
+				{this.state.errorMessage !== "" ? this.removeErrorMessage() : false}
 			</div>
 		</Layout>
 	}
 }
 
-export default connect(state => ({
+export default connect((state: RootReducerState) => ({
 	connected: state.connected,
 	auth: state.auth,
 	initialized: state.initialized
-}), dispatch => ({
-	login: (school_id, password) => dispatch(createSchoolLogin(school_id, password))
+}), (dispatch: Function) => ({
+	login: (school_id: string, password: string) => dispatch(createSchoolLogin(school_id, password))
 }))(withRouter(SchoolLogin))
