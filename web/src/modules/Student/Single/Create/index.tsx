@@ -588,8 +588,18 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	toggleCamera = () => {
-		this.setState({
-			show_camera: !this.state.show_camera
+		this.setState({ show_camera: !this.state.show_camera }, () => {
+			// When the modal is shown, we want a fixed body
+			if(this.state.show_camera === true) {
+				document.body.style.position = 'fixed'
+			}
+		})
+	}
+
+	onCloseCameraModal = () => {
+		this.setState({ show_camera: false }, () => {
+			// When the modal is hidden
+			document.body.style.position = ''
 		})
 	}
 
@@ -635,6 +645,7 @@ class SingleStudent extends Component<propTypes, S> {
 					</div>
 				}
 
+
 				{
 					this.state.show_camera && <Modal>
 						<Camera
@@ -642,7 +653,7 @@ class SingleStudent extends Component<propTypes, S> {
 							height={100}
 							width={100}
 							format="jpeg"
-							onClose={() => this.setState({ show_camera: false })} />
+							onClose={this.onCloseCameraModal} />
 					</Modal>
 				}
 
