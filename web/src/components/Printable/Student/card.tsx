@@ -1,4 +1,5 @@
 import React from "react"
+import toTitleCase from "utils/toTitleCase"
 import './style.css'
 
 type PropsTypes = {
@@ -34,7 +35,7 @@ const StudentIDCard = (props: PropsTypes) => {
             }
             </div>
             <div className="card-student-info">
-                <div>Name: <span>{ student.Name }</span></div>
+                <div>Name: <span>{ toTitleCase(student.Name) }</span></div>
                 <div>Class: <span>{ studentClass }</span></div>
                 <div>Roll No: <span>{ student.RollNumber }</span></div>
             </div>

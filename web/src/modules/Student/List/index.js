@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import qs from 'query-string'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 import Former from 'utils/former'
+import toTitleCase from 'utils/toTitleCase'
 import getStudentLimt from 'utils/getStudentLimit';
 import { LayoutWrap } from 'components/Layout';
 import { StudentPrintableList } from 'components/Printable/Student/list';
@@ -19,6 +20,17 @@ const StudentItem = (student) => {
 	
 	const section_name = student.section ? student.section.namespaced_name: "No Class"
 	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
+	let card_button_text = "Edit Student"
+
+	if(student.forwardTo === 'payment') {
+		card_button_text = "View Payments"
+	}
+	if(student.forwardTo === 'certificates') {
+		card_button_text = "View Certificate"
+	}
+	if(student.forwardTo === 'marks') {
+		card_button_text = "View Marks"
+	}
 	
 	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
 
@@ -29,14 +41,14 @@ const StudentItem = (student) => {
 					src={avatar} 
 					crossOrigin="anonymous"
 					alt="profile"/>	
-				<div className="name">
+				<div className="name name-wrap">
 					<Link style={{textDecoration:"none"}} to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-						{student.Name}
+						{toTitleCase(student.Name)}
 					</Link>
 				</div>
 				<div className="row info">
 					<label>F.Name </label>
-					<div>{student.ManName || ""}</div>
+					<div className="name-wrap">{toTitleCase(student.ManName)}</div>
 				</div>
 				<div className="row info">
 					<label>Class </label>
@@ -62,7 +74,7 @@ const StudentItem = (student) => {
 				}
 				</div>
 				<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-					{student.forwardTo === "payment" ? "View Payments" : "Edit Student"}
+					{card_button_text}
 				</Link>
 			</div>
 		</div>
@@ -178,19 +190,19 @@ export class StudentList extends Component {
 		const chunkSize = 29 // students per page on printsheet
 	
 		let items = Object.entries(students)
-		.filter(([, s]) => s.id && s.Name && 
-			(forwardTo === "prospective-student" || this.getListFilterCondition(s)) &&
-			(this.state.selected_section_id !== "" ? s.section_id === this.state.selected_section_id : true)) // hiding the error for now.... need to build reporting mechanism
-		.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
-		.map( ([id, student]) => {
-			const relevant_section = sections.find(section => student.section_id === section.id);
-			return { 
-				...student,
-				section: relevant_section,
-				id,
-				forwardTo
-			} 
-		});
+			.filter(([, s]) => s.id && s.Name && 
+				(forwardTo === "prospective-student" || this.getListFilterCondition(s)) &&
+				(this.state.selected_section_id !== "" ? s.section_id === this.state.selected_section_id : true)) // hiding the error for now.... need to build reporting mechanism
+			.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
+			.map( ([id, student]) => {
+				const relevant_section = sections.find(section => student.section_id === section.id);
+				return { 
+					...student,
+					section: relevant_section,
+					id,
+					forwardTo
+				} 
+			});
 
 		if(this.state.selected_section_id.length === 0) {
 			items = items.sort((a, b) => {

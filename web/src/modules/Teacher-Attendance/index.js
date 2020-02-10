@@ -4,7 +4,8 @@ import moment from 'moment'
 
 import Former from 'utils/former'
 import Layout from 'components/Layout'
-
+import { Link } from 'react-router-dom'
+import toTitleCase from 'utils/toTitleCase'
 import { markFaculty, undoFacultyAttendance } from 'actions'
 
 import './style.css'
@@ -59,7 +60,7 @@ class TeacherAttendance extends Component {
 							// current_attendance should be something like blank if new day or, { check_in: time, check_out: time, absent: true, leave: true }
 
 							return <div className="list-row" key={f.id}>
-								<label>{f.Name}</label>
+								<Link to={`/faculty/${f.id}/attendance`}>{toTitleCase(f.Name)}</Link>
 								<div className="status">
 								
 									{ (current_attendance.check_in || current_attendance.absent || current_attendance.leave) ? false : <div className="button check_in blue" onClick={this.mark(f, "check_in")}>P</div> }

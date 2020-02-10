@@ -247,34 +247,34 @@ class Settings extends Component <propsType, S>{
 		return <div>
 			<div className="divider">Attendance Template</div>
 			<div className="section">
-				<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+				<div className="row"><div>Use <code>$NAME</code> to insert the student's name.</div></div>
+				<div className="row"><div>Use <code>$FNAME</code> to insert the student's father name.</div></div>
 				<div className="row"><div>Use <code>$STATUS</code> to insert the attendance status.</div></div>
 				<div className="row">
+					<label>Attendance Template</label>
 					<textarea {...this.former.super_handle(["templates", "attendance"])} placeholder="Enter SMS template here" />
 				</div>
 			</div>
 
 			<div className="divider">Fees Template</div>
 			<div className="section">
-				<div className="row"><div>Use <code>$NAME</code> to insert the child's name.</div></div>
+				<div className="row"><div>Use <code>$NAME</code> to insert the student's name.</div></div>
+				<div className="row"><div>Use <code>$FNAME</code> to insert the student's father name.</div></div>
 				<div className="row"><div>Use <code>$AMOUNT</code> to insert the fee amount.</div></div>
 				<div className="row"><div>Use <code>$BALANCE</code> to insert the total fee balance.</div></div>
 				<div className="row">
-					<label>SMS Template</label>
+					<label>Fees Template</label>
 					<textarea {...this.former.super_handle(["templates", "fee"])} placeholder="Enter SMS template here" />
 				</div>
 			</div>
 
-			<div className="divider">Results Template</div>
+			<div className="divider">Result/Report Template</div>
 			<div className="section">
+				<div className="row"><div>Use <code>$NAME</code> to insert the student's name.</div></div>
+				<div className="row"><div>Use <code>$FNAME</code> to insert the student's father name.</div></div>
+				<div className="row"><div>Use <code>$REPORT</code> to send report line by line.</div></div>
 				<div className="row">
-					<div>Use <code>$NAME</code> to insert the child's name.</div>
-				</div>index.
-				<div className="row">
-					<div>Use <code>$REPORT</code> to send report line by line.</div>
-				</div>
-				<div className="row">
-					<label>SMS Template</label>
+					<label>Result/Report Template</label>
 					<textarea {...this.former.super_handle(["templates", "result"])} placeholder="Enter SMS template here" />
 				</div>
 			</div>

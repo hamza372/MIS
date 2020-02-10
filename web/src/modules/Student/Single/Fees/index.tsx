@@ -224,6 +224,7 @@ class StudentFees extends Component <propTypes, S> {
 					.replace(/\$BALANCE/g, `${balance}`)
 					.replace(/\$AMOUNT/g, `${payment.amount}`)
 					.replace(/\$NAME/g, student.FamilyID || student.Name)
+					.replace(/\$FNAME/g, student.ManName)
 
 			// console.log("MESSAGE DATA", message)
 			if(this.props.settings.sendSMSOption !== "SIM") {

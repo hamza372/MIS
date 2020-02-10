@@ -305,10 +305,11 @@ class SingleClass extends Component<propsType, S> {
 				<div className="divider">Subjects</div>
 				{
 					Object.keys(this.state.class.subjects)
-					.map(subject => <div className="subject row" key={subject}>
-						<div>{subject}</div>
-						<div className="button red" onClick={this.removeSubject(subject)}>Remove</div>
-					</div>)
+						.sort((a, b) => a.localeCompare(b))
+						.map(subject => <div className="subject row" key={subject}>
+							<div>{subject}</div>
+							<div className="button red" style={{width: "initial"}} onClick={this.removeSubject(subject)}>x</div>
+						</div>)
 				}
 
 				<div className="subject row">
@@ -320,7 +321,7 @@ class SingleClass extends Component<propsType, S> {
 						.map(subj => <option key={subj} value={subj} />)
 					}
 					</datalist>
-					<div className="button green" onClick={this.addSubject}>+</div>
+					<div className="button green" style={{width: "initial"}} onClick={this.addSubject}>+</div>
 				</div>
 
 				{ Object.values(this.state.class.sections).length === 1 ? false : <div className="divider">Sections</div> }
@@ -351,11 +352,12 @@ class SingleClass extends Component<propsType, S> {
 									<h4>Students</h4>
 									{
 										Object.values(this.props.students)
-											.filter(student => student.section_id === id)
+											.filter(student => student && student.Name && student.section_id === id)
+											.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
 											.map(student => {
 												return <div className="student row" key={student.id}>
-													<Link to={`/student/${student.id}/profile`}>{student.Name}</Link>
-													<div className="button red" onClick={() => this.removeStudent(student)}>Remove</div>
+													<Link to={`/student/${student.id}/profile`}>{student.RollNumber} {student.Name}</Link>
+													<div className="button red" style={{width: "initial"}} onClick={() => this.removeStudent(student)}>x</div>
 												</div>
 											})
 									}

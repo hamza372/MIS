@@ -9,6 +9,7 @@ import moment from 'moment';
 import Banner from 'components/Banner';
 import chunkify from 'utils/chunkify';
 import { GeneralExpensePrintableList } from 'components/Printable/Expense/General/list';
+import { ExpenseCategories } from 'constants/expense'
 
 import '../style.css';
 
@@ -337,12 +338,18 @@ class Expenses extends Component<propTypes, S> {
 
 		let Months  = new Set([])
 		let Years = new Set([])
+		let Categories = new Set([])
 
 		for (const e of Object.values(expenses)) {
 			Months.add(moment(e.date).format("MMMM"))
 			Years.add(moment(e.date).format("YYYY"))
+			Categories.add(e.category)
 		}
 
+		for( const [key, ] of Object.entries(ExpenseCategories)) {
+			Categories.add(key)
+		}
+		
 		let total_filtered_expense = 0
 
 		const total_expense = Object.values(expenses)
@@ -397,14 +404,10 @@ class Expenses extends Component<propTypes, S> {
 
 				<select {...this.former.super_handle(["categoryFilter"])}>
 					<option value="">Select Category</option>
-					<option value="SALARY">Salary</option>
-					<option value="BILLS">Utility Bills</option>
-					<option value="STATIONERY">Stationery</option>
-					<option value="REPAIRS">Repairs</option>
-					<option value="RENT">Rent</option>
-					<option value="ACTIVITY">Student Activity</option>
-					<option value="DAILY">Daily</option>
-					<option value="PETTY_CASH">Petty Cash</option>
+					{
+						[...Categories]
+							.map((category: string) => <option value={category} id={category}>{category}</option>)
+					}
 				</select>
 			</div>
 
@@ -473,22 +476,17 @@ class Expenses extends Component<propTypes, S> {
 							onChange={this.former.handle(["payment", "date"])}
 						/>
 					</div>
-
 					<div className="row">
-						<label>Category</label>
-						<select {...this.former.super_handle(["payment", "category"])}>
-							<option value="">Select</option>
-							<option value="SALARY">Salary</option>
-							<option value="BILLS">Utility Bills</option>
-							<option value="STATIONARY">Stationary</option>
-							<option value="REPAIRS">Repairs</option>
-							<option value="RENT">Rent</option>
-							<option value="ACTIVITY">Student Activity</option>
-							<option value="DAILY">Daily</option>
-							<option value="PETTY_CASH">Petty Cash</option>
-						</select>
-					</div>
+						<label>Select Category</label>
+							<datalist id="expense-categories">
+								{
+									[...Categories]
+										.map((category: string) => <option value={category} id={category}>{category}</option>)
+								}
+							</datalist>
+						<input list="expense-categories" {...this.former.super_handle(["payment", "category"])} />
 
+					</div>
 					{ this.state.payment.category === "SALARY" && <div className="row">
 							<label> Teacher </label>
 							<select onChange={(e) => this.onTeacherSelect(e)}>

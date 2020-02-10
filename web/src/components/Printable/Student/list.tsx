@@ -1,6 +1,8 @@
 import React from "react"
-import "./../print.css"
 import moment from "moment"
+import toTitleCase from "utils/toTitleCase"
+
+import "./../print.css"
 
 type PropsTypes = {
     students: AugmentedStudent[]
@@ -39,8 +41,8 @@ export const StudentPrintableList = (props: PropsTypes) => {
                    {
                        students.map((student: AugmentedStudent, i) => <tr key={student.id}>
                             <td className="cell-center">{i + props.chunkSize + 1}</td>
-                            <td>{student.Name}</td>
-                            <td>{student.ManName}</td>
+                            <td>{toTitleCase(student.Name)}</td>
+                            <td>{toTitleCase(student.ManName)}</td>
                             <td className="cell-center">{student.Birthdate ? moment(student.Birthdate).format("DD-MM-YYYY") : '-'}</td>
                             <td className="cell-center">{student.StartDate ? moment(student.StartDate).format("DD-MM-YYYY") : '-'}</td>
                             <td className="cell-center">{student.AdmissionNumber}</td>
