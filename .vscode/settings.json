@@ -26,8 +26,12 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
 	},
+	"editor.formatOnSave": true,
 	"eslint.workingDirectories": [
 		"./web",
 		"./dashboard"
 	],
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	}
 }
