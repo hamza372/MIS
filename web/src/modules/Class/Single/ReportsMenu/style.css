@@ -15,13 +15,43 @@
 	float: none;
 	padding-top: 10px;
 }
-
 .class-report .student-report .student-marks {
 	margin: auto;
 	margin-top: 0;
 }
-
-.class-report-menu .form, .btn-section {
-	width: 90%;
-	margin: auto;
+.md-form {
+	display: flex;
+	flex-wrap: wrap;
+}
+.md-form .btn-sm {
+	flex: 1 1 45ch;
+	margin: .2rem;
+ }
+.md-form .btn-result-card {
+	flex: 1 1 45ch;
+	margin: .2rem;
+}
+.md-form .btn-edit-exam {
+	flex: 2 1 10ch;
+	margin: .2rem;
+}
+.md-button {
+	border: none;
+    border-radius: .25rem;
+    padding: .75rem 1rem;
+	transition: all .3s linear;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+}
+.md-button.blue {
+	box-shadow: 0 0.75rem 0.5rem -0.5rem hsl(204, 55%, 75%);
+	color: white;
+	background-color: #74aced;
+}
+.md-button.grey {
+	box-shadow: 0 0.75rem 0.5rem -0.5rem hsl(204, 3%, 57%);
+    color: #222222;
+	background-color: #e0e0e0;
 }

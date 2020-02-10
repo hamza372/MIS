@@ -1,0 +1,135 @@
+@media (max-width: 576px) {
+    .school-result-card .student-info-card .student-info {
+        width: 100%;
+    }
+    .school-result-card .student-info-card .student-profile {
+        display: none;
+    }
+    .school-result-card .print-table table tfoot tr {
+        font-weight: normal;
+    }
+}
+.school-result-card {
+    width: 90%;
+    margin: auto;
+}
+.school-result-card .print-table table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border-radius: 2%;
+    margin-bottom: 5mm;
+}
+.school-result-card .print-table table tr {
+    background-color: white;
+    border: 1px solid black;
+    padding: .35em;
+    line-height: 0.5;
+}
+.school-result-card .print-table table thead tr {
+    font-size: 0.8rem;
+    line-height: 0.8;
+    background-color: #222222;
+    color: white;
+}
+.school-result-card .print-table table tbody {
+    font-size: 0.75rem;
+}
+.school-result-card .print-table table th,
+.school-result-card .print-table table td {
+    padding: .625em;
+    border: 1px solid black;
+}
+.school-result-card .print-table table th {
+    font-size: .75em;
+    text-transform: uppercase;
+    text-align: center;
+    word-wrap: normal;
+    word-spacing: normal;
+    word-break: break-all;
+}
+.school-result-card .print-table table .cell-listby, .cell-grade {
+    width: 8%;
+}
+.school-result-card .print-table table .cell-tmarks, .cell-percentage {
+    width: 12%;
+}
+.school-result-card .print-table table .cell-subject {
+    width: 20%;
+}
+.school-result-card .print-table table .cell-remarks {
+    width: 25%;
+}
+.result-card-header {
+    border: 2px solid black;
+    padding: 2px;
+    font-weight: bold;
+    margin: 5px 0px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.result-card-header .row {
+    justify-content: space-between;
+}
+.result-card-header .row .school-session {
+    width: 40%;
+}
+.result-card-header .row .exam-title {
+    width: 60%;
+}
+.school-result-card .student-info-card {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 20px 0px;
+    display: flex;
+}
+.school-result-card .student-info {
+    width: 80%;
+}
+.school-result-card .student-info .row {
+    justify-content: left;
+    padding-bottom: 0;
+}
+.school-result-card .student-info .label {
+    width: 30%;
+}
+.school-result-card .student-info-card .student-profile {
+    margin: 15px;
+}
+.school-result-card .result-stats {
+    margin-bottom: 40px;
+}
+.school-result-card .result-stats.row {
+    margin-bottom: 4px;
+}
+
+.school-result-card .remarks {
+    text-align: start;
+    margin-bottom: 40px;
+}
+.school-result-card .result-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 100px; 
+}
+.school-result-card .result-footer .right {
+    border-top: 1px solid  #222222;
+    padding: 10px 0px;
+}
+
+.school-result-card .result-footer .left {
+    border-top: 1px solid  #222222;
+    padding: 10px 0px;
+}
+@media print {
+    .school-result-card .print-table table thead tr {
+       background-color: white;
+       color: black;
+       font-size: 0.75rem;
+       line-height: 0.8;
+    }
+    .school-result-card .print-table .text-center {
+        text-align: center;
+    } 
+}
