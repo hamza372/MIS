@@ -192,6 +192,7 @@ interface MISStudent {
 	BForm: string
 	Gender: string
 	Phone: string
+	AlternatePhone?: string
 	Fee: number
 	Active: boolean
 

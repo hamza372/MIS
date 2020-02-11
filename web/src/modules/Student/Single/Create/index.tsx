@@ -37,6 +37,7 @@ const blankStudent = (): MISStudent => ({
 	BForm: "",
 	Gender: "",
 	Phone: "",
+	AlternatePhone: "",
 	Fee: 0,
 	Active: true,
 
@@ -45,17 +46,18 @@ const blankStudent = (): MISStudent => ({
 	Birthdate: "",
 	Address: "",
 	Notes: "",
-	// @ts-ignore
-	StartDate: moment(),
+	StartDate: new Date().getTime(),
 	AdmissionNumber: "",
 	BloodType: "",
 	FamilyID: "",
+	Religion: "",
 
 	fees: {},
 	payments: {},
 	attendance: {},
 	section_id: "",
 	tags: {},
+	exams: {},
 	certificates: {},
 	prospective_section_id: "",
 })
@@ -590,7 +592,7 @@ class SingleStudent extends Component<propTypes, S> {
 	toggleCamera = () => {
 		this.setState({ show_camera: !this.state.show_camera }, () => {
 			// When the modal is shown, we want a fixed body
-			if(this.state.show_camera === true) {
+			if (this.state.show_camera === true) {
 				document.body.style.position = 'fixed'
 			}
 		})
@@ -774,6 +776,20 @@ class SingleStudent extends Component<propTypes, S> {
 							type="tel"
 							{...this.former.super_handle(["Phone"], (num) => num.length <= 11, this.updateSiblings)}
 							placeholder="Phone Number"
+							disabled={!admin}
+						/>
+						{!this.isNew() && <a className="button blue call-link" href={`tel:${this.state.profile.Phone}`} > Call</a>}
+					</div>
+				</div>
+
+				<div className="row">
+					<label>Alternate Phone</label>
+					<div className="row" style={{ flexDirection: "row" }}>
+						<input
+							style={{ width: "100%" }}
+							type="tel"
+							{...this.former.super_handle(["AlternatePhone"], (num) => num.length <= 11, this.updateSiblings)}
+							placeholder="Alternate Phone Number"
 							disabled={!admin}
 						/>
 						{!this.isNew() && <a className="button blue call-link" href={`tel:${this.state.profile.Phone}`} > Call</a>}

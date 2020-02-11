@@ -4,6 +4,7 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import Dynamic from '@cerp/dynamic'
+import Former from 'utils/former';
 
 
 import { createFacultyMerge, deleteFaculty } from 'actions'
@@ -16,7 +17,6 @@ import Banner from 'components/Banner'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
 import './style.css'
-import Former from 'utils/former';
 
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
@@ -40,7 +40,7 @@ const blankTeacher = (isFirst = false): MISTeacher => ({
 	StructuredQualification: "",
 	Qualification: "",
 	Experience: "",
-	HireDate: `${moment()}`,
+	HireDate: moment().format("MM-DD-YYYY"),
 	Admin: isFirst,
 
 	attendance: {}
@@ -77,7 +77,6 @@ class CreateTeacher extends Component<propTypes, S> {
 
 	constructor(props: propTypes) {
 		super(props);
-		console.log(props)
 
 		const id = props.match.params.id;
 
