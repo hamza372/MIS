@@ -50,13 +50,14 @@ class SignUp extends Component <propTypes, S> {
 				school_name: "",
 				owner_name: "",
 				owner_easypaisa_number: "",
-		
+
 				association_name: "",
 		
 				agent_name: "",
 				notes: "",
 				owner_phone: "",
-				user
+				user,
+				school_type: ""
 			},
 			agents: [
 				"M. Shahbaz",
@@ -175,7 +176,8 @@ class SignUp extends Component <propTypes, S> {
 				["city"],
 				["type_of_login"],
 				["owner_phone"],
-				["owner_name"]
+				["owner_name"],
+				["school_type"]
 			]
 		)
 
@@ -346,6 +348,14 @@ class SignUp extends Component <propTypes, S> {
 				<div className="row">
 					<label>Password:</label>
 					<input type="text" {...this.former.super_handle(["password"])} placeholder="password"/>
+				</div>
+				<div className="row">
+					<label>School Type</label>
+					<select {...this.former.super_handle(["value","school_type"])}>
+						<option value="">Select</option>
+						<option value="RURAL">Rural</option>
+						<option value="URBAN">Urban</option>
+					</select>
 				</div>
 				<div className="row">
 					<label>Package</label>

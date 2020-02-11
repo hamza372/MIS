@@ -17,14 +17,21 @@
 		"**/_build": true,
 		"**/deps": true
 	},
-	"eslint.autoFixOnSave": true,
 	"eslint.validate": [
 		"javascript",
 		"javascriptreact",
-		{ "language": "typescript", "autoFix": true },
-		{ "language": "typescriptreact", "autoFix": true }
+		"typescript",
+		"typescriptreact"
 	],
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
+	},
+	"editor.formatOnSave": true,
+	"eslint.workingDirectories": [
+		"./web",
+		"./dashboard"
+	],
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
 	}
 }

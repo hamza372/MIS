@@ -583,6 +583,7 @@ input::-webkit-inner-spin-button {
 	display: flex;
 	width: 100%;
 	margin-top: 10px;
+	margin-bottom: 10px;
 }
 .header-style{
 	width: 80%;
@@ -590,6 +591,11 @@ input::-webkit-inner-spin-button {
 	flex-direction: column;
 	align-items: center;
 	margin-right: 20%;
+	font-family: Georgia, 'Times New Roman', Times, serif;
+}
+.header-style .title {
+	font-size: 1.5rem;
+	margin-bottom: 10px;
 }
 
 .tag-container {
@@ -649,4 +655,23 @@ input::-webkit-inner-spin-button {
 :hover.cross{
 	background-color: #ff6b68;
 	color: #fafafa;
+}
+.bold {
+	font-weight: bold;
+}
+.text-center {
+	text-align: center;
+}
+.text-uppercase {
+	text-transform: uppercase;
+}
+.text-lowercase {
+	text-transform: lowercase;
+}
+.text-underline {
+	text-decoration: underline;
+}
+.section-container {
+	width: 90%;
+	margin: auto;
 }
