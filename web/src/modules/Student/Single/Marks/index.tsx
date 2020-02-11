@@ -177,9 +177,9 @@ class StudentMarksContainer extends Component<PropsType, S> {
 						</select>
 					</div>
 					<div className="md-form">
-						{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms} href={url}>Send Reports using SMS</a> : false}
-						<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Result Card</div>
-						<Link className="md-button grey btn-edit-exam"
+						{settings.sendSMSOption === "SIM" ? <a className="button blue sms btn-sm" onClick={() => this.logSms} href={url}>Send Reports using SMS</a> : false}
+						<div className="button grey btn-result-card" onClick={() => window.print()}>Print Result Card</div>
+						<Link className="button grey btn-edit-exam"
 							to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
 					</div>
 				</div>
