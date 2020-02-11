@@ -18,6 +18,7 @@ type S = {
 	password: string
 	errorMessage: string
 	showPassword: boolean
+	loginButtonPressed: boolean
 }
 
 class SchoolLogin extends Component<PropsType, S> {
@@ -31,7 +32,8 @@ class SchoolLogin extends Component<PropsType, S> {
 			school: "",
 			password: "",
 			errorMessage: "",
-			showPassword: false
+			showPassword: false,
+			loginButtonPressed: false
 		}
 
 		this.former = new Former(this, [])
@@ -41,7 +43,17 @@ class SchoolLogin extends Component<PropsType, S> {
 	getShowHideIcon = () => this.state.showPassword ? EyeOpenIcon : EyeClosedIcon
 
 	onLogin = () => {
-		this.props.login(this.state.school, this.state.password);
+
+		const { school, password } = this.state
+
+		if (school === "" || password === "") {
+			alert("Please enter School ID or password")
+			return
+		}
+
+		this.setState({ loginButtonPressed: true }, () => {
+			this.props.login(this.state.school, this.state.password);
+		})
 	}
 
 	handleKeyDown = (e: React.KeyboardEvent) => {
@@ -51,25 +63,25 @@ class SchoolLogin extends Component<PropsType, S> {
 		}
 	}
 
-	componentWillReceiveProps(newProps: PropsType) {
+	UNSAFE_componentWillReceiveProps(nextProps: PropsType) {
 
-		if (newProps.auth.attempt_failed) {
+		if (nextProps.auth.attempt_failed && this.state.loginButtonPressed && !nextProps.auth.loading) {
 			this.setState({
-				errorMessage: "Login failed"
+				password: "",
+				loginButtonPressed: false,
+				errorMessage: "School ID or Password is incorrect!"
+			}, () => {
+				setTimeout(() => {
+					this.setState({
+						errorMessage: "",
+					})
+				}, 3000)
 			})
 		}
 
-		if (newProps.auth.token !== undefined && newProps.auth.token !== this.props.auth.token) {
+		if (nextProps.auth.token !== undefined && nextProps.auth.token !== this.props.auth.token) {
 			this.props.history.push('/login')
 		}
-	}
-
-	removeErrorMessage = () => {
-		setTimeout(() => {
-			this.setState({
-				errorMessage: ""
-			})
-		}, 3000)
 	}
 
 	render() {
@@ -90,22 +102,20 @@ class SchoolLogin extends Component<PropsType, S> {
 		}
 
 		return <Layout history={this.props.history}>
-			<div className="school-login">
+			<div className="login school-login">
 				<div className="title">Verify your School</div>
 				<div className="form">
 					<div className="row">
-						<label>School ID</label>
 						<input type="text" {...this.former.super_handle(["school"])} placeholder="School ID" autoCorrect="off" autoCapitalize="off" />
 					</div>
 					<div className="row">
-						<label>Password</label>
 						<div style={{ display: "flex" }}>
 							<input
 								type={`${this.getPasswordInputType()}`}
 								{...this.former.super_handle(["password"])}
 								onKeyDown={this.handleKeyDown}
 								placeholder="Password"
-								style={{ borderRadius: "5px 0px 0px 5px" }}
+								style={{ borderRadius: "5px 0px 0px 5px", width: "90%" }}
 							/>
 							<div className="show-hide-container">
 								<img
@@ -115,11 +125,11 @@ class SchoolLogin extends Component<PropsType, S> {
 							</div>
 						</div>
 					</div>
-					<div className="button save" onClick={this.onLogin}>Login</div>
+					<div className="button blue" onClick={this.onLogin}>Login</div>
+					{this.props.auth.loading ? <div>Logging in...</div> : false}
+					<div className="error">{this.state.errorMessage}</div>
+
 				</div>
-				{this.props.auth.loading ? <div>Signing in....</div> : false}
-				{this.props.auth.attempt_failed ? <div>{this.state.errorMessage}</div> : false}
-				{this.state.errorMessage !== "" ? this.removeErrorMessage() : false}
 			</div>
 		</Layout>
 	}

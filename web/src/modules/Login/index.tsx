@@ -19,6 +19,8 @@ type PropsType = {
 
 type S = {
 	login: UserLogin
+	loginButtonPressed: boolean
+	errorMessage: string
 	showPassword: boolean
 }
 
@@ -42,6 +44,8 @@ class Login extends Component<PropsType, S> {
 				name: "",
 				password: ""
 			},
+			loginButtonPressed: false,
+			errorMessage: "",
 			showPassword: false
 		}
 
@@ -52,7 +56,17 @@ class Login extends Component<PropsType, S> {
 	getShowHideIcon = () => this.state.showPassword ? EyeOpenIcon : EyeClosedIcon
 
 	onLogin = () => {
-		this.props.login(this.state.login)
+
+		const { login } = this.state
+
+		if (login.name === "" || login.password === "") {
+			alert("Please select user or enter password")
+			return
+		}
+
+		this.setState({ loginButtonPressed: true }, () => {
+			this.props.login(this.state.login)
+		})
 	}
 
 	handleKeyDown = (e: React.KeyboardEvent) => {
@@ -112,15 +126,25 @@ class Login extends Component<PropsType, S> {
 				.catch(err => console.error(err))
 		})
 			.catch(err => console.error(err))
-
-		// localStorage.removeItem("db");
-		// this.props.history.push("/landing")
-		// window.location.reload()
 	}
 
-	componentWillReceiveProps(newProps: PropsType) {
-		if (newProps.auth.name !== undefined && newProps.auth.name !== this.props.auth.name) {
+	UNSAFE_componentWillReceiveProps(nextProps: PropsType) {
+		if (nextProps.auth.name !== undefined && nextProps.auth.name !== this.props.auth.name) {
 			this.props.history.push('/landing')
+		}
+
+		if (nextProps.auth.attempt_failed && this.state.loginButtonPressed) {
+			this.setState({
+				login: { ...this.state.login, password: "" },
+				loginButtonPressed: false,
+				errorMessage: "Password is incorrect!"
+			}, () => {
+				setTimeout(() => {
+					this.setState({
+						errorMessage: "",
+					})
+				}, 2000)
+			})
 		}
 	}
 
@@ -143,13 +167,12 @@ class Login extends Component<PropsType, S> {
 		}
 
 		return <Layout history={this.props.history}>
-			<div className="login">
-				<div className="title">{`Login to School ${this.props.auth.school_id}`}</div>
+			<div className="login faculty-login">
+				<div className="title">Staff Login for {this.props.auth.school_id}</div>
 				<div className="form">
 					<div className="row">
-						<label>Teacher Name</label>
 						<select {...this.former.super_handle(["name"])}>
-							<option value="" disabled>Select a User</option>
+							<option value="" disabled>Select Admin or Teacher</option>
 							{
 								Object.entries(this.props.users)
 									.sort(([, a], [, b]) => a.name.localeCompare(b.name))
@@ -158,14 +181,13 @@ class Login extends Component<PropsType, S> {
 						</select>
 					</div>
 					<div className="row">
-						<label>Password</label>
-						<div style={{ display: "flex" }}>
+						<div style={{ display: "flex", flex: "1" }}>
 							<input
 								type={`${this.getPasswordInputType()}`}
 								{...this.former.super_handle(["password"])}
 								placeholder="Password" autoCapitalize="off"
 								onKeyDown={this.handleKeyDown}
-								style={{ borderRadius: "5px 0px 0px 5px" }}
+								style={{ borderRadius: "5px 0px 0px 5px", width: "90%" }}
 							/>
 							<div className="show-hide-container">
 								<img
@@ -176,9 +198,11 @@ class Login extends Component<PropsType, S> {
 							</div>
 						</div>
 					</div>
-					<div className="button save" onClick={this.onLogin}>Login</div>
+					<div className="button blue" onClick={this.onLogin}>Login</div>
+					<div className="error">{this.state.errorMessage}</div>
+					<div className="info"><b>Note</b>: This login form is only for staff</div>
 				</div>
-				{this.props.auth.attempt_failed ? <div>Login Attempt Failed.</div> : false}
+
 				{this.props.connected ? <div className="button red" onClick={this.onSwitchSchool} style={{ position: "absolute", bottom: "20px", left: "20px" }}>Switch School</div> : false}
 			</div>
 		</Layout>
