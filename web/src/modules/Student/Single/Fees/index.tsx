@@ -18,43 +18,43 @@ import { sortYearMonths } from 'utils/sortUtils'
 import './style.css'
 
 type payment = {
-	student: MISStudent;
-	payment_id: string;
+	student: MISStudent
+	payment_id: string
 } & MISStudentPayment
 
 interface P {
-	faculty_id: RootReducerState["auth"]["faculty_id"];
-	students: RootDBState["students"];
-	connected: RootReducerState["connected"];
-	settings: RootDBState["settings"];
-	feeSMSTemplate: RootDBState["sms_templates"]["fee"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
-	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id?: string, fee_name?: string) => any;
-	addMultiplePayments: (payments: payment[] ) => any;
-	sendSMS: (text: string, number: string) => any;
-	logSms: (history: any) => any;
-	editPayment: (payments: AugmentedMISPaymentMap) => any;
+	faculty_id: RootReducerState["auth"]["faculty_id"]
+	students: RootDBState["students"]
+	connected: RootReducerState["connected"]
+	settings: RootDBState["settings"]
+	feeSMSTemplate: RootDBState["sms_templates"]["fee"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	addPayment: (student: MISStudent, id: string, amount: number, date: number, type: MISStudentPayment["type"], fee_id?: string, fee_name?: string) => any
+	addMultiplePayments: (payments: payment[] ) => any
+	sendSMS: (text: string, number: string) => any
+	logSms: (history: any) => any
+	editPayment: (payments: AugmentedMISPaymentMap) => any
  }
 
 interface S {
 	banner: {
-		active: boolean;
-		good: boolean;
-		text: string;
-	};
+		active: boolean
+		good: boolean
+		text: string
+	}
 	payment: {
-		active: boolean;
-		amount: string;
-		type: "SUBMITTED" | "FORGIVEN";
-		sendSMS?: boolean;
-	};
-	month: string;
-	year: string;
+		active: boolean
+		amount: string
+		type: "SUBMITTED" | "FORGIVEN"
+		sendSMS?: boolean
+	}
+	month: string
+	year: string
 	edits: AugmentedMISPaymentMap
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 	famId: string
 }
 

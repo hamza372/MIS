@@ -14,14 +14,14 @@ import { ExpenseCategories } from 'constants/expense'
 import '../style.css';
 
 interface P {
-	teachers: RootDBState["faculty"];
-	expenses: RootDBState["expenses"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
-	addExpense: (amount: number, label: string, type: MISExpense["type"], category: MISExpense["category"], quantity: number, date: number) => any;
-	addSalaryExpense: (id: string, amount: number, label: string, type: MISSalaryExpense["type"], faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string) => any;
-	editExpense: (edits: { [id: string]: { amount: number } }) => any;
-	deleteExpense: (deletes: string) => any;
+	teachers: RootDBState["faculty"]
+	expenses: RootDBState["expenses"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	addExpense: (amount: number, label: string, type: MISExpense["type"], category: MISExpense["category"], quantity: number, date: number) => any
+	addSalaryExpense: (id: string, amount: number, label: string, type: MISSalaryExpense["type"], faculty_id: string, date: number, advance: number, deduction: number, deduction_reason: string) => any
+	editExpense: (edits: { [id: string]: { amount: number } }) => any
+	deleteExpense: (deletes: string) => any
 }
 /**
  * need to do something to show expense deduction 
@@ -32,32 +32,32 @@ interface P {
 
 interface S {
 	banner: {
-		active: boolean;
-		good: boolean;
-		text: string;
-	};
+		active: boolean
+		good: boolean
+		text: string
+	}
 	payment: {
-		active: boolean;
-		amount: string;
-		type: string;
-		category: MISExpense["category"];
-		faculty_id: string;
-		quantity: string;
-		label: string;
-		deduction: string;
-		deduction_reason: string;
-		date: number;
-	};
-	monthFilter: string;
-	yearFilter: string;
-	categoryFilter: string;
+		active: boolean
+		amount: string
+		type: string
+		category: MISExpense["category"]
+		faculty_id: string
+		quantity: string
+		label: string
+		deduction: string
+		deduction_reason: string
+		date: number
+	}
+	monthFilter: string
+	yearFilter: string
+	categoryFilter: string
 	edits: {
-		[id: string]: { amount: number };
-	};
+		[id: string]: { amount: number }
+	}
 }
 
 interface Routeinfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P

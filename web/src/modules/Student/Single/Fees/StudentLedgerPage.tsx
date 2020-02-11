@@ -15,7 +15,7 @@ interface StudentLedgerPageProp {
 	css_style?: "print-only" | "no-print" | ""
 }
 
-export const StudentLedgerPage : React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name, voucherNo, css_style, family }) => {
+export const StudentLedgerPage: React.SFC < StudentLedgerPageProp > = ({ payments, student, settings, class_name, voucherNo, css_style, family }) => {
 
 	const owed = payments.reduce((agg, [,curr]) => agg - (curr.type === "SUBMITTED" || curr.type === "FORGIVEN" ? 1 : -1) * curr.amount, 0)
 	

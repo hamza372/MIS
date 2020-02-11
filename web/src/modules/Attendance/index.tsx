@@ -14,27 +14,27 @@ import Former from 'utils/former'
 import './style.css'
 
 interface P {
-	current_faculty: MISTeacher;
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
-	connected: RootReducerState["connected"];
-	attendance_message_template: RootDBState["sms_templates"]["attendance"];
-	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any;
-	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) => any;
+	current_faculty: MISTeacher
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	connected: RootReducerState["connected"]
+	attendance_message_template: RootDBState["sms_templates"]["attendance"]
+	markStudent: (student: MISStudent, date: string, status: MISStudentAttendanceEntry["status"]) => any
+	markAllStudents: (students: MISStudent[], date: string, status: MISStudentAttendanceEntry["status"]) => any
 
-	logSms: (history: any) => any;
+	logSms: (history: any) => any
 }
 
 interface S {
-	date: number;
-	sending: boolean;
-	selected_section: string;
-	selected_students: { [id: string]: boolean };
+	date: number
+	sending: boolean
+	selected_section: string
+	selected_students: { [id: string]: boolean }
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>

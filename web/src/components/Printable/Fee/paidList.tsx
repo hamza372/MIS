@@ -11,7 +11,7 @@ type PropsTypes = {
     paidDate: string
 }
 
-type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
+type AugmentedStudent = MISStudent & { amount_paid: number; balance: number; section: AugmentedSection }
 
 export const PaidFeeStudentsPrintableList = (props: PropsTypes) => {
 

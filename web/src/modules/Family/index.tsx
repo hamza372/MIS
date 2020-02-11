@@ -7,14 +7,14 @@ import List from 'components/List'
 import Layout from 'components/Layout'
 
 interface Families {
-	[family_id: string]: Family;
+	[family_id: string]: Family
 }
 
 interface Family {
-	id: string;
+	id: string
 	students: {
-		[id: string]: MISStudent;
-	};
+		[id: string]: MISStudent
+	}
 }
 
 interface S {
@@ -22,7 +22,7 @@ interface S {
 }
 
 type P = {
-	students: RootDBState['students'];
+	students: RootDBState['students']
 } & RouteComponentProps
 
 class FamilyModule extends React.Component<P, S> {

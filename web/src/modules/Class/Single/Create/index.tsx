@@ -13,13 +13,13 @@ import { createEditClass, addStudentToSection, removeStudentFromSection, deleteC
 import './style.css'
 
 interface P {
-	classes: RootDBState["classes"],
-	faculty: RootDBState["faculty"],
+	classes: RootDBState["classes"]
+	faculty: RootDBState["faculty"]
 	students: RootDBState["students"]
 
-	save: (mis_class: AugmentedMISClass) => void,
-	addStudent: (section_id: string, student: MISStudent) => void,
-	removeStudent: (student: MISStudent) => void,
+	save: (mis_class: AugmentedMISClass) => void
+	addStudent: (section_id: string, student: MISStudent) => void
+	removeStudent: (student: MISStudent) => void
 	removeClass: (mis_class: AugmentedMISClass) => void
 }
 

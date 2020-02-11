@@ -11,25 +11,25 @@ import './style.css'
 import { LedgerPage } from './LedgerPage';
 
 type payment = {
-	student: MISStudent;
-	payment_id: string;
+	student: MISStudent
+	payment_id: string
 } & MISStudentPayment
 
 interface P {
-	curr_class: MISClass;
-	faculty_id: RootReducerState["auth"]["faculty_id"];
-	students: RootDBState["students"];
-	settings: RootDBState["settings"];
-	addMultiplePayments: (payments: payment[]) => any;
+	curr_class: MISClass
+	faculty_id: RootReducerState["auth"]["faculty_id"]
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
+	addMultiplePayments: (payments: payment[]) => any
 }
 
 interface S {
-	month: string;
-	year: string;
+	month: string
+	year: string
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P

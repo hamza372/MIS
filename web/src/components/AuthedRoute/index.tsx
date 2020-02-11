@@ -3,7 +3,7 @@ import { Route, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 type propsType = {
-	component: any,	
+	component: any	
 	school_id: string
 	name: string
 	token: string

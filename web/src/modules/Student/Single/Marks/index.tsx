@@ -16,25 +16,25 @@ import months from 'constants/months'
 import './style.css'
 
 type PropsType = {
-	faculty_id: string;
-	faculty: RootDBState["faculty"];
-	classes: RootDBState["classes"];
-	students: RootDBState["students"];
-	settings: RootDBState["settings"];
-	exams: RootDBState["exams"];
-	grades: RootDBState["settings"]["exams"]["grades"];
-	schoolLogo: string;
-	sms_templates: RootDBState["sms_templates"];
+	faculty_id: string
+	faculty: RootDBState["faculty"]
+	classes: RootDBState["classes"]
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
+	exams: RootDBState["exams"]
+	grades: RootDBState["settings"]["exams"]["grades"]
+	schoolLogo: string
+	sms_templates: RootDBState["sms_templates"]
 
-	logSms: (history: MISSMSHistory) => void;
+	logSms: (history: MISSMSHistory) => void
 } & RouteComponentProps<RouteInfo>
 
 type S = {
-	exams_list_by: string;
+	exams_list_by: string
 } & ExamFilter
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam[] }

@@ -12,17 +12,17 @@ import { RouteComponentProps } from 'react-router';
 // need to give this a route 
 
 interface P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
 }
 
 interface S {
-	fee_for: string;
+	fee_for: string
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<RouteInfo> & P

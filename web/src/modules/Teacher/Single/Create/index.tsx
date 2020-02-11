@@ -49,24 +49,24 @@ const blankTeacher = (isFirst = false): MISTeacher => ({
 // should be a dropdown of choices. not just teacher or admin.
 
 interface P {
-	faculty: RootDBState['faculty'];
-	user: MISTeacher;
-	save: (teacher: MISTeacher) => any;
-	delete: (faculty_id: string) => any;
+	faculty: RootDBState['faculty']
+	user: MISTeacher
+	save: (teacher: MISTeacher) => any
+	delete: (faculty_id: string) => any
 }
 
 interface S {
-	profile: MISTeacher;
-	redirect: false | string;
+	profile: MISTeacher
+	redirect: false | string
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
+		active: boolean
+		good?: boolean
+		text?: string
+	}
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>

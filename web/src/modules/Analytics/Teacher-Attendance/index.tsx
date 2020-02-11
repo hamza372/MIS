@@ -9,38 +9,38 @@ import Former from "utils/former"
 import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'recharts'
 
 interface Attendance {
-	PRESENT: number;
-	ABSENT: number;
-	LEAVE: number;
+	PRESENT: number
+	ABSENT: number
+	LEAVE: number
 }
 
 type TAttendance = Attendance & { teacher: MISTeacher}
 
 interface Filter {
-		present: boolean;
-		absent: boolean;
-		leave: boolean;
-		percentage: boolean;
+		present: boolean
+		absent: boolean
+		leave: boolean
+		percentage: boolean
 }
 
 interface ChartData {
 	attendance: {
-		[id: string]: Attendance;
-	};
-	filter: Filter;
-	date_format: string;
+		[id: string]: Attendance
+	}
+	filter: Filter
+	date_format: string
 }
 
 interface TableData {
 	attendance: {
-		[id: string]: Attendance;
-	};
+		[id: string]: Attendance
+	}
 	totals: {
-		PRESENT: number;
-		LEAVE: number;
-		ABSENT: number;
-	};
-	date_format: string;
+		PRESENT: number
+		LEAVE: number
+		ABSENT: number
+	}
+	date_format: string
 }
 
 const AttendanceChart = ({attendance, filter, date_format}: ChartData) => {		
@@ -100,25 +100,25 @@ const AttendanceTable = ({attendance, totals, date_format}: TableData) =>{
 }
 
 interface P {
-	teachers: RootDBState["faculty"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	teachers: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
-	filterText: string;
+	filterText: string
 	chartFilter: {
-		present: boolean;
-		absent: boolean;
-		leave: boolean;
-		percentage: boolean;
-	};
-	classFilter: string;
-	is_attendance_filter: boolean;
-	selected_faculty_id: string;
-	selected_period: string;
-	start_date: number;
-	end_date: number;
+		present: boolean
+		absent: boolean
+		leave: boolean
+		percentage: boolean
+	}
+	classFilter: string
+	is_attendance_filter: boolean
+	selected_faculty_id: string
+	selected_period: string
+	start_date: number
+	end_date: number
 }
 
 type propTypes = RouteComponentProps & P

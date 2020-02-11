@@ -69,10 +69,10 @@ export const getDownsizedImage = (imageDataUrl: string, max_size: number, format
 
 function resetOrientation(srcBase64: string, srcOrientation: number) {
 	return new Promise<string>((resolve, reject) => {
-		var img = new Image();
+		let img = new Image();
 
 		img.onload = function () {
-			var width = img.width,
+			let width = img.width,
 				height = img.height,
 				canvas = document.createElement('canvas'),
 				ctx = canvas.getContext("2d");
@@ -113,7 +113,7 @@ function resetOrientation(srcBase64: string, srcOrientation: number) {
 const getOrientation = (file: File) => {
 
 	return new Promise<number>((resolve, reject) => {
-		var reader = new FileReader();
+		let reader = new FileReader();
 
 		reader.onload = (event: ProgressEvent) => {
 

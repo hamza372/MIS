@@ -1,9 +1,9 @@
 
-const debounce = (f : Function, wait : number) : Function => {
+const debounce = (f: Function, wait: number): Function => {
 
-	let timeout : NodeJS.Timeout;
+	let timeout: NodeJS.Timeout;
 
-	return (...args : any[]) => {
+	return (...args: any[]) => {
 		//@ts-ignore
 		const fncall = () => f.apply(this, args);
 

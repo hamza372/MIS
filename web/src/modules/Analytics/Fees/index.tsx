@@ -16,25 +16,25 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from 'rec
 
 
 interface Filters {
-	total: boolean;
-	paid: boolean;
-	forgiven: boolean;
-	pending: boolean;
+	total: boolean
+	paid: boolean
+	forgiven: boolean
+	pending: boolean
 }
 
 interface Payment {
-	SUBMITTED: number;
-	SCHOLARSHIP: number;
-	OWED: number;
-	FORGIVEN: number;
+	SUBMITTED: number
+	SCHOLARSHIP: number
+	OWED: number
+	FORGIVEN: number
 }
 
 interface ChartProps {
 	payments: {
-		[is: string]: Payment;
-	};
-	filter: Filters;
-	date_format: string;
+		[is: string]: Payment
+	}
+	filter: Filters
+	date_format: string
 }
 
 const FeesChart = (props: ChartProps) => {
@@ -63,15 +63,15 @@ const FeesChart = (props: ChartProps) => {
 
 interface TableProps {
 	payments: {
-		[id: string]: Payment;
-	};
+		[id: string]: Payment
+	}
 	total_debts: {
-		PAID: number;
-		SCHOLARSHIP: number;
-		OWED: number;
-		FORGIVEN: number;
-	};
-	date_format: string;
+		PAID: number
+		SCHOLARSHIP: number
+		OWED: number
+		FORGIVEN: number
+	}
+	date_format: string
 }
 
 const FeesTable = (props: TableProps) => {
@@ -116,37 +116,37 @@ const FeesTable = (props: TableProps) => {
 }
 
 type PaymentAddItem = {
-	student: MISStudent;
-	payment_id: string;
+	student: MISStudent
+	payment_id: string
 } & MISStudentPayment
 
 interface P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
-	addPayments: (payments: PaymentAddItem[]) => void;
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
+	addPayments: (payments: PaymentAddItem[]) => void
 }
 
 interface S {
-	filterText: string;
-	chartFilter: Filters;
-	classFilter: string;
-	is_fee_filter: boolean;
-	selected_period: string;
-	start_date: number;
-	end_date: number;
+	filterText: string
+	chartFilter: Filters
+	classFilter: string
+	is_fee_filter: boolean
+	selected_period: string
+	start_date: number
+	end_date: number
 
-	loading: boolean;
-	percentage: number;
-	payments: ChartProps["payments"];
-	total_student_debts: StudentDebtMap;
+	loading: boolean
+	percentage: number
+	payments: ChartProps["payments"]
+	total_student_debts: StudentDebtMap
 	total_debts: {
-		PAID: number;
-		OWED: number;
-		FORGIVEN: number;
-		SCHOLARSHIP: number;
-	};
+		PAID: number
+		OWED: number
+		FORGIVEN: number
+		SCHOLARSHIP: number
+	}
 
 }
 
@@ -156,14 +156,14 @@ interface routeInfo {
 
 type StudentDebtMap = {
 	[id: string]: {
-		student: MISStudent;
-		debt: Payment;
-		familyId?: string;
-	}; 
+		student: MISStudent
+		debt: Payment
+		familyId?: string
+	} 
 }
 
 type PaymentSingleMap = {
-	[id: string]: Payment;
+	[id: string]: Payment
 }
 
 type propTypes = RouteComponentProps<routeInfo> & P

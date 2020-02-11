@@ -64,36 +64,36 @@ const blankStudent = (): MISStudent => ({
 // should be a dropdown of choices. not just teacher or admin.
 
 interface P {
-	students: RootDBState['students'];
-	classes: RootDBState['classes'];
-	settings: RootDBState["settings"];
-	logo: RootDBState["assets"]["schoolLogo"];
-	permissions: RootDBState['settings']['permissions'];
-	max_limit: RootDBState['max_limit'];
-	user: MISTeacher;
-	save: (student: MISStudent) => any;
-	delete: (student: MISStudent) => any;
+	students: RootDBState['students']
+	classes: RootDBState['classes']
+	settings: RootDBState["settings"]
+	logo: RootDBState["assets"]["schoolLogo"]
+	permissions: RootDBState['settings']['permissions']
+	max_limit: RootDBState['max_limit']
+	user: MISTeacher
+	save: (student: MISStudent) => any
+	delete: (student: MISStudent) => any
 	uploadImage: (student: MISStudent, image_string: string) => any
 }
 
 interface S {
-	profile: MISStudent;
-	redirect: false | string;
+	profile: MISStudent
+	redirect: false | string
 	show_camera: boolean
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
-	new_tag: string;
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	new_tag: string
 	edit: {
-		[id: string]: boolean;
-	};
-	show_hide_fee: boolean;
+		[id: string]: boolean
+	}
+	show_hide_fee: boolean
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>

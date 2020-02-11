@@ -9,18 +9,18 @@ import './style.css'
 import { RouteComponentProps } from 'react-router';
 
 interface P {
-	faculty: RootDBState["faculty"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	faculty: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
-	monthFilter: string;
-	yearFilter: string;
+	monthFilter: string
+	yearFilter: string
 }
 
 interface Routeinfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<Routeinfo>
