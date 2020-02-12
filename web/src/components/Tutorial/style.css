@@ -1,0 +1,60 @@
+.tutorial-window {
+	background-color: #fafafa;
+	width: 75%;
+	min-height: 50%;
+	padding: 20px;
+	border-radius: 8px;
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.tutorial-window video, .tutorial-window img {
+	margin: 25px;
+	border: 2px solid #333;
+	border-radius: 100%;
+}
+
+.tutorial-window .row {
+	color: white;
+	width: 50%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+
+}
+
+@media (max-width: 425px) {
+	.tutorial-window .close.button {
+		padding: 5px 10px;
+	}
+	.tutorial-window .title {
+		font-size: 1.5rem;
+	}
+}
+
+.tutorial-window .close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.tutorial-window .title {
+	color: #333;
+	align-self: center;
+}
+
+.tutorial-window .card {
+	padding: 20px;
+	width: 90%;
+}
+
+.tutorial-window .card.video {
+	box-shadow: 5px 5px 5px 5px #eaeaea;
+	border-radius: 5px;
+	cursor: pointber;
+}
