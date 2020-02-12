@@ -15,29 +15,29 @@ import DiaryPrintable from 'components/Printable/Diary/diary'
 import './style.css'
 
 interface P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
-	faculty_id: string;
-	diary: RootDBState["diary"];
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	faculty_id: string
+	diary: RootDBState["diary"]
 
-	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => any;
-	sendMessage: (text: string, number: string) => any;
-	sendBatchMessages: (messages: MISSms[]) => any;
-	logSms: (history: MISSMSHistory) => any;
+	addDiary: (date: string, section_id: string , diary: MISDiary["section_id"]) => any
+	sendMessage: (text: string, number: string) => any
+	sendBatchMessages: (messages: MISSms[]) => any
+	logSms: (history: MISSMSHistory) => any
 }
 
 interface S {
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
-	selected_date: number;
-	selected_section_id: string;
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	selected_date: number
+	selected_section_id: string
 	selected_student_phone: string
-	students_filter: string;
-	diary: MISDiary["date"];
+	students_filter: string
+	diary: MISDiary["date"]
 }
 
 type propTypes = RouteComponentProps & P

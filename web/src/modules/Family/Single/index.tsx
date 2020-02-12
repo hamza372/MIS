@@ -11,21 +11,21 @@ import { addStudentToFamily, saveFamilyInfo } from 'actions';
 import Hyphenator from 'utils/Hyphenator';
 
 type P = {
-	students: RootDBState['students'];
-	addStudentToFamily: (s: MISStudent, famId: string) => void;
-	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void;
+	students: RootDBState['students']
+	addStudentToFamily: (s: MISStudent, famId: string) => void
+	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void
 } & RouteComponentProps<RouteInfo>
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 interface S {
-	Phone: string;
+	Phone: string
 	AlternatePhone?: string
-	ManName: string;
-	ManCNIC: string;
-	Address: string;
+	ManName: string
+	ManCNIC: string
+	Address: string
 }
 
 class SingleFamily extends React.Component<P, S> {

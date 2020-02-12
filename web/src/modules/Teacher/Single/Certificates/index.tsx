@@ -9,18 +9,18 @@ import { getGenderSpecificText } from 'utils/getGenderSpecificText'
 import moment from 'moment';
 
 interface P {
-	students: RootDBState['students'];
-	teachers: RootDBState["faculty"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	students: RootDBState['students']
+	teachers: RootDBState["faculty"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
-	selectedCertificate: string;
+	selectedCertificate: string
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps < RouteInfo > & P
@@ -84,7 +84,7 @@ export default connect ((state: RootReducerState) => ({
 }))(TeacherCertificates)
 
 interface CertificateProps {
-	curr_teacher: MISTeacher;
+	curr_teacher: MISTeacher
 }
 
 

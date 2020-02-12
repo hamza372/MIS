@@ -12,43 +12,43 @@ import { ProgressBar } from 'components/ProgressBar';
 import '../style.css';
 
 interface P {
-	teachers: RootDBState["faculty"];
-	expenses: RootDBState["expenses"];
-	settings: RootDBState["settings"];
-	students: RootDBState["students"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	teachers: RootDBState["faculty"]
+	expenses: RootDBState["expenses"]
+	settings: RootDBState["settings"]
+	students: RootDBState["students"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface collectiveOBJ {
 	[id: string]: {
-		amount: number;
-		quantity: number;
-		category: string;
-		label: string;
+		amount: number
+		quantity: number
+		category: string
+		label: string
 		date: number
 	}
 }
 
 interface S {
 	banner: {
-		active: boolean;
-		good: boolean;
-		text: string;
-	};
-	loading: boolean;
+		active: boolean
+		good: boolean
+		text: string
+	}
+	loading: boolean
 	collective_obj: collectiveOBJ
-	total_income: number,
-	total_expense: number,
+	total_income: number
+	total_expense: number
 	percentage: number
-	monthFilter: string;
-	yearFilter: string;
+	monthFilter: string
+	yearFilter: string
 	Months: Set<any>
 	Years: Set<any>
 	viewBy: "DAILY" | "MONTHLY"
 }
 
 interface Routeinfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P

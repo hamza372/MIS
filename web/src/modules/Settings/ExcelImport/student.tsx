@@ -11,20 +11,20 @@ import Banner from 'components/Banner'
 
 interface S {
 
-	importedStudents: MISStudent[];
-	loadingStudentImport: boolean;
+	importedStudents: MISStudent[]
+	loadingStudentImport: boolean
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
-	selectedSection: string;
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	selectedSection: string
 }
 
 type P = {
-	students: RootDBState['students'];
-	classes: RootDBState['classes'];
-	saveStudents: (student: MISStudent[]) => void;
+	students: RootDBState['students']
+	classes: RootDBState['classes']
+	saveStudents: (student: MISStudent[]) => void
 }
 
 const studentCSVHeaders = [

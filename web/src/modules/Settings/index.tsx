@@ -14,15 +14,15 @@ import { openDB } from 'idb'
 
 import './style.css'
 interface P {
-	settings: RootDBState["settings"],
-	students: RootDBState["students"], 
-	user: RootDBState["faculty"]["MISTeacher"], 
+	settings: RootDBState["settings"]
+	students: RootDBState["students"] 
+	user: RootDBState["faculty"]["MISTeacher"] 
 	sms_templates: RootDBState["sms_templates"]
-	schoolLogo: string,
+	schoolLogo: string
 	max_limit: number
 
 	saveTemplates: (templates: RootDBState["sms_templates"]) => void
-	saveSettings: (settings: RootDBState["settings"]) => void,
+	saveSettings: (settings: RootDBState["settings"]) => void
 	addLogo: (logo_string: string) => void
 }
 interface S {
@@ -35,8 +35,8 @@ interface S {
 		active: boolean
 		good?: boolean
 		text?: string
-	},
-	client_id : string
+	}
+	client_id: string
 	schoolLogo: string
 	addGrade: boolean
 	newGrade: NewGrade

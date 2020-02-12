@@ -21,7 +21,11 @@ module.exports = {
 				delimiter: 'none'
 			}
 		}],
-		"@typescript-eslint/prefer-const": [false, { "destructuring": "any" }]
+		"prefer-const": [0],
+		"@typescript-eslint/prefer-const": [0, { destructuring: "any" }],
+		"@typescript-eslint/ban-ts-ignore": [0],
+		"@typescript-eslint/explicit-function-return-type": [0],
+		"@typescript-eslint/no-explicit-any": [0]
 	},
 	settings: {
 		react: {

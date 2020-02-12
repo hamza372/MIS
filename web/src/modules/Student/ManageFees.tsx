@@ -10,49 +10,49 @@ import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import { addMultipleFees, addFee, deleteMultipleFees } from 'actions'
 
 interface P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
 
-	addMultipleFees: (fees: FeeAddItem[]) => any;
-	addFee: (fee: FeeSingleItem) => any;
-	deleteMultipleFees: (students_fees: FeeDeleteMap) => any;
+	addMultipleFees: (fees: FeeAddItem[]) => any
+	addFee: (fee: FeeSingleItem) => any
+	deleteMultipleFees: (students_fees: FeeDeleteMap) => any
 }
 
 interface S {
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
+		active: boolean
+		good?: boolean
+		text?: string
+	}
 
-	fee: MISStudentFee;
-	selected_section_id: string;
-	selected_student_id: string;
-	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | "";
+	fee: MISStudentFee
+	selected_section_id: string
+	selected_student_id: string
+	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | ""
 }
 
 interface FeeDeleteMap {
 	[id: string]: {
-		student_id: string;
-		paymentIds: string[];
-	};
+		student_id: string
+		paymentIds: string[]
+	}
 }
 
 type FeeAddItem = MISStudentFee & {
-	student: MISStudent;
-	fee_id: string;
+	student: MISStudent
+	fee_id: string
 }
 
 type FeeSingleItem = MISStudentFee & {
-	student_id: string;
-	fee_id: string;
+	student_id: string
+	fee_id: string
 }
 
 type ReducedFeeMap = {
 	[id: string]: {
-		count: number;
-		students_fees: FeeDeleteMap;
-	};
+		count: number
+		students_fees: FeeDeleteMap
+	}
 }
 
 type propTypes = RouteComponentProps & P
@@ -316,17 +316,17 @@ export default connect((state: RootReducerState) => ({
 
 
 interface RemoveProps {
-	students: MISStudent[];
-	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | "";
-	selected_section_id: string;
-	selected_student_id: string;
-	delete: (students_fees: FeeDeleteMap) => void;
+	students: MISStudent[]
+	fee_filter: "to_all_students" | "to_single_class" | "to_single_student" | ""
+	selected_section_id: string
+	selected_student_id: string
+	delete: (students_fees: FeeDeleteMap) => void
 }
 
 interface RemoveState {
 
-	loading: boolean;
-	reduced_fees: ReducedFeeMap;
+	loading: boolean
+	reduced_fees: ReducedFeeMap
 
 }
 

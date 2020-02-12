@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { trackRoute } from '../../actions'
 
 type propsType = {
-	component: any,	
+	component: any
 	school_id: string
 	name: string
 	token: string
@@ -12,7 +12,7 @@ type propsType = {
 	location: { pathname: string }
 	trackRoute: (path: string) => any
 }
- 
+
 const TrackedRoute = ({ component, school_id, name, token, initialized, location, trackRoute, ...rest }: propsType) => {
 
 	const Component = component
@@ -25,7 +25,7 @@ const TrackedRoute = ({ component, school_id, name, token, initialized, location
 		return <div>Loading Database....</div>
 	}
 
-	if(token && name) {
+	if (token && name) {
 		return <Route {...rest} render={(props) => {
 			trackRoute(window.location.pathname)
 			//@ts-ignore
@@ -44,6 +44,6 @@ const TrackedRoute = ({ component, school_id, name, token, initialized, location
 
 export default connect((state: RootReducerState) => ({
 	...state.auth, initialized: state.initialized
-}),(dispatch: Function) => ({
+}), (dispatch: Function) => ({
 	trackRoute: (path: string) => dispatch(trackRoute(path))
 }))(TrackedRoute);

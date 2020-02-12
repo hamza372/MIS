@@ -10,13 +10,13 @@ const client_type = "mis";
 export const MERGES = "MERGES"
 
 interface Merge {
-	path: string[];
-	value: any;
+	path: string[]
+	value: any
 }
 
 export interface MergeAction {
-	type: "MERGES";
-	merges: Merge[];
+	type: "MERGES"
+	merges: Merge[]
 }
 
 const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['queued'], state: RootReducerState): RootReducerState['queued'] => {
@@ -320,8 +320,8 @@ export const sendSMS = (text: string, number: string) => (dispatch: (a: any) => 
 
 export const BATCH_SMS = "BATCH_SMS"
 interface SMS {
-	text: string;
-	number: string;
+	text: string
+	number: string
 }
 
 export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
@@ -341,8 +341,8 @@ export const sendBatchSMS = (messages: SMS[]) => (dispatch: (a: any) => any, get
 }
 
 interface ServerAction {
-	type: string;
-	payload: any;
+	type: string
+	payload: any
 }
 
 export const sendServerAction = (action: ServerAction) => (dispatch: Dispatch, getState: () => RootReducerState, syncr: Syncr) => {
@@ -366,12 +366,12 @@ export const sendServerAction = (action: ServerAction) => (dispatch: Dispatch, g
 
 export const DELETES = "DELETES"
 interface Delete {
-	path: string[];
+	path: string[]
 }
 
 export interface DeletesAction {
-	type: "DELETES";
-	paths: Delete[];
+	type: "DELETES"
+	paths: Delete[]
 }
 
 export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
@@ -414,17 +414,17 @@ export const createDeletes = (paths: Delete[]) => (dispatch: Function, getState:
 export const CONFIRM_SYNC = "CONFIRM_SYNC"
 export const CONFIRM_SYNC_DIFF = "CONFIRM_SYNC_DIFF"
 export interface ConfirmSyncAction {
-	type: "CONFIRM_SYNC_DIFF";
-	date: number;
-	new_writes: Write[];
+	type: "CONFIRM_SYNC_DIFF"
+	date: number
+	new_writes: Write[]
 }
 
 export interface Write {
-	date: number;
-	value: any;
-	path: string[];
-	type: "MERGE" | "DELETE";
-	client_id: string;
+	date: number
+	value: any
+	path: string[]
+	type: "MERGE" | "DELETE"
+	client_id: string
 }
 
 export const SNAPSHOT = "SNAPSHOT"
@@ -433,11 +433,11 @@ export const SNAPSHOT_DIFF = "SNAPSHOT_DIFF"
 export interface SnapshotDiffAction {
 	new_writes: {
 		[path_string: string]: {
-			type: "MERGE" | "DELETE";
-			path: string[];
-			value?: any;
-		};
-	};
+			type: "MERGE" | "DELETE"
+			path: string[]
+			value?: any
+		}
+	}
 }
 
 export const QUEUE = "QUEUE"
@@ -445,31 +445,31 @@ export const QUEUE = "QUEUE"
 interface MutationsQueueable {
 	[path: string]: {
 		action: {
-			type: "MERGE" | "DELETE";
-			path: string[];
-			value?: any;
-		};
-		date: number;
-	};
+			type: "MERGE" | "DELETE"
+			path: string[]
+			value?: any
+		}
+		date: number
+	}
 }
 
 interface AnalyticsQueuable {
-	[path: string]: RouteAnalyticsEvent;
+	[path: string]: RouteAnalyticsEvent
 }
 
 interface BaseQueueAction {
-	type: "QUEUE";
-	queue_type: string;
+	type: "QUEUE"
+	queue_type: string
 }
 
 export interface QueueAnalyticsAction extends BaseQueueAction {
-	queue_type: "analytics";
-	payload: AnalyticsQueuable;
+	queue_type: "analytics"
+	payload: AnalyticsQueuable
 }
 
 export interface QueueMutationsAction extends BaseQueueAction {
-	queue_type: "mutations";
-	payload: MutationsQueueable;
+	queue_type: "mutations"
+	payload: MutationsQueueable
 }
 
 export interface QueueImagesAction extends BaseQueueAction {
@@ -480,7 +480,7 @@ export interface QueueImagesAction extends BaseQueueAction {
 export type QueueAction = QueueMutationsAction | QueueAnalyticsAction | QueueImagesAction
 
 export interface ConfirmAnalyticsSyncAction {
-	type: "CONFIRM_ANALYTICS_SYNC";
+	type: "CONFIRM_ANALYTICS_SYNC"
 	time: number
 }
 
@@ -549,10 +549,10 @@ export const createLoginFail = () => ({ type: LOGIN_FAIL })
 
 export const LOGIN_SUCCEED = "LOGIN_SUCCEED"
 export interface LoginSucceed {
-	type: "LOGIN_SUCCEED";
-	school_id: string;
-	token: string;
-	db: RootReducerState['db'];
+	type: "LOGIN_SUCCEED"
+	school_id: string
+	token: string
+	db: RootReducerState['db']
 }
 export const createLoginSucceed = (school_id: string, db: RootReducerState['db'], token: string): LoginSucceed => ({
 	type: LOGIN_SUCCEED,
@@ -600,7 +600,7 @@ export const loadDB = () => (dispatch: Function, getState: () => RootReducerStat
 	})
 }
 
-export const multiAction = (resp: { key: string, val: any }) => (dispatch: Function) => {
+export const multiAction = (resp: { key: string; val: any }) => (dispatch: Function) => {
 	for (const action of Object.values(resp)) {
 		if (action) {
 			dispatch(action)

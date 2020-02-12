@@ -15,37 +15,37 @@ import Banner from '../../../components/Banner';
 
 
 export type historicalPayment = {
-	date: number;
-	name: string;
-	amount_owed: number;
-	amount_paid: number;
-	amount_forgiven: number;
+	date: number
+	name: string
+	amount_owed: number
+	amount_paid: number
+	amount_forgiven: number
 }
 
 interface  P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
-	addHistoricalPayment: (payments: historicalPayment, student_id: string) => any;
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	addHistoricalPayment: (payments: historicalPayment, student_id: string) => any
 }
 
 interface S {
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
+		active: boolean
+		good?: boolean
+		text?: string
+	}
 	fee: {
-		date: number;
-		name: string;
-		amount_owed: string;
-		amount_paid: string;
-		amount_forgiven: string;
-	};
-	selected_section_id: string;
-	selected_student_id: string;
-	month_filter: string;
-	year_filter: string;
+		date: number
+		name: string
+		amount_owed: string
+		amount_paid: string
+		amount_forgiven: string
+	}
+	selected_section_id: string
+	selected_student_id: string
+	month_filter: string
+	year_filter: string
 }
 
 interface RouteInfo {

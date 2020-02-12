@@ -13,44 +13,44 @@ import { ResponsiveContainer, Line, XAxis, YAxis, LineChart, Tooltip } from 'rec
 import './style.css'
 
 interface Attendance {
-	PRESENT: number;
-	ABSENT: number;
-	LEAVE: number;
-	SICK_LEAVE: number;
-	SHORT_LEAVE: number;
-	CASUAL_LEAVE: number;
+	PRESENT: number
+	ABSENT: number
+	LEAVE: number
+	SICK_LEAVE: number
+	SHORT_LEAVE: number
+	CASUAL_LEAVE: number
 }
 
 interface Filter {
-	present: boolean;
-	absent: boolean;
-	leave: boolean;
-	percentage: boolean;
+	present: boolean
+	absent: boolean
+	leave: boolean
+	percentage: boolean
 }
 
 type StudentAttendance = Attendance & { student: MISStudent }
 
 interface ChartData {
 	attendance: {
-		[id: string]: Attendance;
-	};
-	filter: Filter;
-	date_format: string;
+		[id: string]: Attendance
+	}
+	filter: Filter
+	date_format: string
 }
 
 interface TableData {
 	attendance: {
-		[id: string]: Attendance;
-	};
+		[id: string]: Attendance
+	}
 	totals: {
-		PRESENT: number;
-		LEAVE: number;
-		ABSENT: number;
-		SICK_LEAVE: number;
-		SHORT_LEAVE: number;
-		CASUAL_LEAVE: number;
-	};
-	date_format: string;
+		PRESENT: number
+		LEAVE: number
+		ABSENT: number
+		SICK_LEAVE: number
+		SHORT_LEAVE: number
+		CASUAL_LEAVE: number
+	}
+	date_format: string
 }
 
 const AttendanceChart = ({ attendance, filter, date_format }: ChartData) => {
@@ -111,42 +111,42 @@ const AttendanceTable = ({ attendance, totals, date_format }: TableData) => {
 }
 
 interface P {
-	students: RootDBState["students"];
-	classes: RootDBState["classes"];
-	settings: RootDBState["settings"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
-	filterText: string;
+	filterText: string
 	chartFilter: {
-		present: boolean;
-		absent: boolean;
-		leave: boolean;
-		percentage: boolean;
-	};
-	classFilter: string;
-	selected_section_id: string;
-	selected_period: string;
-	start_date: number;
-	end_date: number;
-	isStudentAttendanceFilter: boolean;
+		present: boolean
+		absent: boolean
+		leave: boolean
+		percentage: boolean
+	}
+	classFilter: string
+	selected_section_id: string
+	selected_period: string
+	start_date: number
+	end_date: number
+	isStudentAttendanceFilter: boolean
 	percentage: number
-	loading: boolean;
+	loading: boolean
 	totals: {
-		PRESENT: number;
-		LEAVE: number;
-		ABSENT: number;
-		SICK_LEAVE: number;
-		SHORT_LEAVE: number;
-		CASUAL_LEAVE: number;
-	};
+		PRESENT: number
+		LEAVE: number
+		ABSENT: number
+		SICK_LEAVE: number
+		SHORT_LEAVE: number
+		CASUAL_LEAVE: number
+	}
 	attendance: {
-		[id: string]: Attendance;
-	};
+		[id: string]: Attendance
+	}
 	student_attendance: {
-		[id: string]: StudentAttendance;
-	};
+		[id: string]: StudentAttendance
+	}
 }
 
 type propTypes = RouteComponentProps & P

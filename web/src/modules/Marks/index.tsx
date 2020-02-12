@@ -18,26 +18,26 @@ import { ExamTitles } from 'constants/exam'
 import './style.css'
 
 type propsType = {
-	classes: RootDBState["classes"];
-	students: RootDBState["students"];
-	exams: RootDBState["exams"];
-	grades: RootDBState["settings"]["exams"]["grades"];
-	schoolName: string;
+	classes: RootDBState["classes"]
+	students: RootDBState["students"]
+	exams: RootDBState["exams"]
+	grades: RootDBState["settings"]["exams"]["grades"]
+	schoolName: string
 
-	deleteExam: (students: Array<string>, exam_id: string) => void;
+	deleteExam: (students: Array<string>, exam_id: string) => void
 
 } & RouteComponentProps
 
 type S = {
-	section_id: string;
-	exam_title: string;
-	year: string;
-	month: string;
+	section_id: string
+	exam_title: string
+	year: string
+	month: string
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
+		active: boolean
+		good?: boolean
+		text?: string
+	}
 }
 
 class Reports extends Component<propsType, S> {
@@ -130,14 +130,12 @@ class Reports extends Component<propsType, S> {
 
 		const chunkSize = 22
 		let filtered_exams: MISExam[] = []
-		let examSubjectsWithMarks = new Set<string>()
 
 		for (const exam of Object.values(exams)) {
 
 			if (exam.name === exam_title && moment(exam.date).format("YYYY") === year && exam.section_id === section_id &&
 				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true)) {
 				filtered_exams.push(exam)
-				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
 		}
 
@@ -166,7 +164,7 @@ class Reports extends Component<propsType, S> {
 		return chunkify(marks_sheet, chunkSize)
 			.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
 				sectionName={section ? section.namespaced_name : ''}
-				examSubjectsWithMarks={examSubjectsWithMarks}
+				relevant_exams={filtered_exams}
 				examName={exam_title}
 				schoolName={schoolName}
 				students={chunkItems}

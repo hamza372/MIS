@@ -24,7 +24,7 @@ type S = {
     statsDate: number
 }
 
-type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
+type AugmentedStudent = MISStudent & { amount_paid: number; balance: number; section: AugmentedSection }
 
 class DailyStats extends Component<PropsType, S> {
 

@@ -11,12 +11,12 @@ import './style.css'
 
 
 interface P {
-	user: MISTeacher;
-	permissions: RootDBState["settings"]["permissions"];
+	user: MISTeacher
+	permissions: RootDBState["settings"]["permissions"]
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps <RouteInfo> & P

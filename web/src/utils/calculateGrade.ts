@@ -11,7 +11,7 @@ const calculateGrade = (marks_obtained: number, total_marks: number, grades: MIS
 
     const sorted_grades = Object.entries(grades).sort((a, b) => parseFloat(b[1].percent) - parseFloat(a[1].percent))
 
-    let previous_percent: number = 0
+    let previous_percent = 0
     let grade: string
 
     const highest_grade = sorted_grades[0]

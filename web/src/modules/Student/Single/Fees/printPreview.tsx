@@ -8,15 +8,15 @@ import { StudentLedgerPage } from './StudentLedgerPage';
 import Layout from "components/Layout";
 
 interface P {
-	classes: RootDBState["classes"];
-	student: MISStudent;
-	faculty_id: RootReducerState["auth"]["faculty_id"];
-	students: RootDBState["students"];
-	settings: RootDBState["settings"];
+	classes: RootDBState["classes"]
+	student: MISStudent
+	faculty_id: RootReducerState["auth"]["faculty_id"]
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 	famId: string
 }
 

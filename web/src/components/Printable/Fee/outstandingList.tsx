@@ -51,7 +51,7 @@ export const OutstandingFeePrintableList = (props: PropsTypes) => {
 
                 <tbody>
                    {
-                    props.items.map(({ student, debt, familyId }:itemsType, i: number) => <tr key={student.id}>
+                    props.items.map(({ student, debt, familyId }: itemsType, i: number) => <tr key={student.id}>
                         <td className="cell-center">{i + props.chunkSize + 1}</td>
                         <td>{familyId ? `${familyId}(F)` : toTitleCase(student.Name)}</td>
                         <td>{familyId ? "(Family)" : getStudentSection(student.section_id)}</td>

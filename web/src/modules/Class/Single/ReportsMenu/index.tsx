@@ -1,20 +1,23 @@
 import React, { Component } from 'react'
 import moment from 'moment'
 import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { Link } from 'react-router-dom'
+
+import { logSms } from 'actions'
+import ResultCard from 'components/Printable/ResultCard/resultCard'
+import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
+
+import Months from 'constants/months'
+import { ExamTitles } from 'constants/exam'
+
 import Former from 'utils/former'
 import { smsIntentLink } from 'utils/intent'
-import { RouteComponentProps } from 'react-router'
-import { logSms } from 'actions'
 import chunkify from 'utils/chunkify'
 import getSectionFromId from 'utils/getSectionFromId'
 import getStudentExamMarksSheet from 'utils/studentExamMarksSheet'
-import ResultCard from 'components/Printable/ResultCard/resultCard'
 import getFacultyNameFromId from 'utils/getFacultyNameFromId'
-import { ClassResultSheet } from 'components/Printable/ResultCard/classResultSheet'
-import Months from 'constants/months'
-import { ExamTitles } from 'constants/exam'
 import getReportStringForStudent from 'utils/getReportStringForStudent'
-import { Link } from 'react-router-dom'
 
 import './style.css'
 
@@ -108,7 +111,6 @@ class ClassReportMenu extends Component<PropsType, S> {
 		let years = new Set<string>()
 		let filtered_exams: MISExam[] = []
 		let subjects = new Set<string>()
-		let examSubjectsWithMarks = new Set<string>()
 
 		for (const exam of Object.values(exams)) {
 
@@ -119,7 +121,6 @@ class ClassReportMenu extends Component<PropsType, S> {
 				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true) &&
 				(exam_title === "Test" && subject ? exam.subject === subject : true)) {
 				filtered_exams.push(exam)
-				examSubjectsWithMarks.add(`${exam.subject} ( ${exam.total_score} )`)
 			}
 			// show all subjects of class in the list
 			if (exam.section_id === section_id && exam.class_id === class_id) {
@@ -231,9 +232,9 @@ class ClassReportMenu extends Component<PropsType, S> {
 					</div>
 				</div>
 				<div className="md-form">
-					{settings.sendSMSOption === "SIM" ? <a className="md-button blue sms btn-sm" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
-					<div className="md-button grey btn-result-card" onClick={() => window.print()}>Print Class Result {this.state.print_type}</div>
-					<Link className="md-button grey btn-edit-exam"
+					{settings.sendSMSOption === "SIM" ? <a className="button blue sms btn-sm" onClick={() => this.logSms(messages)} href={url}>Send Reports using SMS</a> : false}
+					<div className="button grey btn-result-card" onClick={() => window.print()}>Print Class Result {this.state.print_type}</div>
+					<Link className="button grey btn-edit-exam"
 						to={`/reports?section_id=${section_id}&exam_title=${exam_title}&year=${year}&month=${month}`}>Edit Exam</Link>
 				</div>
 			</div>
@@ -244,7 +245,7 @@ class ClassReportMenu extends Component<PropsType, S> {
 						chunkify(marksSheet, chunkSize)
 							.map((chunkItems: StudentMarksSheet[], index: number) => <ClassResultSheet key={index}
 								sectionName={section_name}
-								examSubjectsWithMarks={examSubjectsWithMarks}
+								relevant_exams={filtered_exams}
 								examName={exam_title}
 								schoolName={this.props.settings.schoolName}
 								students={chunkItems}
