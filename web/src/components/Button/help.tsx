@@ -7,12 +7,14 @@ import { TutorialLinks } from 'constants/links'
 import './style.css'
 
 type PropsType = {
-	tutorialID: string
+	title?: string
+	link?: string
 }
 
 type S = {
 	showTutorial: boolean
 }
+
 
 class HelpButton extends Component<PropsType, S> {
 	constructor(props: PropsType) {
@@ -25,6 +27,7 @@ class HelpButton extends Component<PropsType, S> {
 
 	toggleTutorialWindow = () => {
 		this.setState({ showTutorial: !this.state.showTutorial }, () => {
+			// on modal shown
 			if (this.state.showTutorial) {
 				document.body.style.position = "fixed"
 			}
@@ -33,18 +36,26 @@ class HelpButton extends Component<PropsType, S> {
 
 	onCloseTutorialWindow = () => {
 		this.setState({ showTutorial: false }, () => {
+			// on modal hidden
 			document.body.style.position = ''
 		})
 	}
 
 	render() {
 
-		const { tutorialID } = this.props
+		let { title, link } = this.props
 
-		const { title, link } = TutorialLinks[tutorialID] ? TutorialLinks[tutorialID] : { title: "", link: "" }
+		if (!(title && link)) {
+
+			// getting the main component name from url
+			const path = window.location.pathname.split("/")[1].toUpperCase()
+
+			title = TutorialLinks[path] ? TutorialLinks[path].title : TutorialLinks["DEFAULT"].title
+			link = TutorialLinks[path] ? TutorialLinks[path].link : TutorialLinks["DEFAULT"].link
+		}
 
 		return <>
-			<img src={HelpIcon} className="help-button" onClick={this.toggleTutorialWindow} alt="help-icon" />
+			<img src={HelpIcon} className="help-button" onClick={this.toggleTutorialWindow} title={"MISchool Tutorial"} alt="help" />
 			{
 				this.state.showTutorial && <Modal>
 					<TutorialWindow

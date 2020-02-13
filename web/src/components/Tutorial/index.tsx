@@ -17,7 +17,7 @@ const TutorialWindow = (props: P) => {
 		<div className="title">{title}</div>
 		<div className="card video">
 			<iframe src={link}
-				height={280}
+				height={320}
 				width={"100%"}
 				frameBorder={0}
 				allowFullScreen
