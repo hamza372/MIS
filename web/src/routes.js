@@ -14,7 +14,6 @@ import SchoolLogin from 'modules/Login/school'
 import ClassModule from 'modules/Class/List'
 import ClassSingle from 'modules/Class/Single'
 import Attendance from 'modules/Attendance'
-import QRAttendance from 'modules/Attendance/qr'
 import TeacherAttendance from 'modules/Teacher-Attendance'
 import SMS from 'modules/SMS'
 import Marks from 'modules/Marks'
@@ -87,7 +86,6 @@ export default class Routes extends React.Component {
 					<TrackedRoute path="/class/:id" component={ClassSingle} />
 					<TrackedRoute path="/class" component={ClassModule} />
 
-					<TrackedRoute path="/qr-attendance" component={QRAttendance} />
 					<TrackedRoute path="/attendance" component={Attendance} />
 					<TrackedRoute path="/teacher-attendance" component={TeacherAttendance} />
 
