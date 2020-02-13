@@ -308,6 +308,13 @@ defmodule Sarkar.Server.Analytics do
 		FROM mischool_referrals", [])
 
 		csv = [["date", "school_id", "area_manager_name", "agent_name", "type", "package", "city", "office", "notes", "owner_name"] | resp.rows]
+			|> Enum.map(fn row -> 
+				Enum.map(row, fn item -> case item do
+						nil -> ""
+						_ -> String.replace(item, ",", "-") 
+					end
+				end)
+			end)
 			|> CSV.encode
 			|> Enum.join()
 		
