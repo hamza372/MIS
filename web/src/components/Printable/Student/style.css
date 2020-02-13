@@ -30,7 +30,7 @@
     border: 0.5px solid;
 }
 .card-student-info {
-    padding: 5px;
+    padding: 0 5px;
     padding-top: 0px;
     white-space: normal;
     word-break: normal;
@@ -57,11 +57,11 @@
     display: flex;
 }
 .student-card .card-row.first {
-    padding: 2px 5px;
+	margin-top: 2px;
+    padding: 0px 5px;
 }
 .student-card .card-row.last {
     padding: 0px 5px;
-    margin-top: 10px;
 }
 .card-column {
     flex: 1;
@@ -162,4 +162,7 @@
     margin-left: 15px;
     height: 100px;
     width: 100px;
+}
+
+.card-student-info > canvas {
 }
