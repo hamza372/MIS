@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { HelpIcon } from 'assets/icons'
 import Modal from 'components/Modal'
 import TutorialWindow from 'components/Tutorial'
-import { TutorialLinks } from 'constants/links'
+import { getLinkForPath } from 'constants/links'
 
 import './style.css'
 
@@ -43,16 +43,7 @@ class HelpButton extends Component<PropsType, S> {
 
 	render() {
 
-		let { title, link } = this.props
-
-		if (!(title && link)) {
-
-			// getting the main component name from url
-			const path = window.location.pathname.split("/")[1].toUpperCase()
-
-			title = TutorialLinks[path] ? TutorialLinks[path].title : TutorialLinks["DEFAULT"].title
-			link = TutorialLinks[path] ? TutorialLinks[path].link : TutorialLinks["DEFAULT"].link
-		}
+		const { title, link } = this.props.title && this.props.link ? this.props : getLinkForPath(window.location.pathname)
 
 		return <>
 			<img src={HelpIcon} className="help-button" onClick={this.toggleTutorialWindow} title={"MISchool Tutorial"} alt="help" />

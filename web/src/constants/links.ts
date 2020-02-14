@@ -91,3 +91,13 @@ export const TutorialLinks: Tutorial = {
 		link: ""
 	},
 }
+
+export const getLinkForPath = (pathname: string) => {
+
+	const path = pathname.split("/")[1].toUpperCase()
+
+	const title = TutorialLinks[path] ? TutorialLinks[path].title : TutorialLinks["DEFAULT"].title
+	const link = TutorialLinks[path] ? TutorialLinks[path].link : TutorialLinks["DEFAULT"].link
+
+	return { title, link }
+}

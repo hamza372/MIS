@@ -9,7 +9,7 @@ import './style.css'
 
 type PropsType = {
 	user?: MISTeacher
-	children?: any
+	children?: React.ReactNode
 	title?: string
 	link?: string
 	settings?: RootDBState["settings"]
