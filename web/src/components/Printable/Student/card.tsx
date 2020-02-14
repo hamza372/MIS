@@ -34,20 +34,18 @@ const StudentIDCard = (props: PropsTypes) => {
 						style={{ height: 100, width: 100 }}
 						alt="profile" />
 				}
+				<div className="card-signature" style={{ marginTop: avatar ? 18 : 122 }}>Issuing Authority</div>
 			</div>
 			<div className="card-student-info">
-				<div>Name: <span>{toTitleCase(student.Name)}</span></div>
-				<div>Class: <span>{studentClass}</span></div>
-				<div>Roll No: <span>{student.RollNumber}</span></div>
-				<QRCode value={student.id} size={50} />
-			</div>
-		</div>
-		<div className="card-row last">
-			<div className="card-column">
-				<div className="card-signature">Issuing Authority</div>
-			</div>
-			<div className="card-column">
-				<div className="card-valid-date">Valid {schoolSession.startYear}-{schoolSession.endYear}</div>
+				<div style={{ fontSize: ".75rem" }}>
+					<div>Name: <span>{toTitleCase(student.Name)}</span></div>
+					<div>Class: <span className="name-wrap">{studentClass}</span></div>
+					<div>Roll No: <span>{student.RollNumber}</span></div>
+					<div>Valid for: <span>{schoolSession.startYear}-{schoolSession.endYear}</span></div>
+				</div>
+				<div style={{ marginLeft: 130 }}>
+					<QRCode value={student.id} size={72} />
+				</div>
 			</div>
 		</div>
 	</div>);

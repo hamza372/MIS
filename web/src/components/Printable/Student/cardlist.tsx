@@ -26,7 +26,7 @@ export const StudenPrintableIDCardList = (props: PropsTypes) => {
 		students
 
 	return (
-		<div className="student-id-card print-only print-table" style={{ width: "90%" }}>
+		<div className="student-id-card print-only print-table" style={{ width: "90%", margin: "auto" }}>
 			<table>
 				<tbody>
 					<div className="card-grid">

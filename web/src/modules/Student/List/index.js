@@ -297,7 +297,7 @@ export class StudentList extends Component {
 							studentClass={section_name} />)
 					:
 					// print 10 students ID cards per page
-					chunkify(items, 10)
+					chunkify(items, 8)
 						.map((chunkItems, index) => <StudenPrintableIDCardList students={chunkItems} key={index}
 							schoolName={settings.schoolName}
 							schoolLogo={this.props.schoolLogo}
