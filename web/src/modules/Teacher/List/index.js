@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { LayoutWrap } from 'components/Layout'
 
 import List from 'components/List'
 import Title from 'components/Title'
-import { LayoutWrap } from 'components/Layout';
+import toTitleCase from 'utils/toTitleCase'
+
  
 const TeacherItem = (T) => 
 	<Link key={T.id} to={`/faculty/${T.id}/${T.forwardTo}`}>
-		{T.Name}
+		{ toTitleCase (T.Name) }
 	</Link>
 
 const tableTitle = () =>{
@@ -19,6 +21,8 @@ const tableTitle = () =>{
 
 export const TeacherList = (props) => {
 
+	const [tag, setTag] = useState("")
+
 	let forwardTo = "profile"
 	let create = '/faculty/new'
 
@@ -27,8 +31,17 @@ export const TeacherList = (props) => {
 		create = ""
 	}
 
+	const tags = new Set()
+
+	Object.values(props.teachers || {})
+		.filter(f => f.id && f.Name)
+		.forEach(s => {
+			Object.keys(s.tags || {})
+				.forEach(tag => tags.add(tag))
+		})
+
 	const items = Object.entries(props.teachers)
-			.filter(([,f]) => f.Name && f.id)
+			.filter(([,f]) => f.Name && f.id && (f.tags && tag !== "" ? f.tags[tag] : true))
 			.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 			.map(([id,teacher]) => {
 				return {
@@ -46,12 +59,21 @@ export const TeacherList = (props) => {
 				tableTitle={tableTitle}
 				Component={TeacherItem}
 				create={create} 
-				createText={"Add new Teacher"} 
-				toLabel={T => T.Name} 
-			/>
+				createText={"Add new Teacher"}
+				toLabel={T => T.Name} >
+					<div className="row" style={{ width: "90%", justifyContent: "flex-end" }}>
+						<select onChange={ (e) => setTag(e.target.value)}>
+							<option value="">Select Tag</option>
+							{
+								[...tags.keys()]
+									.map(tag => <option key={tag} value={tag}> {tag} </option>)
+							}
+						</select>
+					</div>
+			</List>
 		</div>
 }
 
 export default connect(state => ({
-	teachers: state.db.faculty //Object.entries(state.db.faculty).reduce((agg, [k, v]) => v.Admin ? agg : {...agg, [k]: v}, { })
-}))(LayoutWrap(TeacherList));
+	teachers: state.db.faculty
+}))(LayoutWrap(TeacherList))

@@ -172,9 +172,10 @@ class Login extends Component<PropsType, S> {
 				<div className="form">
 					<div className="row">
 						<select {...this.former.super_handle(["name"])}>
-							<option value="" disabled>Select Admin or Teacher</option>
+							<option value="" disabled>Select a User</option>
 							{
 								Object.entries(this.props.users)
+									.filter(([, f]) => f.hasLogin !== false)
 									.sort(([, a], [, b]) => a.name.localeCompare(b.name))
 									.map(([uid, u]) => <option key={uid} value={u.name}>{u.name}</option>)
 							}

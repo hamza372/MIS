@@ -32,7 +32,8 @@ export const createFacultyMerge = (faculty: MISTeacher) => (dispatch: Function) 
 			value: {
 				name: faculty.Name,
 				password: faculty.Password,
-				type: faculty.Admin ? "admin" : "teacher"
+				type: faculty.Admin ? "admin" : "teacher",
+				hasLogin: faculty.HasLogin
 			}
 		}
 	]))
