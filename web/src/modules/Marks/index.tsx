@@ -247,7 +247,9 @@ class Reports extends Component<propsType, S> {
 							<select {...this.former.super_handle(["year"], () => true, this.onStateChange)}>
 								<option value="">Select Year</option>
 								{
-									Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+									Array.from(years)
+										.sort((a, b) => parseInt(b) - parseInt(a))
+										.map(year => <option key={year} value={year}>{year}</option>)
 								}
 							</select>
 						</div>

@@ -175,7 +175,9 @@ class ClassReportMenu extends Component<PropsType, S> {
 						<select {...this.former.super_handle(["year"])}>
 							<option value="">Select Year</option>
 							{
-								Array.from(years).map(year => <option key={year} value={year}>{year}</option>)
+								Array.from(years)
+									.sort((a, b) => parseInt(b) - parseInt(a))
+									.map(year => <option key={year} value={year}>{year}</option>)
 							}
 						</select>
 					</div>
