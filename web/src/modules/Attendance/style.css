@@ -1,11 +1,23 @@
 .attendance .status {
 	display: flex;
-	margin-left: auto;
 	flex-direction: row;
 }
 
 .attendance .status .button {
 	margin: 0 5px;
+}
+
+.attendance .list-row {
+	flex-wrap: wrap;
+	flex-direction: row;
+	justify-content: space-between;
+	height: min-content;
+	padding: 5px 0px;
+}
+.attendance .list-row .student-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 .attendance .list-row input {
@@ -73,4 +85,5 @@
 
 .select.button {
 	height: auto;
+	-webkit-appearance: inherit;
 }

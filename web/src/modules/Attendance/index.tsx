@@ -350,9 +350,13 @@ class Attendance extends Component<propTypes, S> {
 								const status = current_attendance ? current_attendance.status : "n/a"
 
 								return <div className="list-row" key={x.id}>
-									<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])}></input>
-									<div> {`${x.RollNumber === "" || x.RollNumber === undefined ? "" : x.RollNumber}`} </div>
-									{isAdmin || setupPage ? <Link className="student" to={`/student/${x.id}/attendance`}>{toTitleCase(x.Name)}</Link> : <div> {x.Name} </div>}
+									<div className="student-info">
+										<input type="checkbox" {...this.Former.super_handle(["selected_students", x.id])} />
+										<div className="row">
+											<div style={{ marginRight: "5px" }}> {`${x.RollNumber === "" || x.RollNumber === undefined ? "-" : x.RollNumber}`} </div>
+											{isAdmin || setupPage ? <Link className="student" to={`/student/${x.id}/attendance`}>{toTitleCase(x.Name)}</Link> : <div> {x.Name} </div>}
+										</div>
+									</div>
 									<div className="status">
 										<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 										<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
