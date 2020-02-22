@@ -675,3 +675,7 @@ input::-webkit-inner-spin-button {
 	width: 90%;
 	margin: auto;
 }
+.header .row.header-items {
+	align-items: center;
+	font-size: 1.2rem;
+}
