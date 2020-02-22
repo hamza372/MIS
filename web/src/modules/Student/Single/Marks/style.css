@@ -59,11 +59,11 @@
 	font-weight: bold !important;
 }
 
-.student-info {
+.student-marks-container .student-info {
 	padding-bottom: 8px;
 }
 
-.student-info .row {
+.student-marks-container .student-info .row {
 	-webkit-justify-content: space-between;
 	justify-content: space-between;
 	padding-bottom: 2px;

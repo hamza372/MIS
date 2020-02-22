@@ -1,22 +1,38 @@
 .attendance .status {
 	display: flex;
 	flex-direction: row;
+	flex-shrink: 1;
 }
 
 .attendance .status .button {
 	margin: 0 5px;
+	font-size: 1rem;
+}
+
+.attendance .select.button {
+	height: auto;
+	width: 90px;
+	-webkit-appearance: inherit;
 }
 
 .attendance .list-row {
-	flex-wrap: wrap;
 	flex-direction: row;
 	justify-content: space-between;
 	height: min-content;
 	padding: 5px 0px;
+	width: 100%;
 }
+
 .attendance .list-row .student-info {
 	display: flex;
 	flex-direction: row;
+	align-items: center;
+	flex-shrink: 20;
+	max-width: 50%;
+	overflow-x: auto;
+}
+
+.attendance .list-row .student-info .row {
 	align-items: center;
 }
 
@@ -81,9 +97,19 @@
 		margin-top: 5px;
 		width: 100%;
 	}
+
+	.attendance .select.button {
+		width: 50px;
+	}
 }
 
-.select.button {
-	height: auto;
-	-webkit-appearance: inherit;
+@media only screen and (max-width: 400px) {
+	.attendance .status .button {
+		padding: 5px 10px;
+		border-width: 2px;
+	}
+
+	.attendance .select.button {
+		width: 34px;
+	}
 }

@@ -361,7 +361,7 @@ class Attendance extends Component<propTypes, S> {
 										<div className={`button ${status === "PRESENT" ? "green" : false}`} onClick={this.mark(x, "PRESENT")}>P</div>
 										<div className={`button ${status === "ABSENT" ? "red" : false}`} onClick={this.mark(x, "ABSENT")}>A</div>
 										<select value={status} className={`select button ${this.getLeaveStatus(status) ? "grey" : false}`} onChange={(e) => this.markLeave(e, x)}>
-											<option value="">Select Leave</option>
+											<option value="">L</option>
 											<option value="LEAVE">Leave</option>
 											<option value="SHORT_LEAVE">Short Leave</option>
 											<option value="SICK_LEAVE">Sick Leave</option>
