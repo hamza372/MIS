@@ -1,6 +1,7 @@
 import React from "react"
-import "../../print.css"
 import moment from "moment"
+
+import "../../print.css"
 
 type PropsTypes = {
     items: any
@@ -9,12 +10,17 @@ type PropsTypes = {
 }
 
 export const GeneralExpensePrintableList = (props: PropsTypes) => {
+
+    const parseAmount = (val: any) => {
+        return parseFloat(val) || 0
+    }
+
     return (
         <div className="print-only print-table">
             <table>
                 <caption>
-                    <div>{ props.schoolName ? props.schoolName.toUpperCase() : "" }</div>
-                    <div>Expense List</div>
+                    <div>{props.schoolName ? props.schoolName.toUpperCase() : ""}</div>
+                    <div>Expense List - {moment().format("DD/MM/YYYY")}</div>
                 </caption>
                 <thead>
                     <tr>
@@ -28,28 +34,29 @@ export const GeneralExpensePrintableList = (props: PropsTypes) => {
                 </thead>
 
                 <tbody>
-                {
-                    props.items.map(([id, exp]: any, i: number) => {
-                    if(exp.expense === "SALARY_EXPENSE") {
-                        return <tr key={id}>
-                            <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
-                            <td>{exp.label}</td>
-                            <td>{exp.category}</td>
-                            <td className="cell-center"> - </td>
-                            <td className="cell-center">{exp.deduction}{ exp.deduction_reason ? `(${exp.deduction_reason})` : "" }</td>
-                            <td className="cell-center">{exp.amount - exp.deduction}</td>
-                        </tr>
-                    } else {
-                        return <tr key={id}>
-                            <td>{moment(exp.date).format("DD-MM-YYYY")}</td>
-                            <td>{exp.label}</td>
-                            <td>{exp.category}</td>
-                            <td className="cell-center">{exp.quantity}</td>
-                            <td className="cell-center"> - </td>
-                            <td className="cell-center">{exp.amount}</td>
-                        </tr>
-                    }})
-                }
+                    {
+                        props.items.map(([id, expense]: any) => {
+                            if (expense.expenseense === "SALARY_expenseENSE") {
+                                return <tr key={id}>
+                                    <td>{moment(expense.date).format("DD-MM-YYYY")}</td>
+                                    <td>{expense.label}</td>
+                                    <td>{expense.category}</td>
+                                    <td className="cell-center"> - </td>
+                                    <td className="cell-center">{expense.deduction}{expense.deduction_reason ? `(${expense.deduction_reason})` : ""}</td>
+                                    <td className="cell-center">{parseAmount(expense.amount) - parseAmount(expense.deduction)}</td>
+                                </tr>
+                            } else {
+                                return <tr key={id}>
+                                    <td>{moment(expense.date).format("DD-MM-YYYY")}</td>
+                                    <td>{expense.label}</td>
+                                    <td>{expense.category}</td>
+                                    <td className="cell-center">{expense.quantity}</td>
+                                    <td className="cell-center"> - </td>
+                                    <td className="cell-center">{expense.amount}</td>
+                                </tr>
+                            }
+                        })
+                    }
                 </tbody>
             </table>
         </div>

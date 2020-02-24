@@ -1,22 +1,23 @@
 import React from "react"
-import "../../print.css"
 import moment from "moment"
+
+import "../../print.css"
 
 type PropsTypes = {
     items: any
     chunkSize: number
-	schoolName: string
-	dateFormat: string
+    schoolName: string
+    dateFormat: string
 }
 
 export const IncomeExpenditurePrintableList = (props: PropsTypes) => {
-	const dateView = props.dateFormat === "DAILY" ? "DD-MM-YY" : "MM-YYYY"
+    const dateView = props.dateFormat === "DAILY" ? "DD-MM-YY" : "MM-YYYY"
     return (
         <div className="print-only print-table">
             <table>
                 <caption>
-                    <div>{ props.schoolName ? props.schoolName.toUpperCase() : "" }</div>
-                    <div>Income-Expenditure List</div>
+                    <div>{props.schoolName ? props.schoolName.toUpperCase() : ""}</div>
+                    <div>Income-Expenditure List - {moment().format("DD/MM/YYYY")}</div>
                 </caption>
                 <thead>
                     <tr>
@@ -29,15 +30,15 @@ export const IncomeExpenditurePrintableList = (props: PropsTypes) => {
                 </thead>
 
                 <tbody>
-                {
-                    props.items.map(([id, exp]: any, i: number) => <tr key={id}>
-                    <td className="cell-center">{moment(exp.date).format(dateView)}</td>
-					<td> {exp.label}</td>
-					<td> {exp.category}</td>
-					<td className="cell-center"> {exp.quantity} {exp.quantity !== 1 ? "Entries" : "Entry"}</td>
-					<td className="cell-center"> {exp.amount}</td>
-                    </tr>)
-                }
+                    {
+                        props.items.map(([id, expense]: any) => <tr key={id}>
+                            <td className="cell-center">{moment(expense.date).format(dateView)}</td>
+                            <td> {expense.label}</td>
+                            <td> {expense.category}</td>
+                            <td className="cell-center"> {expense.quantity} {expense.quantity !== 1 ? "Entries" : "Entry"}</td>
+                            <td className="cell-center"> {expense.amount}</td>
+                        </tr>)
+                    }
                 </tbody>
             </table>
         </div>

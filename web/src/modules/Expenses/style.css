@@ -24,6 +24,24 @@
 	max-height: 50vh;
 }
 
-	.expenses .payment-history.section .table.row {
-		min-width: 600px;
-	}
+.expenses .payment-history.section .table.row {
+	min-width: 600px;
+}
+
+.expenses .payment-history.section .edit-input {
+	text-align: right;
+	border: none;
+	border-bottom: 1px solid #bbb;
+	width: 70%;
+}
+
+.expenses .payment-history.section .row.edit {
+	color: rgb(94, 205, 185);
+	justify-content: space-between;
+}
+.expenses .payment-history.section .delete {
+	text-align: center;
+	padding: 0;
+	width: 15px;
+	line-height: 15px;
+}
