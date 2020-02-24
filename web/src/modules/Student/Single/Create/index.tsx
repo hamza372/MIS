@@ -37,6 +37,7 @@ const blankStudent = (): MISStudent => ({
 	BForm: "",
 	Gender: "",
 	Phone: "",
+	AlternatePhone: "",
 	Fee: 0,
 	Active: true,
 
@@ -45,53 +46,54 @@ const blankStudent = (): MISStudent => ({
 	Birthdate: "",
 	Address: "",
 	Notes: "",
-	// @ts-ignore
-	StartDate: moment(),
+	StartDate: new Date().getTime(),
 	AdmissionNumber: "",
 	BloodType: "",
 	FamilyID: "",
+	Religion: "",
 
 	fees: {},
 	payments: {},
 	attendance: {},
 	section_id: "",
 	tags: {},
+	exams: {},
 	certificates: {},
 	prospective_section_id: "",
 })
 // should be a dropdown of choices. not just teacher or admin.
 
 interface P {
-	students: RootDBState['students'];
-	classes: RootDBState['classes'];
-	settings: RootDBState["settings"];
-	logo: RootDBState["assets"]["schoolLogo"];
-	permissions: RootDBState['settings']['permissions'];
-	max_limit: RootDBState['max_limit'];
-	user: MISTeacher;
-	save: (student: MISStudent) => any;
-	delete: (student: MISStudent) => any;
+	students: RootDBState['students']
+	classes: RootDBState['classes']
+	settings: RootDBState["settings"]
+	logo: RootDBState["assets"]["schoolLogo"]
+	permissions: RootDBState['settings']['permissions']
+	max_limit: RootDBState['max_limit']
+	user: MISTeacher
+	save: (student: MISStudent) => any
+	delete: (student: MISStudent) => any
 	uploadImage: (student: MISStudent, image_string: string) => any
 }
 
 interface S {
-	profile: MISStudent;
-	redirect: false | string;
+	profile: MISStudent
+	redirect: false | string
 	show_camera: boolean
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
-	new_tag: string;
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	new_tag: string
 	edit: {
-		[id: string]: boolean;
-	};
-	show_hide_fee: boolean;
+		[id: string]: boolean
+	}
+	show_hide_fee: boolean
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -588,8 +590,18 @@ class SingleStudent extends Component<propTypes, S> {
 	}
 
 	toggleCamera = () => {
-		this.setState({
-			show_camera: !this.state.show_camera
+		this.setState({ show_camera: !this.state.show_camera }, () => {
+			// When the modal is shown, we want a fixed body
+			if (this.state.show_camera === true) {
+				document.body.style.position = 'fixed'
+			}
+		})
+	}
+
+	onCloseCameraModal = () => {
+		this.setState({ show_camera: false }, () => {
+			// When the modal is hidden
+			document.body.style.position = ''
 		})
 	}
 
@@ -635,6 +647,7 @@ class SingleStudent extends Component<propTypes, S> {
 					</div>
 				}
 
+
 				{
 					this.state.show_camera && <Modal>
 						<Camera
@@ -642,7 +655,7 @@ class SingleStudent extends Component<propTypes, S> {
 							height={100}
 							width={100}
 							format="jpeg"
-							onClose={() => this.setState({ show_camera: false })} />
+							onClose={this.onCloseCameraModal} />
 					</Modal>
 				}
 
@@ -690,7 +703,13 @@ class SingleStudent extends Component<propTypes, S> {
 						<option value="female">Female</option>
 					</select>
 				</div>
-
+				<div className="row">
+					<label>Religion</label>
+					<input type="text"
+						{...this.former.super_handle(["Religion"])}
+						placeholder="Religion"
+					/>
+				</div>
 				{!prospective ? <div className="row">
 					<label>Blood Type</label>
 					<select {...this.former.super_handle(["BloodType"])}>
@@ -757,6 +776,20 @@ class SingleStudent extends Component<propTypes, S> {
 							type="tel"
 							{...this.former.super_handle(["Phone"], (num) => num.length <= 11, this.updateSiblings)}
 							placeholder="Phone Number"
+							disabled={!admin}
+						/>
+						{!this.isNew() && <a className="button blue call-link" href={`tel:${this.state.profile.Phone}`} > Call</a>}
+					</div>
+				</div>
+
+				<div className="row">
+					<label>Alternate Phone</label>
+					<div className="row" style={{ flexDirection: "row" }}>
+						<input
+							style={{ width: "100%" }}
+							type="tel"
+							{...this.former.super_handle(["AlternatePhone"], (num) => num.length <= 11, this.updateSiblings)}
+							placeholder="Alternate Phone Number"
 							disabled={!admin}
 						/>
 						{!this.isNew() && <a className="button blue call-link" href={`tel:${this.state.profile.Phone}`} > Call</a>}

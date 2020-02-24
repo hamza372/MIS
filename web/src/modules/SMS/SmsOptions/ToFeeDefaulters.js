@@ -114,7 +114,7 @@ class ToFeeDefaulters extends Component {
 				(student.tags === undefined || !student.tags["PROSPECTIVE"]) &&
 				this.calculateDebt(debt) > 0
 		})
-		.reduce((agg, {student}) => {
+		.reduce((agg, {student, debt}) => {
 
 			const index  = agg.findIndex(s => s.number === student.Phone)		
 			
@@ -125,6 +125,9 @@ class ToFeeDefaulters extends Component {
 			return [...agg, {
 				number: student.Phone,
 				text : this.state.text
+				.replace(/\$BALANCE/g, `${debt}`)
+				.replace(/\$NAME/g, student.FamilyID || student.Name)
+				.replace(/\$FNAME/g, student.ManName)
 			}]
 		}, [])
 
@@ -133,7 +136,11 @@ class ToFeeDefaulters extends Component {
 				<div className="row">
 					<label>Message</label>
 					<textarea {...this.former.super_handle(["text"])} placeholder="Write text message here" />
-				</div> 
+				</div>
+				<div className="row">
+					<label>Options</label>
+					<div style={{fontSize: "0.85rem", color: "grey"}}>use $NAME, $FNAME and $BALANCE</div>
+				</div>
 					{
 						smsOption === "SIM" ? 
 							<a href={smsIntentLink({

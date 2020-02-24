@@ -24,7 +24,7 @@ type S = {
     statsDate: number
 }
 
-type AugmentedStudent = MISStudent & { amount_paid: number, balance: number, section: AugmentedSection }
+type AugmentedStudent = MISStudent & { amount_paid: number; balance: number; section: AugmentedSection }
 
 class DailyStats extends Component<PropsType, S> {
 
@@ -167,6 +167,7 @@ class DailyStats extends Component<PropsType, S> {
                             chunkSize={ index === 0 ? 0 : chunk_size * index }
                             totalAmount={ total_amount_received }
                             totalStudents={ total_students_paid }
+                            paidDate={ moment(statsDate).format("DD/MM/YYYY") }
                             />)
                 }
             </>);

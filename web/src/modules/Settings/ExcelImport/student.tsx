@@ -11,20 +11,20 @@ import Banner from 'components/Banner'
 
 interface S {
 
-	importedStudents: MISStudent[];
-	loadingStudentImport: boolean;
+	importedStudents: MISStudent[]
+	loadingStudentImport: boolean
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
-	selectedSection: string;
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	selectedSection: string
 }
 
 type P = {
-	students: RootDBState['students'];
-	classes: RootDBState['classes'];
-	saveStudents: (student: MISStudent[]) => void;
+	students: RootDBState['students']
+	classes: RootDBState['classes']
+	saveStudents: (student: MISStudent[]) => void
 }
 
 const studentCSVHeaders = [
@@ -321,7 +321,7 @@ const convertCSVToStudents = (studentImportCSV: string ) => {
 			Birthdate,
 			Address,
 			Notes,
-			StartDate: StartDate ? moment(StartDate, "DD/MM/YYYY").unix() : new Date().getTime(), // shady...
+			StartDate: StartDate ? moment(StartDate, "DD/MM/YYYY").unix() * 1000 : new Date().getTime(), // shady...
 			AdmissionNumber,
 			Fee: 0,
 

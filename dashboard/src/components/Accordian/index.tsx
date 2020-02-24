@@ -52,6 +52,7 @@ class Accordian extends React.Component<propTypes, S> {
 		const current = this.props.location.pathname;
 		const search = this.props.location.search;
 
+		const { visible } = this.state
 		const { permissions, role } = this.props
 
 		const new_school = permissions && permissions.new_school
@@ -61,23 +62,24 @@ class Accordian extends React.Component<propTypes, S> {
 
 		const admin = role === "ADMIN" ? true : false
 
-		return <div className={`root-page accordian ${this.state.visible ? "" : "minimized"}`}>
-			<div className="header" style={{ justifyContent: "space-between"}}>
+		return <div className={`root-page accordian ${visible ? "" : "minimized"}`}>
+
+			<div className="header" style={{ justifyContent: "space-between" }}>
+				<div className="icon" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat` }} />
 				<div>Mischool Dashboard</div>
 				<div>{this.props.user}</div>
 			</div>
 
-			<div className="burger">
-				<div className="whopper" onClick={this.onMinimize} style={{ background: `url(${icon}) 50% 0 no-repeat`}} />
-				{ this.state.visible && (new_school || admin) && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>New School</Link> }
-				{ this.state.visible && ( stats || admin ) && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard/school_id/start_date/end_date/" ? "active" : ""}> Stats</Link>}
-				{ this.state.visible && ( trials || admin) &&<Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link> }
-				{this.state.visible && admin && <Link to={{ pathname: "/admin", search }} className={current === "/admin" ? "active" : ""}>Admin</Link>}
-				{this.state.visible && ( new_user || admin ) && <Link to={{ pathname: "/user/new", search }} className={current === "/user/new" ? "active" : ""}>New User</Link>}
-				{ this.state.visible && <Link to="" onClick={() => this.onLogout()}> LOGOUT </Link>}
-			</div>
+			{visible && <div className="burger">
+				{(new_school || admin) && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>New School</Link>}
+				{(stats || admin) && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard/school_id/start_date/end_date/" ? "active" : ""}> Stats</Link>}
+				{(trials || admin) && <Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link>}
+				{admin && <Link to={{ pathname: "/admin", search }} className={current === "/admin" ? "active" : ""}>Admin</Link>}
+				{(new_user || admin) && <Link to={{ pathname: "/user/new", search }} className={current === "/user/new" ? "active" : ""}>New User</Link>}
+				<Link to="" onClick={() => this.onLogout()}> LOGOUT </Link>
+			</div>}
 
-			<div className="burger-stub">
+			<div className={ visible ? "burger-stub" : "burger-stub full-view"} >
 				<Route exact path="/" component={signUp} />
 				<Route path="/dashboard/:school_id/:start_date/:end_date/" component={DashboardPage} />
 				<Route path="/trials" component={Trials} />

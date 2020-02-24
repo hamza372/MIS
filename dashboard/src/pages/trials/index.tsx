@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createSchoolLogin, updateReferralInformation, getReferralsInfo } from 'actions/index'
+import { updateReferralInformation, getReferralsInfo } from 'actions/index'
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import Former from 'former';
@@ -10,7 +10,6 @@ import moment from 'moment';
 interface P {
 	trials: RootReducerState["trials"]
 	getReferralsInfo: () => any
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => any
 	updateReferralInformation: (school_id: string, value: any) => any
 }
 
@@ -49,7 +48,9 @@ interface S {
 		status: string
 		daysPassed: string
 		filterText: string
-	}
+	},
+	filterMenu: boolean
+	active_school: string
 }
 
 interface Routeinfo {
@@ -71,7 +72,9 @@ class Trial extends Component<propTypes, S> {
 				status: "ALL",
 				daysPassed: "",
 				filterText: ""
-			}
+			},
+			filterMenu: false,
+			active_school: ""
 		}
 
 		this.former = new Former(this, [])
@@ -83,7 +86,6 @@ class Trial extends Component<propTypes, S> {
 
 	markPaid = (id: string) => {
 
-		console.log("MARKINKG", this.state.edits)
 		this.setState({
 			edits: {
 				...this.state.edits,
@@ -181,8 +183,17 @@ class Trial extends Component<propTypes, S> {
 			return true
 		}
 	}
+
+	setActive = (school_id: string) => {
+		const active_school = this.state.active_school === school_id ? "" : school_id
+
+		this.setState({
+			active_school
+		})
+	}
+
 	render() {
-		const { edits } = this.state
+		const { edits, filterMenu,active_school } = this.state
 
 		const Items = Object.entries(edits)
 			.filter(([school_id, value]) => {
@@ -197,86 +208,107 @@ class Trial extends Component<propTypes, S> {
 			<div className="title"> Trial Information</div>
 
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
-				<div className="row">
-					<label>Total</label>
-					<div style={{ fontWeight: "bold", color: "grey", fontSize: "2em" }}>{Items.length}</div>
-				</div>
-				<div className="row">
-					<label>Status</label>
-					<select {...this.former.super_handle(["filters", "status"])}>
-						<option value="ALL"> ALL</option>
-						<option value="ENDED">Ended</option>
-						<option value="NOT_ENDED">Not Ended</option>
-						<option value="PAID"> Paid</option>
-						<option value="NOT_PAID"> Not Paid</option>
-					</select>
-				</div>
-				<div className="row">
-					<label>Days Passed since Login</label>
-					<input type="text" {...this.former.super_handle(["filters", "daysPassed"])} placeholder="Day-Day" />
-				</div>
-				<input type="text" {...this.former.super_handle(["filters", "filterText"])} placeholder="Search" style={{ width: "100%" }} />
+				
+				<div className={!filterMenu ? "button blue" : "button red"} onClick={() => this.setState({ filterMenu: !filterMenu })}>{!filterMenu ? "Filters" : "Close"}</div>
+				{filterMenu && <>
+					<div className="row">
+						<label>Total</label>
+						<div style={{ fontWeight: "bold", color: "grey", fontSize: "2em" }}>{Items.length}</div>
+					</div>
+					<div className="row">
+						<label>Status</label>
+						<select {...this.former.super_handle(["filters", "status"])}>
+							<option value="ALL"> ALL</option>
+							<option value="ENDED">Ended</option>
+							<option value="NOT_ENDED">Not Ended</option>
+							<option value="PAID"> Paid</option>
+							<option value="NOT_PAID"> Not Paid</option>
+						</select>
+					</div>
+					<div className="row">
+						<label>Days Passed since Login</label>
+						<input type="text" {...this.former.super_handle(["filters", "daysPassed"])} placeholder="Day-Day" />
+					</div>
+					<input type="text" {...this.former.super_handle(["filters", "filterText"])} placeholder="Search" style={{ width: "100%" }} />
+				</>}
 			</div>
 
 			<div className="section" style={{ overflow: "auto" }}>
-				<div className="newTable">
+				<div className="newtable">
 					<div className="newtable-row heading">
-						<div className="serial">Sr#</div>
 						<div>School Name</div>
 						<div>Area/City</div>
 						<div>Status</div>
-						<div>Area Manager</div>
-						<div>Agent</div>
-						<div>Owner Phone</div>
-						<div>Notes</div>
-						<div>RefCode</div>
-						<div>Backcheck Status</div>
-						<div>Warning Status</div>
-						<div>Followup Status</div>
-						<div>Trial Reset Status</div>
-						<div>Overall Status</div>
 					</div>
 
 					{
 						Items
 							.map(([school_id, value], index) => {
-								return <div key={school_id} className="newtable-row">
-									<div className="serial">{index + 1}</div>
-									<div>{school_id}</div>
-									<div>{value.city}</div>
-									{!value.payment_received ? <div className="row">
-										<div>{this.getStatus(value.time)}</div>
-										<div className="button blue" onClick={() => this.markPaid(school_id)}>mark paid</div>
-									</div>: <div> Paid </div>}
-									<div>{value.area_manager_name || "-"}</div>
-									<div>{value.agent_name || "-"}</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "owner_phone"])} />
+								return <div key={school_id}>
+									<div className="newtable-row">
+										<div className="clickable" onClick={() => this.setActive(school_id)}>{school_id}</div>
+										<div>{value.city}</div>
+										{
+											!value.payment_received ? <div> {this.getStatus(value.time)}</div> : <div> Paid </div>
+										}
 									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "notes"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "ref_code"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "backcheck_status"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "warning_status"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "follow_up_status"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "trial_reset_status"])} />
-									</div>
-									<div>
-										<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "overall_status"])} />
-									</div>
-									<div style={{ display: "flex", justifyContent: "center" }}>
-										<div className="button save" onClick={() => this.onSave(school_id)}> Save </div>
-									</div>
+									{
+										this.state.active_school === school_id && <div className="more">
+											<div className="form">
+											<div className="row">
+													<label>Owner Name</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "owner_name"])} />
+												</div>
+												<div className="row">
+													<label>Owner Phone</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "owner_phone"])} />
+												</div>
+												<div className="row">
+													<label>Area Manager</label>
+													<div>{value.area_manager_name || "-"}</div>
+												</div>
+												<div className="row">
+													<label>Agent name</label>
+													<div>{value.agent_name || "-"}</div>
+												</div>
+												<div className="row">
+													<label>Notes</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "notes"])} />
+												</div>
+												<div className="row">
+													<label>Ref-Code</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "ref_code"])} />
+												</div>
+												<div className="row">
+													<label>BackCheck Status</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "backcheck_status"])} />
+												</div>
+												<div className="row">
+													<label>Warning Status</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "warning_status"])} />
+												</div>
+												<div className="row">
+													<label>Followup Status</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "follow_up_status"])} />
+												</div>
+												<div className="row">
+													<label>Trial Reset Status</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "trial_reset_status"])} />
+												</div>
+												<div className="row">
+													<label>Overall Status</label>
+													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "overall_status"])} />
+												</div>
+												{
+													!value.payment_received && <div className="row">
+														<label>Mark Paid</label>
+														<div className="button blue" onClick={() => this.markPaid(school_id)}>Mark</div>
+													</div>
+												}
+												<div className="button save" style={{ marginTop: "20px" }} onClick={() => this.onSave(school_id)}> Save </div>
+											</div>
+										</div>
+									}
 								</div>
 							})
 					}
@@ -290,7 +322,6 @@ class Trial extends Component<propTypes, S> {
 export default connect((state: RootReducerState) => ({
 	trials: state.trials
 }), (dispatch: Function) => ({
-	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
 	updateReferralInformation: (school_id: string, value: any) => dispatch(updateReferralInformation(school_id, value)),
 	getReferralsInfo: () => dispatch(getReferralsInfo())
 }))(Trial)

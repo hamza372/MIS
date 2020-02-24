@@ -4,6 +4,7 @@ import { v4 } from 'node-uuid'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router-dom';
 import Dynamic from '@cerp/dynamic'
+import Former from 'utils/former';
 
 
 import { createFacultyMerge, deleteFaculty } from 'actions'
@@ -16,7 +17,6 @@ import Banner from 'components/Banner'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
 
 import './style.css'
-import Former from 'utils/former';
 
 // this page will have all the profile info for a teacher.
 // all this data will be editable.
@@ -40,33 +40,33 @@ const blankTeacher = (isFirst = false): MISTeacher => ({
 	StructuredQualification: "",
 	Qualification: "",
 	Experience: "",
-	HireDate: `${moment()}`,
+	HireDate: moment().format("MM-DD-YYYY"),
 	Admin: isFirst,
-
+	HasLogin: true,
+	tags: {},
 	attendance: {}
 })
 
-// should be a dropdown of choices. not just teacher or admin.
-
 interface P {
-	faculty: RootDBState['faculty'];
-	user: MISTeacher;
-	save: (teacher: MISTeacher) => any;
-	delete: (faculty_id: string) => any;
+	faculty: RootDBState['faculty']
+	user: MISTeacher
+	save: (teacher: MISTeacher) => any
+	delete: (faculty_id: string) => any
 }
 
 interface S {
-	profile: MISTeacher;
-	redirect: false | string;
+	profile: MISTeacher
+	redirect: false | string
 	banner: {
-		active: boolean;
-		good?: boolean;
-		text?: string;
-	};
+		active: boolean
+		good?: boolean
+		text?: string
+	}
+	tag: string
 }
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = P & RouteComponentProps<RouteInfo>
@@ -76,19 +76,23 @@ class CreateTeacher extends Component<propTypes, S> {
 	former: Former
 
 	constructor(props: propTypes) {
-		super(props);
-		console.log(props)
+		super(props)
 
-		const id = props.match.params.id;
+		const id = props.match.params.id
+		const faculty = props.faculty[id]
 
 		this.state = {
-			profile: props.faculty[id] || blankTeacher(this.isFirst()),
+			profile: {
+				...faculty || blankTeacher(this.isFirst()),
+				HasLogin: faculty && faculty.HasLogin ? faculty.HasLogin : true
+			},
 			redirect: false,
 			banner: {
 				active: false,
 				good: true,
 				text: "Saved!"
-			}
+			},
+			tag: ""
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -98,8 +102,6 @@ class CreateTeacher extends Component<propTypes, S> {
 	isNew = () => this.props.location.pathname.indexOf("new") >= 0
 
 	onSave = () => {
-		// dispatch merge action, which should come from props.
-		// check if they set a username and password. 
 
 		const compulsoryFileds = checkCompulsoryFields(this.state.profile, [
 			["Name"],
@@ -188,7 +190,7 @@ class CreateTeacher extends Component<propTypes, S> {
 		}, 1000);
 	}
 
-	componentWillReceiveProps(newProps: propTypes) {
+	UNSAFE_componentWillReceiveProps(newProps: propTypes) {
 		// this means every time teacher upgrades, we will change the fields to whatever was just sent.
 		// this means it will be very annoying for someone to edit the user at the same time as someone else
 		// which is probably a good thing. 
@@ -204,6 +206,51 @@ class CreateTeacher extends Component<propTypes, S> {
 		this.setState(Dynamic.put(this.state, path, Hyphenator(str)) as S)
 	}
 
+	addTag = () => {
+
+		const { tag, profile } = this.state
+
+		if (tag.trim() === "") {
+			return
+		}
+
+		this.setState({
+			profile: {
+				...profile,
+				tags: {
+					...(profile.tags || {}),
+					[tag.trim()]: true
+				}
+			}
+		})
+	}
+
+	removeTag = (tag: string) => () => {
+
+		const { profile } = this.state
+		const { [tag]: removed, ...rest } = profile.tags
+
+		this.setState({
+			profile: {
+				...profile,
+				tags: rest
+			}
+		})
+	}
+
+	getUniqueTagsFromFaculty = (): Array<string> => {
+
+		const tags = new Set<string>()
+
+		Object.values(this.props.faculty || {})
+			.filter(f => f.id && f.Name)
+			.forEach(s => {
+				Object.keys(s.tags || {})
+					.forEach(tag => tags.add(tag))
+			})
+
+		return [...tags]
+	}
 
 	render() {
 
@@ -265,6 +312,20 @@ class CreateTeacher extends Component<propTypes, S> {
 
 				<div className="divider">Account Information</div>
 				<div className="row">
+					<label>Admin Status</label>
+					<select {...this.former.super_handle(["Admin"])} disabled={!admin}>
+						<option value="true">Admin</option>
+						<option value="false">Not an Admin</option>
+					</select>
+				</div>
+				<div className="row">
+					<label>User status</label>
+					<select {...this.former.super_handle(["HasLogin"])} disabled={!admin}>
+						<option value="true">Has login access</option>
+						<option value="false">Does not have login access</option>
+					</select>
+				</div>
+				<div className="row">
 					<label>Password</label>
 					<input type="password" {...this.former.super_handle_flex(["Password"], { styles: (val: string) => { return val === "" ? { borderColor: "#fc6171" } : {} } })} placeholder="Password" disabled={!canEdit} />
 				</div>
@@ -278,6 +339,33 @@ class CreateTeacher extends Component<propTypes, S> {
 					<label>Address</label>
 					<input type="text" {...this.former.super_handle(["Address"])} placeholder="Address" disabled={!canEdit} />
 				</div>
+
+				<div className="divider"> Tags </div>
+				<div className="tag-container">
+					{
+						Object.keys(this.state.profile.tags || {})
+							.map(tag =>
+								<div className="tag-row" key={tag}>
+									<div className="deletable-tag-wrapper" onClick={this.removeTag(tag)}>
+										<div className="tag">{tag} </div>
+										<div className="cross">×</div>
+									</div>
+								</div>
+							)
+					}
+				</div>
+
+				<div className="row" style={{ flexDirection: "row" }}>
+					<input list="tags" onChange={(e) => this.setState({ tag: e.target.value })} placeholder="Type or Select Tag" style={{ width: "initial" }} />
+					<datalist id="tags">
+						{
+							this.getUniqueTagsFromFaculty()
+								.map(tag => <option key={tag} value={tag} />)
+						}
+					</datalist>
+					<div className="button green" style={{ width: "initial", marginLeft: "auto" }} onClick={this.addTag}>+</div>
+				</div>
+
 
 				<div className="divider">School Information</div>
 
@@ -311,14 +399,6 @@ class CreateTeacher extends Component<propTypes, S> {
 				<div className="row">
 					<label>Joining Date</label>
 					<input type="date" onChange={this.former.handle(["HireDate"])} value={moment(this.state.profile.HireDate).format("YYYY-MM-DD")} placeholder="Hire Date" disabled={!admin} />
-				</div>
-
-				<div className="row">
-					<label>Admin Status</label>
-					<select {...this.former.super_handle(["Admin"])} disabled={!admin}>
-						<option value="false">Not an Admin</option>
-						<option value="true">Admin</option>
-					</select>
 				</div>
 
 				<div className="row">

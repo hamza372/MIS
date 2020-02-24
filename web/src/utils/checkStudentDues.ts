@@ -1,8 +1,8 @@
 import moment from 'moment'
 
 type payment = {
-	student: MISStudent;
-	payment_id: string;
+	student: MISStudent
+	payment_id: string
 } & MISStudentPayment
 
 // i want this function wrapped in comlink

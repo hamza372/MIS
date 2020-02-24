@@ -13,13 +13,13 @@ import { ResponsiveContainer, XAxis, YAxis, Tooltip, LineChart, Line } from "rec
 import './style.css'
 
 interface ChartProps {
-	collective_obj: { [month: string]: { income: number; expense: number } };
+	collective_obj: { [month: string]: { income: number; expense: number } }
 	chartFilter: {
-		income: boolean;
-		expense: boolean;
-		profit: boolean;
-	};
-	date_format: string;
+		income: boolean
+		expense: boolean
+		profit: boolean
+	}
+	date_format: string
 }
 
 const ExpenseChart: React.SFC<ChartProps> = ({ collective_obj, chartFilter, date_format }) => {
@@ -45,10 +45,10 @@ const ExpenseChart: React.SFC<ChartProps> = ({ collective_obj, chartFilter, date
 }
 
 interface TableProps {
-	collective_obj: { [month: string]: { income: number; expense: number } };
-	total_income: number;
-	total_expense: number;
-	date_format: string;
+	collective_obj: { [month: string]: { income: number; expense: number } }
+	total_income: number
+	total_expense: number
+	date_format: string
 }
 
 const ExpenseTable: React.SFC<TableProps> = ({ collective_obj, total_income, total_expense, date_format }) => {
@@ -84,34 +84,34 @@ const ExpenseTable: React.SFC<TableProps> = ({ collective_obj, total_income, tot
 }
 
 interface P {
-	students: RootDBState["students"];
-	settings: RootDBState["settings"];
-	classes: RootDBState["classes"];
-	expenses: RootDBState["expenses"];
-	schoolLogo: RootDBState["assets"]["schoolLogo"];
+	students: RootDBState["students"]
+	settings: RootDBState["settings"]
+	classes: RootDBState["classes"]
+	expenses: RootDBState["expenses"]
+	schoolLogo: RootDBState["assets"]["schoolLogo"]
 }
 
 interface S {
-	filterText: string;
+	filterText: string
 	chartFilter: {
-		income: boolean;
-		expense: boolean;
-		profit: boolean;
-	};
-	collective_obj: { [month: string]: { income: number; expense: number } };
-	total_income: number;
-	total_expense: number;
-	is_payment_filter: boolean;
-	selected_period: string;
-	start_date: number;
-	end_date: number;
+		income: boolean
+		expense: boolean
+		profit: boolean
+	}
+	collective_obj: { [month: string]: { income: number; expense: number } }
+	total_income: number
+	total_expense: number
+	is_payment_filter: boolean
+	selected_period: string
+	start_date: number
+	end_date: number
 
-	loading: boolean;
+	loading: boolean
 	percentage: number
 }
 
 interface routeInfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<routeInfo> & P

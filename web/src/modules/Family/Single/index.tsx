@@ -11,20 +11,21 @@ import { addStudentToFamily, saveFamilyInfo } from 'actions';
 import Hyphenator from 'utils/Hyphenator';
 
 type P = {
-	students: RootDBState['students'];
-	addStudentToFamily: (s: MISStudent, famId: string) => void;
-	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void;
+	students: RootDBState['students']
+	addStudentToFamily: (s: MISStudent, famId: string) => void
+	saveFamilyInfo: (siblings: MISStudent[], familyInfo: MISFamilyInfo) => void
 } & RouteComponentProps<RouteInfo>
 
 interface RouteInfo {
-	id: string;
+	id: string
 }
 
 interface S {
-	Phone: string;
-	ManName: string;
-	ManCNIC: string;
-	Address: string;
+	Phone: string
+	AlternatePhone?: string
+	ManName: string
+	ManCNIC: string
+	Address: string
 }
 
 class SingleFamily extends React.Component<P, S> {
@@ -37,6 +38,7 @@ class SingleFamily extends React.Component<P, S> {
 
 		this.state = {
 			Phone: (siblings.find(s => s.Phone !== "") || { Phone: "" }).Phone,
+			AlternatePhone: (siblings.find(s => s.AlternatePhone !== "") || { AlternatePhone: "" }).AlternatePhone,
 			ManName: (siblings.find(s => s.ManName !== "") || { ManName: "" }).ManName,
 			ManCNIC: (siblings.find(s => s.ManCNIC !== "") || { ManCNIC: "" }).ManCNIC,
 			Address: (siblings.find(s => s.Address !== "") || { Address: "" }).Address
@@ -127,6 +129,18 @@ class SingleFamily extends React.Component<P, S> {
 								placeholder="Phone Number"
 							/>
 							<a className="button blue call-link" href={`tel:${this.state.Phone}`}> Call</a>
+						</div>
+					</div>
+					<div className="row">
+						<label>Alternate Phone Number</label>
+						<div className="row" style={{ flexDirection: "row" }}>
+							<input
+								style={{ width: "100%" }}
+								type="tel"
+								{...this.former.super_handle(["AlternatePhone"], (num) => num.length <= 11)}
+								placeholder="Alternate Phone Number"
+							/>
+							<a className="button blue call-link" href={`tel:${this.state.AlternatePhone}`}> Call</a>
 						</div>
 					</div>
 

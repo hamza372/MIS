@@ -173,6 +173,8 @@ interface TrialsDataRow {
 		follow_up_status: string
 		trial_reset_status: string
 		overall_status: string
+		user: string
+		school_type: string
 	}
 }
 
@@ -192,6 +194,9 @@ interface SignUpValue {
 	agent_name: string
 
 	notes: string
+	user: string
+	owner_phone: string
+	school_type: string
 }
 
 interface UserPermissions {

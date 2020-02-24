@@ -17,8 +17,8 @@
 }
 .card-school-logo {
     border-radius: 2px;
-    width: 64px;
-    height: 64px;
+    width: 54px;
+    height: 54px;
 }
 .card-school-info {
     padding: 5px 5px;
@@ -30,14 +30,13 @@
     border: 0.5px solid;
 }
 .card-student-info {
-    padding: 5px;
+    padding: 0 5px;
     padding-top: 0px;
     white-space: normal;
     word-break: normal;
 }
 .card-student-info div {
     font-weight: bold;
-    padding: 2px;
     margin: 0px;
 }
 .card-student-info span {
@@ -57,11 +56,11 @@
     display: flex;
 }
 .student-card .card-row.first {
-    padding: 2px 5px;
+	margin-top: 4px;
+    padding: 0px 5px;
 }
 .student-card .card-row.last {
     padding: 0px 5px;
-    margin-top: 10px;
 }
 .card-column {
     flex: 1;
@@ -69,10 +68,12 @@
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2,1fr);
-    grid-gap: 12px;
+    grid-gap: 50px;
 }
 .student-id-card.print-table table {
-    margin-bottom: 0.372cm;
+    /* margin-bottom: 0.372cm; */
+    margin-top: 15mm;
+    margin-bottom: 16.7585mm;
 }
 .student-info-list.print-table table {
     margin-bottom: 6.10mm;

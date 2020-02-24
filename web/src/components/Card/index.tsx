@@ -5,19 +5,19 @@ import Former from 'utils/former'
 import './style.css'
 
 interface P {
-	items: Array<any>;
-	Component: Function;
-	create: string;
-	createText: string;
-	toLabel: Function;
+	items: Array<any>
+	Component: Function
+	create: string
+	createText: string
+	toLabel: Function
 }
 
 interface S {
-	filterText: string;
+	filterText: string
 }
 
 interface Routeinfo {
-	id: string;
+	id: string
 }
 
 type propTypes = RouteComponentProps<Routeinfo> & P

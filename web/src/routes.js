@@ -25,7 +25,7 @@ import Analytics from 'modules/Analytics'
 import ReportsMenu from 'modules/ReportsMenu'
 import PromotionPage from 'modules/Settings/promote-students'
 import Help from "modules/Help"
-import Diary from  'modules/Diary'
+import Diary from 'modules/Diary'
 import Front from 'modules/Front'
 import FeeMenu from 'modules/FeeMenu'
 import PlannerList from 'modules/Planner/ClassList'
@@ -66,7 +66,7 @@ export default class Routes extends React.Component {
 
 	render() {
 
-		if(this.state.error) {
+		if (this.state.error) {
 			return <ErrorComponent err={this.state.err} errInfo={this.state.errInfo} />
 		}
 
@@ -82,7 +82,7 @@ export default class Routes extends React.Component {
 
 					<TrackedRoute path="/student/:id" component={StudentSingle} />
 					<TrackedRoute path="/student" component={StudentList} />
-					
+
 					<TrackedRoute path="/class/:id" component={ClassSingle} />
 					<TrackedRoute path="/class" component={ClassModule} />
 
@@ -100,7 +100,7 @@ export default class Routes extends React.Component {
 
 					<TrackedRoute path="/settings/excel-import" component={ExcelImport} />
 					<TrackedRoute path="/settings/promote" component={PromotionPage} />
-					<TrackedRoute path="/settings/class" component={ClassSettings}/>
+					<TrackedRoute path="/settings/class" component={ClassSettings} />
 					<TrackedRoute path="/settings/historicalFee" component={historicalFee} />
 					<TrackedRoute path="/settings" component={Settings} />
 					<TrackedRoute path="/analytics/daily-stats" component={DailyStats} />
@@ -110,17 +110,17 @@ export default class Routes extends React.Component {
 					<TrackedRoute path="/reports-menu" component={ReportsMenu} />
 					<TrackedRoute path="/expenses" component={ExpensePage} />
 
-      				<TrackedRoute exact path="/families/:famId/fee-print-preview" component={printPreview}/>
-					<TrackedRoute path="/families/:famId/payments" component={StudentFees}/>
+					<TrackedRoute exact path="/families/:famId/fee-print-preview" component={printPreview} />
+					<TrackedRoute path="/families/:famId/payments" component={StudentFees} />
 					<TrackedRoute path="/families/:id" component={SingleFamily} />
 					<TrackedRoute path="/families" component={FamilyModule} />
-					
+
 					<TrackedRoute path="/ClassList" component={PlannerList} />
 					<TrackedRoute path="/planner/:class_id/:section_id" component={Planner} />
 
 					<TrackedRoute path="/help" component={Help} />
 					<TrackedRoute path="/certificate-menu" component={CertificateMenu} />
-					
+
 					<TrackedRoute path="/fee-menu" component={FeeMenu} />
 					<Route exact path="/" component={Front} />
 					<Route path="/school-login" component={SchoolLogin} />

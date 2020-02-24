@@ -67,6 +67,8 @@ export default class Camera extends React.Component<P, S> {
 
 	onImageAccept = () => {
 		this.props.onImageAccepted(this.state.image_string)
+		// When the modal is hidden
+		document.body.style.position = ''
 	}
 
 	componentWillUnmount() {

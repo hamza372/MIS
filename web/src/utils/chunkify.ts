@@ -7,7 +7,7 @@
  *  return: [[], [], [], ...]
  */
 
-export const chunkify = (kvArray: any, chunkSize: number = 32) => {
+export const chunkify = (kvArray: any, chunkSize = 32) => {
     if(kvArray.length === 0) {
         return [[]]
     } 

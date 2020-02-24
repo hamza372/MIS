@@ -3,9 +3,9 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "SCHOOL_LIST",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
-				"id" => id
+				"id" => _id
 			}
 		},
 		state
@@ -27,9 +27,9 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "GET_REFERRALS_INFO",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
-				"id" => id
+				"id" => _id
 			}
 		},
 		state
@@ -52,7 +52,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "GET_SCHOOL_INFO",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id
 			}
@@ -123,7 +123,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "EXPENSE_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -162,7 +162,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "SMS_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -201,7 +201,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "DIARY_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -236,7 +236,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "STUDENT_ATTENDANCE_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -286,7 +286,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "TEACHER_ATTENDANCE_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -336,7 +336,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "FEES_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -390,7 +390,7 @@ defmodule Sarkar.ActionHandler.Dashboard do
 	def handle_action(
 		%{
 			"type" => "EXAMS_DATA",
-			"client_id" => client_id,
+			"client_id" => _client_id,
 			"payload" => %{
 				"school_id" => school_id,
 				"start_date" => start_date,
@@ -485,8 +485,8 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		end
 	end
 
-	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value }}, state) do		
-		case Sarkar.Auth.createTracked({username, password, limit, value }) do 
+	def handle_action(%{"type"=> "CREATE_NEW_SCHOOL", "payload" => %{ "username" => username, "password" => password, "limit" => limit, "value" => value, "role" => role }}, state) do		
+		case Sarkar.Auth.createTracked({username, password, limit, value, role }) do 
 			{:ok, resp} ->
 				IO.inspect resp
 				{:reply, succeed(resp), state}
@@ -499,25 +499,54 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		case Sarkar.Auth.update_referrals_info({ school_id, value}) do
 			{:ok, resp} ->
 				{:reply, succeed(resp), state}
-			{:err, resp} ->
+			{:err, _resp} ->
 				{:reply, fail("Updating Failed"), state}
 		end
 	end
 
-	def handle_action(%{"type" => "UPDATE_SCHOOL_INFO",  "payload" => %{"school_id" => school_id, "merges" => merges}}, state) do
-		
+	def handle_action(
+		%{
+			"type" => "UPDATE_SCHOOL_INFO",  
+			"payload" => %{
+				"school_id" => school_id, 
+				"merges" => merges, 
+				"paid" => paid 
+			}
+		},
+		state
+	) do
+
 		case Registry.lookup(Sarkar.SchoolRegistry, school_id) do
 			[{_, _}] -> {:ok}
 			[] -> DynamicSupervisor.start_child(Sarkar.SchoolSupervisor, {Sarkar.School, {school_id}})
 		end
 
-		merges
-			|> Enum.map( fn (merge) -> 
+		merges |> Enum.map( 
+			fn (merge) -> 
 				Sarkar.School.sync_changes(school_id,"backend", merge, :os.system_time(:millisecond))
-			end)
+			end
+		)
 		
-			{:reply, succeed("Successful"), state}
+		if paid do
+			# Update referrals table to add payment received to value
+			case Sarkar.DB.Postgres.query(
+				Sarkar.School.DB,
+				"UPDATE 
+					mischool_referrals 
+				SET 
+					value=jsonb_set(value,'{payment_received}','true') 
+				WHERE id=$1",
+				[school_id]
+			) do
+				{:ok, _resp} ->
+					{:reply, succeed("Successful"), state}
+				{:error, err} ->
+					IO.inspect err
+					{:reply, fail("Auto Update Failed, Please Mark Paid Manually"), state}
+			end
+		end
 
+		{:reply, succeed("Successful"), state }
 	end
 
 	defp fail(message) do

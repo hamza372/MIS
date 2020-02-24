@@ -32,7 +32,8 @@ export const createFacultyMerge = (faculty: MISTeacher) => (dispatch: Function) 
 			value: {
 				name: faculty.Name,
 				password: faculty.Password,
-				type: faculty.Admin ? "admin" : "teacher"
+				type: faculty.Admin ? "admin" : "teacher",
+				hasLogin: faculty.HasLogin
 			}
 		}
 	]))
@@ -104,19 +105,19 @@ export const deleteFaculty = (faculty_id: string) => (dispatch: Function, getSta
 
 type PromotionMap = {
 	[student_id: string]: {
-		current: string;
-		next: string;
-	};
+		current: string
+		next: string
+	}
 }
 
 type Section = {
-	id: string;
-	class_id: string;
-	namespaced_name: string;
-	className: string;
-	classYear: number;
-	name: string;
-	faculty_id?: string;
+	id: string
+	class_id: string
+	namespaced_name: string
+	className: string
+	classYear: number
+	name: string
+	faculty_id?: string
 }
 
 export const promoteStudents = (promotion_map: PromotionMap, section_metadata: Section[]) => (dispatch: Function) => {
@@ -206,11 +207,11 @@ export const SIGN_UP_SUCCEED = "SIGN_UP_SUCCEED"
 export const SIGN_UP_FAILED = "SIGN_UP_FAILED"
 
 type Profile = {
-	name: string;
-	phone: string;
-	city: string;
-	schoolName: string;
-	packageName: "Free-Trial" | "Taleem-1" | "Taleem-2" | "Taleem-3";
+	name: string
+	phone: string
+	city: string
+	schoolName: string
+	packageName: "Free-Trial" | "Taleem-1" | "Taleem-2" | "Taleem-3"
 }
 
 export const createSignUp = (profile: Profile) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
@@ -461,8 +462,8 @@ export const addPayment = (student: MISStudent, payment_id: string, amount: numb
 }
 
 type PaymentAddItem = {
-	student: MISStudent;
-	payment_id: string;
+	student: MISStudent
+	payment_id: string
 } & MISStudentPayment
 
 export const addMultiplePayments = (payments: PaymentAddItem[]) => (dispatch: Function) => {
@@ -575,7 +576,7 @@ export const addSalaryExpense = (id: string, amount: number, label: string, type
 }
 
 interface ExpenseEditItem {
-	[id: string]: { amount: number };
+	[id: string]: { amount: number }
 }
 
 export const editExpense = (expenses: ExpenseEditItem) => (dispatch: Function, getState: () => RootReducerState) => {
@@ -613,8 +614,8 @@ export const deleteExpense = (id: string) => (dispatch: Function) => {
 }
 
 type FeeAddItem = MISStudentFee & {
-	student: MISStudent;
-	fee_id: string;
+	student: MISStudent
+	fee_id: string
 }
 
 export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
@@ -635,8 +636,8 @@ export const addMultipleFees = (fees: FeeAddItem[]) => (dispatch: Function) => {
 }
 
 type SingleFeeItem = MISStudentFee & {
-	student_id: string;
-	fee_id: string;
+	student_id: string
+	fee_id: string
 }
 
 export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
@@ -657,9 +658,9 @@ export const addFee = (student_fee: SingleFeeItem) => (dispatch: Function) => {
 
 type FeeDeleteItem = {
 	[id: string]: {
-		student_id: string;
-		paymentIds: string[];
-	};
+		student_id: string
+		paymentIds: string[]
+	}
 }
 
 export const deleteMultipleFees = (students_fees: FeeDeleteItem) => (dispatch: Function) => {
@@ -693,8 +694,8 @@ export const createTemplateMerges = (templates: RootDBState["sms_templates"]) =>
 
 type Exam = MISExam & {
 	student_marks: {
-		[id: string]: MISStudentExam;
-	};
+		[id: string]: MISStudentExam
+	}
 }
 export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (dispatch: Function) => {
 
@@ -836,7 +837,7 @@ export const issueCertificate = (type: string, student_id: string, faculty_id: s
 	}]))
 }
 
-export const resetTrial = (days: number = 7) => (dispatch: Function) => {
+export const resetTrial = (days = 7) => (dispatch: Function) => {
 	const date = moment().subtract(days, "days")
 
 	dispatch(createMerges([{
@@ -864,11 +865,11 @@ export const trackRoute = (route: string) => (dispatch: Function) => {
 	]))
 }
 
-export interface dateSheetMerges {
+export interface DateSheetMerges {
 	[id: string]: MISDateSheet
 }
 
-export const saveDateSheet = (datesheetMerges: dateSheetMerges, section_id: string) => (dispatch: Function) => {
+export const saveDateSheet = (datesheetMerges: DateSheetMerges, section_id: string) => (dispatch: Function) => {
 
 	const merges = Object.entries(datesheetMerges)
 		.reduce((agg, [id, dateSheet]) => {
