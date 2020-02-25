@@ -7,12 +7,12 @@ type Tutorial = {
 
 export const TutorialLinks: Tutorial = {
 	"DEFAULT": {
-		title: "What is MISchool",
-		link: "https://www.youtube.com/embed/QN6JzExvbw8?controls=0"
-	},
-	"SCHOOL-LOGIN": {
 		title: "Brief Introduction to MISchool",
 		link: "https://www.youtube.com/embed/SHnVsuqp6G8?controls=0"
+	},
+	"SCHOOL-LOGIN": {
+		title: "",
+		link: ""
 	},
 	"LOGIN": {
 		title: "",
