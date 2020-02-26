@@ -165,7 +165,7 @@ const ResultCard = (props: PropsType) => {
 				</tfoot>
 			</table>
 			<div className="result-stats">
-				<div className="row">Grade: &nbsp; <b>{calculateGrade(marks.obtained, marks.obtained, grades)}</b></div>
+				<div className="row">Grade: &nbsp; <b>{calculateGrade(marks.obtained, marks.total, grades)}</b></div>
 				<div className="row">Position: ________</div>
 			</div>
 		</div>
