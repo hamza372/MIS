@@ -549,6 +549,18 @@ defmodule Sarkar.ActionHandler.Dashboard do
 		{:reply, succeed("Successful"), state }
 	end
 
+	def handle_action(%{
+			"type" => "RESET_SCHOOL_PASSWORD",
+			"client_id" => _client_id,
+			"payload" => %{
+				"school_id" => school_id,
+				"password" => new_password
+			}
+		},
+	%{id: id, client_id: client_id } = state)do
+		Sarkar.Auth.updatePassword(school_id, new_password)
+	end
+
 	defp fail(message) do
 		%{type: "failure", payload: message}
 	end
