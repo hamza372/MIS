@@ -41,7 +41,7 @@ export const TeacherList = (props) => {
 		})
 
 	const items = Object.entries(props.teachers)
-			.filter(([,f]) => f.Name && f.id && (f.tags && tag !== "" ? f.tags[tag] : true))
+			.filter(([,f]) => f.Name && f.id && ( tag ? f.tags && f.tags[tag] : true))
 			.sort(([,a], [,b]) => a.Name.localeCompare(b.Name))
 			.map(([id,teacher]) => {
 				return {
