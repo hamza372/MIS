@@ -558,7 +558,12 @@ defmodule Sarkar.ActionHandler.Dashboard do
 			}
 		},
 	%{id: id, client_id: client_id } = state)do
-		Sarkar.Auth.updatePassword(school_id, new_password)
+		case Sarkar.Auth.updatePassword({school_id, new_password}) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:err, err} ->
+				{:reply, fail(err), state}
+		end
 	end
 
 	defp fail(message) do
