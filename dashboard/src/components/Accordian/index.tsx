@@ -7,6 +7,7 @@ import DashboardPage from 'pages/stats';
 import './style.css'
 import Trials from 'pages/trials';
 import AdminActions from 'pages/admin';
+import ResetPassword from 'pages/admin/password'
 import newUser from 'pages/admin/newUser';
 import { connect } from 'react-redux';
 
@@ -24,7 +25,7 @@ interface S {
 
 class Accordian extends React.Component<propTypes, S> {
 
-	constructor(props : propTypes) {
+	constructor(props: propTypes) {
 		super(props)
 
 		this.state = {
@@ -75,15 +76,17 @@ class Accordian extends React.Component<propTypes, S> {
 				{(stats || admin) && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard/school_id/start_date/end_date/" ? "active" : ""}> Stats</Link>}
 				{(trials || admin) && <Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link>}
 				{admin && <Link to={{ pathname: "/admin", search }} className={current === "/admin" ? "active" : ""}>Admin</Link>}
+				{admin && <Link to={{ pathname: "/reset-password", search }} className={current === "/reset-password" ? "active" : ""}>Reset Password</Link>}
 				{(new_user || admin) && <Link to={{ pathname: "/user/new", search }} className={current === "/user/new" ? "active" : ""}>New User</Link>}
 				<Link to="" onClick={() => this.onLogout()}> LOGOUT </Link>
 			</div>}
 
-			<div className={ visible ? "burger-stub" : "burger-stub full-view"} >
+			<div className={visible ? "burger-stub" : "burger-stub full-view"} >
 				<Route exact path="/" component={signUp} />
 				<Route path="/dashboard/:school_id/:start_date/:end_date/" component={DashboardPage} />
 				<Route path="/trials" component={Trials} />
 				<Route exact path="/admin" component={AdminActions} />
+				<Route exact path="/reset-password" component={ResetPassword} />
 				<Route exact path="/user/new" component={newUser} />
 			</div>
 		</div>

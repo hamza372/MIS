@@ -1,16 +1,16 @@
 import Syncr from '@cerp/syncr'
-import { createLoginSucceed } from './core';
-import moment from 'moment';
+import { createLoginSucceed } from './core'
+import moment from 'moment'
 
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
-type permissionPayload = {
-	role: string;
+interface PermissionPayload {
+	role: string
 	permissions: UserPermissions
 }
 
-export const createUser = ( name: string, password: string, permissions: permissionPayload) => ( dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export const createUser = ( name: string, password: string, permissions: PermissionPayload) => ( dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
 	
 	syncr.send({
@@ -23,12 +23,12 @@ export const createUser = ( name: string, password: string, permissions: permiss
 			permissions
 		}
 	})
-	.then((res: any) => {
-		window.alert(res)
-	})
-	.catch(res => {
-		alert("create user failed" + JSON.stringify(res))
-	})
+		.then((res: any) => {
+			window.alert(res)
+		})
+		.catch(res => {
+			alert("create user failed" + JSON.stringify(res))
+		})
 }
 
 export const createLogin = (username: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -44,14 +44,14 @@ export const createLogin = (username: string, password: string) => (dispatch: Di
 			password
 		}
 	})
-	.then((res: { id: string, token: string, permissions: permissionPayload }) => {
-		syncr.verify()
-		dispatch(createLoginSucceed( res.id, res.token, res.permissions.role, res.permissions.permissions))
-	})
-	.catch(res => {
-		console.error(res)
-		alert("login failed" + JSON.stringify(res))
-	})
+		.then((res: { id: string; token: string; permissions: PermissionPayload }) => {
+			syncr.verify()
+			dispatch(createLoginSucceed( res.id, res.token, res.permissions.role, res.permissions.permissions))
+		})
+		.catch(res => {
+			console.error(res)
+			alert("login failed" + JSON.stringify(res))
+		})
 
 }
 
@@ -73,15 +73,15 @@ export const getSchoolList = () => (dispatch: Dispatch, getState: GetState, sync
 			id: state.auth.id
 		}
 	})
-	.then((res: { school_list: string[]}) => {
-		dispatch({
-			type: SCHOOL_LIST,
-			school_list: res.school_list
+		.then((res: { school_list: string[]}) => {
+			dispatch({
+				type: SCHOOL_LIST,
+				school_list: res.school_list
+			})
 		})
-	})
-	.catch(err => {
-		window.alert("Error Fetching List!")
-	})
+		.catch(err => {
+			window.alert("Error Fetching List!")
+		})
 }
 
 export const SCHOOL_INFO = "SCHOOL_INFO"
@@ -102,17 +102,17 @@ export const getSchoolInfo = (school_id: string) => (dispatch: Dispatch, getStat
 			school_id
 		}
 	})
-	.then((res: { trial_info: any, student_info: any, meta: TrialsDataRow["value"] }) => {
-		dispatch({
-			type: SCHOOL_INFO,
-			trial_info: res.trial_info,
-			student_info: res.student_info,
-			meta: res.meta
+		.then((res: { trial_info: any; student_info: any; meta: TrialsDataRow["value"] }) => {
+			dispatch({
+				type: SCHOOL_INFO,
+				trial_info: res.trial_info,
+				student_info: res.student_info,
+				meta: res.meta
+			})
 		})
-	})
-	.catch(err => {
-		window.alert("Error Fetching List!")
-	})
+		.catch(err => {
+			window.alert("Error Fetching List!")
+		})
 }
 
 export const updateSchoolInfo = (school_id: string, student_limit: number, paid: boolean, date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -157,14 +157,14 @@ export const updateSchoolInfo = (school_id: string, student_limit: number, paid:
 			paid
 		}
 	})
-	.then((res: {token: string, sync_state: SyncState }) => {
-		alert(res)
-		getSchoolInfo(school_id)
-	})
-	.catch(res => {
-		console.error(res)
-		alert("School Info Update Fail" + JSON.stringify(res))
-	})
+		.then((res: {token: string; sync_state: SyncState }) => {
+			alert(res)
+			getSchoolInfo(school_id)
+		})
+		.catch(res => {
+			console.error(res)
+			alert("School Info Update Fail" + JSON.stringify(res))
+		})
 }
 
 export const REFERRALS_INFO = "REFERRALS_INFO"
@@ -185,15 +185,15 @@ export const getReferralsInfo = () => ( dispatch: Dispatch, getState: GetState, 
 			id: state.auth.id
 		}
 	})
-	.then((res: { referrals: any}) => {
-		dispatch({
-			type: REFERRALS_INFO,
-			trials: res.referrals
+		.then((res: { referrals: any}) => {
+			dispatch({
+				type: REFERRALS_INFO,
+				trials: res.referrals
+			})
 		})
-	})
-	.catch( (err: any) => {
-		window.alert(`Error Fetching Trial Information!\n${err}`)
-	})
+		.catch( (err: any) => {
+			window.alert(`Error Fetching Trial Information!\n${err}`)
+		})
 }
 
 export const updateReferralInformation = (school_id: string, value: any) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -208,13 +208,13 @@ export const updateReferralInformation = (school_id: string, value: any) => (dis
 			value
 		}
 	})
-	.then((res) => {
-		window.alert(`Update Successful\n${res}`)
-		getReferralsInfo()
-	})
-	.catch(() => {
-		window.alert(`Update Information Failed for school ${school_id}`)
-	})
+		.then((res) => {
+			window.alert(`Update Successful\n${res}`)
+			dispatch(getReferralsInfo())
+		})
+		.catch(() => {
+			window.alert(`Update Information Failed for school ${school_id}`)
+		})
 	
 }
 
@@ -233,12 +233,31 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 			role: state.auth.role
 		}
 	})
-	.then((res)=> {
-		window.alert(`Success\n${JSON.stringify(res)}`)
-	})
-	.catch(res => {
-		console.log("Login Failed", res)
-		alert("School Creation Failed !!" + JSON.stringify(res))
+		.then((res)=> {
+			window.alert(`Success\n${JSON.stringify(res)}`)
+		})
+		.catch(res => {
+			console.log("Login Failed", res)
+			alert("School Creation Failed !!" + JSON.stringify(res))
+		})
+}
+
+export const resetSchoolPassword = (school_id: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	
+	const state = getState()
+
+	syncr.send({
+		type: "RESET_SCHOOL_PASSWORD",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload:{
+			school_id,
+			password
+		}
+	}).then(res => {
+		window.alert(res)
+	}).catch(() => {
+		window.alert(`Unable to reset password for ${school_id}`)
 	})
 }
 
@@ -261,13 +280,13 @@ export const getEndPointResource = ( point: string, school_id: string, start_dat
 			end_date
 		}
 	})
-	.then(res => {
-		dispatch({
-			type: point,
-			payload: res
+		.then(res => {
+			dispatch({
+				type: point,
+				payload: res
+			})
 		})
-	})
-	.catch(err => {
-		console.error(`Error Getting ${point}-Resource`)
-	})
+		.catch(err => {
+			console.error(`Error Getting ${point}-Resource`)
+		})
 }

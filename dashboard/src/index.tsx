@@ -27,7 +27,7 @@ syncr.on('connect', () => store.dispatch(connected()))
 syncr.on('disconnect', () => store.dispatch(disconnected()))
 syncr.on('message', (msg: any) => store.dispatch(msg))
 //@ts-ignore
-const store : Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
+const store: Store<RootReducerState> = createStore(reducer, initial_state, applyMiddleware(thunkMiddleware.withExtraArgument(syncr) as ThunkMiddleware<RootReducerState, AnyAction, Syncr>))
 
 const saveBounce = debounce(() => {
 	const state = store.getState();
@@ -35,7 +35,7 @@ const saveBounce = debounce(() => {
 }, 500);
 
 store.subscribe(saveBounce as () => void)
-ReactDOM.render(<Routes store={store}/>, document.getElementById('root'));
+ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -127,7 +127,6 @@ class IncomeExpenditure extends Component<propTypes, S> {
 		const student_list = Object.values(students)
 		const expense_list = Object.values(expenses)
 
-		const Months = new Set([])
 		const Years = new Set([])
 
 		const s_length = student_list.length
@@ -204,12 +203,11 @@ class IncomeExpenditure extends Component<propTypes, S> {
 					const deduction = this.parseAmount(expense.deduction)
 
 					const income_month = `EXPENSE-${moment(expense.date).format(viewBy)}-${expense.category}`
-					const curr_amount = amount
 
 					collectiveExpense[income_month] = collectiveExpense[income_month] ?
 						{
 							...collectiveExpense[income_month],
-							amount: this.parseAmount(collectiveExpense[income_month].amount) + expense.expense === "SALARY_EXPENSE" ? amount - deduction : amount,
+							amount: this.parseAmount(collectiveExpense[income_month].amount) + (expense.expense === "SALARY_EXPENSE" ? amount - deduction : amount),
 							quantity: collectiveExpense[income_month].quantity + 1
 						} :
 						{
@@ -220,7 +218,7 @@ class IncomeExpenditure extends Component<propTypes, S> {
 							date: expense.date
 						}
 
-					total_expense += curr_amount
+					total_expense += amount
 				}
 
 			}

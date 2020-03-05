@@ -36,7 +36,7 @@ interface S {
 	selected_date: number
 	selected_section_id: string
 	selected_student_phone: string
-	students_filter: string
+	students_filter: "" | "all_students" | "single_student" | "absent_students" | "leave_students"
 	diary: MISDiary["date"]
 }
 
@@ -213,28 +213,32 @@ class Diary extends Component<propTypes, S> {
 	}
 
 	getSelectedSectionStudents = () => {
+
+		const { selected_section_id } = this.state
+
 		return Object.values(this.props.students)
-			.filter(s => s.section_id === this.state.selected_section_id &&
+			.filter(s => s.Name && s.Active && s.section_id && s.section_id === selected_section_id &&
 				(s.tags === undefined || !s.tags["PROSPECTIVE"]) &&
 				s.Phone !== undefined && s.Phone !== "")
 	}
 
 	getFilterCondition = (student: MISStudent) => {
 
-		const curr_attendance = student.attendance[moment(this.state.selected_date).format("YYYY-MM-DD")]
+		const { selected_date, students_filter } = this.state
+		const curr_date = moment(selected_date).format("YYYY-MM-DD")
 
-		switch (this.state.students_filter) {
-			case "absent_students":
-				return curr_attendance ? curr_attendance.status === "ABSENT" : false
-			case "leave_students":
-				return curr_attendance ? curr_attendance.status === "LEAVE" ||
-					curr_attendance.status === "SHORT_LEAVE" ||
-					curr_attendance.status === "SICK_LEAVE" ||
-					curr_attendance.status === "CASUAL_LEAVE"
-					: false
-			default:
-				return true // if student_filter set to 'all_students'
+		const { status } = (student.attendance && student.attendance[curr_date]) || { status: "" }
+
+		if (students_filter === "absent_students") {
+			return status === "ABSENT"
 		}
+
+		if (students_filter === "leave_students") {
+			return status === "LEAVE" || status === "SHORT_LEAVE" || status === "SICK_LEAVE" || status === "CASUAL_LEAVE"
+		}
+
+		// in case of single student, all students 
+		return true
 	}
 
 	getSelectedSectionName = (): string => {
@@ -252,11 +256,11 @@ class Diary extends Component<propTypes, S> {
 		const diary = this.diaryString()
 
 		// in case of single student
-		if (phone && phone !== "") {
+		if (phone) {
 			return [{ number: phone, text: diary }]
 		}
 
-		const selected_students = this.getSelectedSectionStudents().filter(s => this.getFilterCondition(s))
+		const selected_students = this.getSelectedSectionStudents().filter(student => this.getFilterCondition(student))
 
 		const messages = selected_students
 			.reduce((agg, student) => {
