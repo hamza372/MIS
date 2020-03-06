@@ -901,3 +901,22 @@ export const removeSubjectFromDatesheet = (id: string, subj: string, section_id:
 	}]))
 
 }
+
+export const resetFees = (students: MISStudent[]) => (dispatch: Function) => {
+	
+	const merges = students.reduce((agg, curr) => {
+		return [
+			...agg,
+			{
+				path: ["db", "students", curr.id, "fees"],
+				value: {}
+			},
+			{
+				path: ["db", "students", curr.id, "payments"],
+				value: {}
+			}
+		]
+	}, [])
+
+	dispatch(createMerges(merges))
+}
