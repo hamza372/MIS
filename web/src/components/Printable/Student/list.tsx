@@ -11,18 +11,16 @@ type PropsTypes = {
     studentClass: string
 }
 
-type AugmentedStudent = MISStudent & { section: AugmentedSection }
-
 export const StudentPrintableList = (props: PropsTypes) => {
-    const students = props.studentClass !== "" ? 
-        props.students.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0)) : 
+    const students = props.studentClass !== "" ?
+        props.students.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0)) :
         props.students
-    
+
     return (
-        <div className="print-only print-table student-info-list" style={{width: "95%"}}>
+        <div className="print-only print-table student-info-list" style={{ width: "95%" }}>
             <table>
-                <caption>   
-                    <div>{ props.schoolName ? props.schoolName.toUpperCase() : "" } - Students List { props.studentClass }</div>
+                <caption>
+                    <div>{props.schoolName ? props.schoolName.toUpperCase() : ""} - Students List {props.studentClass}</div>
                 </caption>
                 <thead>
                     <tr>
@@ -38,8 +36,8 @@ export const StudentPrintableList = (props: PropsTypes) => {
                     </tr>
                 </thead>
                 <tbody>
-                   {
-                       students.map((student: AugmentedStudent, i) => <tr key={student.id}>
+                    {
+                        students.map((student: AugmentedStudent, i) => <tr key={student.id}>
                             <td className="cell-center">{i + props.chunkSize + 1}</td>
                             <td>{toTitleCase(student.Name)}</td>
                             <td>{toTitleCase(student.ManName)}</td>
@@ -50,7 +48,7 @@ export const StudentPrintableList = (props: PropsTypes) => {
                             <td className="cell-center">{student.RollNumber}</td>
                             <td className="cell-center">{student.Phone}</td>
                         </tr>)
-                   }
+                    }
                 </tbody>
             </table>
         </div>

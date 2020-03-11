@@ -1,22 +1,22 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import qs from 'query-string'
-import { getSectionsFromClasses } from 'utils/getSectionsFromClasses';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Link, RouteProps } from 'react-router-dom'
+import queryString from 'query-string'
 import Former from 'utils/former'
-import toTitleCase from 'utils/toTitleCase'
-import getStudentLimt from 'utils/getStudentLimit';
-import { LayoutWrap } from 'components/Layout';
-import { StudentPrintableList } from 'components/Printable/Student/list';
-import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist';
-import { chunkify } from 'utils/chunkify'
 import Card from 'components/Card'
 import moment from 'moment'
+import toTitleCase from 'utils/toTitleCase'
+import getStudentLimt from 'utils/getStudentLimit'
+import { LayoutWrap } from 'components/Layout'
+import { StudentPrintableList } from 'components/Printable/Student/list'
+import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist'
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import { StudentIcon } from 'assets/icons'
+import { chunkify } from 'utils/chunkify'
 
 import './style.css'
 
-const StudentItem = (student) => {
+const StudentItem = (student: AugmentedStudent) => {
 
 	const section_name = student.section ? student.section.namespaced_name : "No Class"
 	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
@@ -80,7 +80,7 @@ const StudentItem = (student) => {
 	</div>
 }
 
-const toLabel = (student) => {
+const toLabel = (student: AugmentedStudent) => {
 
 	const section_name = student.section ? student.section.namespaced_name : "No Class";
 	const admissionNumber = student.AdmissionNumber ? `a${student.AdmissionNumber}` : "";
@@ -89,10 +89,27 @@ const toLabel = (student) => {
 
 }
 
-export class StudentList extends Component {
+type P = {
+	students: RootDBState["students"]
+	classes: RootDBState["classes"]
+	settings: RootDBState["settings"]
+	schoolLogo?: string
+	forwardTo: string
+	max_limit?: number
+}
 
+type S = {
+	showActiveStudent: boolean
+	showInactiveStudent: boolean
+	printStudentCard: boolean
+	tag: string
+	selected_section_id: string
+}
 
-	constructor(props) {
+export class StudentList extends Component<P, S> {
+
+	former: Former
+	constructor(props: P) {
 		super(props)
 
 		this.state = {
@@ -105,9 +122,9 @@ export class StudentList extends Component {
 		this.former = new Former(this, [])
 	}
 
-	uniqueTags = (students) => {
+	uniqueTags = (students: RootDBState["students"]): Set<string> => {
 
-		const tags = new Set();
+		const tags = new Set<string>()
 
 		Object.values(students)
 			.filter(s => s.id && s.Name)
@@ -116,10 +133,10 @@ export class StudentList extends Component {
 					.forEach(tag => tags.add(tag))
 			})
 
-		return tags;
+		return tags
 	}
 
-	getListFilterCondition = (item) => {
+	getListFilterCondition = (item: MISStudent) => {
 
 		//Active is checked and inactive is unchecked
 		if (this.state.showActiveStudent && !this.state.showInactiveStudent && this.state.tag === "") {
@@ -171,13 +188,13 @@ export class StudentList extends Component {
 
 	}
 
-	getSectionName = (sections) => {
+	getSectionName = (sections: AugmentedSection[]): string => {
 		const section = sections.find(section => section.id === this.state.selected_section_id)
-		const section_name = section ? section.namespaced_name : ""
-		return section_name
+		return section ? section.namespaced_name : ""
 	}
 
 	render() {
+
 		const { classes, students, settings, forwardTo, max_limit } = this.props
 
 		const schoolSession = {
@@ -195,7 +212,7 @@ export class StudentList extends Component {
 				(this.state.selected_section_id !== "" ? s.section_id === this.state.selected_section_id : true)) // hiding the error for now.... need to build reporting mechanism
 			.sort(([, a], [, b]) => a.Name.localeCompare(b.Name))
 			.map(([id, student]) => {
-				const relevant_section = sections.find(section => student.section_id === section.id);
+				const relevant_section = sections.find(section => student.section_id === section.id)
 				return {
 					...student,
 					section: relevant_section,
@@ -240,50 +257,53 @@ export class StudentList extends Component {
 		return <div className="student-list">
 			<div className="title no-print">All Students</div>
 			<div className="no-print">
-				<Card
-					items={items}
-					Component={StudentItem}
-					create={create}
-					createText={createText}
-					toLabel={toLabel}>
+				{
+					//@ts-ignore
+					<Card
+						items={items}
+						Component={StudentItem}
+						create={create}
+						createText={createText}
+						toLabel={toLabel}>
 
-					{forwardTo !== "prospective-student" && <div className="row filter-container no-print">
-						<div className="row checkbox-container">
-							<div className="checkbox">
-								<input type="checkbox" {...this.former.super_handle(["showActiveStudent"])} style={{ height: "20px" }} />
-								Active
+						{forwardTo !== "prospective-student" && <div className="row filter-container no-print">
+							<div className="row checkbox-container">
+								<div className="checkbox">
+									<input type="checkbox" {...this.former.super_handle(["showActiveStudent"])} style={{ height: "20px" }} />
+									Active
 							</div>
-							<div className="checkbox">
-								<input type="checkbox" {...this.former.super_handle(["showInactiveStudent"])} style={{ height: "20px" }} />
-								InActive
+								<div className="checkbox">
+									<input type="checkbox" {...this.former.super_handle(["showInactiveStudent"])} style={{ height: "20px" }} />
+									InActive
 							</div>
-							<div className="checkbox">
-								<input type="checkbox" {...this.former.super_handle(["printStudentCard"])} style={{ height: "20px" }} />
-								ID Cards
+								<div className="checkbox">
+									<input type="checkbox" {...this.former.super_handle(["printStudentCard"])} style={{ height: "20px" }} />
+									ID Cards
 							</div>
-						</div>
-						<div className="row">
-							<select className="list-select" {...this.former.super_handle(["tag"])} style={{ marginLeft: 0 }}>
-								<option value="">Select Tag</option>
-								{
-									[...this.uniqueTags(students).keys()]
-										.filter(tag => tag !== "PROSPECTIVE" && (this.state.showActiveStudent &&
-											!this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true))
-										.map(tag => <option key={tag} value={tag}> {tag} </option>)
-								}
-							</select>
-							<select className="list-select" {...this.former.super_handle(["selected_section_id"])}>
-								<option value="">Select Class</option>
-								{
-									sections
-										.sort((a, b) => a.classYear - b.classYear)
-										.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
-								}
-							</select>
-							<div className="print button" onClick={() => window.print()}>Print</div>
-						</div>
-					</div>}
-				</Card>
+							</div>
+							<div className="row">
+								<select className="list-select" {...this.former.super_handle(["tag"])} style={{ marginLeft: 0 }}>
+									<option value="">Select Tag</option>
+									{
+										[...this.uniqueTags(students).keys()]
+											.filter(tag => tag !== "PROSPECTIVE" && (this.state.showActiveStudent &&
+												!this.state.showInactiveStudent ? tag !== "FINISHED_SCHOOL" : true))
+											.map(tag => <option key={tag} value={tag}> {tag} </option>)
+									}
+								</select>
+								<select className="list-select" {...this.former.super_handle(["selected_section_id"])}>
+									<option value="">Select Class</option>
+									{
+										sections
+											.sort((a, b) => a.classYear - b.classYear)
+											.map(section => <option key={section.id} value={section.id}> {section.namespaced_name} </option>)
+									}
+								</select>
+								<div className="print button" onClick={() => window.print()}>Print</div>
+							</div>
+						</div>}
+					</Card>
+				}
 			</div>
 
 			{	// for first table, Sr. no will start from 1,
@@ -291,14 +311,14 @@ export class StudentList extends Component {
 				// here's "index" representing table number
 				!this.state.printStudentCard ?
 					chunkify(items, chunkSize)
-						.map((chunkItems, index) => <StudentPrintableList students={chunkItems} key={index}
+						.map((chunkItems: AugmentedStudent[], index: number) => <StudentPrintableList students={chunkItems} key={index}
 							chunkSize={index === 0 ? 0 : chunkSize * index}
 							schoolName={settings.schoolName}
 							studentClass={section_name} />)
 					:
 					// print 10 students ID cards per page
 					chunkify(items, 8)
-						.map((chunkItems, index) => <StudenPrintableIDCardList students={chunkItems} key={index}
+						.map((chunkItems: AugmentedStudent[], index: number) => <StudenPrintableIDCardList students={chunkItems} key={index}
 							schoolName={settings.schoolName}
 							schoolLogo={this.props.schoolLogo}
 							studentClass={section_name}
@@ -309,11 +329,12 @@ export class StudentList extends Component {
 	}
 }
 
-export default connect((state, { location, forwardTo = undefined }) => ({
+
+export default connect((state: RootReducerState, { location, forwardTo = undefined }: { location: RouteProps["location"]; forwardTo: string | undefined }) => ({
 	students: state.db.students,
 	classes: state.db.classes,
 	settings: state.db.settings,
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
-	forwardTo: forwardTo || qs.parse(location.search, { ignoreQueryPrefix: true }).forwardTo || "profile",
+	forwardTo: forwardTo || queryString.parse(location.search).forwardTo || "profile",
 	max_limit: state.db.max_limit || -1
 }))(LayoutWrap(StudentList));

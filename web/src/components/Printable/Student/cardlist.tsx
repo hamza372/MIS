@@ -5,7 +5,7 @@ import "./../print.css"
 import "./style.css"
 
 type PropsTypes = {
-	students: AugmentedStudents[]
+	students: AugmentedStudent[]
 	schoolName: string
 	schoolLogo: string
 	schoolSession: {
@@ -14,8 +14,6 @@ type PropsTypes = {
 	}
 	studentClass: string
 }
-
-type AugmentedStudents = MISStudent & { section: AugmentedSection }
 
 export const StudenPrintableIDCardList = (props: PropsTypes) => {
 
