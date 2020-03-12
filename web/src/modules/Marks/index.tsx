@@ -276,6 +276,7 @@ class Reports extends Component<propsType, S> {
 					</div>
 					<div className="row create-exam">
 						<div className="button blue create-exam" onClick={() => this.createNewExam()}>Create New Exam</div>
+						<Link className="button blue create-exam" to='/reports/bulk-exams'>Create Bulk Exam</Link>
 					</div>
 				</div>
 				{

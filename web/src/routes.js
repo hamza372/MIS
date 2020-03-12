@@ -42,6 +42,7 @@ import printPreview from 'modules/Student/Single/Fees/printPreview'
 import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
 import ClassSettings from 'modules/Settings/ClassSettings/Index'
+import BulkExam from 'modules/Marks/BulkExam'
 
 export default class Routes extends React.Component {
 
@@ -91,6 +92,7 @@ export default class Routes extends React.Component {
 
 					<TrackedRoute path="/sms" component={SMS} />
 
+					<TrackedRoute exact path="/reports/bulk-exams" component={BulkExam} />
 					<TrackedRoute path="/reports/:class_id/:section_id/new" component={SingleExam} />
 					<TrackedRoute path="/reports/:class_id/:section_id/exam/:exam_id" component={SingleExam} />
 					<TrackedRoute path="/reports/:class_id/:section_id" component={ExamList} />

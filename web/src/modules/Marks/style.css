@@ -64,3 +64,56 @@ legend {
     margin-top: 15px;
     justify-content: flex-end;
  }
+ .marks-table {
+   width: 100%;
+   display: table;
+   border-spacing: 0;
+ }
+
+ .bulk-exams .section .row.exam-button .button {
+   padding: 10px 15px;
+ }
+
+
+table {
+   white-space: nowrap;
+   table-layout: auto;
+   border-collapse: collapse;
+}
+
+table tr {
+   padding: 20px;
+   line-height: 0.85;
+   border-bottom: 1px solid rgba(0,0,0,0.3);
+}
+table thead {
+   background-color: #74aced;
+   color: white;
+}
+
+table thead tr {
+   border: none;
+}
+
+table th,
+table td {
+   padding: 5px;
+   text-align: left;
+}
+table th {
+   font-size: 0.85rem;
+   text-transform: uppercase;
+   text-align: center;
+   padding: 8px;
+   margin-bottom: 10px;
+}
+
+table tr td input {
+   width: 90%;
+   margin: auto;
+   padding-left: 10px;
+}
+
+table tr td button {
+   margin: auto;
+}
