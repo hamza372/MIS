@@ -21,10 +21,14 @@
 	align-items: center;
 }
 
-.filter-container .checkbox-container .checkbox{
+.filter-container .checkbox-container .checkbox {
 	display: flex;
 	align-items: center;
 	margin-right: 4px;
+}
+
+.filter-container .checkbox-container .checkbox input {
+	height: 20px;
 }
 
 .list-select {
