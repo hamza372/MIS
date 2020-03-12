@@ -31,9 +31,12 @@ type S = {
 	printStudentCard: boolean
 	tag: string
 	section_id: string
+	previous_count: number
+	next_count: number
 }
 
-const CHUNK_SIZE = 29
+const CHUNK_SIZE_FOR_LIST = 29
+const CHUNK_SIZE_FOR_CARDS = 8
 
 export class StudentList extends Component<P, S> {
 
@@ -46,7 +49,9 @@ export class StudentList extends Component<P, S> {
 			showInactiveStudent: false,
 			printStudentCard: false,
 			tag: "",
-			section_id: ""
+			section_id: "",
+			previous_count: 0,
+			next_count: 32
 		}
 		this.former = new Former(this, [])
 	}
@@ -127,6 +132,31 @@ export class StudentList extends Component<P, S> {
 		return section ? section.namespaced_name : ""
 	}
 
+	onPreviousButton = (items: MISStudent[]) => {
+
+		let { next_count, previous_count } = this.state
+
+		if (next_count > 32) {
+
+			this.setState({ next_count: previous_count }, () => {
+				this.setState({ previous_count: previous_count - 32 })
+			})
+		}
+
+	}
+
+
+	onNextButton = (items: MISStudent[]) => {
+
+		const { next_count } = this.state
+
+		if (next_count <= items.length) {
+			this.setState({ previous_count: next_count }, () => {
+				this.setState({ next_count: next_count + 32 })
+			})
+		}
+	}
+
 	render() {
 
 		const { classes, students, settings, forwardTo, max_limit } = this.props
@@ -188,13 +218,15 @@ export class StudentList extends Component<P, S> {
 			createText = "Manage Fees"
 		}
 
+		const { previous_count, next_count } = this.state
+
 		return <div className="student-list">
 			<div className="title no-print">All Students</div>
 			<div className="no-print">
 				{
 					//@ts-ignore
 					<Card
-						items={items}
+						items={items.slice(previous_count, next_count)}
 						Component={StudentItem}
 						create={create}
 						createText={createText}
@@ -240,18 +272,23 @@ export class StudentList extends Component<P, S> {
 				}
 			</div>
 
+			<div className="row" style={{ width: "90%", justifyContent: "space-between" }}>
+				<div className="button blue" onClick={() => this.onPreviousButton(items)}>←</div>
+				<div className="button blue" onClick={() => this.onNextButton(items)}>→</div>
+			</div>
+
 			{	// for first table, Sr. no will start from 1,
 				// for other tables, Sr. no will start from chunkSize * index
 				// here's "index" representing table number
 				!printStudentCard ?
-					chunkify(items, CHUNK_SIZE)
+					chunkify(items, CHUNK_SIZE_FOR_LIST)
 						.map((chunkItems: AugmentedStudent[], index: number) => <StudentPrintableList students={chunkItems} key={index}
-							chunkSize={index === 0 ? 0 : CHUNK_SIZE * index}
+							chunkSize={index === 0 ? 0 : CHUNK_SIZE_FOR_LIST * index}
 							schoolName={settings.schoolName}
 							studentClass={section_name} />)
 					:
-					// print 10 students ID cards per page
-					chunkify(items, 8)
+					// print 8 students ID cards per page
+					chunkify(items, CHUNK_SIZE_FOR_CARDS)
 						.map((chunkItems: AugmentedStudent[], index: number) => <StudenPrintableIDCardList students={chunkItems} key={index}
 							schoolName={settings.schoolName}
 							schoolLogo={this.props.schoolLogo}
