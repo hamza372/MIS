@@ -151,6 +151,22 @@ interface MISSettings {
 		defaultFee: {
 			[class_id: string]: MISStudentFee
 		}
+		feeVoucher?: {
+			dueDays: string
+			feeFine: string
+			notice: string
+			bankInfo: {
+				name: string
+				accountTitle: string
+				accountNo: string
+			}
+			options?: {
+				showDueDays: boolean
+				showFine: boolean
+				showNotice: boolean
+				showBankInfo: boolean
+			}
+		}
 	}
 }
 
@@ -238,8 +254,11 @@ interface MISFamilyInfo {
 	ManName: string
 	Phone: string
 	ManCNIC: string
-	Address: string
+	Address?: string
+	children?: AugmentedSibling[]
 }
+
+type AugmentedSibling = MISStudent & {section?: AugmentedSection}
 
 type AugmentedMISFamily = MISFamilyInfo & { ID: string }
 

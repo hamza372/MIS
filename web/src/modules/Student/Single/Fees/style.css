@@ -20,15 +20,15 @@
 	background-color: white;
 }
 
-	.payment-history .table.row {
-		border-bottom: 1px solid #222;
-		line-height: 2rem;
-	}
+.payment-history .table.row {
+	border-bottom: 1px solid #222;
+	line-height: 2rem;
+}
 
-	.payment-history .table.row.last {
-		border-top: 1px solid #222;
-		border-bottom: none;
-	}
+.payment-history .table.row.last {
+	border-top: 1px solid #222;
+	border-bottom: none;
+}
 
 .student-fees .filter select {
 	margin: 5px;
@@ -38,61 +38,101 @@
 	display: flex;
 	flex-direction: row;
 }
+
+.student-fees .print-wrap>* {
+	display: none;
+	width: 100%;
+}
+
+.student-fees .print-wrap>*:first-child {
+	display: block;
+}
+
+@media print {
+
+	.payment-history.section.print-page {
+		margin-top: 15mm;
+		width: 285px;
+		height: 600px;
+		border: 1px solid black;
+		border-radius: 0px;
+		font-family: Georgia, 'Times New Roman', Times, serif;
+	}
 	.student-fees .print-wrap>* {
-		display: none;
+		display: block;
 		width: 100%;
 	}
-
-	.student-fees .print-wrap>*:first-child {
-		display: block;
+	.payment-history.section .row.info * {
+		font-size: 0.75rem;
 	}
-
-	@media print {
-		.student-fees .print-wrap>* {
-			display: block;
-			width: 100%;
-		}
-		.payment-history.section .row.info * {
-			font-weight: normal;
-			font-size: 0.7rem;
-		}
-		.payment-history {
-			margin: 10px 5px;
-		}
-		.payment-history .divider {
-			margin: 10px
-		}
-		.voucher.table.row * {
-			font-weight: normal;
-			line-height: 1.5rem;
-			font-size: 0.8rem;
-			width: 100%;
-		}
-		.voucher.table.row .date {
-			text-align: left;
-			max-width: 20%;
-		}
-		.voucher.table.row .amount {
-			text-align: right;
-			max-width: 20%;
-		}
-		.voucher.table.row .label {
-			text-align: center;
-			max-width: 60%;
-			word-wrap: normal;
-		}
-
-		.voucher-signature div {
-			font-size: 0.5rem;
-			margin-top: 4px;
-			border-top: 1px solid;
-		}
-	}
-	.pending-amount{
-		color: #FC6171;
+	.payment-history.section .row.info label {
 		font-weight: bold;
 	}
-	.advance-amount{
-		color: #5ECDB9;
-		font-weight: bold;
+	.payment-history {
+		margin: 10px 10px;
 	}
+	.payment-history .print-table table th {
+		font-size: 0.75rem;
+		color: black;
+		background-color: white;
+	}
+	.payment-history .print-table table {
+		margin-bottom: 0px;
+	}
+	.payment-history .print-table table tbody {
+		font-size: 0.75rem !important;
+	}
+	.payment-history .fee-notice, .bank-info {
+		width: 100%;
+		margin-top: 10px;
+		font-size: 0.75rem;
+		height: 23mm;
+	}
+	.payment-history .fee-notice {
+		height: 25mm;
+	}
+	.payment-history fieldset {
+		border: 1px solid black;
+		border-radius: 0;
+		margin: 0;
+	}
+	.payment-history .voucher-signature div {
+		font-size: 0.6rem;
+		margin-top: 4px;
+		border-top: 1px solid;
+	}
+}
+
+.pending-amount{
+	color: #FC6171;
+	font-weight: bold;
+}
+.advance-amount{
+	color: #5ECDB9;
+	font-weight: bold;
+}
+.payment-history fieldset {
+	border: 1px solid black;
+	margin: 0;
+}
+.payment-history .voucher-heading {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	font-size: 1rem;
+}
+.payment-history .print-table table {
+	border: 1px solid black;
+	margin-bottom: 4px;
+}
+.payment-history .print-table table thead {
+	font-size: 1rem;
+	background-color: #74aced;
+	color: white;
+}
+.payment-history .print-table table tbody {
+	font-size: 1rem;
+}
+
+.payment-history fieldset {
+	border-radius: 0;
+}

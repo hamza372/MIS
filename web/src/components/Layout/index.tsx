@@ -70,8 +70,13 @@ export const PrintHeader = ({ settings, logo }: PropsType) => <div className="pr
 	</div>
 </div>
 
-export const PrintHeaderSmall = ({ settings }: PropsType) => <div className="print-only small-school-header">
-	<div className="small-title">{settings.schoolName ? settings.schoolName : ""}</div>
+export const PrintHeaderSmall = ({ settings, logo }: PropsType) => <div className="print-only small-school-header">
+	<div className="row" style={{ alignItems: "center" }}>
+		<div style={{ width: "10%" }}>
+			<img src={logo} alt="logo" width={32} height={32} />
+		</div>
+		<div style={{ width: "90%" }} className="small-title">{settings.schoolName ? settings.schoolName : ""}</div>
+	</div>
 	<div className="small-address">{settings.schoolAddress}</div>
 	<div className="small-phone-number"> Tel:{settings.schoolPhoneNumber} </div>
 </div>

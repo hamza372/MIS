@@ -15,8 +15,8 @@ import { openDB } from 'idb'
 import './style.css'
 interface P {
 	settings: RootDBState["settings"]
-	students: RootDBState["students"] 
-	user: RootDBState["faculty"]["MISTeacher"] 
+	students: RootDBState["students"]
+	user: RootDBState["faculty"]["MISTeacher"]
 	sms_templates: RootDBState["sms_templates"]
 	schoolLogo: string
 	max_limit: number
@@ -50,9 +50,9 @@ interface NewGrade {
 type propsType = RouteComponentProps & P
 
 export const defaultPermissions = {
-	fee:  { teacher: true },
+	fee: { teacher: true },
 	dailyStats: { teacher: true },
-	setupPage: {teacher: true },
+	setupPage: { teacher: true },
 	expense: { teacher: true },
 	prospective: { teacher: true },
 	family: { teacher: true }
@@ -95,33 +95,52 @@ export const defaultExams = {
 	}
 }
 
-const defaultSettings = {
-	shareData: true,
-	schoolName: "",
-	schoolAddress: "",
-	schoolPhoneNumber: "",
-	schoolCode: "",
-	schoolSession: {
-		start_date: moment().startOf("year").unix() * 1000,
-		end_date: moment().add(1, "year").startOf("year").unix() * 1000
-	},
-	vouchersPerPage: "1",
-	sendSMSOption: "SIM", // API
-	permissions: defaultPermissions,
-	devices: {},
-	exams: defaultExams,
-	classes: {
-		defaultFee: {}
-	} 
+function getDefaultSettings(): RootDBState["settings"] {
+	return {
+		shareData: true,
+		schoolName: "",
+		schoolAddress: "",
+		schoolPhoneNumber: "",
+		schoolCode: "",
+		schoolSession: {
+			start_date: moment().startOf("year").unix() * 1000,
+			end_date: moment().add(1, "year").startOf("year").unix() * 1000
+		},
+		vouchersPerPage: "1",
+		sendSMSOption: "SIM", // API
+		permissions: defaultPermissions,
+		devices: {},
+		exams: defaultExams,
+		classes: {
+			defaultFee: {},
+			feeVoucher: {
+				dueDays: "",
+				feeFine: "",
+				notice: "",
+				bankInfo: {
+					name: "",
+					accountTitle: "",
+					accountNo: ""
+				},
+				options: {
+					showDueDays: false,
+					showFine: false,
+					showNotice: false,
+					showBankInfo: false
+				}
+			}
+		}
+	}
 }
-class Settings extends Component <propsType, S>{
-	
+class Settings extends Component<propsType, S>{
+
 	former: Former
-	constructor(props: propsType){ 
+	constructor(props: propsType) {
 		super(props);
 
 		const aggGrades = this.reconstructGradesObject()
 
+		const defaultSettings = getDefaultSettings()
 		const settings = {
 			...(props.settings || defaultSettings),
 			schoolSession: props.settings ? (props.settings.schoolSession || defaultSettings.schoolSession) : defaultSettings.schoolSession,
@@ -136,7 +155,7 @@ class Settings extends Component <propsType, S>{
 					...aggGrades
 				}
 			},
-			classes: props.settings ? (props.settings.classes || defaultSettings.classes) : defaultSettings.classes
+			classes: this.classFeeSettings()
 		} as RootDBState["settings"]
 
 		this.state = {
@@ -150,7 +169,7 @@ class Settings extends Component <propsType, S>{
 				good: true,
 				text: "Saved!"
 			},
-			client_id : localStorage.getItem("client_id"),
+			client_id: localStorage.getItem("client_id"),
 			schoolLogo: props.schoolLogo,
 			addGrade: false,
 			newGrade: {
@@ -164,17 +183,17 @@ class Settings extends Component <propsType, S>{
 		this.former = new Former(this, [])
 	}
 
-	reconstructGradesObject = () =>  {
-		
-		if(this.props.settings && this.props.settings.exams) {
-	
+	reconstructGradesObject = () => {
+
+		if (this.props.settings && this.props.settings.exams) {
+
 			const grades_values = Object.values(this.props.settings.exams.grades)
-			
+
 			// check if new structure already exists
-			if (typeof(grades_values[0]) === "object") {
+			if (typeof (grades_values[0]) === "object") {
 				return this.props.settings.exams.grades
 			}
-			
+
 			// else construct new structure using previous information
 			const grades = Object.entries(this.props.settings.exams.grades)
 				.reduce((agg, [grade, val]) => {
@@ -186,13 +205,31 @@ class Settings extends Component <propsType, S>{
 						}
 					}
 				}, {})
-			
+
 			// return new grades structure
 			return grades
 		}
-		
+
 		// return default grades in case of settings don't have exams
 		return defaultExams.grades
+	}
+
+	classFeeSettings = (): RootDBState["settings"]["classes"] => {
+
+		const { settings } = this.props
+
+		const defaultSettings = getDefaultSettings()
+
+		return {
+			defaultFee: {
+				...(settings ? (settings.classes || defaultSettings.classes).defaultFee : defaultSettings.classes.defaultFee)
+			},
+			feeVoucher: {
+				...(settings ? (settings.classes && settings.classes.feeVoucher ?
+					settings.classes.feeVoucher : defaultSettings.classes.feeVoucher) :
+					defaultSettings.classes.feeVoucher)
+			}
+		}
 	}
 
 	changeTeacherPermissions = () => {
@@ -200,42 +237,42 @@ class Settings extends Component <propsType, S>{
 		return <div className="table">
 			<div className="row">
 				<label> Allow teacher to view Fee Information ? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "fee","teacher"])}>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
+				<select {...this.former.super_handle(["settings", "permissions", "fee", "teacher"])}>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Daily Statistics ? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "dailyStats","teacher"])}>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
+				<select {...this.former.super_handle(["settings", "permissions", "dailyStats", "teacher"])}>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Setup Page ? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "setupPage","teacher"])}>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
-						</select>
+				<select {...this.former.super_handle(["settings", "permissions", "setupPage", "teacher"])}>
+					<option value="true">Yes</option>
+					<option value="false">No</option>
+				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Expense Information? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "expense","teacher"])}>
+				<select {...this.former.super_handle(["settings", "permissions", "expense", "teacher"])}>
 					<option value="true">Yes</option>
 					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Family Information? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "family","teacher"])}>
+				<select {...this.former.super_handle(["settings", "permissions", "family", "teacher"])}>
 					<option value="true">Yes</option>
 					<option value="false">No</option>
 				</select>
 			</div>
 			<div className="row">
 				<label> Allow teacher to view Prospective Information? </label>
-				<select {...this.former.super_handle(["settings", "permissions", "prospective","teacher"])}>
+				<select {...this.former.super_handle(["settings", "permissions", "prospective", "teacher"])}>
 					<option value="true">Yes</option>
 					<option value="false">No</option>
 				</select>
@@ -287,12 +324,12 @@ class Settings extends Component <propsType, S>{
 			{
 				Object.entries(exams.grades)
 					.map(([grade, curr]) => {
-						return <div className="row">
+						return <div key={grade} className="row">
 							<label> {grade} </label>
 							<div className="editable-row">
-								<input type="text" {...this.former.super_handle(["settings", "exams", "grades", grade, "remarks"])}/>
-								<input type="number" {...this.former.super_handle(["settings", "exams", "grades", grade, "percent"])}/>
-								<div className="button red" onClick={()=> this.removeGrade(grade)}>x</div>
+								<input type="text" {...this.former.super_handle(["settings", "exams", "grades", grade, "remarks"])} />
+								<input type="number" {...this.former.super_handle(["settings", "exams", "grades", grade, "percent"])} />
+								<div className="button red" onClick={() => this.removeGrade(grade)}>x</div>
 							</div>
 						</div>
 					})
@@ -303,20 +340,20 @@ class Settings extends Component <propsType, S>{
 			</div>}
 
 			{
-				this.state.addGrade && 
+				this.state.addGrade &&
 				<div className="add-grade section">
 					<div className="divider">New Grade</div>
 					<div className="row">
 						<label>Grade</label>
-						<input type="text" {...this.former.super_handle(["newGrade","grade"])}/>
+						<input type="text" {...this.former.super_handle(["newGrade", "grade"])} />
 					</div>
 					<div className="row">
 						<label>Percent</label>
-						<input type="number" {...this.former.super_handle(["newGrade", "percent"])}/>
+						<input type="number" {...this.former.super_handle(["newGrade", "percent"])} />
 					</div>
 					<div className="row">
 						<label>Remarks</label>
-						<input type="text" {...this.former.super_handle(["newGrade", "remarks"])}/>
+						<input type="text" {...this.former.super_handle(["newGrade", "remarks"])} />
 					</div>
 					<div className="row">
 						<div className="button green" onClick={() => this.addGrade()}>+</div>
@@ -330,9 +367,9 @@ class Settings extends Component <propsType, S>{
 
 		const newGrade = this.state.newGrade
 
-		if( !newGrade.grade || !newGrade.percent){
+		if (!newGrade.grade || !newGrade.percent) {
 			this.setState({
-				banner:{
+				banner: {
 					active: true,
 					good: false,
 					text: "Please Fill all fields !"
@@ -349,11 +386,11 @@ class Settings extends Component <propsType, S>{
 
 			return
 		}
-		
+
 		this.setState({
 			settings: {
 				...this.state.settings,
-				exams:{
+				exams: {
 					...this.state.settings.exams,
 					grades: {
 						...this.state.settings.exams.grades,
@@ -379,7 +416,7 @@ class Settings extends Component <propsType, S>{
 		const { [x]: removed, ...rest } = grades
 
 		this.setState({
-			settings:{
+			settings: {
 				...this.props.settings,
 				exams: {
 					...this.state.settings.exams,
@@ -390,14 +427,14 @@ class Settings extends Component <propsType, S>{
 
 	}
 
-	onSave = () => {		
+	onSave = () => {
 		this.props.saveSettings(this.state.settings);
 		this.props.saveTemplates(this.state.templates);
-		if(this.state.schoolLogo === "" || this.state.schoolLogo !== this.props.schoolLogo){
+		if (this.state.schoolLogo === "" || this.state.schoolLogo !== this.props.schoolLogo) {
 			this.props.addLogo(this.state.schoolLogo)
 		}
-		this.setState({templateMenu: false});
-		
+		this.setState({ templateMenu: false });
+
 		this.setState({
 			banner: {
 				active: true,
@@ -430,7 +467,7 @@ class Settings extends Component <propsType, S>{
 
 		const file = e.target.files[0];
 		const reader = new FileReader();
-		
+
 		reader.onloadend = () => {
 			this.setState({
 				schoolLogo: reader.result as string
@@ -439,14 +476,14 @@ class Settings extends Component <propsType, S>{
 		reader.readAsDataURL(file);
 	}
 
-	componentWillReceiveProps(nextProps: propsType) {
+	UNSAFE_componentWillReceiveProps(nextProps: propsType) {
 		console.log(nextProps)
 
 		const settings = {
-			...(nextProps.settings || defaultSettings),
+			...(nextProps.settings || getDefaultSettings()),
 			permissions: {
 				...defaultPermissions,
-				...(nextProps.settings || defaultSettings).permissions
+				...(nextProps.settings || getDefaultSettings()).permissions
 			},
 			devices: (nextProps.settings ? (nextProps.settings.devices || {}) : {})
 		} as RootDBState["settings"]
@@ -456,7 +493,7 @@ class Settings extends Component <propsType, S>{
 		})
 	}
 	onExport = async () => {
-		if(!window.confirm("Are you sure, you want to export data to your device?")){
+		if (!window.confirm("Are you sure, you want to export data to your device?")) {
 			return
 		}
 		try {
@@ -466,15 +503,15 @@ class Settings extends Component <propsType, S>{
 				}
 			})
 
-			const IdbData = await db.get('root-state','db')
-			
+			const IdbData = await db.get('root-state', 'db')
+
 			if (IdbData) {
 				console.log("Exporting From idb")
-				
+
 				const a = document.createElement("a")
 				const client_id = localStorage.getItem("client_id")
-	
-				a.href = URL.createObjectURL(new Blob([IdbData], {type: "text/json"}))
+
+				a.href = URL.createObjectURL(new Blob([IdbData], { type: "text/json" }))
 				a.download = `mischool_export_idb_${client_id}_${moment().format("DD-MM-YYYY")}.json`
 				a.click()
 			}
@@ -485,8 +522,8 @@ class Settings extends Component <propsType, S>{
 					console.log("Exporting From ls")
 					const a = document.createElement("a")
 					const client_id = localStorage.getItem("client_id")
-					
-					a.href = URL.createObjectURL(new Blob([db], {type: "text/json"}))
+
+					a.href = URL.createObjectURL(new Blob([db], { type: "text/json" }))
 					a.download = `mischool_export_${client_id}_${moment().format("DD-MM-YYYY")}.json`
 					a.click()
 				}
@@ -501,34 +538,34 @@ class Settings extends Component <propsType, S>{
 	render() {
 
 		const studentLength = Object.values(this.props.students)
-        .filter(x => x.Name &&( x.Active && ( x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"] ) : true )) 
-		).length
-		
+			.filter(x => x.Name && (x.Active && (x.tags ? (!x.tags["PROSPECTIVE"] && !x.tags["FINISHED_SCHOOL"]) : true))
+			).length
+
 		//@ts-ignore
 		const mis_version = window.version || "no version set"
-	
+
 		return <Layout history={this.props.history}>
 			<div className="settings" style={{ width: "100%" }}>
-			{ this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false }
+				{this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
 
 				<div className="title">Settings</div>
 
-				<div className="form" style={{width: "90%"}}>
+				<div className="form" style={{ width: "90%" }}>
 
 					<div className="row">
-						<img className="school logo" src={this.state.schoolLogo} alt={"No Logo Found"}/> 
+						<img className="school logo" src={this.state.schoolLogo} alt={"No Logo Found"} />
 					</div>
 
 					<div className="row">
 						<label>School Logo</label>
 						{this.state.schoolLogo === "" ?
-						<div className="badge-container">
-							<div className="fileContainer button green" style={{width:"90%"}}>
-								<div>Select A Logo</div>
-								<input type="file" onChange={this.logoHandler}/>
+							<div className="badge-container">
+								<div className="fileContainer button green" style={{ width: "90%" }}>
+									<div>Select A Logo</div>
+									<input type="file" onChange={this.logoHandler} />
+								</div>
 							</div>
-						</div>
-						: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
+							: <div className="button red" onClick={this.onLogoRemove}> Remove </div>}
 
 					</div>
 					<div className="row">
@@ -554,8 +591,8 @@ class Settings extends Component <propsType, S>{
 					<div className="row">
 						<label>School Session Start Period</label>
 						<input type="date" {...this.former.super_handle(["settings", "schoolSession", "start_date"])}
-									value={moment(this.state.settings.schoolSession.start_date).format("YYYY-MM-DD")}
-									placeholder="session start" />
+							value={moment(this.state.settings.schoolSession.start_date).format("YYYY-MM-DD")}
+							placeholder="session start" />
 					</div>
 					<div className="row">
 						<label>School Session End Period</label>
@@ -591,7 +628,7 @@ class Settings extends Component <propsType, S>{
 
 					<div className="row">
 						<label>Device Name</label>
-						<input type="text" {...this.former.super_handle(["settings","devices", this.state.client_id ])} placeholder="Device Name" />
+						<input type="text" {...this.former.super_handle(["settings", "devices", this.state.client_id])} placeholder="Device Name" />
 					</div>
 
 					<div className="row">
@@ -601,16 +638,16 @@ class Settings extends Component <propsType, S>{
 
 					<div className="row">
 						<label>Client Id</label>
-						<label>{ this.state.client_id }</label>
+						<label>{this.state.client_id}</label>
 					</div>
 
 					<div className="row">
 						<label>Student Limit</label>
-						<label>{ this.props.max_limit >= 0 ? `${studentLength} out of ${this.props.max_limit}` : "Unlimited"}</label>
+						<label>{this.props.max_limit >= 0 ? `${studentLength} out of ${this.props.max_limit}` : "Unlimited"}</label>
 					</div>
 
 
-					<div className="button grey" onClick={() => this.setState({templateMenu : !this.state.templateMenu })}>
+					<div className="button grey" onClick={() => this.setState({ templateMenu: !this.state.templateMenu })}>
 						Change SMS Templates
 					</div>
 					{
@@ -618,7 +655,7 @@ class Settings extends Component <propsType, S>{
 					}
 					{
 						this.props.user.Admin ?
-							<div className="button grey" onClick={() => this.setState({permissionMenu : !this.state.permissionMenu })}>
+							<div className="button grey" onClick={() => this.setState({ permissionMenu: !this.state.permissionMenu })}>
 								Change Teacher Permissions
 							</div>
 							: false
@@ -628,44 +665,44 @@ class Settings extends Component <propsType, S>{
 					}
 					{
 						this.props.user.Admin ?
-							<div className="button grey" onClick={()=> this.setState({ gradeMenu: !this.state.gradeMenu})}>
+							<div className="button grey" onClick={() => this.setState({ gradeMenu: !this.state.gradeMenu })}>
 								Grade Settings
 							</div>
-						: false
+							: false
 					}
 					{
 						this.state.gradeMenu && this.gradeMenu()
 					}
 
-					<Link className="button grey" to="settings/class">Class Settings</Link>
+					<Link className="button grey" to="settings/class">Fee Settings</Link>
 					<Link className="button grey" to="/settings/promote">Promote Students</Link>
 					<Link className="button grey" to="/settings/historicalFee">Add Historical Fees</Link>
 					<Link className="button grey" to="/settings/excel-import/students">Import From Excel</Link>
 					{
 						this.props.user.Admin ?
-							<div className="button grey" onClick={() => this.onExport() }>
+							<div className="button grey" onClick={() => this.onExport()}>
 								Export to File
 							</div>
 							: false
 					}
 
-					</div>
-					<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
 				</div>
+				<div className="button save" onClick={this.onSave} style={{ marginTop: "15px", marginRight: "5%", alignSelf: "flex-end" }}>Save</div>
+			</div>
 		</Layout>
 	}
 }
 
-export default connect((state: RootReducerState) => ({ 
-		settings: state.db.settings,
-		students: state.db.students, 
-		user: state.db.faculty[state.auth.faculty_id], 
-		sms_templates: state.db.sms_templates,
-		schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
-		max_limit: state.db.max_limit || -1
-	}), 
+export default connect((state: RootReducerState) => ({
+	settings: state.db.settings,
+	students: state.db.students,
+	user: state.db.faculty[state.auth.faculty_id],
+	sms_templates: state.db.sms_templates,
+	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
+	max_limit: state.db.max_limit || -1
+}),
 	(dispatch: Function) => ({
 		saveTemplates: (templates: RootDBState["sms_templates"]) => dispatch(createTemplateMerges(templates)),
 		saveSettings: (settings: RootDBState["settings"]) => dispatch(mergeSettings(settings)),
 		addLogo: (logo_string: string) => dispatch(addLogo(logo_string))
-}))(Settings);
+	}))(Settings);
