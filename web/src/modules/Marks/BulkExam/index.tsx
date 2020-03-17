@@ -5,24 +5,47 @@ import Former from 'utils/former'
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import Layout from 'components/Layout'
 import { ExamTitles } from 'constants/exam'
-
-import './style.css'
+import { v4 } from 'node-uuid'
 import toTitleCase from 'utils/toTitleCase'
 import moment from 'moment'
 import months from 'constants/months'
 import Modal from 'components/Modal'
 import CreateExamModal from './createExamModal'
+import { mergeExam } from 'actions/index'
+
+import './style.css'
 
 type P = {
 	grades: RootDBState["settings"]["exams"]["grades"]
 	schoolName: string
+
+	createSingleExam: (exam: CreateExam, class_id: string, section_id: string) => void
+
 } & RouteComponentProps & RootDBState
 
 
 type S = {
 	section_id: string
+	sections: AugmentedSection[]
 	show_create_exam: boolean
 } & ExamFilter
+
+type CreateExam = MISExam & {
+	student_marks: {
+		[id: string]: MISStudentExam
+	}
+}
+
+function blankExam() {
+	return {
+		id: v4(),
+		name: "",
+		subject: "",
+		total_score: "",
+		date: new Date().getTime(),
+		student_marks: {}
+	}
+}
 
 class BulkExam extends Component<P, S> {
 	former: Former
@@ -30,30 +53,38 @@ class BulkExam extends Component<P, S> {
 		super(props)
 
 		const year = moment().format("YYYY")
+		const sections = getSectionsFromClasses(this.props.classes)
 
 		this.state = {
 			section_id: "9bbdc949-d158-476e-8df0-e15482029795",
 			exam_title: "Final-Term",
 			year,
 			month: '',
-			show_create_exam: false
+			show_create_exam: false,
+			sections
 		}
 
 		this.former = new Former(this, [])
 	}
 
-	getClassIdFromSections = (sections: AugmentedSection[]): string => {
+	getClassIdFromSections = (): string => {
 
-		const { section_id } = this.state
+		const { section_id, sections } = this.state
 		const section = sections.find(section => section.id === section_id)
 
 		return section ? section.class_id : undefined
 	}
 
-	getSubjects = (sections: AugmentedSection[]): string[] => {
+	onCloseCreateExamModal = () => {
+		this.setState({ show_create_exam: false }, () => {
+			document.body.style.position = ''
+		})
+	}
+
+	getSubjects = (): string[] => {
 
 		const { classes } = this.props
-		const class_id = this.getClassIdFromSections(sections)
+		const class_id = this.getClassIdFromSections()
 		const subjects = classes[class_id] ? classes[class_id].subjects : {}
 
 		return Object.keys(subjects)
@@ -62,25 +93,35 @@ class BulkExam extends Component<P, S> {
 
 	toggleCreateExamModal = () => {
 		this.setState({ show_create_exam: !this.state.show_create_exam }, () => {
-			// When the modal is shown, we want a fixed body
 			if (this.state.show_create_exam === true) {
 				document.body.style.position = 'fixed'
 			}
 		})
 	}
 
-	onCloseCreateExamModal = () => {
-		this.setState({ show_create_exam: false }, () => {
-			// When the modal is hidden
-			document.body.style.position = ''
-		})
-	}
+	onCreateExam = (subject: string, total_score: number, date: number): void => {
 
-	onCreateExam = (subject: string, total_score: number, date: number): string => {
-
+		const { students } = this.props
 		const { section_id, exam_title } = this.state
 
-		return ""
+		const class_id = this.getClassIdFromSections()
+
+		const student_marks = Object.entries(students)
+			.filter(([_, student]) => student && student.Name && student.section_id === section_id)
+			.reduce((agg, [id, _]) => ({ ...agg, [id]: { score: "", grade: "", remarks: "" } }), {})
+
+		const prepare_exam: CreateExam = {
+			...blankExam(),
+			name: exam_title,
+			class_id,
+			section_id,
+			subject,
+			total_score,
+			date,
+			student_marks
+		}
+
+		this.props.createSingleExam(prepare_exam, class_id, section_id)
 	}
 
 	onSaveBulkExams = (): void => {
@@ -89,9 +130,9 @@ class BulkExam extends Component<P, S> {
 
 	render() {
 
-		const { students, classes, exams, grades, settings, schoolName, history } = this.props
+		const { students, exams, history } = this.props
 
-		const { exam_title, section_id, year, month, show_create_exam } = this.state
+		const { exam_title, section_id, year, month, show_create_exam, sections } = this.state
 
 		let years = new Set<string>()
 		let filtered_exams: MISExam[] = []
@@ -107,8 +148,7 @@ class BulkExam extends Component<P, S> {
 			}
 		}
 
-		const sections = getSectionsFromClasses(classes)
-		const subjects = this.getSubjects(sections)
+		const subjects = this.getSubjects()
 
 		return <Layout history={history}>
 			<div className="bulk-exams">
@@ -116,7 +156,7 @@ class BulkExam extends Component<P, S> {
 				<div className="section-container section form">
 					<div className="row">
 						<label>Class-Section</label>
-						<select {...this.former.super_handle(["section_id"], () => true, () => this.getSubjects(sections))}>
+						<select {...this.former.super_handle(["section_id"])}>
 							<option value="">Select Class</option>
 							{
 								sections.map(section => <option key={section.id} value={section.id}>{section ? section.namespaced_name : ''}</option>)
@@ -209,5 +249,5 @@ export default connect((state: RootReducerState) => ({
 	settings: state.db.settings,
 	schoolName: state.db.settings.schoolName
 }), (dispatch: Function) => ({
-
+	createSingleExam: (exam: CreateExam, class_id: string, section_id: string) => dispatch(mergeExam(exam, class_id, section_id)),
 }))(BulkExam)

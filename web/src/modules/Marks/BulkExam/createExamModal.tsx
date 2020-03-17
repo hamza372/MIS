@@ -3,7 +3,7 @@ import Former from 'utils/former'
 import moment from 'moment'
 
 interface PropsType {
-	onCreate?: (subject: string, total_score: number, date: number) => string
+	onCreate: (subject: string, total_score: number, date: number) => void
 	onClose: () => void
 	subjects: string[]
 }
@@ -34,6 +34,21 @@ class CreateExamModal extends Component<PropsType, S> {
 	isDisabled = () => {
 		const { subject, total_score } = this.state
 		return subject.length === 0 || isNaN(parseFloat(total_score))
+	}
+
+	createExam = () => {
+
+		const { subject, total_score, date } = this.state
+		// invoking method
+		this.props.onCreate(subject, parseFloat(total_score), date)
+
+		// reseting state
+		this.setState({
+			total_score: "",
+			subject: ""
+		})
+
+		alert("Exam has been created successfully!")
 	}
 
 	render() {
@@ -68,7 +83,7 @@ class CreateExamModal extends Component<PropsType, S> {
 						</div>
 					</div>
 					<div className="row" style={{ marginTop: 15, justifyContent: "flex-end" }}>
-						<div className={`button blue ${disabled ? 'disabled' : ''}`}>Create Exam</div>
+						<div className={`button blue ${disabled ? 'disabled' : ''}`} onClick={this.createExam}>Create Exam</div>
 					</div>
 				</div>
 			</div>
