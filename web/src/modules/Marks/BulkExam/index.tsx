@@ -23,16 +23,27 @@ type P = {
 
 } & RouteComponentProps & RootDBState
 
-
-type S = {
+interface S extends ExamFilter {
 	section_id: string
 	sections: AugmentedSection[]
 	show_create_exam: boolean
-} & ExamFilter
+	exam_marks_sheet: ExamMarksSheet
+}
 
-type CreateExam = MISExam & {
+interface CreateExam extends MISExam {
 	student_marks: {
 		[id: string]: MISStudentExam
+	}
+}
+
+interface ExamMarksSheet {
+	[studentId: string]: {
+		id: string
+		name: string
+		rollNo: string
+		exams: {
+			[examId: string]: MISStudentExam
+		}
 	}
 }
 
@@ -54,14 +65,16 @@ class BulkExam extends Component<P, S> {
 
 		const year = moment().format("YYYY")
 		const sections = getSectionsFromClasses(this.props.classes)
+			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 
 		this.state = {
-			section_id: "9bbdc949-d158-476e-8df0-e15482029795",
-			exam_title: "Final-Term",
+			section_id: "",
+			exam_title: "",
 			year,
 			month: '',
 			show_create_exam: false,
-			sections
+			sections,
+			exam_marks_sheet: {}
 		}
 
 		this.former = new Former(this, [])
@@ -124,15 +137,116 @@ class BulkExam extends Component<P, S> {
 		this.props.createSingleExam(prepare_exam, class_id, section_id)
 	}
 
+	getFilteredExams = (): MISExam[] => {
+
+		const { section_id, exam_title, month, year } = this.state
+
+		const { exams } = this.props
+
+		let filtered_exams: MISExam[] = []
+
+		for (const exam of Object.values(exams)) {
+			if (exam.name === exam_title && moment(exam.date).format("YYYY") === year &&
+				exam.section_id === section_id &&
+				(exam_title === "Test" && month ? moment(exam.date).format("MMMM") === month : true)) {
+				filtered_exams.push(exam)
+			}
+		}
+
+		return filtered_exams
+	}
+
+	onSectionSelect = () => {
+
+		const merge_students_exams = this.getMergeStudentsExams()
+
+		const exam_marks_sheet = merge_students_exams.reduce<ExamMarksSheet>((aggStudents, currStudent) => {
+
+			const merge_exams = currStudent.merge_exams
+
+			const student_exams = merge_exams.reduce<{ [id: string]: MISStudentExam }>((agg, curr) => {
+				return {
+					...agg,
+					[curr.id]: curr.stats
+				}
+			}, {})
+
+			return {
+				...aggStudents,
+				[currStudent.id]: {
+					id: currStudent.id,
+					name: currStudent.Name,
+					rollNo: currStudent.RollNumber,
+					exams: student_exams
+				}
+			}
+
+		}, {})
+
+		this.setState({ exam_marks_sheet }, () => {
+			return;
+		})
+	}
+
+	getMergeStudentsExams = (): MergeStudentsExams[] => {
+
+		const filtered_exams = this.getFilteredExams()
+
+		const { students } = this.props
+
+		const exam_students = Object.values(students)
+			.filter(student => student && student.Name && student.section_id && student.exams)
+			.reduce<MergeStudentsExams[]>((agg, curr) => {
+
+				const merge_exams: AugmentedMISExam[] = []
+
+				for (const exam of filtered_exams) {
+					const stats = curr.exams[exam.id]
+					if (stats != null) {
+						merge_exams.push({ ...exam, stats })
+					}
+				}
+
+				// in case there is no exams for the curr student, no need to put into list
+				if (merge_exams.length === 0)
+					return agg
+				return [...agg, { ...curr, merge_exams }]
+			}, [])
+
+		return exam_students
+	}
+
+	onSubjectMarksChange = (student_id: string, exam_id: string, score: string) => {
+
+		const { exam_marks_sheet } = this.state
+
+		this.setState({
+			exam_marks_sheet: {
+				...exam_marks_sheet,
+				[student_id]: {
+					...exam_marks_sheet[student_id],
+					exams: {
+						...exam_marks_sheet[student_id]["exams"],
+						[exam_id]: {
+							...exam_marks_sheet[student_id]["exams"][exam_id],
+							score: parseFloat(score) || 0
+						}
+					}
+				}
+			}
+		})
+	}
+
 	onSaveBulkExams = (): void => {
 
 	}
 
 	render() {
 
-		const { students, exams, history } = this.props
+		const { exams, history } = this.props
 
-		const { exam_title, section_id, year, month, show_create_exam, sections } = this.state
+		const { exam_title, section_id, year, month, show_create_exam, sections, exam_marks_sheet } = this.state
+
 
 		let years = new Set<string>()
 		let filtered_exams: MISExam[] = []
@@ -156,7 +270,7 @@ class BulkExam extends Component<P, S> {
 				<div className="section-container section form">
 					<div className="row">
 						<label>Class-Section</label>
-						<select {...this.former.super_handle(["section_id"])}>
+						<select {...this.former.super_handle(["section_id"], () => true, () => this.onSectionSelect())}>
 							<option value="">Select Class</option>
 							{
 								sections.map(section => <option key={section.id} value={section.id}>{section ? section.namespaced_name : ''}</option>)
@@ -165,7 +279,7 @@ class BulkExam extends Component<P, S> {
 					</div>
 					<div className="row">
 						<label>Exam Year</label>
-						<select {...this.former.super_handle(["year"])}>
+						<select {...this.former.super_handle(["year"], () => true, () => this.onSectionSelect())}>
 							<option value="">Select Year</option>
 							{
 								[...years].map(year => <option key={year} value={year}>{year}</option>)
@@ -174,7 +288,7 @@ class BulkExam extends Component<P, S> {
 					</div>
 					<div className="row">
 						<label>Exam Title</label>
-						<select {...this.former.super_handle(["exam_title"])}>
+						<select {...this.former.super_handle(["exam_title"], () => true, () => this.onSectionSelect())}>
 							<option value="">Select Exam</option>
 							{
 								ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
@@ -212,19 +326,24 @@ class BulkExam extends Component<P, S> {
 								<tr>
 									<th style={{ width: "10%" }}></th>
 									{
-										subjects
-											.map(subject => <th key={subject}>{subject}</th>)
+										filtered_exams
+											.sort((a, b) => a.date - b.date)
+											.map(exam => {
+												return <th key={exam.id}> {exam.subject} <br /> ( {exam.total_score} ) </th>
+											})
 									}
 								</tr>
 							</thead>
 							<tbody>
 								{
-									Object.values(students)
-										.filter(student => student && student.Name && student.section_id && student.section_id === section_id)
+									Object.values(exam_marks_sheet)
 										.map(student => <tr key={student.id}>
-											<td>{student.RollNumber || ""} {toTitleCase(student.Name.substr(0, 12))}</td>
+											<td>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 12))}</td>
 											{
-												subjects.map(subject => <td key={subject + student.id}><input type="number" placeholder="enter marks" /></td>)
+												Object.entries(student.exams)
+													.map(exam => <td key={exam[0] + "-" + student.id}>
+														<input onChange={(e) => this.onSubjectMarksChange(student.id, exam[0], e.target.value)} type="number" placeholder="enter marks" value={exam[1].score} />
+													</td>)
 											}
 										</tr>)
 								}
