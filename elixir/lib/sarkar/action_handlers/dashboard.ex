@@ -465,11 +465,57 @@ defmodule Sarkar.ActionHandler.Dashboard do
 				"permissions" => permissions
 			}
 		},
-		state
+		%{ id: id, client_id: client_id} = state
 	) do
 		case Sarkar.Auth.Dashboard.create({ name, password, permissions }) do
 			{:ok, resp} ->
 				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state} 
+		end
+	end
+
+	def handle_action(
+		%{
+			"type" => "UPDATE_USER",
+			"payload" => %{
+				"name" => name,
+				"permissions" => permissions
+			}
+		},
+		%{ id: id, client_id: client_id} = state
+	) do
+		case Sarkar.Auth.Dashboard.updateUser({ name, permissions }) do
+			{:ok, resp} ->
+				{:reply, succeed(resp), state}
+			{:error, err} ->
+				{:reply, fail(err), state} 
+		end
+	end
+	
+	def handle_action(
+		%{
+			"type" => "GET_USER_LIST",
+			"payload" => payload
+		},
+		%{ id: id, client_id: client_id} = state
+	) do
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
+			"SELECT 
+				id, 
+				permissions
+			FROM mis_dashboard_auth",
+			[]
+		) do
+			{:ok, resp} ->
+				mapped = resp.rows 
+					|>Enum.reduce(
+						%{},
+						fn ([name, permissions], acc ) ->
+							Map.put(acc, name, permissions )
+						end
+					)
+				{:reply, succeed(mapped), state}
 			{:error, err} ->
 				{:reply, fail(err), state} 
 		end

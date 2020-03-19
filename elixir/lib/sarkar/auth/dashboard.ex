@@ -19,7 +19,7 @@ defmodule Sarkar.Auth.Dashboard do
 		end
 	end
 
-	def create ({id, password, permissions }) do
+	def create({id, password, permissions }) do
 		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
 			"INSERT INTO mis_dashboard_auth (id, password, permissions) values ($1, $2, $3)", 
 			[id, hash(password, 52), permissions]) do
@@ -28,6 +28,21 @@ defmodule Sarkar.Auth.Dashboard do
 				{:error, err} -> 
 					IO.inspect err
 					{:error, err.postgres.detail}
+		end
+	end
+
+	def updateUser({ id, permissions }) do
+		case Sarkar.DB.Postgres.query(Sarkar.School.DB,
+			"UPDATE TABLE mis_dashboard_auth 
+			SET permissions=$2 
+			WHERE id=$1",
+			[id, permissions]
+		) do
+			{:ok, _res} -> 
+				{:ok, "Successfully Updated #{id}"}
+			{:error, err} ->
+				IO.inspect err
+				{:error, "User Update Failed"}
 		end
 	end
 

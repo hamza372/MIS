@@ -5,14 +5,62 @@ import moment from 'moment'
 type Dispatch = (action: any) => any
 type GetState = () => RootReducerState
 
-interface PermissionPayload {
-	role: string
-	permissions: UserPermissions
+export const ADD_USERS = "ADD_USERS"
+export const getUserList = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
+	const state = getState();
+
+	if (!state.connected) {
+		syncr.onNext("connect", () => dispatch(getUserList()))
+		return
+	}
+
+	syncr.send({
+		type: "GET_USER_LIST",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {}
+	})
+		.then((res: any) => {
+			dispatch({
+				type: "ADD_USERS",
+				users: res
+			})
+		})
+		.catch(err => {
+			alert(`ERROR GETTING USER LIST + ${err}`)
+		})
 }
 
-export const createUser = ( name: string, password: string, permissions: PermissionPayload) => ( dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+export interface AddUserAction {
+	type: "ADD_USERS"
+	users: any
+}
+
+export const updateUser = (name: string, permissions: PermissionPayload) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 	const state = getState();
-	
+
+	syncr.send({
+		type: "UPDATE_USER",
+		client_type: state.auth.client_type,
+		client_id: state.client_id,
+		payload: {
+			name: name,
+			permissions
+		}
+	})
+		.then((res: any) => {
+			dispatch(getUserList())
+			window.alert(res)
+		})
+		.catch(res => {
+			alert("Update user failed" + JSON.stringify(res))
+		})
+}
+
+export const createUser = (name: string, password: string, permissions: PermissionPayload) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+	const state = getState();
+
 	syncr.send({
 		type: "CREATE_USER",
 		client_type: state.auth.client_type,
@@ -46,7 +94,7 @@ export const createLogin = (username: string, password: string) => (dispatch: Di
 	})
 		.then((res: { id: string; token: string; permissions: PermissionPayload }) => {
 			syncr.verify()
-			dispatch(createLoginSucceed( res.id, res.token, res.permissions.role, res.permissions.permissions))
+			dispatch(createLoginSucceed(res.id, res.token, res.permissions.role, res.permissions.permissions))
 		})
 		.catch(res => {
 			console.error(res)
@@ -73,7 +121,7 @@ export const getSchoolList = () => (dispatch: Dispatch, getState: GetState, sync
 			id: state.auth.id
 		}
 	})
-		.then((res: { school_list: string[]}) => {
+		.then((res: { school_list: string[] }) => {
 			dispatch({
 				type: SCHOOL_LIST,
 				school_list: res.school_list
@@ -90,7 +138,7 @@ export const getSchoolInfo = (school_id: string) => (dispatch: Dispatch, getStat
 	const state = getState()
 
 	if (!syncr.connection_verified) {
-		syncr.onNext("verify", () => dispatch(getSchoolInfo( school_id )))
+		syncr.onNext("verify", () => dispatch(getSchoolInfo(school_id)))
 		return
 	}
 
@@ -142,7 +190,7 @@ export const updateSchoolInfo = (school_id: string, student_limit: number, paid:
 					"value": student_limit
 				}
 			}
-		
+
 		}
 	]
 
@@ -157,7 +205,7 @@ export const updateSchoolInfo = (school_id: string, student_limit: number, paid:
 			paid
 		}
 	})
-		.then((res: {token: string; sync_state: SyncState }) => {
+		.then((res: { token: string; sync_state: SyncState }) => {
 			alert(res)
 			getSchoolInfo(school_id)
 		})
@@ -168,8 +216,8 @@ export const updateSchoolInfo = (school_id: string, student_limit: number, paid:
 }
 
 export const REFERRALS_INFO = "REFERRALS_INFO"
-export const getReferralsInfo = () => ( dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
-	
+export const getReferralsInfo = () => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+
 	const state = getState()
 
 	if (!syncr.connection_verified) {
@@ -185,19 +233,19 @@ export const getReferralsInfo = () => ( dispatch: Dispatch, getState: GetState, 
 			id: state.auth.id
 		}
 	})
-		.then((res: { referrals: any}) => {
+		.then((res: { referrals: any }) => {
 			dispatch({
 				type: REFERRALS_INFO,
 				trials: res.referrals
 			})
 		})
-		.catch( (err: any) => {
+		.catch((err: any) => {
 			window.alert(`Error Fetching Trial Information!\n${err}`)
 		})
 }
 
 export const updateReferralInformation = (school_id: string, value: any) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
-	
+
 	const state = getState();
 
 	syncr.send({
@@ -215,7 +263,7 @@ export const updateReferralInformation = (school_id: string, value: any) => (dis
 		.catch(() => {
 			window.alert(`Update Information Failed for school ${school_id}`)
 		})
-	
+
 }
 
 export const createSchoolLogin = (username: string, password: string, limit: number, value: SignUpValue) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
@@ -223,7 +271,7 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 	const state = getState();
 
 	syncr.send({
-		type:"CREATE_NEW_SCHOOL",
+		type: "CREATE_NEW_SCHOOL",
 		client_type: state.auth.client_type,
 		payload: {
 			username,
@@ -233,7 +281,7 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 			role: state.auth.role
 		}
 	})
-		.then((res)=> {
+		.then((res) => {
 			window.alert(`Success\n${JSON.stringify(res)}`)
 		})
 		.catch(res => {
@@ -243,14 +291,14 @@ export const createSchoolLogin = (username: string, password: string, limit: num
 }
 
 export const resetSchoolPassword = (school_id: string, password: string) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
-	
+
 	const state = getState()
 
 	syncr.send({
 		type: "RESET_SCHOOL_PASSWORD",
 		client_type: state.auth.client_type,
 		client_id: state.client_id,
-		payload:{
+		payload: {
 			school_id,
 			password
 		}
@@ -261,7 +309,7 @@ export const resetSchoolPassword = (school_id: string, password: string) => (dis
 	})
 }
 
-export const getEndPointResource = ( point: string, school_id: string, start_date: number, end_date: number) => ( dispatch: Dispatch, getState: GetState,  syncr: Syncr) => {
+export const getEndPointResource = (point: string, school_id: string, start_date: number, end_date: number) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
 
 	const state = getState()
 
