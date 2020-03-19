@@ -258,7 +258,7 @@ interface MISFamilyInfo {
 	children?: AugmentedSibling[]
 }
 
-type AugmentedSibling = MISStudent & {section?: AugmentedSection}
+type AugmentedSibling = MISStudent & { section?: AugmentedSection }
 
 type AugmentedMISFamily = MISFamilyInfo & { ID: string }
 
@@ -404,11 +404,12 @@ interface StudentMarksSheet {
 	name: MISStudent["Name"]
 	manName: MISStudent["ManName"]
 	rollNo: MISStudent["RollNumber"]
-	marks: { total: number; obtained: number }
-	position: number
-	merge_exams: AugmentedMISExam[]
+	section_id?: MISStudent['section_id']
+	marks?: { total: number; obtained: number }
+	position?: number
+	merge_exams?: AugmentedMISExam[]
 	grade: string
-	remarks: string
+	remarks?: string
 }
 
 type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam[] }
@@ -418,3 +419,5 @@ interface ExamFilter {
 	subject?: string
 	exam_title: string
 }
+
+type MISGrades = RootDBState["settings"]["exams"]["grades"]
