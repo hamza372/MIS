@@ -728,6 +728,38 @@ export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (
 	]))
 }
 
+interface ExamMarksSheet {
+	[studentId: string]: {
+		id: string
+		name: string
+		rollNo: string
+		exams: {
+			[examId: string]: AugmentedMISExam
+		}
+	}
+}
+
+export const updateBulkExams = (exam_marks_sheet: ExamMarksSheet) => (dispatch: Function) => {
+	
+	let merges = []
+
+	for(const student of Object.values(exam_marks_sheet)) {
+
+		const exams = student.exams
+
+		for(const exam of Object.values(exams)){
+			merges.push({
+				path: ["db", "students", student.id, "exams", exam.id],
+				value: {
+					...exam.stats
+				}
+			})
+		}
+	}
+	
+	dispatch(createMerges(merges))
+}
+
 
 export const removeStudentFromExam = (e_id: string, student_id: string) => (dispatch: Function) => {
 	dispatch(createDeletes([
