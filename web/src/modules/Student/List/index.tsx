@@ -31,12 +31,12 @@ type S = {
 	printStudentCard: boolean
 	tag: string
 	section_id: string
-	previous_count: number
-	next_count: number
+	students_per_page: number
 }
 
 const CHUNK_SIZE_FOR_LIST = 29
 const CHUNK_SIZE_FOR_CARDS = 8
+const PAGE_SIZE = 32
 
 export class StudentList extends Component<P, S> {
 
@@ -50,8 +50,7 @@ export class StudentList extends Component<P, S> {
 			printStudentCard: false,
 			tag: "",
 			section_id: "",
-			previous_count: 0,
-			next_count: 32
+			students_per_page: PAGE_SIZE
 		}
 		this.former = new Former(this, [])
 	}
@@ -132,29 +131,30 @@ export class StudentList extends Component<P, S> {
 		return section ? section.namespaced_name : ""
 	}
 
-	onPreviousButton = (items: MISStudent[]) => {
+	onPreviousButton = () => {
 
-		let { next_count, previous_count } = this.state
+		let { students_per_page } = this.state
 
-		if (next_count > 32) {
-
-			this.setState({ next_count: previous_count }, () => {
-				this.setState({ previous_count: previous_count - 32 })
-			})
+		if (students_per_page > PAGE_SIZE) {
+			this.setState({ students_per_page: students_per_page - PAGE_SIZE })
 		}
 
 	}
 
+	onNextButton = (students: MISStudent[]) => {
 
-	onNextButton = (items: MISStudent[]) => {
+		const { students_per_page } = this.state
 
-		const { next_count } = this.state
+		const new_page_size = students_per_page + PAGE_SIZE
 
-		if (next_count <= items.length) {
-			this.setState({ previous_count: next_count }, () => {
-				this.setState({ next_count: next_count + 32 })
-			})
+		// check condition to avoid unnecessary state mutation
+		if (students_per_page <= students.length) {
+			this.setState({ students_per_page: new_page_size })
 		}
+	}
+
+	resetStudentsPerPage = () => {
+		this.setState({ students_per_page: PAGE_SIZE })
 	}
 
 	render() {
@@ -218,7 +218,8 @@ export class StudentList extends Component<P, S> {
 			createText = "Manage Fees"
 		}
 
-		const { previous_count, next_count } = this.state
+		const { students_per_page } = this.state
+		const card_items = items.slice(0, students_per_page)
 
 		return <div className="student-list">
 			<div className="title no-print">All Students</div>
@@ -226,11 +227,12 @@ export class StudentList extends Component<P, S> {
 				{
 					//@ts-ignore
 					<Card
-						items={items.slice(previous_count, next_count)}
+						items={card_items}
 						Component={StudentItem}
 						create={create}
 						createText={createText}
-						toLabel={toLabel}>
+						toLabel={toLabel}
+						totalItems={items.length}>
 
 						{forwardTo !== "prospective-student" && <div className="row filter-container no-print">
 							<div className="row checkbox-container">
@@ -248,7 +250,7 @@ export class StudentList extends Component<P, S> {
 							</div>
 							</div>
 							<div className="row">
-								<select className="list-select" {...this.former.super_handle(["tag"])} style={{ marginLeft: 0 }}>
+								<select className="list-select" {...this.former.super_handle(["tag"], () => true, () => this.resetStudentsPerPage())} style={{ marginLeft: 0 }}>
 									<option value="">Select Tag</option>
 									{
 										[...this.uniqueTags(students).keys()]
@@ -257,7 +259,7 @@ export class StudentList extends Component<P, S> {
 											.map(tag => <option key={tag} value={tag}> {tag} </option>)
 									}
 								</select>
-								<select className="list-select" {...this.former.super_handle(["section_id"])}>
+								<select className="list-select" {...this.former.super_handle(["section_id"], () => true, () => this.resetStudentsPerPage())}>
 									<option value="">Select Class</option>
 									{
 										sections
@@ -271,13 +273,18 @@ export class StudentList extends Component<P, S> {
 					</Card>
 				}
 			</div>
-
-			<div className="row" style={{ width: "90%", justifyContent: "space-between" }}>
-				<div className="button blue" onClick={() => this.onPreviousButton(items)}>←</div>
-				<div className="button blue" onClick={() => this.onNextButton(items)}>→</div>
+			<div className="section-container pagination no-print">
+				<div className="row paginate-button">
+					<div className={`button ${students_per_page <= PAGE_SIZE ? 'grey' : 'green'}`} onClick={() => this.onPreviousButton()}>Previous</div>
+					<div className={`button ${students_per_page > items.length ? 'grey' : 'green'}`} onClick={() => this.onNextButton(items)}>Next</div>
+				</div>
+				<div className="row" style={{ marginTop: 10 }}>
+					<div> Showing <strong>{card_items.length}</strong> of <strong>{items.length}</strong> students</div>
+				</div>
 			</div>
 
-			{	// for first table, Sr. no will start from 1,
+			{
+				// for first table, Sr. no will start from 1,
 				// for other tables, Sr. no will start from chunkSize * index
 				// here's "index" representing table number
 				!printStudentCard ?
@@ -328,7 +335,7 @@ const StudentItem = (student: AugmentedStudent) => {
 
 	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
 
-	return <div className="profile-card-wrapper" key={Math.random()}>
+	return <div className="profile-card-wrapper" key={`${student.id}-${student.section_id}`}>
 		<div className="profile">
 			<img
 				className="thumbnail"

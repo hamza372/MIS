@@ -1,4 +1,4 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import Former from 'utils/former'
 
@@ -10,6 +10,7 @@ interface P {
 	create: string
 	createText: string
 	toLabel: Function
+	totalItems?: number
 }
 
 interface S {
@@ -22,49 +23,48 @@ interface Routeinfo {
 
 type propTypes = RouteComponentProps<Routeinfo> & P
 
-export default class Card extends Component <propTypes, S> {
+export default class Card extends Component<propTypes, S> {
 
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
 		this.state = {
-			filterText : ""
+			filterText: ""
 		}
 		this.former = new Former(this, [])
 	}
-	
+
 	onChange = (e: any) => {
-		this.setState({filterText:e.target.value});
+		this.setState({ filterText: e.target.value });
 	}
-	
-	create = ({ to , text}: { to: string; text: string} ) => {
+
+	create = ({ to, text }: { to: string; text: string }) => {
 		return <Link className="button blue" to={to}>{text}</Link>
 	}
 
-	render(){
-		const {items, toLabel, Component, children } = this.props;
+	render() {
+
+		const { items, toLabel, Component, children, totalItems } = this.props;
 
 		const filteredList = items
 			.filter(item => {
 				return toLabel(item) !== undefined && toLabel(item).toLowerCase().includes(this.state.filterText.toLowerCase())
 			})
-			.sort((a,b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
+			.sort((a, b) => toLabel(b).localeCompare(this.state.filterText) - toLabel(a).localeCompare(this.state.filterText))
 
 		return <div className="card-wrap">
 
 			<div className="total">
-				<div className="label">
-					Total: <strong> {filteredList.length} </strong>
-				</div>
-				{ this.props.create ? <this.create to={this.props.create} text={this.props.createText} /> : false }
+				<div className="label">Total: <strong> {totalItems} </strong> </div>
+				{this.props.create ? <this.create to={this.props.create} text={this.props.createText} /> : false}
 			</div>
-			<input className="search-bar no-print" type="text" placeholder="Search by name | class | admission # | phone #" onChange={this.onChange}/>
-			{ children }
+			<input className="search-bar no-print" type="text" placeholder="Search by name | class | admission # | phone #" onChange={this.onChange} />
+			{children}
 
 			<div className="card-list">
-			{
-				filteredList.map(item => Component(item) )
-			}
+				{
+					filteredList.map(item => Component(item))
+				}
 			</div>
 		</div>
 	}
