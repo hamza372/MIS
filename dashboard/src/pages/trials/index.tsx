@@ -9,6 +9,8 @@ import moment from 'moment';
 
 interface P {
 	trials: RootReducerState["trials"]
+	user: RootReducerState["auth"]["id"]
+	admin: boolean
 	getReferralsInfo: () => any
 	updateReferralInformation: (school_id: string, value: any) => any
 }
@@ -33,7 +35,12 @@ const defaultReferralState = () => ({
 	warning_status: "",
 	follow_up_status: "",
 	trial_reset_status: "",
-	overall_status: ""
+	overall_status: "",
+	survey_status: "",
+	owner_other_job: "",
+	computer_operator: "",
+	previous_management_system: "",
+	previous_software_name: ""
 })
 
 type EditsRow = TrialsDataRow["value"] & {
@@ -48,7 +55,7 @@ interface S {
 		status: string
 		daysPassed: string
 		filterText: string
-	},
+	}
 	filterMenu: boolean
 	active_school: string
 }
@@ -139,7 +146,7 @@ class Trial extends Component<propTypes, S> {
 
 	}
 	getSearchString = (school_id: string, value: EditsRow) => {
-		return `${school_id}${value.notes}${value.area_manager_name}${value.agent_name}${value.owner_phone}${value.city + value.office}${this.daysPassed(value.time) > 15 ? "ENDED-" + (this.daysPassed(value.time) - 15) : "NOT-ENDED"}${value.payment_received ? "paid": ""}`.toLowerCase()
+		return `${school_id}${value.notes}${value.area_manager_name}${value.agent_name}${value.owner_phone}${value.city + value.office}${this.daysPassed(value.time) > 15 ? "ENDED-" + (this.daysPassed(value.time) - 15) : "NOT-ENDED"}${value.payment_received ? "paid" : ""}`.toLowerCase()
 	}
 
 	getStatusFilter = (time: number, paid: boolean) => {
@@ -152,7 +159,7 @@ class Trial extends Component<propTypes, S> {
 			return daysPassed <= 15
 		}
 		else if (status === "PAID") {
-			return paid 
+			return paid
 		}
 		else if (status === "NOT_PAID") {
 			return !paid
@@ -184,6 +191,8 @@ class Trial extends Component<propTypes, S> {
 		}
 	}
 
+	byAreaManager = (area_manager: string) => this.props.admin || this.props.user === area_manager
+
 	setActive = (school_id: string) => {
 		const active_school = this.state.active_school === school_id ? "" : school_id
 
@@ -193,13 +202,14 @@ class Trial extends Component<propTypes, S> {
 	}
 
 	render() {
-		const { edits, filterMenu,active_school } = this.state
+		const { edits, filterMenu, active_school } = this.state
 
 		const Items = Object.entries(edits)
 			.filter(([school_id, value]) => {
 				return this.getStatusFilter(value.time, value.payment_received)
 					&& this.getDaysPassedFliter(value.time)
 					&& this.getSearchString(school_id, value).includes(this.state.filters.filterText.toLowerCase())
+					&& this.byAreaManager(value.area_manager_name)
 			})
 			.sort(([, a_value], [, b_value]) => this.daysPassed(a_value.time) - this.daysPassed(b_value.time))
 
@@ -208,7 +218,7 @@ class Trial extends Component<propTypes, S> {
 			<div className="title"> Trial Information</div>
 
 			<div className="form" style={{ width: "90%", marginBottom: "20px" }}>
-				
+
 				<div className={!filterMenu ? "button blue" : "button red"} onClick={() => this.setState({ filterMenu: !filterMenu })}>{!filterMenu ? "Filters" : "Close"}</div>
 				{filterMenu && <>
 					<div className="row">
@@ -255,7 +265,7 @@ class Trial extends Component<propTypes, S> {
 									{
 										this.state.active_school === school_id && <div className="more">
 											<div className="form">
-											<div className="row">
+												<div className="row">
 													<label>Owner Name</label>
 													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "owner_name"])} />
 												</div>
@@ -299,6 +309,15 @@ class Trial extends Component<propTypes, S> {
 													<label>Overall Status</label>
 													<input type="text" className="newtable-input" {...this.former.super_handle(["edits", school_id, "overall_status"])} />
 												</div>
+												<div className="row">
+													<label>Survey Status</label>
+													<select {...this.former.super_handle(["edits", school_id, "survey_status"])}>
+														<option value=""> Pending </option>
+														<option value="IN_PROGRESS"> In Progress</option>
+														<option value="COMPLETED"> Completed</option>
+													</select>
+												</div>
+
 												{
 													!value.payment_received && <div className="row">
 														<label>Mark Paid</label>
@@ -320,7 +339,9 @@ class Trial extends Component<propTypes, S> {
 }
 
 export default connect((state: RootReducerState) => ({
-	trials: state.trials
+	trials: state.trials,
+	user: state.auth && state.auth.id,
+	admin: state.auth.role ? state.auth.role === "ADMIN" : false
 }), (dispatch: Function) => ({
 	updateReferralInformation: (school_id: string, value: any) => dispatch(updateReferralInformation(school_id, value)),
 	getReferralsInfo: () => dispatch(getReferralsInfo())

@@ -18,8 +18,8 @@ interface S {
 
 	username: string
 	password: string
-	value:  SignUpValue
-	agents: Array<string>
+	value: SignUpValue
+	agents: string[]
 }
 
 interface Routeinfo {
@@ -28,9 +28,9 @@ interface Routeinfo {
 
 type propTypes = RouteComponentProps<Routeinfo> & P
 
+const Span = () => <span style={{ color: "red" }}>*</span>
+class SignUp extends Component<propTypes, S> {
 
-class SignUp extends Component <propTypes, S> {
-	
 	former: Former
 	constructor(props: propTypes) {
 		super(props)
@@ -52,12 +52,16 @@ class SignUp extends Component <propTypes, S> {
 				owner_easypaisa_number: "",
 
 				association_name: "",
-		
+
 				agent_name: "",
 				notes: "",
 				owner_phone: "",
 				user,
-				school_type: ""
+				school_type: "",
+				owner_other_job: "",
+				computer_operator: "",
+				previous_management_system: "",
+				previous_software_name: ""
 			},
 			agents: [
 				"M. Shahbaz",
@@ -79,11 +83,11 @@ class SignUp extends Component <propTypes, S> {
 				"Raza Mustafa"
 			],
 		}
-	
-		this.former = new Former(this,[], [
+
+		this.former = new Former(this, [], [
 			// SCHOOL REFERRAL BLOCK
 			{
-				path:["value","school_name"],
+				path: ["value", "school_name"],
 				value: "",
 				depends: [
 					"OR",
@@ -98,7 +102,7 @@ class SignUp extends Component <propTypes, S> {
 				]
 			},
 			{
-				path:["value", "owner_easypaisa_number"],
+				path: ["value", "owner_easypaisa_number"],
 				value: "",
 				depends: [
 					"OR",
@@ -114,7 +118,7 @@ class SignUp extends Component <propTypes, S> {
 			},
 			// ASSOCIATION BLOCK
 			{
-				path:["value", "association_name"],
+				path: ["value", "association_name"],
 				value: "",
 				depends: [
 					{
@@ -126,7 +130,7 @@ class SignUp extends Component <propTypes, S> {
 
 			// AGENT BLOCK
 			{
-				path:["value", "agent_name"],
+				path: ["value", "agent_name"],
 				value: "",
 				depends: [
 					"OR",
@@ -140,9 +144,20 @@ class SignUp extends Component <propTypes, S> {
 					}
 				]
 			},
+
+			{
+				path: ["value", "previous_software_name"],
+				value: "",
+				depends: [
+					{
+						path: ["value", "previous_management_system"],
+						value: "SOFTWARE"
+					}
+				]
+			}
 		])
 	}
-	componentDidMount () {
+	componentDidMount() {
 		this.props.getSchoolList()
 	}
 
@@ -160,7 +175,7 @@ class SignUp extends Component <propTypes, S> {
 	onSave = () => {
 
 		const { username, password } = this.state
-		
+
 		console.log(this.state.value)
 
 		const value = {
@@ -177,36 +192,38 @@ class SignUp extends Component <propTypes, S> {
 				["type_of_login"],
 				["owner_phone"],
 				["owner_name"],
-				["school_type"]
-			]
+				["school_type"],
+				["owner_other_job"],
+				["computer_operator"],
+				["previous_management_system"]]
 		)
 
-		if(compulsory_fields) {
+		if (compulsory_fields) {
 			const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
 			return window.alert(erroText)
 		}
 
 		const limit = this.getLimitFromPackage(this.state.value.package_name)
 
-		if(this.former.check(["value","school_name"])) {
+		if (this.former.check(["value", "school_name"])) {
 			const compulsory_fields = checkCompulsoryFields(this.state.value,
 				[
 					["school_name"],
 					["owner_easypaisa_number"]
 				]
 			)
-			if(compulsory_fields) {
+			if (compulsory_fields) {
 				const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
 				return window.alert(erroText)
 			}
 		}
-		else if(this.former.check(["value","association_name"])) {
+		else if (this.former.check(["value", "association_name"])) {
 			const compulsory_fields = checkCompulsoryFields(this.state.value,
 				[
 					["association_name"],
 				]
 			)
-			if(compulsory_fields) {
+			if (compulsory_fields) {
 				const erroText = `Please Fill ${(compulsory_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
 				return window.alert(erroText)
 			}
@@ -219,7 +236,7 @@ class SignUp extends Component <propTypes, S> {
 			]
 		)
 
-		if(login_detail_fields) {
+		if (login_detail_fields) {
 			const erroText = `Please Fill ${(login_detail_fields as string[][]).map(x => x[0] === "agent_name" ? "Agent Name" : x[0]).join(", ")} !`
 			return window.alert(erroText)
 		}
@@ -232,13 +249,13 @@ class SignUp extends Component <propTypes, S> {
 		const { agents } = this.state
 		const { role } = this.props.auth
 
- 		return <div className="school-sign-up page">
-			<div className="title"> New School</div>
+		return <div className="school-sign-up page">
 
+			<div className="title"> New Login</div>
 			<div className="section form">
-				{ role !== "AREA_MANAGER" && <div className="row">
-					<label>Name</label>
-					<select {...this.former.super_handle(["value","area_manager_name"])}>
+				{role !== "AREA_MANAGER" && <div className="row">
+					<label>Area Manager <Span /></label>
+					<select {...this.former.super_handle(["value", "area_manager_name"])}>
 						<option value="">Select</option>
 						<option value="AYESHA">Ayesha</option>
 						<option value="UMER">Umer</option>
@@ -250,8 +267,8 @@ class SignUp extends Component <propTypes, S> {
 					</select>
 				</div>}
 				<div className="row">
-					<label>Office</label>
-					<select {...this.former.super_handle(["value","office"])}>
+					<label>Office <Span /></label>
+					<select {...this.former.super_handle(["value", "office"])}>
 						<option value="">Select</option>
 						<option value="LAHORE">Lahore</option>
 						<option value="SARGODHA">Sargodha</option>
@@ -266,12 +283,12 @@ class SignUp extends Component <propTypes, S> {
 				</div>
 
 				<div className="row">
-					<label>City/Area</label>
-					<input type="text" {...this.former.super_handle(["value","city"])} placeholder="city"/>
+					<label>City/Area <Span /></label>
+					<input type="text" {...this.former.super_handle(["value", "city"])} placeholder="city" />
 				</div>
 
 				<div className="row">
-					<label>Type</label>
+					<label>Strategy <Span /></label>
 					<select {...this.former.super_handle(["value", "type_of_login"])}>
 						<option value="">Select</option>
 						<option value="AGENT">Agent </option>
@@ -281,41 +298,42 @@ class SignUp extends Component <propTypes, S> {
 						<option value="SCHOOL_REFERRAL">School Referrals</option>
 						<option value="INDIVIDUAL">Individual </option>
 						<option value="ILM_EXCHANGE">Ilm Exchange</option>
+						<option value="FACEBOOK">Facebook</option>
 					</select>
 				</div>
 			</div>
 
-			{ this.former.check(["value","school_name"]) && <div className="section form">
+			{this.former.check(["value", "school_name"]) && <div className="section form">
 				<div className="divider"> Referral School Information </div>
-				
+
 				<div className="row">
-					<label>School Name</label>
+					<label>School Name <Span /></label>
 					<input list="schl-list" {...this.former.super_handle(["value", "school_name"])} placeholder="school name" />
 					<datalist id="schl-list">
-					{
-						this.props.schoolList.map(s => <option value={s}/> )
-					}
+						{
+							this.props.schoolList.map(s => <option key={s} value={s} />)
+						}
 					</datalist>
 				</div>
 
 				<div className="row">
-					<label>Owner Easy Paisa</label>
-					<input type="number" {...this.former.super_handle(["value","owner_easypaisa_number"])} placeholder="Easy Paisa"/>
+					<label>Owner Easy Paisa <Span /></label>
+					<input type="number" {...this.former.super_handle(["value", "owner_easypaisa_number"])} placeholder="Easy Paisa" />
 				</div>
 			</div>}
 
-			{ this.former.check(["value","association_name"]) && <div className="section form">
+			{this.former.check(["value", "association_name"]) && <div className="section form">
 				<div className="divider">Association Information</div>
 				<div className="row">
-					<label>Association</label>
-					<input type="text" {...this.former.super_handle(["value","association_name"])} placeholder="Association Name"/>
+					<label>Association <Span /></label>
+					<input type="text" {...this.former.super_handle(["value", "association_name"])} placeholder="Association Name" />
 				</div>
 			</div>}
 
-			{ this.former.check(["value","agent_name"]) && <div className="section form">
-				<div className="divider">Agent Information</div>
-			
-{/* 				<div className="row">
+			{this.former.check(["value", "agent_name"]) && <div className="section form">
+				<div className="divider">Agent Information <Span /></div>
+
+				{/* 				<div className="row">
 					<label>Agent Name:</label>
 					<input type="text" {...this.former.super_handle(["value","agent_name"])} placeholder="Agent Name"/>
 				</div>
@@ -326,59 +344,90 @@ class SignUp extends Component <propTypes, S> {
 				</div> */}
 
 				<div className="row">
-						<label>Agent Name</label>
-						<select {...this.former.super_handle(["value", "agent_name"])}>
-							<option value="">Select Agent</option>
-							{
-								agents
-									.map(name => <option key={name} value={name}>{name}</option>)
-							}
+					<label>Agent Name</label>
+					<select {...this.former.super_handle(["value", "agent_name"])}>
+						<option value="">Select Agent</option>
+						{
+							agents
+								.map(name => <option key={name} value={name}>{name}</option>)
+						}
 
-						</select>
+					</select>
 				</div>
 
-			</div> }
-			
+			</div>}
+
 			<div className="section form">
-				<div className="divider">SignUp Information</div>
+				<div className="divider">School Information</div>
 				<div className="row">
-					<label>School ID:</label>
-					<input type="text" {...this.former.super_handle(["username"])} placeholder="username"/>
+					<label>Owner Name:<Span /></label>
+					<input type="text" {...this.former.super_handle(["value", "owner_name"])} placeholder="name" />
 				</div>
 				<div className="row">
-					<label>Password:</label>
-					<input type="text" {...this.former.super_handle(["password"])} placeholder="password"/>
+					<label>Owner Phone <Span /></label>
+					<input type="number" placeholder="number" {...this.former.super_handle(["value", "owner_phone"])} />
 				</div>
 				<div className="row">
-					<label>School Type</label>
-					<select {...this.former.super_handle(["value","school_type"])}>
+					<label>School Type <Span /></label>
+					<select {...this.former.super_handle(["value", "school_type"])}>
 						<option value="">Select</option>
 						<option value="RURAL">Rural</option>
 						<option value="URBAN">Urban</option>
 					</select>
 				</div>
 				<div className="row">
-					<label>Package</label>
-					<select {...this.former.super_handle(["value","package_name"])}>
+					<label>Does the school owner have another job? (where he invest time instead of school) <Span /></label>
+					<select {...this.former.super_handle(["value", "owner_other_job"])}>
+						<option value="">Select</option>
+						<option value="YES">Yes</option>
+						<option value="NO">No</option>
+					</select>
+				</div>
+				<div className="row">
+					<label>Is there any computer operator in the school responsible to use MISchool (any specific teacher or person who act as a computer operator) <Span /></label>
+					<select {...this.former.super_handle(["value", "computer_operator"])}>
+						<option value="">Select</option>
+						<option value="YES">Yes</option>
+						<option value="NO">No</option>
+					</select>
+				</div>
+				<div className="row">
+					<label>What was their previous management system? <Span /></label>
+					<select {...this.former.super_handle(["value", "previous_management_system"])}>
+						<option value="">Select</option>
+						<option value="REGISTER">Register</option>
+						<option value="EXCEL">Excel</option>
+						<option value="SOFTWARE">Software</option>
+					</select>
+				</div>
+				{this.former.check(["value", "previous_software_name"]) && <div className="row">
+					<label>Please mention the name of the previous software</label>
+					<input type="text" placeholder="name" {...this.former.super_handle(["value", "previous_software_name"])} />
+				</div>}
+
+				<div className="row">
+					<label>Notes:</label>
+					<textarea {...this.former.super_handle(["value", "notes"])} placeholder="Additional Info (If Any)" />
+				</div>
+			</div>
+			<div className="section form">
+				<div className="divider">Login Credentials</div>
+				<div className="row">
+					<label>School ID: <Span /></label>
+					<input type="text" {...this.former.super_handle(["username"])} placeholder="username" />
+				</div>
+				<div className="row">
+					<label>Password:<Span /></label>
+					<input type="text" {...this.former.super_handle(["password"])} placeholder="password" />
+				</div>
+				<div className="row">
+					<label>Package<Span /></label>
+					<select {...this.former.super_handle(["value", "package_name"])}>
 						<option value="FREE_TRIAL">Free Trial</option>
 						<option value="TALEEM1">Taleem-1</option>
 						<option value="TALEEM2">Taleem-2</option>
 						<option value="TALEEM3">Taleem-3</option>
 					</select>
-					</div>
-
-				<div className="row">
-					<label>Owner Name:</label>
-					<input type="text" {...this.former.super_handle(["value","owner_name"])} placeholder="name"/>
-				</div>
-				<div className="row">
-					<label>Owner Phone</label>
-					<input type="number" placeholder="number" {...this.former.super_handle(["value","owner_phone"])}/>
-				</div>
-
-				<div className="row">
-					<label>Notes:</label>
-					<textarea {...this.former.super_handle(["value","notes"])} placeholder="Additional Info (If Any)"/>
 				</div>
 				<div className="button save" onClick={() => this.onSave()}> SignUp</div>
 			</div>
@@ -389,7 +438,7 @@ class SignUp extends Component <propTypes, S> {
 export default connect((state: RootReducerState) => ({
 	auth: state.auth,
 	schoolList: state.school_Info.school_list
-}), ( dispatch: Function ) => ({
+}), (dispatch: Function) => ({
 	createSchoolLogin: (username: string, password: string, limit: number, value: SignUpValue) => dispatch(createSchoolLogin(username, password, limit, value)),
 	getSchoolList: () => dispatch(getSchoolList())
 }))(SignUp)

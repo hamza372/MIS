@@ -3,7 +3,7 @@ interface SyncState {
 }
 
 interface RootReducerState {
-	sync_state: SyncState 
+	sync_state: SyncState
 	auth: {
 		id?: string
 		token?: string
@@ -36,7 +36,7 @@ interface RootReducerState {
 			max_limit: number
 		}
 		meta?: TrialsDataRow["value"]
-	},
+	}
 	trials: TrialsDataRow[]
 	stats: {
 		student_attendance?: {
@@ -65,10 +65,13 @@ interface RootReducerState {
 			data: DiaryData[]
 		}
 	}
+	users: {
+		[id: string]: PermissionPayload
+	}
 }
 
 interface SchoolInfoAction {
-	type: "SCHOOL_INFO",
+	type: "SCHOOL_INFO"
 	trial_info: RootReducerState["school_Info"]["trial_info"]
 	student_info: RootReducerState["school_Info"]["student_info"]
 	meta: TrialsDataRow["value"]
@@ -175,6 +178,13 @@ interface TrialsDataRow {
 		overall_status: string
 		user: string
 		school_type: string
+
+		survey_status: string
+
+		owner_other_job: string
+		computer_operator: string
+		previous_management_system: string
+		previous_software_name: string
 	}
 }
 
@@ -197,6 +207,11 @@ interface SignUpValue {
 	user: string
 	owner_phone: string
 	school_type: string
+
+	owner_other_job: "" | "YES" | "NO"
+	computer_operator: "" | "YES" | "NO"
+	previous_management_system: "" | "REGISTER" | "SOFTWARE" | "EXCEL"
+	previous_software_name: string
 }
 
 interface UserPermissions {
@@ -204,4 +219,8 @@ interface UserPermissions {
 	new_user: boolean
 	stats: boolean
 	trials: boolean
+}
+interface PermissionPayload {
+	role: string
+	permissions: UserPermissions
 }
