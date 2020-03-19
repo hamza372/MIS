@@ -2,21 +2,32 @@
  *  description: takes a single array, breaks it into chunks of size chunkSize
  *               and returns an array of arrays of max length chunkSize
  * 
- *  params: kvArray, chunkSize
- *  defaults: kvArray = [], chunkSize = 32
+ *  @param reverse: if set to true, chunkify will return the reverse version(shallow copy) of the original array
+ * 
+ *  params: kvArray, chunkSize, reverse
+ *  defaults: kvArray = [], chunkSize = 32, reverse = false
  *  return: [[], [], [], ...]
  */
 
-export const chunkify = (kvArray: any, chunkSize = 32) => {
+
+export const chunkify = (kvArray: any, chunkSize = 32, reverse = false) => {
     if(kvArray.length === 0) {
         return [[]]
     } 
     
     if(kvArray.length <= chunkSize) {
-        return [kvArray]
+
+        // check if reverse true, without mutating the original array,
+        // return the reverse array, else return the shallow copy of original array
+        const new_arr = reverse ? kvArray.map((_: any, index: number) => kvArray[kvArray.length - 1 - index]) : [...kvArray]
+
+        return [new_arr]
     }
 
-    return kvArray.reduce((agg: any, curr: any, index: number) => {
+    return kvArray.reduce((agg: any, _: any, index: number) => {
+
+        const curr = reverse ? kvArray[kvArray.length - 1 - index] : kvArray[index]
+
         const chunkIndex = Math.floor(index / chunkSize)
         if(!agg[chunkIndex]) {
             agg[chunkIndex] = [] // create a new chunk

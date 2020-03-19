@@ -1,4 +1,4 @@
-.student-fees-ledger{
+.student-fees-ledger {
 	width: 90%;
 	margin: auto;
 }
@@ -41,9 +41,6 @@
 	.student-fees-ledger .divider {
 		font-size: 1rem;
 		font-weight: bold;
-		text-decoration: underline
-	}
-	.student-fees-ledger .info label {
 		text-decoration: underline
 	}
 }

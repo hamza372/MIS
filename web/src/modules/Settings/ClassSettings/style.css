@@ -2,16 +2,19 @@
     width: 90%;
     margin: auto;
 }
+.class-settings .row.tags .button {
+    margin: 10px;
+}
 .note-message {
     margin: 10px 0px
 }
 .note-message span {
     font-weight: bold;
 }
-.class-settings .default-fee {
-    width: inherit;
-}
 .class-settings .disabled {
   pointer-events: none;
   opacity: 0.7;
+}
+.class-settings.fee-voucher fieldset {
+    border: 1px solid rgba(0,0,0,0.3);
 }
