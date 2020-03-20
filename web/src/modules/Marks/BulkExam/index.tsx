@@ -16,6 +16,8 @@ import calculateGrade from 'utils/calculateGrade'
 
 
 import './style.css'
+import { Link } from 'react-router-dom'
+import Banner from 'components/Banner'
 
 type P = {
 	grades: RootDBState["settings"]["exams"]["grades"]
@@ -29,6 +31,7 @@ interface S extends ExamFilter {
 	sections: AugmentedSection[]
 	show_create_exam: boolean
 	exam_marks_sheet: ExamMarksSheet
+	banner: MISBanner
 }
 
 interface CreateExam extends MISExam {
@@ -43,7 +46,7 @@ interface ExamMarksSheet {
 		name: string
 		rollNo: string
 		exams: {
-			[examId: string]: AugmentedMISExam
+			[examId: string]: { edited: boolean } & AugmentedMISExam
 		}
 	}
 }
@@ -75,7 +78,12 @@ class BulkExam extends Component<P, S> {
 			month: '',
 			show_create_exam: false,
 			sections,
-			exam_marks_sheet: {}
+			exam_marks_sheet: {},
+			banner: {
+				active: false,
+				good: true,
+				text: ""
+			}
 		}
 
 		this.former = new Former(this, [])
@@ -83,7 +91,7 @@ class BulkExam extends Component<P, S> {
 
 	UNSAFE_componentWillReceiveProps(nextProps: P) {
 		const { students, exams } = nextProps
-		this.setCurrentSectionExams(students, exams)
+		this.setExamsMarksSheetForSection(students, exams)
 	}
 
 	getClassIdFromSections = (): string => {
@@ -160,7 +168,7 @@ class BulkExam extends Component<P, S> {
 		return filtered_exams
 	}
 
-	setCurrentSectionExams = (stundents: RootDBState["students"], exams: RootDBState["exams"]) => {
+	setExamsMarksSheetForSection = (stundents: RootDBState["students"], exams: RootDBState["exams"]) => {
 
 		const { section_id, exam_title, year } = this.state
 
@@ -174,11 +182,12 @@ class BulkExam extends Component<P, S> {
 
 			const merge_exams = currStudent.merge_exams
 
-			const student_exams = merge_exams.reduce<{ [id: string]: AugmentedMISExam }>((agg, curr) => {
+			const student_exams = merge_exams.reduce<{ [id: string]: { edited: boolean } & AugmentedMISExam }>((agg, curr) => {
 				return {
 					...agg,
 					[curr.id]: {
 						...curr,
+						edited: false
 					}
 				}
 			}, {})
@@ -189,7 +198,7 @@ class BulkExam extends Component<P, S> {
 					id: currStudent.id,
 					name: currStudent.Name,
 					rollNo: currStudent.RollNumber,
-					exams: student_exams
+					exams: student_exams,
 				}
 			}
 
@@ -228,42 +237,66 @@ class BulkExam extends Component<P, S> {
 
 	onSubjectMarksChange = (student_id: string, exam_id: string, score: string) => {
 
-		const { grades, exams } = this.props
+		const { grades } = this.props
+		const { exam_marks_sheet } = this.state
 
-		const exam = exams[exam_id]
+		const student = exam_marks_sheet[student_id]
+		const exam = student.exams[exam_id]
 
 		const total_marks = exam ? exam.total_score : 0
 		const obtained_marks = parseFloat(score) || 0
+
 		const grade = calculateGrade(obtained_marks, total_marks, grades)
 		const remarks = grade && grades && grades[grade] ? grades[grade].remarks : ""
-
-		const { exam_marks_sheet } = this.state
 
 		this.setState({
 			exam_marks_sheet: {
 				...exam_marks_sheet,
 				[student_id]: {
-					...exam_marks_sheet[student_id],
+					...student,
 					exams: {
-						...exam_marks_sheet[student_id]["exams"],
+						...student["exams"],
 						[exam_id]: {
-							...exam_marks_sheet[student_id]["exams"][exam_id],
+							...exam,
 							stats: {
 								score: obtained_marks,
 								grade,
 								remarks
-							}
+							},
+							edited: true
 						}
-					}
+					},
 				}
 			}
 		})
 	}
 
 	onSaveBulkExams = (): void => {
+
 		const { exam_marks_sheet } = this.state
-		if (Object.values(exam_marks_sheet).length > 0) {
+		const students_count = Object.values(exam_marks_sheet).length
+
+		if (students_count === 0) {
+			alert("There is nothing to save!")
+			return
+		}
+
+		if (students_count > 0) {
+
 			this.props.updateBulkExams(exam_marks_sheet)
+
+			this.setState({
+				banner: {
+					active: true,
+					good: true,
+					text: "Exam marks sheet has been saved successfully"
+				}
+			})
+
+			setTimeout(() => {
+				this.setState({ banner: { active: false } })
+			}, 3000);
+
 		}
 	}
 
@@ -284,11 +317,12 @@ class BulkExam extends Component<P, S> {
 
 		return <Layout history={history}>
 			<div className="bulk-exams">
+				{this.state.banner.active && <Banner isGood={this.state.banner.good} text={this.state.banner.text} />}
 				<div className="title">Bulk Exams</div>
 				<div className="section-container section form">
 					<div className="row">
 						<label>Class-Section</label>
-						<select {...this.former.super_handle(["section_id"], () => true, () => this.setCurrentSectionExams(students, exams))}>
+						<select {...this.former.super_handle(["section_id"], () => true, () => this.setExamsMarksSheetForSection(students, exams))}>
 							<option value="">Select Class</option>
 							{
 								sections.map(section => <option key={section.id} value={section.id}>{section ? section.namespaced_name : ''}</option>)
@@ -297,16 +331,18 @@ class BulkExam extends Component<P, S> {
 					</div>
 					<div className="row">
 						<label>Exam Year</label>
-						<select {...this.former.super_handle(["year"], () => true, () => this.setCurrentSectionExams(students, exams))}>
+						<select {...this.former.super_handle(["year"], () => true, () => this.setExamsMarksSheetForSection(students, exams))}>
 							<option value="">Select Year</option>
 							{
-								[...years].map(year => <option key={year} value={year}>{year}</option>)
+								[...years]
+									.sort((a, b) => parseInt(b) - parseInt(a))
+									.map(year => <option key={year} value={year}>{year}</option>)
 							}
 						</select>
 					</div>
 					<div className="row">
 						<label>Exam Title</label>
-						<select {...this.former.super_handle(["exam_title"], () => true, () => this.setCurrentSectionExams(students, exams))}>
+						<select {...this.former.super_handle(["exam_title"], () => true, () => this.setExamsMarksSheetForSection(students, exams))}>
 							<option value="">Select Exam</option>
 							{
 								ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
@@ -354,9 +390,10 @@ class BulkExam extends Component<P, S> {
 							</thead>
 							<tbody>
 								{
-									Object.values(exam_marks_sheet)
+									[...Object.values(exam_marks_sheet)]
+										.sort((a: any, b: any) => (a.rollNo || 0) - (b.rollNo || 0))
 										.map(student => <tr key={student.id}>
-											<td title={toTitleCase(student.name)}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 12))}</td>
+											<td title={toTitleCase(student.name)}><Link to={`/student/${student.id}/profile`}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 12))}</Link></td>
 											{
 												Object.entries(student.exams)
 													.map(([exam_id, exam]) => <td key={`${exam_id}-${student.id}-${exam.section_id}`}>
@@ -368,9 +405,8 @@ class BulkExam extends Component<P, S> {
 							</tbody>
 						</table>
 					</div>
-					<div className="row" style={{ marginTop: 20, justifyContent: "flex-end" }}>
-						<div className="button grey" style={{ padding: "10px 15px", marginRight: "2px" }}>Print Marks Sheet</div>
-						<div className="button blue" style={{ padding: "10px 15px" }} onClick={this.onSaveBulkExams}>Save Marks Sheet</div>
+					<div className="row marks-sheet">
+						<div className="button blue" onClick={this.onSaveBulkExams}>Save Marks Sheet</div>
 					</div>
 				</div>
 			</div>

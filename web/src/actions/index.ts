@@ -734,7 +734,7 @@ interface ExamMarksSheet {
 		name: string
 		rollNo: string
 		exams: {
-			[examId: string]: AugmentedMISExam
+			[examId: string]: { edited: boolean } & AugmentedMISExam 
 		}
 	}
 }
@@ -748,16 +748,21 @@ export const updateBulkExams = (exam_marks_sheet: ExamMarksSheet) => (dispatch: 
 		const exams = student.exams
 
 		for(const exam of Object.values(exams)){
-			merges.push({
-				path: ["db", "students", student.id, "exams", exam.id],
-				value: {
-					...exam.stats
-				}
-			})
+			// only create merges for those students' exams which are updated
+			if(exam.edited) {
+				merges.push({
+					path: ["db", "students", student.id, "exams", exam.id],
+					value: {
+						...exam.stats
+					}
+				})
+			}
 		}
 	}
 	
-	dispatch(createMerges(merges))
+	if (merges.length > 0) {
+		dispatch(createMerges(merges))
+	}
 }
 
 

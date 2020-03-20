@@ -421,3 +421,9 @@ interface ExamFilter {
 }
 
 type MISGrades = RootDBState["settings"]["exams"]["grades"]
+
+interface MISBanner {
+	active: boolean
+	good?: boolean
+	text?: string
+}
