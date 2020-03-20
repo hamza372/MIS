@@ -50,7 +50,7 @@ class Reports extends Component<propsType, S> {
 
 		const section_id = parsed_query.section_id ? parsed_query.section_id.toString() : ''
 		const exam_title = parsed_query.exam_title ? parsed_query.exam_title.toString() : ''
-		const year = parsed_query.year ? parsed_query.year.toString() : ''
+		const year = parsed_query.year ? parsed_query.year.toString() : moment().format("YYYY")
 		const month = parsed_query.month ? parsed_query.month.toString() : ''
 
 		this.state = {
@@ -113,6 +113,11 @@ class Reports extends Component<propsType, S> {
 		const url = `/reports/${class_id}/${section_id}/new`
 
 		// redirect to create new exam page
+		window.location.href = url
+	}
+
+	createBulkExams = (): void => {
+		const url = "/reports/bulk-exams"
 		window.location.href = url
 	}
 
@@ -254,7 +259,7 @@ class Reports extends Component<propsType, S> {
 							</select>
 						</div>
 						<div className="row">
-							<label>Exam</label>
+							<label>Exam Title</label>
 							<select {...this.former.super_handle(["exam_title"], () => true, this.onStateChange)}>
 								<option value="">Select Exam</option>
 								{
@@ -275,8 +280,7 @@ class Reports extends Component<propsType, S> {
 						}
 					</div>
 					<div className="row create-exam">
-						<div className="button blue create-exam" onClick={() => this.createNewExam()}>Create New Exam</div>
-						<Link className="button blue create-exam" to='/reports/bulk-exams'>Create Bulk Exam</Link>
+						<div className="button blue create-exam" onClick={this.createBulkExams}>Create Bulk Exams</div>
 					</div>
 				</div>
 				{
@@ -311,7 +315,8 @@ class Reports extends Component<propsType, S> {
 							</div>
 						</fieldset>
 						<div className="row">
-							<div className="button grey" onClick={() => window.print()}>Print Result Sheet</div>
+							<div className="button grey" onClick={() => window.print()} style={{ marginRight: 5 }}>Print Result Sheet</div>
+							<div className="button blue" onClick={() => this.createNewExam()}>Create New Exam</div>
 						</div>
 					</div>
 				}
