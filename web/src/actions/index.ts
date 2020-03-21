@@ -728,17 +728,6 @@ export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (
 	]))
 }
 
-interface ExamMarksSheet {
-	[studentId: string]: {
-		id: string
-		name: string
-		rollNo: string
-		exams: {
-			[examId: string]: { edited: boolean } & AugmentedMISExam 
-		}
-	}
-}
-
 export const updateBulkExams = (exam_marks_sheet: ExamMarksSheet) => (dispatch: Function) => {
 	
 	let merges = []

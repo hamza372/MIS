@@ -42,17 +42,6 @@ interface CreateExam extends MISExam {
 	}
 }
 
-interface ExamMarksSheet {
-	[studentId: string]: {
-		id: string
-		name: string
-		rollNo: string
-		exams: {
-			[examId: string]: { edited: boolean } & AugmentedMISExam
-		}
-	}
-}
-
 function blankExam() {
 	return {
 		id: v4(),
@@ -117,12 +106,6 @@ class BulkExam extends Component<P, S> {
 		return section ? section.class_id : undefined
 	}
 
-	closeCreateExamModal = () => {
-		this.setState({ show_create_exam: false }, () => {
-			document.body.style.position = ''
-		})
-	}
-
 	getSubjects = (): string[] => {
 
 		const { classes } = this.props
@@ -132,6 +115,11 @@ class BulkExam extends Component<P, S> {
 		return Object.keys(subjects)
 	}
 
+	closeCreateExamModal = () => {
+		this.setState({ show_create_exam: false }, () => {
+			document.body.style.position = ''
+		})
+	}
 
 	toggleCreateExamModal = () => {
 
@@ -194,7 +182,7 @@ class BulkExam extends Component<P, S> {
 
 		// do nothing
 		if (section_id.length === 0 || exam_title.length === 0 || year.length === 0)
-			return;
+			return
 
 		const merge_students_exams = this.getMergeStudentsExams(stundents, exams)
 
@@ -202,11 +190,11 @@ class BulkExam extends Component<P, S> {
 
 			const merge_exams = currStudent.merge_exams
 
-			const student_exams = merge_exams.reduce<{ [id: string]: { edited: boolean } & AugmentedMISExam }>((agg, curr) => {
+			const student_exams = merge_exams.reduce<{ [id: string]: { edited: boolean } & AugmentedMISExam }>((aggExams, currExam) => {
 				return {
-					...agg,
-					[curr.id]: {
-						...curr,
+					...aggExams,
+					[currExam.id]: {
+						...currExam,
 						edited: false
 					}
 				}
@@ -255,6 +243,9 @@ class BulkExam extends Component<P, S> {
 		return merge_student_exams
 	}
 
+	// accepting score as string here, it is basically for the future use case where we can
+	// add options like 'A' for 'Absent' so that when any school print result card, show Absent
+	// instead of 0 (zero student got zero in that exam).
 	subjectMarksUpdate = (student_id: string, exam_id: string, score: string): void => {
 
 		const { grades } = this.props
@@ -263,7 +254,8 @@ class BulkExam extends Component<P, S> {
 		const student = exam_marks_sheet[student_id]
 		const exam = student.exams[exam_id]
 
-		const total_marks = exam ? exam.total_score : 0
+		// to handle some old exams with total score of type string
+		const total_marks = exam ? parseFloat(exam.total_score.toString()) || 0 : 0
 		const obtained_marks = parseFloat(score) || 0
 
 		const grade = calculateGrade(obtained_marks, total_marks, grades)
@@ -338,13 +330,11 @@ class BulkExam extends Component<P, S> {
 		this.props.deleteExam(students, exam_id)
 
 		setTimeout(() => this.setState({ banner: { active: false } }), 3000)
-
 	}
 
 	editExam = (exam: MISExam): void => {
 		const { class_id, section_id, id } = exam
 		const url = `/reports/${class_id}/${section_id}/exam/${id}`
-		// redirect to edit exam page
 		window.location.href = url
 	}
 
@@ -491,8 +481,8 @@ const ExamMarksSheet = (props: ExamMarksSheetProps) => {
 					</thead>
 					<tbody>
 						{
-							[...Object.values(examMarksSheet)]
-								.sort((a: any, b: any) => (a.rollNo || 0) - (b.rollNo || 0))
+							Object.values(examMarksSheet)
+								.sort((a, b) => (parseInt(a.rollNo) || 0) - (parseInt(b.rollNo) || 0))
 								.map(student => <tr key={student.id}>
 									<td title={toTitleCase(student.name)}><Link to={`/student/${student.id}/profile`}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 12))}</Link></td>
 									{

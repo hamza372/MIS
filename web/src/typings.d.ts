@@ -427,3 +427,14 @@ interface MISBanner {
 	good?: boolean
 	text?: string
 }
+
+interface ExamMarksSheet {
+	[studentId: string]: {
+		id: string
+		name: string
+		rollNo: string
+		exams: {
+			[examId: string]: { edited: boolean } & AugmentedMISExam
+		}
+	}
+}
