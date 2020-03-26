@@ -11,8 +11,11 @@ import { LayoutWrap } from 'components/Layout'
 import { StudentPrintableList } from 'components/Printable/Student/list'
 import { StudenPrintableIDCardList } from 'components/Printable/Student/cardlist'
 import getSectionsFromClasses from 'utils/getSectionsFromClasses'
-import { StudentIcon } from 'assets/icons'
+import { StudentIcon, HorizontalDots } from 'assets/icons'
 import { chunkify } from 'utils/chunkify'
+import { deleteStudentById } from 'actions/index'
+import DropdownMenu from 'components/Dropdown/DropdownMenu'
+import { Popover, OverlayTrigger } from 'react-bootstrap'
 
 import './style.css'
 
@@ -23,6 +26,8 @@ type P = {
 	schoolLogo?: string
 	forwardTo: string
 	max_limit?: number
+
+	deleteStudent?: (student_id: string) => void
 }
 
 type S = {
@@ -32,6 +37,7 @@ type S = {
 	tag: string
 	section_id: string
 	students_per_page: number
+	student_id: string
 }
 
 const CHUNK_SIZE_FOR_LIST = 29
@@ -50,6 +56,7 @@ export class StudentList extends Component<P, S> {
 			printStudentCard: false,
 			tag: "",
 			section_id: "",
+			student_id: "",
 			students_per_page: PAGE_SIZE
 		}
 		this.former = new Former(this, [])
@@ -157,6 +164,33 @@ export class StudentList extends Component<P, S> {
 		this.setState({ students_per_page: PAGE_SIZE })
 	}
 
+	onPrint = () => {
+
+		window.print()
+
+		// reset state
+		this.setState({
+			student_id: "",
+			printStudentCard: false
+		})
+	}
+
+	printStudentIdCard = (student_id: string) => {
+
+		this.setState({ student_id, printStudentCard: true })
+
+		// wait to render the elements for id card correctly and then print
+		setTimeout(() => {
+			this.onPrint()
+		}, 200)
+	}
+
+	deleteStudent = (student_id: string) => {
+		if (window.confirm("Are you sure you want to delete this student?")) {
+			this.props.deleteStudent(student_id)
+		}
+	}
+
 	render() {
 
 		const { classes, students, settings, forwardTo, max_limit } = this.props
@@ -218,8 +252,12 @@ export class StudentList extends Component<P, S> {
 			createText = "Manage Fees"
 		}
 
-		const { students_per_page } = this.state
+		const { students_per_page, student_id } = this.state
+
 		const card_items = items.slice(0, students_per_page)
+
+		// filter in case of single student id card print
+		const print_card_items = student_id ? items.filter(student => student.id === student_id) : items
 
 		return <div className="student-list">
 			<div className="title no-print">All Students</div>
@@ -228,11 +266,12 @@ export class StudentList extends Component<P, S> {
 					//@ts-ignore
 					<Card
 						items={card_items}
-						Component={StudentItem}
 						create={create}
 						createText={createText}
 						toLabel={toLabel}
-						totalItems={items.length}>
+						totalItems={items.length}
+						onDeleteStudent={this.deleteStudent}
+						onPrintStudentIdCard={this.printStudentIdCard}>
 
 						{forwardTo !== "prospective-student" && <div className="row filter-container no-print">
 							<div className="row checkbox-container">
@@ -295,7 +334,7 @@ export class StudentList extends Component<P, S> {
 							studentClass={section_name} />)
 					:
 					// print 8 students ID cards per page
-					chunkify(items, CHUNK_SIZE_FOR_CARDS)
+					chunkify(print_card_items, CHUNK_SIZE_FOR_CARDS)
 						.map((chunkItems: AugmentedStudent[], index: number) => <StudenPrintableIDCardList students={chunkItems} key={index}
 							schoolName={settings.schoolName}
 							schoolLogo={this.props.schoolLogo}
@@ -314,71 +353,121 @@ export default connect((state: RootReducerState, { location, forwardTo = undefin
 	schoolLogo: state.db.assets ? state.db.assets.schoolLogo || "" : "",
 	forwardTo: forwardTo || queryString.parse(location.search).forwardTo || "profile",
 	max_limit: state.db.max_limit || -1
+}), (dispatch: Function) => ({
+	deleteStudent: (student_id: string) => dispatch(deleteStudentById(student_id))
 }))(LayoutWrap(StudentList))
 
+interface StudentItemProps {
+	student: AugmentedStudent
+	deleteStudent: (student_id: string) => void
+	printStudentIdCard: (student_id: string) => void
+}
 
-const StudentItem = (student: AugmentedStudent) => {
+export class StudentItem extends Component<StudentItemProps> {
 
-	const section_name = student.section ? student.section.namespaced_name : "No Class"
-	const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
-	let card_button_text = "Edit Student"
+	onPrintStudentIdCard = (student_id: string) => {
+		// hack to close the popover before invoking print method
+		document.body.click()
 
-	if (student.forwardTo === 'payment') {
-		card_button_text = "View Payments"
+		// wait for popover close
+		setTimeout(() => {
+			this.props.printStudentIdCard(student_id)
+		}, 500);
 	}
-	if (student.forwardTo === 'certificates') {
-		card_button_text = "View Certificate"
-	}
-	if (student.forwardTo === 'marks') {
-		card_button_text = "View Marks"
+
+	renderPopover = (props: StudentItemProps) => {
+
+		return <Popover id="card-popover">
+			<DropdownMenu>
+				<div className="dropdown-item disabled bold">For Single Student</div>
+				<div className="dropdown-divider" role="none"></div>
+				<div className="dropdown-item" onClick={() => this.onPrintStudentIdCard(props.student.id)}>Print ID Card</div>
+				<div className="dropdown-item delete" onClick={() => this.props.deleteStudent(props.student.id)}>Delete Permanently</div>
+			</DropdownMenu>
+		</Popover>
 	}
 
-	const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
+	render() {
 
-	return <div className="profile-card-wrapper" key={`${student.id}-${student.section_id}`}>
-		<div className="profile">
-			<img
-				className="thumbnail"
-				src={avatar}
-				crossOrigin="anonymous"
-				alt="profile" />
-			<div className="name name-wrap">
-				<Link style={{ textDecoration: "none" }} to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-					{toTitleCase(student.Name)}
+		const { student } = this.props
+
+		const section_name = student.section ? student.section.namespaced_name : "No Class"
+		const tags = student.tags !== undefined && Object.keys(student.tags).length > 0 ? Object.keys(student.tags) : []
+
+		let card_button_text = "Edit Student"
+
+		if (student.forwardTo === 'payment') {
+			card_button_text = "View Payments"
+		}
+		if (student.forwardTo === 'certificates') {
+			card_button_text = "View Certificate"
+		}
+		if (student.forwardTo === 'marks') {
+			card_button_text = "View Marks"
+		}
+
+		// to show dropdown menu only for profile
+		const isProfileComponent = student.forwardTo === 'profile'
+
+		const avatar = student.ProfilePicture ? student.ProfilePicture.url || student.ProfilePicture.image_string : StudentIcon
+
+		return <div className="profile-card-wrapper" key={`${student.id}-${student.section_id}`}>
+			{
+				isProfileComponent && <div className="dropdown-menu-container">
+					<OverlayTrigger
+						key={student.id}
+						trigger="click"
+						placement="bottom-end"
+						rootClose={true}
+						overlay={this.renderPopover(this.props)}>
+						<div className="menu-anchor"><img src={HorizontalDots} alt="menu" /></div>
+					</OverlayTrigger>
+				</div>
+			}
+			<div className="profile" style={{ marginTop: isProfileComponent ? '0em' : '2.2em' }}>
+				<img
+					className="thumbnail"
+					src={avatar}
+					crossOrigin="anonymous"
+					alt="profile" />
+				<div className="name name-wrap">
+					<Link style={{ textDecoration: "none" }} to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
+						{toTitleCase(student.Name)}
+					</Link>
+				</div>
+				<div className="row info">
+					<label>F.Name </label>
+					<div className="name-wrap">{toTitleCase(student.ManName)}</div>
+				</div>
+				<div className="row info">
+					<label>Class </label>
+					<div>{section_name}</div>
+				</div>
+				<div className="row info">
+					<label>Adm No </label>
+					<div>{(student.forwardTo !== "prospective-student" && student.AdmissionNumber) || ""}</div>
+				</div>
+				<div className="row info">
+					<label>Roll No </label>
+					<div>{(student.forwardTo !== "prospective-student" && student.RollNumber) || ""}</div>
+				</div>
+				<div className="row info">
+					<label>Phone </label>
+					<div>{student.Phone || ""}</div>
+				</div>
+				<div className={`row tags ${tags.length > 0 ? 'scroll' : ''}`}>
+					{
+						tags
+							.filter(tag => tag !== "FINISHED_SCHOOL")
+							.map((tag, i) => <div className="tag" key={i}> {tag}</div>)
+					}
+				</div>
+				<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
+					{card_button_text}
 				</Link>
 			</div>
-			<div className="row info">
-				<label>F.Name </label>
-				<div className="name-wrap">{toTitleCase(student.ManName)}</div>
-			</div>
-			<div className="row info">
-				<label>Class </label>
-				<div>{section_name}</div>
-			</div>
-			<div className="row info">
-				<label>Adm No </label>
-				<div>{(student.forwardTo !== "prospective-student" && student.AdmissionNumber) || ""}</div>
-			</div>
-			<div className="row info">
-				<label>Roll No </label>
-				<div>{(student.forwardTo !== "prospective-student" && student.RollNumber) || ""}</div>
-			</div>
-			<div className="row info">
-				<label>Phone </label>
-				<div>{student.Phone || ""}</div>
-			</div>
-			<div className={`row tags ${tags.length > 0 ? 'scroll' : ''}`}>
-				{
-					tags
-						.filter(tag => tag !== "FINISHED_SCHOOL")
-						.map((tag, i) => <div className="tag" key={i}> {tag}</div>)
-				}
-			</div>
-			<Link className="edit-btn" to={`/student/${student.id}/${student.forwardTo}`} key={student.id}>
-				{card_button_text}
-			</Link>
 		</div>
-	</div>
+	}
 }
 
 const toLabel = (student: AugmentedStudent): string => {

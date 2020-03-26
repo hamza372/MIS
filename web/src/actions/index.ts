@@ -69,6 +69,14 @@ export const deleteStudent = (student: MISStudent) => (dispatch: Function) => {
 	]))
 }
 
+export const deleteStudentById = (student_id: string) => (dispatch: Function) => {
+	dispatch(createDeletes([
+		{
+			path: ["db", "students", student_id]
+		}
+	]))
+}
+
 export const deleteFaculty = (faculty_id: string) => (dispatch: Function, getState: () => RootReducerState) => {
 
 	const state = getState()

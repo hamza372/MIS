@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import Former from 'utils/former'
-
+import { StudentItem } from 'modules/Student/List'
 import './style.css'
 
 interface P {
 	items: Array<any>
-	Component: Function
 	create: string
 	createText: string
 	toLabel: Function
 	totalItems?: number
+	onDeleteStudent?: (student_id: string) => void
+	onPrintStudentIdCard?: (student_id: string) => void
+
 }
 
 interface S {
@@ -44,7 +46,7 @@ export default class Card extends Component<propTypes, S> {
 
 	render() {
 
-		const { items, toLabel, Component, children, totalItems } = this.props;
+		const { items, toLabel, children, totalItems, onDeleteStudent, onPrintStudentIdCard } = this.props;
 
 		const filteredList = items
 			.filter(item => {
@@ -63,7 +65,11 @@ export default class Card extends Component<propTypes, S> {
 
 			<div className="card-list">
 				{
-					filteredList.map(item => Component(item))
+					filteredList.map(item => <StudentItem
+						key={item.id + "-" + item.section_id}
+						student={item}
+						deleteStudent={onDeleteStudent}
+						printStudentIdCard={onPrintStudentIdCard} />)
 				}
 			</div>
 		</div>
