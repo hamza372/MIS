@@ -122,10 +122,12 @@ class ToFeeDefaulters extends Component {
 				return agg
 			}
 
+			const balance = this.calculateDebt(debt)
+
 			return [...agg, {
 				number: student.Phone,
 				text : this.state.text
-				.replace(/\$BALANCE/g, `${debt}`)
+				.replace(/\$BALANCE/g, `${balance}`)
 				.replace(/\$NAME/g, student.FamilyID || student.Name)
 				.replace(/\$FNAME/g, student.ManName)
 			}]
