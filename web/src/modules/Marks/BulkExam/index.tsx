@@ -14,26 +14,27 @@ import CreateExamModal from './createExamModal'
 import { mergeExam, updateBulkExams, deleteExam } from 'actions/index'
 import calculateGrade from 'utils/calculateGrade'
 import { EditIcon, DeleteIcon } from 'assets/icons'
-
-
-import './style.css'
 import { Link } from 'react-router-dom'
 import Banner from 'components/Banner'
+import queryString from 'query-string'
+
+import './style.css'
 
 type P = {
 	grades: RootDBState["settings"]["exams"]["grades"]
 	schoolName: string
 	createSingleExam: (exam: CreateExam, class_id: string, section_id: string) => void
-	updateBulkExams: (marks_sheet: ExamMarksSheet) => void
+	updateBulkExams: (marks_sheet: ExamScoreSheet) => void
 	deleteExam: (students_ids: string[], exam_id: string) => void
 } & RouteComponentProps & RootDBState
 
-interface S extends ExamFilter {
-	section_id: string
+interface S {
+	selectedSection: string
 	sections: AugmentedSection[]
-	show_create_exam: boolean
-	exam_marks_sheet: ExamMarksSheet
+	showCreateExam: boolean
+	scoreSheet: ExamScoreSheet
 	banner: MISBanner
+	examFilter: ExamFilter
 }
 
 interface CreateExam extends MISExam {
@@ -58,18 +59,34 @@ class BulkExam extends Component<P, S> {
 	constructor(props: P) {
 		super(props)
 
-		const year = moment().format("YYYY")
-		const sections = getSectionsFromClasses(this.props.classes)
+		const students = this.props.students
+		const exams = this.props.exams
+		const classes = this.props.classes
+
+		const sections = getSectionsFromClasses(classes)
 			.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
 
-		this.state = {
-			section_id: "",
-			exam_title: "",
+		const pq = queryString.parse(this.props.location.search)
+
+		const section_id = pq.section_id ? pq.section_id.toString() : ''
+		const exam_title = pq.exam_title ? pq.exam_title.toString() : ''
+		const year = pq.year ? pq.year.toString() : moment().format("YYYY")
+		const month = pq.month ? pq.month.toString() : ''
+
+		const examFilter = {
+			exam_title,
 			year,
-			month: '',
-			show_create_exam: false,
+			month
+		}
+
+		const scoreSheet = this.createScoreSheet(students, exams, section_id, examFilter)
+
+		this.state = {
+			selectedSection: section_id,
+			examFilter,
 			sections,
-			exam_marks_sheet: {},
+			scoreSheet,
+			showCreateExam: false,
 			banner: {
 				active: false,
 				good: true,
@@ -80,14 +97,63 @@ class BulkExam extends Component<P, S> {
 		this.former = new Former(this, [])
 	}
 
+	// handling score sheet for newly created exams
 	UNSAFE_componentWillReceiveProps(nextProps: P) {
+
 		const { students, exams } = nextProps
-		this.setExamMarksSheetForSection(students, exams)
+		const { selectedSection, examFilter } = this.state
+
+		const score_sheet = this.createScoreSheet(students, exams, selectedSection, examFilter)
+
+		this.setState({
+			scoreSheet: score_sheet
+		})
 	}
 
-	getExamFilterConditions = (exam: MISExam): boolean => {
+	getClassIdFromSections = (): string => {
 
-		const { section_id, exam_title, month, year } = this.state
+		const { selectedSection, sections } = this.state
+		const section = sections.find(section => section.id === selectedSection)
+
+		return section ? section.class_id : undefined
+	}
+
+	getSubjects = (): string[] => {
+
+		const { classes } = this.props
+
+		const class_id = this.getClassIdFromSections()
+		const subjects = classes[class_id] ? classes[class_id].subjects : {}
+
+		return Object.keys(subjects)
+	}
+
+	closeCreateExamModal = () => {
+		this.setState({ showCreateExam: false }, () => {
+			document.body.style.position = ''
+		})
+	}
+
+	toggleCreateExamModal = () => {
+
+		const { selectedSection, examFilter } = this.state
+
+		// section id and exam title are compulsory to create new exam
+		if (selectedSection === "" || examFilter.exam_title === "") {
+			alert("Please select class and exam title to create new exam")
+			return
+		}
+
+		this.setState({ showCreateExam: !this.state.showCreateExam }, () => {
+			if (this.state.showCreateExam === true) {
+				document.body.style.position = 'fixed'
+			}
+		})
+	}
+
+	getExamFilterConditions = (exam: MISExam, section_id: string, examFilter: ExamFilter): boolean => {
+
+		const { exam_title, year, month } = examFilter
 
 		const is_exam = exam.name === exam_title
 		const is_year = moment(exam.date).format("YYYY") === year
@@ -98,77 +164,39 @@ class BulkExam extends Component<P, S> {
 		return is_exam && is_year && is_section && is_month
 	}
 
-	getClassIdFromSections = (): string => {
-
-		const { section_id, sections } = this.state
-		const section = sections.find(section => section.id === section_id)
-
-		return section ? section.class_id : undefined
-	}
-
-	getSubjects = (): string[] => {
-
-		const { classes } = this.props
-		const class_id = this.getClassIdFromSections()
-		const subjects = classes[class_id] ? classes[class_id].subjects : {}
-
-		return Object.keys(subjects)
-	}
-
-	closeCreateExamModal = () => {
-		this.setState({ show_create_exam: false }, () => {
-			document.body.style.position = ''
-		})
-	}
-
-	toggleCreateExamModal = () => {
-
-		const { section_id, exam_title } = this.state
-
-		// section id and exam title are compulsory to create new exam
-		if (section_id.length === 0 || exam_title.length === 0) {
-			alert("Please select class and exam title to create new exam")
-			return;
-		}
-
-		this.setState({ show_create_exam: !this.state.show_create_exam }, () => {
-			if (this.state.show_create_exam === true) {
-				document.body.style.position = 'fixed'
-			}
-		})
-	}
-
+	// creating empty exam for each student
 	onCreateExam = (subject: string, total_score: number, date: number): void => {
 
 		const { students } = this.props
-		const { section_id, exam_title } = this.state
+		const { selectedSection, examFilter } = this.state
 
 		const class_id = this.getClassIdFromSections()
 
 		const student_marks = Object.entries(students)
-			.filter(([_, student]) => student && student.Name && student.section_id === section_id)
+			.filter(([_, student]) => student && student.Name && student.section_id === selectedSection)
 			.reduce((agg, [id, _]) => ({ ...agg, [id]: { score: "", grade: "", remarks: "" } }), {})
 
 		const prepare_exam: CreateExam = {
 			...blankExam(),
-			name: exam_title,
+			name: examFilter.exam_title,
 			class_id,
-			section_id,
+			section_id: selectedSection,
 			subject,
 			total_score,
 			date,
 			student_marks
 		}
 
-		this.props.createSingleExam(prepare_exam, class_id, section_id)
+		// this action should be simplify because exam object has class_id and section_id
+		this.props.createSingleExam(prepare_exam, class_id, selectedSection)
 	}
 
-	getFilteredExams = (exams: RootDBState["exams"]): MISExam[] => {
+	getFilteredExams = (exams: RootDBState["exams"], section_id: string, examFilter: ExamFilter): MISExam[] => {
 
 		let filtered_exams: MISExam[] = []
 
 		for (const exam of Object.values(exams)) {
-			if (this.getExamFilterConditions(exam)) {
+			if (this.getExamFilterConditions(exam, section_id, examFilter)) {
 				filtered_exams.push(exam)
 			}
 		}
@@ -176,21 +204,16 @@ class BulkExam extends Component<P, S> {
 		return filtered_exams
 	}
 
-	setExamMarksSheetForSection = (stundents: RootDBState["students"], exams: RootDBState["exams"]): void => {
+	createScoreSheet = (students: RootDBState["students"], exams: RootDBState["exams"], section_id: string, examFilter: ExamFilter): ExamScoreSheet => {
 
-		const { section_id, exam_title, year } = this.state
+		const merge_students_exams = this.getMergeStudentsExams(students, exams, section_id, examFilter)
 
-		// do nothing
-		if (section_id.length === 0 || exam_title.length === 0 || year.length === 0)
-			return
+		const scoreSheet = merge_students_exams.reduce<ExamScoreSheet>((aggStudents, currStudent) => {
 
-		const merge_students_exams = this.getMergeStudentsExams(stundents, exams)
+			const exams = currStudent.merge_exams
 
-		const exam_marks_sheet = merge_students_exams.reduce<ExamMarksSheet>((aggStudents, currStudent) => {
-
-			const merge_exams = currStudent.merge_exams
-
-			const student_exams = merge_exams.reduce<{ [id: string]: { edited: boolean } & AugmentedMISExam }>((aggExams, currExam) => {
+			// inner reduce for student exams
+			const student_exams = exams.reduce((aggExams, currExam) => {
 				return {
 					...aggExams,
 					[currExam.id]: {
@@ -200,6 +223,7 @@ class BulkExam extends Component<P, S> {
 				}
 			}, {})
 
+			// outer reduce return
 			return {
 				...aggStudents,
 				[currStudent.id]: {
@@ -212,14 +236,12 @@ class BulkExam extends Component<P, S> {
 
 		}, {})
 
-		this.setState({ exam_marks_sheet }, () => {
-			console.log("state has been updated")
-		})
+		return scoreSheet
 	}
 
-	getMergeStudentsExams = (students: RootDBState["students"], exams: RootDBState["exams"]): MergeStudentsExams[] => {
+	getMergeStudentsExams = (students: RootDBState["students"], exams: RootDBState["exams"], section_id: string, examFilter: ExamFilter): MergeStudentsExams[] => {
 
-		const filtered_exams = this.getFilteredExams(exams)
+		const filtered_exams = this.getFilteredExams(exams, section_id, examFilter)
 
 		const merge_student_exams = Object.values(students)
 			.filter(student => student && student.Name && student.section_id && student.exams)
@@ -228,7 +250,9 @@ class BulkExam extends Component<P, S> {
 				const merge_exams: AugmentedMISExam[] = []
 
 				for (const exam of filtered_exams) {
+
 					const stats = curr.exams[exam.id]
+
 					if (stats != null) {
 						merge_exams.push({ ...exam, stats })
 					}
@@ -237,21 +261,42 @@ class BulkExam extends Component<P, S> {
 				// in case there is no exams for the curr student, no need to put into list
 				if (merge_exams.length === 0)
 					return agg
+
 				return [...agg, { ...curr, merge_exams }]
+
 			}, [])
 
 		return merge_student_exams
 	}
 
+	setScoreSheet = (students: RootDBState["students"], exams: RootDBState["exams"]): void => {
+
+		const { examFilter, selectedSection } = this.state
+
+		// set query params on each filter change
+		this.setQueryParams(selectedSection, examFilter)
+
+		// do nothing if all filters not selected
+		if (selectedSection === "" || examFilter.exam_title === "" || examFilter.year === "") {
+			return
+		}
+
+		const scoreSheet = this.createScoreSheet(students, exams, selectedSection, examFilter)
+
+		this.setState({ scoreSheet }, () => {
+			console.log("state has been updated")
+		})
+	}
+
 	// accepting score as string here, it is basically for the future use case where we can
 	// add options like 'A' for 'Absent' so that when any school print result card, show Absent
 	// instead of 0 (zero student got zero in that exam).
-	subjectMarksUpdate = (student_id: string, exam_id: string, score: string): void => {
+	subjectScoreUpdate = (student_id: string, exam_id: string, score: string): void => {
 
 		const { grades } = this.props
-		const { exam_marks_sheet } = this.state
+		const { scoreSheet } = this.state
 
-		const student = exam_marks_sheet[student_id]
+		const student = scoreSheet[student_id]
 		const exam = student.exams[exam_id]
 
 		// to handle some old exams with total score of type string
@@ -262,8 +307,8 @@ class BulkExam extends Component<P, S> {
 		const remarks = grade && grades && grades[grade] ? grades[grade].remarks : ""
 
 		this.setState({
-			exam_marks_sheet: {
-				...exam_marks_sheet,
+			scoreSheet: {
+				...scoreSheet,
 				[student_id]: {
 					...student,
 					exams: {
@@ -285,28 +330,25 @@ class BulkExam extends Component<P, S> {
 
 	saveBulkExams = (): void => {
 
-		const { exam_marks_sheet } = this.state
-		const students_count = Object.values(exam_marks_sheet).length
+		const { scoreSheet } = this.state
+		const students_count = Object.values(scoreSheet).length
 
 		if (students_count === 0) {
 			alert("There is nothing to save!")
 			return
 		}
 
-		if (students_count > 0) {
+		this.props.updateBulkExams(scoreSheet)
 
-			this.props.updateBulkExams(exam_marks_sheet)
+		this.setState({
+			banner: {
+				active: true,
+				good: true,
+				text: "Exam marks sheet has been saved successfully"
+			}
+		})
 
-			this.setState({
-				banner: {
-					active: true,
-					good: true,
-					text: "Exam marks sheet has been saved successfully"
-				}
-			})
-
-			setTimeout(() => { this.setState({ banner: { active: false } }) }, 3000)
-		}
+		setTimeout(() => { this.setState({ banner: { active: false } }) }, 3000)
 	}
 
 	deleteExam = (exam_id: string): void => {
@@ -338,11 +380,26 @@ class BulkExam extends Component<P, S> {
 		window.location.href = url
 	}
 
+	setQueryParams = (section_id: string, examFilter: ExamFilter) => {
+
+		const { exam_title, year, month } = examFilter
+
+		const url = '/reports/bulk-exams'
+		let params = `section_id=${section_id}&exam_title=${exam_title}&year=${year}`
+
+		if (exam_title === "Test")
+			params = params + `&month=${month}`
+
+		window.history.replaceState(this.state, "Bulk Exams", `${url}?${params}`)
+	}
+
 	render() {
 
 		const { exams, history, students } = this.props
 
-		const { exam_title, section_id, year, show_create_exam, sections, exam_marks_sheet } = this.state
+		const { selectedSection, examFilter, showCreateExam, sections, scoreSheet } = this.state
+
+		const { exam_title, year } = examFilter
 
 		let years = new Set<string>()
 		let filtered_exams: MISExam[] = []
@@ -351,7 +408,7 @@ class BulkExam extends Component<P, S> {
 
 			years.add(moment(exam.date).format("YYYY"))
 
-			if (this.getExamFilterConditions(exam)) {
+			if (this.getExamFilterConditions(exam, selectedSection, examFilter)) {
 				filtered_exams.push(exam)
 			}
 		}
@@ -364,8 +421,8 @@ class BulkExam extends Component<P, S> {
 				<div className="title">Bulk Exams</div>
 				<div className="section-container section form">
 					<div className="row">
-						<label>Class-Section</label>
-						<select {...this.former.super_handle(["section_id"], () => true, () => this.setExamMarksSheetForSection(students, exams))}>
+						<label>Class</label>
+						<select {...this.former.super_handle(["selectedSection"], () => true, () => this.setScoreSheet(students, exams))}>
 							<option value="">Select Class</option>
 							{
 								sections.map(section => <option key={section.id} value={section.id}>{section ? section.namespaced_name : ''}</option>)
@@ -374,7 +431,7 @@ class BulkExam extends Component<P, S> {
 					</div>
 					<div className="row">
 						<label>Exam Year</label>
-						<select {...this.former.super_handle(["year"], () => true, () => this.setExamMarksSheetForSection(students, exams))}>
+						<select {...this.former.super_handle(["examFilter", "year"], () => true, () => this.setScoreSheet(students, exams))}>
 							<option value="">Select Year</option>
 							{
 								[...years]
@@ -385,7 +442,7 @@ class BulkExam extends Component<P, S> {
 					</div>
 					<div className="row">
 						<label>Exam Title</label>
-						<select {...this.former.super_handle(["exam_title"], () => true, () => this.setExamMarksSheetForSection(students, exams))}>
+						<select {...this.former.super_handle(["examFilter", "exam_title"], () => true, () => this.setScoreSheet(students, exams))}>
 							<option value="">Select Exam</option>
 							{
 								ExamTitles.map(title => <option key={title} value={title}>{title}</option>)
@@ -395,7 +452,7 @@ class BulkExam extends Component<P, S> {
 					{
 						exam_title === 'Test' && <div className="row">
 							<label>Exam Month</label>
-							<select {...this.former.super_handle(["month"])}>
+							<select {...this.former.super_handle(["examFilter", "month"], () => true, () => this.setScoreSheet(students, exams))}>
 								<option value="">Select Month</option>
 								{
 									months.map(month => <option key={month} value={month}>{month}</option>)
@@ -404,7 +461,7 @@ class BulkExam extends Component<P, S> {
 						</div>
 					}
 					{
-						section_id && exam_title && year && <div className="exams">
+						selectedSection && exam_title && year && <div className="exams">
 							<fieldset>
 								<legend>Recent Added Exams</legend>
 								<RecentAddedExams
@@ -419,18 +476,19 @@ class BulkExam extends Component<P, S> {
 					}
 				</div>
 				{
-					show_create_exam && <Modal>
+					showCreateExam && <Modal>
 						<CreateExamModal
 							subjects={subjects}
 							onCreate={this.onCreateExam}
-							onClose={this.closeCreateExamModal} />
+							onClose={this.closeCreateExamModal}
+						/>
 					</Modal>
 				}
 				{
-					section_id && exam_title && year && <ExamMarksSheet
-						examMarksSheet={exam_marks_sheet}
+					selectedSection && exam_title && year && <ExamScoreSheet
+						scoreSheet={scoreSheet}
 						exams={filtered_exams}
-						onSubjectMarksUpdate={this.subjectMarksUpdate}
+						onSubjectScoreUpdate={this.subjectScoreUpdate}
 						onSaveBulkExams={this.saveBulkExams} />
 				}
 			</div>
@@ -447,20 +505,18 @@ export default connect((state: RootReducerState) => ({
 	schoolName: state.db.settings.schoolName
 }), (dispatch: Function) => ({
 	createSingleExam: (exam: CreateExam, class_id: string, section_id: string) => dispatch(mergeExam(exam, class_id, section_id)),
-	updateBulkExams: (marks_sheet: ExamMarksSheet) => dispatch(updateBulkExams(marks_sheet)),
-	deleteExam: (students_ids: string[], exam_id: string) => dispatch(deleteExam(students_ids, exam_id))
+	updateBulkExams: (scoreSheet: ExamScoreSheet) => dispatch(updateBulkExams(scoreSheet)),
+	deleteExam: (students: string[], exam_id: string) => dispatch(deleteExam(students, exam_id))
 }))(BulkExam)
 
-interface ExamMarksSheetProps {
-	examMarksSheet: ExamMarksSheet
+interface ExamScoreSheetProps {
+	scoreSheet: ExamScoreSheet
 	exams: MISExam[]
-	onSubjectMarksUpdate: (student_id: string, exam_id: string, score: string) => void
+	onSubjectScoreUpdate: (student_id: string, exam_id: string, score: string) => void
 	onSaveBulkExams: () => void
 }
 
-const ExamMarksSheet = (props: ExamMarksSheetProps) => {
-
-	const { examMarksSheet, exams, onSubjectMarksUpdate, onSaveBulkExams } = props
+const ExamScoreSheet: React.FC<ExamScoreSheetProps> = ({ scoreSheet, exams, onSubjectScoreUpdate, onSaveBulkExams }) => {
 
 	return <>
 		<div className="divider">Exams Marks Sheet</div>
@@ -481,14 +537,14 @@ const ExamMarksSheet = (props: ExamMarksSheetProps) => {
 					</thead>
 					<tbody>
 						{
-							Object.values(examMarksSheet)
+							Object.values(scoreSheet)
 								.sort((a, b) => (parseInt(a.rollNo) || 0) - (parseInt(b.rollNo) || 0))
 								.map(student => <tr key={student.id}>
-									<td title={toTitleCase(student.name)}><Link to={`/student/${student.id}/profile`}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 12))}</Link></td>
+									<td title={toTitleCase(student.name)}><Link to={`/student/${student.id}/profile`}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 15))}</Link></td>
 									{
 										Object.entries(student.exams)
 											.map(([exam_id, exam]) => <td key={`${exam_id}-${student.id}-${exam.section_id}`}>
-												<input onBlur={(e) => onSubjectMarksUpdate(student.id, exam_id, e.target.value)} type="text" placeholder="enter marks" defaultValue={exam.stats.score} />
+												<input onBlur={(e) => onSubjectScoreUpdate(student.id, exam_id, e.target.value)} type="text" placeholder="enter marks" defaultValue={exam.stats.score} />
 											</td>)
 									}
 								</tr>)
@@ -510,9 +566,7 @@ interface RecentAddExamsProps {
 	onEditExam: (exam: MISExam) => void
 }
 
-const RecentAddedExams = (props: RecentAddExamsProps) => {
-
-	const { exams, onDeleteExam, onEditExam } = props
+const RecentAddedExams: React.FC<RecentAddExamsProps> = ({ exams, onDeleteExam, onEditExam }) => {
 
 	return <div className="exams-table">
 		<div className="table-row table-header">

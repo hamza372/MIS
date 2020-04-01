@@ -428,7 +428,7 @@ interface MISBanner {
 	text?: string
 }
 
-interface ExamMarksSheet {
+interface ExamScoreSheet {
 	[studentId: string]: {
 		id: string
 		name: string

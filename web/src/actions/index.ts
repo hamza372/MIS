@@ -728,7 +728,7 @@ export const mergeExam = (exam: Exam, class_id: string, section_id: string) => (
 	]))
 }
 
-export const updateBulkExams = (exam_marks_sheet: ExamMarksSheet) => (dispatch: Function) => {
+export const updateBulkExams = (exam_marks_sheet: ExamScoreSheet) => (dispatch: Function) => {
 	
 	let merges = []
 
