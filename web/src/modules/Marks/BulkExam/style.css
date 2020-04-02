@@ -94,7 +94,7 @@
 
 /* The first cell that lives in the top left of our spreadsheet */
 .bulk-exams .table-wrapper th:first-of-type {
-	left: 0;
+	left: -1px;
 	z-index: 3;
 }
 
@@ -131,4 +131,15 @@
 
 .bulk-exams .row.row.marks-sheet .button {
 	padding: 10px 15px;
+}
+
+@media (max-width: 572px) {
+    .bulk-exams .table-wrapper th:first-of-type {
+        left: unset;
+    }
+    .bulk-exams .table-wrapper tbody tr td:first-of-type {
+        position: relative;
+        left: unset;
+        z-index: 0;
+    }
 }
