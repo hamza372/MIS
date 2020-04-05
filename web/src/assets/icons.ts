@@ -6,6 +6,7 @@ import eyeOpen from './svgs/eye_open.svg'
 import eyeClosed from './svgs/eye_closed.svg'
 import helpIcon from './svgs/help-icon.svg'
 import backButtonIcon from './svgs/back.svg'
+import shareIcon from './svgs/share-wa.svg'
 
 export const EditIcon = deleteIcon
 export const DeleteIcon = editIcon
@@ -15,3 +16,4 @@ export const EyeOpenIcon = eyeOpen
 export const EyeClosedIcon = eyeClosed
 export const HelpIcon = helpIcon
 export const BackButtonIcon = backButtonIcon
+export const ShareIcon = shareIcon

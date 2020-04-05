@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
+import ShareButton from 'components/ShareButton'
 
 class ToSingleStudent extends Component {
 	constructor(props) {
@@ -62,6 +63,10 @@ class ToSingleStudent extends Component {
 
 						<div className="button" onClick={() => sendMessage( this.state.text, this.state.selected_student_number)}>Send</div>
 				}
+			<div className="is-mobile-only" style={{marginTop: 10}}>
+				<div className="text-center">Share on Whatsapp</div>
+				<ShareButton text={this.state.text} />
+			</div>
 		</div>
 	)
   }

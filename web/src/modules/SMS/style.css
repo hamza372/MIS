@@ -6,3 +6,9 @@
 .sms-page .form a.button {
 	display: block;
 }
+
+@media (min-width: 772px){
+	.is-mobile-only {
+		display: none;
+	}
+}
