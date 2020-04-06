@@ -8,6 +8,10 @@ defmodule Sarkar.ActionHandler do
 		Sarkar.ActionHandler.Dashboard.handle_action(action, state)
 	end
 
+	def handle_action(%{"client_type" => "family-portal"} = action, state) do
+		Sarkar.ActionHandler.Family.handle_action(action, state)
+	end
+
 	def handle_action(action, state) do
 		IO.inspect action
 		IO.inspect state
