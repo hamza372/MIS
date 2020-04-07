@@ -34,6 +34,7 @@ import certificates from 'modules/Landing/icons/Certificate/certificate1.svg'
 import expense from 'modules/Landing/icons/Expense/expense.svg'
 
 import SignUp from './SignUp'
+import AboutTeam from './AboutTeam/team'
 
 import './style.css'
 
@@ -469,6 +470,9 @@ class Front extends Component {
 							<img alt="" className="image-cerp" src={cerpLogo}/>
 						</div>
 					</div>
+
+					<div className="card-heading"> Our Team</div>
+					<AboutTeam />
 				</div>
 				
 				{/**FOOTER */}
