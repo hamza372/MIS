@@ -23,9 +23,10 @@
 .about-team .card .avatar {
 	width: 150px;
 	height: 150px;
-	border-radius: 50%;
+	border-radius: 100%;
 	border: 2px solid grey;
-	object-fit: contain;
+	object-fit: fill;
+	display: flex;
 }
 
 .about-team .card .title {
