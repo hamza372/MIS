@@ -8,6 +8,10 @@ import helpIcon from './svgs/help-icon.svg'
 import backButtonIcon from './svgs/back.svg'
 import horizontalDots from './svgs/dots-horizontal.svg'
 import verticalDots from './svgs/dots-vertical.svg'
+import downloadDocument from './svgs/document-download.svg'
+import trashOutlineIcon from './svgs/outline-trash.svg'
+import shareIcon from './svgs/share-wa.svg'
+import phoneIcon from './svgs/phone.svg'
 
 
 export const EditIcon = deleteIcon
@@ -20,3 +24,7 @@ export const HelpIcon = helpIcon
 export const BackButtonIcon = backButtonIcon
 export const HorizontalDots = horizontalDots
 export const VerticalDots = verticalDots
+export const DocumentDownloadIcon = downloadDocument
+export const TrashOutlineIcon = trashOutlineIcon
+export const ShareIcon = shareIcon
+export const PhoneIcon = phoneIcon

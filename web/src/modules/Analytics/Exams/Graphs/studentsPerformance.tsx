@@ -75,11 +75,14 @@ class StudentsPerformance extends Component<PropsType, S> {
 			}
 
 			if (i >= relevant_students.length) {
+
+				const sorted_data = graph_data.sort((a, b) => a.percentage - b.percentage)
+
 				// we are done calculating
 				this.setState({
 					loading: false,
 					loading_percentage: 0,
-					graph_data
+					graph_data: sorted_data
 				})
 			}
 
@@ -166,21 +169,19 @@ class StudentsPerformance extends Component<PropsType, S> {
 
 		const name = this.state.student_name
 
-		const sorted_data = [...graph_data]
+		const table_data = graph_data
 			.filter(s => name ? s.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()) : true)
-			.sort((a, b) => b.percentage - a.percentage)
 
 		return <>
 			<div className="school-grades-graph no-print">
 				<div className="title divider">Students Position Graph</div>
 				<div className="section">
 					<ResponsiveContainer width="100%" height={280}>
-						<BarChart data={graph_data} barSize={10}>
-							<XAxis dataKey="percentage" type="number" />
+						<BarChart data={graph_data} barSize={5}>
+							<XAxis dataKey="percentage" type="category" />
 							<YAxis />
 							<Tooltip content={BarLabel} />
 							<Bar dataKey="percentage" fill="#74aced" />
-
 						</BarChart>
 					</ResponsiveContainer>
 				</div>
@@ -204,8 +205,10 @@ class StudentsPerformance extends Component<PropsType, S> {
 					{
 						// to avoid sorting the data in descending order again,
 						// accessing items in reverse order from sorted data
-						sorted_data
-							.map((student) => {
+						table_data
+							.map((_, i: number) => {
+
+								const student = table_data[table_data.length - 1 - i]
 
 								return <div className="table row" key={student.id}>
 									<Link to={`/student/${student.id}/marks`}>{student.name}</Link>
@@ -219,7 +222,7 @@ class StudentsPerformance extends Component<PropsType, S> {
 				</div>
 			</div>
 			{
-				chunkify(sorted_data, CHUNK_SIZE)
+				chunkify(table_data, CHUNK_SIZE, true)
 					.map((chunk_items: GraphData[], i: number) => <StudentsPerformanceList key={i}
 						students_class={students_class}
 						items={chunk_items}
