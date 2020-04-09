@@ -8,21 +8,6 @@ interface Team {
 
 const TeamMembers: Array<Team> = [
 	{
-		name: "Asim Khwaja",
-		avatar_url: "/images/asim.jpg",
-		designation: "Principle Investigator"
-	},
-	{
-		name: "Maroof Syed",
-		avatar_url: "/images/maroof.jpg",
-		designation: "President & CEO, CERP"
-	},
-	{
-		name: "Zainab Qureshi",
-		avatar_url: "/images/zainab.jpg",
-		designation: "LEAPS Sr. Program Manager"
-	},
-	{
 		name: "Taimur Shah",
 		avatar_url: "images/taimur.jpg",
 		designation: "Technology Lead"
