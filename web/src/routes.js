@@ -43,6 +43,8 @@ import ExpensePage from './modules/Expenses';
 import ExcelImport from './modules/Settings/ExcelImport';
 import ClassSettings from 'modules/Settings/ClassSettings/Index'
 
+import Corona from 'modules/Corona'
+
 export default class Routes extends React.Component {
 
 	constructor(props) {
@@ -120,6 +122,8 @@ export default class Routes extends React.Component {
 
 					<TrackedRoute path="/help" component={Help} />
 					<TrackedRoute path="/certificate-menu" component={CertificateMenu} />
+
+					<TrackedRoute path="/corona" component={Corona} />
 
 					<TrackedRoute path="/fee-menu" component={FeeMenu} />
 					<Route exact path="/" component={Front} />

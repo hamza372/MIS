@@ -1,0 +1,36 @@
+.corona table {
+	border-collapse: collapse;
+	width: 85%;
+}
+
+.corona table thead {
+	font-weight: bold;
+}
+
+.corona table, .corona td {
+	border: 1px solid #333;
+	padding: 2px;
+}
+
+.corona table td:last-child, .corona table td:first-child  {
+	text-align: center;
+}
+
+.corona table tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+
+.needy-form {
+	width: 85%;
+	height: 85%;
+	background-color: #fafafa;
+	border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.needy-form .form {
+	width: 90%;
+}

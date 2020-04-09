@@ -248,6 +248,8 @@ interface MISStudent {
 	certificates: {
 		[id: string]: MISCertificate
 	}
+
+	needy: boolean
 }
 
 interface MISFamilyInfo {

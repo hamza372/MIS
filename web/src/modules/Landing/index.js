@@ -24,7 +24,7 @@ import prospective from './icons/Prospective/prospective.svg'
 import planner from './icons/Planner/planner.svg'
 import cerificate from './icons/Certificate/certificate1.svg'
 import expense from './icons/Expense/expense.svg'
-// import newBadge from "./icons/New/new.svg";
+import newBadge from "./icons/New/new.svg";
 import family from "./icons/family/family.svg"
 
 import Help from './icons/Help/help.svg'
@@ -168,9 +168,9 @@ class Landing extends Component {
 
 		for (const student of Object.values(students)) {
 
-			if(student && student.Name) {
+			if (student && student.Name) {
 				const record = (student.attendance || {})[today_date];
-				if(record) {
+				if (record) {
 					today_attendance[record.status] += 1;
 				}
 
@@ -178,10 +178,10 @@ class Landing extends Component {
 					.filter(x => moment(x.date).format("YYYY-MM-DD") === today_date && x.type === "SUBMITTED")
 					.reduce((agg, curr) => agg + curr.amount, 0);
 
-				if(additional_payment > 0) {
+				if (additional_payment > 0) {
 					today_payment_students += 1
 				}
-        
+
 				today_payment += additional_payment;
 			}
 		}
@@ -250,6 +250,15 @@ class Landing extends Component {
 									style={{ backgroundImage: `url(${family})` }}>
 									Families
 								</Link>
+							}
+							{
+								(user.Admin) &&
+								<div className="badge-container">
+									<img className="new-badge" src={newBadge} />
+									<Link to="/corona" className="button red-shadow">
+										Corona
+								</Link>
+								</div>
 							}
 						</div>
 					</div>
@@ -393,7 +402,7 @@ class Landing extends Component {
 
 							<Link
 								className="box no-underline bg-green"
-								to = '/analytics/daily-stats?type=paid_students'>
+								to='/analytics/daily-stats?type=paid_students'>
 								<div>{today_payment_students}</div>
 								<div>Students</div>
 							</Link>
