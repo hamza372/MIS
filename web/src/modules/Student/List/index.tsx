@@ -15,7 +15,8 @@ import { StudentIcon, HorizontalDots } from 'assets/icons'
 import { chunkify } from 'utils/chunkify'
 import { deleteStudentById } from 'actions/index'
 import DropdownMenu from 'components/Dropdown/DropdownMenu'
-import { Popover, OverlayTrigger } from 'react-bootstrap'
+import Popover from 'react-bootstrap/Popover'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 
 import './style.css'
 
