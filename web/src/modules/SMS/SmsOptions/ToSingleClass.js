@@ -4,6 +4,7 @@ import { smsIntentLink } from 'utils/intent'
 import {getSectionsFromClasses} from 'utils/getSectionsFromClasses';
 
 import former from 'utils/former'
+import ShareButton from 'components/ShareButton';
 
 
 class ToSingleClass extends Component {
@@ -75,7 +76,12 @@ class ToSingleClass extends Component {
 							messages,
 							return_link: window.location.href 
 							})} onClick={() => this.logSms(messages)} className="button blue">Send using Local SIM</a> 
-							: <div className="button" onClick={() => sendBatchMessages(messages)}>Send</div>}
+							: <div className="button" onClick={() => sendBatchMessages(messages)}>Send</div>
+					}
+				<div className="is-mobile-only" style={{marginTop: 10}}>
+					<div className="text-center">Share on Whatsapp</div>
+					<ShareButton text={this.state.text} />
+				</div>
 			</div>
 		)
 	}
