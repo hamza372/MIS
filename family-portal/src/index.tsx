@@ -12,7 +12,7 @@ import reducer from './reducers'
 import { loadDB, saveDB } from './utils/localStorage'
 import debounce from './utils/debounce';
 
-import { connected, disconnected } from 'actions/core'
+import { connected, disconnected, processImageQueue } from 'actions/core'
 
 
 //const debug_url = "c26dc055.ngrok.io"
@@ -28,6 +28,8 @@ const syncr = new Syncr(`ws://${host}/ws`)
 syncr.on('connect', () => store.dispatch(connected()))
 syncr.on('disconnect', () => store.dispatch(disconnected()))
 syncr.on('message', (msg: AnyAction) => store.dispatch(msg))
+//@ts-ignore
+syncr.on('verify', () => store.dispatch(processImageQueue()))
 
 
 const store: Store<RootReducerState> = createStore(
@@ -48,10 +50,8 @@ ReactDOM.render(<Routes store={store} />, document.getElementById('root'));
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register({
 	onUpdate: (registration: ServiceWorkerRegistration) => {
-		if (navigator.serviceWorker.controller) {
-			navigator.serviceWorker.controller.postMessage({
-				type: "SKIP_WAITING"
-			})
-		}
+		registration.installing?.postMessage({
+			type: "SKIP_WAITING"
+		})
 	}
 });

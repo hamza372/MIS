@@ -69,29 +69,36 @@ const rootReducer: Reducer<RootReducerState, AnyAction> = (state: RootReducerSta
 		case CONFIRM_SYNC_DIFF:
 			{
 				const diff_action = action as ConfirmSyncAction
-
-				console.log(
-					"confirm sync diff: ",
+				console.log("confirm sync diff: ",
 					Object.keys(diff_action.new_writes).length,
-					"changes synced")
+					" changes synced")
 
-				const newQ = Object.keys(state.queued)
+				const newM = Object.keys(state.queued.mutations)
 					.filter(t => {
-						console.log(state.queued[t].date, diff_action.date, state.queued[t].date - diff_action.date)
-						return state.queued[t].date > diff_action.date
+						console.log(state.queued.mutations[t].date, diff_action.date, state.queued.mutations[t].date - diff_action.date);
+						return state.queued.mutations[t].date > diff_action.date
 					})
 					.reduce((agg, curr) => {
-						return Dynamic.put(agg, ["queued", state.queued[curr].action.path], state.queued[curr].action)
+						return Dynamic.put(agg,
+							[state.queued.mutations[curr].action.path.join(',')],
+							state.queued.mutations[curr])
 					}, {})
 
+				const newQ = {
+					...state.queued,
+					mutations: newM,
+				}
+
 				if (Object.keys(diff_action.new_writes).length > 0) {
+					// remove queued items
+
 					const nextState = Object.values(diff_action.new_writes)
 						.reduce((agg, curr) => {
 							if (curr.type === "DELETE") {
-								return Dynamic.delete(agg, curr.path)
+								return Dynamic.delete(agg, curr.path) as RootReducerState
 							}
-							return Dynamic.put(agg, curr.path, curr.value)
-						}, JSON.parse(JSON.stringify(state)))
+							return Dynamic.put(agg, curr.path, curr.value) as RootReducerState
+						}, state)
 
 					return {
 						...nextState,

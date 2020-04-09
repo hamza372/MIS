@@ -1,4 +1,5 @@
 import Syncr from '@cerp/syncr'
+import { v4 } from 'uuid'
 
 type GetState = () => RootReducerState
 type Dispatch = (a: any) => any
@@ -18,7 +19,96 @@ export interface MergeAction {
 	merges: Merge[]
 }
 
-export const createMerges = (merges: Merge[]) => (dispatch: Dispatch, getState: GetState, syncr: Syncr) => {
+const getRationalizedQueuePayload = (payload: any, key: keyof RootReducerState['queued'], state: RootReducerState): RootReducerState['queued'] => {
+
+	// here we can do stuff to make sure we are not including queued items that are processing.
+	// for now we can make this only for images. in the future we can add support for mutations and analytics as well.
+
+	// for now actually we will take images out of the queue
+	/*
+	const filtered_images = Object.entries(state.queued.images || {})
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			if (v.status === "processing") {
+				return agg
+			}
+
+			agg[k] = v
+			return agg;
+		}, {})
+	*/
+
+	return {
+		...state.queued,
+		images: {},
+		[key]: {
+			...state.queued[key],
+			...payload
+		}
+	}
+}
+
+const Sync = (payload: RootReducerState['queued']) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState()
+	syncr.send({
+		type: SYNC,
+		school_id: state.auth.id,
+		client_type: state.auth.client_type,
+		lastSnapshot: state.last_snapshot,
+		payload
+	})
+		.then(res => {
+			// dispatch multiaction
+			dispatch(multiAction(res))
+		})
+		.catch(err => {
+			// go through payload, mark all images as error
+			// may need to handle specific errors here.
+			// really should have different timeout if there are images here
+			// uploading will be slow
+			// and really it could be happening over a different channel altogether.
+			// this could be http
+			// for now this should work.
+
+			dispatch(markImagesInQueue(payload.images, "queued"))
+
+			console.error("sync error:", err)
+
+			if (state.connected && err !== "timeout") {
+				alert("Syncing Error: " + err)
+			}
+		})
+
+}
+
+export const analyticsEvent = (event: BaseAnalyticsEvent[]) => (dispatch: Function, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const event_payload = event.reduce((agg, curr) => {
+		return {
+			...agg,
+			[v4()]: {
+				type: curr.type,
+				meta: curr.meta,
+				time: new Date().getTime()
+			} as RouteAnalyticsEvent
+		}
+	}, {} as { [id: string]: RouteAnalyticsEvent })
+
+	const state = getState();
+
+	const rationalized_event_payload = getRationalizedQueuePayload(event_payload, "analytics", state)
+
+	dispatch(QueueAnalytics(event_payload))
+
+	if (!syncr.connection_verified) {
+		console.warn("connection not verified")
+		return
+	}
+
+	dispatch(Sync(rationalized_event_payload))
+}
+
+export const createMerges = (merges: Merge[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
 	// merges is a list of path, value
 
 	const action = {
@@ -41,19 +131,16 @@ export const createMerges = (merges: Merge[]) => (dispatch: Dispatch, getState: 
 	}), {})
 
 	const state = getState();
-	const rationalized_merges = { ...state.queued, ...new_merges }
+	const rationalized_merges = getRationalizedQueuePayload(new_merges, "mutations", state)
 
-	const payload = {
-		type: SYNC,
-		id: state.auth.id,
-		client_type: state.auth.client_type,
-		last_snapshot: state.last_snapshot,
-		payload: rationalized_merges
+	dispatch(QueueMutations(new_merges))
+
+	if (!syncr.connection_verified) {
+		console.warn("connection not verified")
+		return;
 	}
 
-	syncr.send(payload)
-		.then(dispatch)
-		.catch(err => dispatch(QueueUp(new_merges)))
+	dispatch(Sync(rationalized_merges))
 }
 
 export const SMS = "SMS"
@@ -75,6 +162,161 @@ export const sendSMS = (text: string, number: string) => (dispatch: Dispatch, ge
 		.catch((err: Error) => console.error(err)) // this should backup to sending the sms via the android app?
 }
 
+export const uploadImages = (images: ImageMergeItem[]) => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const queueable = images.reduce<ImagesQueuable>((agg, curr) => {
+		const key = curr.path.join(",")
+
+		agg[key] = {
+			...curr,
+			status: "queued"
+		}
+
+		return agg;
+
+	}, {})
+
+	dispatch(QueueImages(queueable))
+
+	const local_merges = images.map<Merge>(m => ({
+		path: m.path,
+		value: {
+			image_string: m.image_string
+		}
+	}))
+
+	dispatch({
+		type: MERGES,
+		merges: local_merges
+	})
+
+	dispatch(processImageQueue())
+
+}
+
+export const IMAGE_UPLOAD_CONFIRM = "IMAGE_UPLOAD_CONFIRM"
+export interface ImageUploadConfirmation {
+	type: "IMAGE_UPLOAD_CONFIRM"
+	value: {
+		url: string
+		id: string
+	}
+	path: string[]
+	id: string
+}
+
+export const IMAGE_QUEUE_LOCK = "IMAGE_QUEUE_LOCK"
+const lockImageQueue = {
+	type: IMAGE_QUEUE_LOCK
+}
+
+export const IMAGE_QUEUE_UNLOCK = "IMAGE_QUEUE_UNLOCK"
+const unlockImageQueue = {
+	type: IMAGE_QUEUE_UNLOCK
+}
+
+export const processImageQueue = () => (dispatch: (a: any) => any, getState: () => RootReducerState, syncr: Syncr) => {
+
+	const state = getState();
+
+	if (state.processing_images) {
+		console.log('already processing')
+		return;
+	}
+
+	if (!syncr.connection_verified) {
+		console.log('connection not verified')
+		return;
+	}
+
+	dispatch(lockImageQueue)
+
+	console.log('processing image queue')
+
+	// need to know if this processing is already running or not...
+	// if it is running, then we should return early. 
+	// so we need this in reducer state
+
+	// for now, we ignore it.
+
+	console.log(state.queued.images)
+	const items = Object.entries(state.queued.images || {})
+		.filter(([k, v]) => v.status === "queued")
+
+	if (items.length === 0) {
+		console.log('nothing to process in queue')
+		dispatch(unlockImageQueue)
+		return
+	}
+
+	const [merge_key, image_merge] = items[0]
+
+	//@ts-ignore
+	const host = window.api_url || window.debug_host;
+
+	fetch(`https://${host}/upload/image`, {
+		method: 'POST',
+		mode: 'cors',
+		cache: 'no-cache',
+		headers: {
+			'content-type': 'application/json',
+			'token': state.auth.token || "",
+			'phone_number': state.auth.phone_number || "",
+			'client-id': state.client_id,
+			'school-id': state.auth.school_id || "",
+			'client-type': state.auth.client_type
+		},
+		body: JSON.stringify({
+			lastSnapshot: state.last_snapshot,
+			payload: {
+				image_merge
+			}
+		})
+	})
+		.then(res => {
+			console.log('image uploaded')
+			console.log(res)
+			console.log(res.json())
+
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'processing'))
+
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
+
+			// now we should mark this item as 'processing' in the queue.
+			// and progress to the next one.
+			// syncr.on('connect') should kick  
+		})
+		.catch(err => {
+			console.error('image upload failed')
+			dispatch(markImagesInQueue({
+				[merge_key]: image_merge
+			}, 'queued'))
+
+			dispatch(unlockImageQueue)
+			dispatch(processImageQueue())
+		})
+
+}
+
+const markImagesInQueue = (images: ImagesQueuable, status: QueueStatus) => (dispatch: (a: any) => any) => {
+
+	const mapped = Object.entries(images)
+		.reduce<ImagesQueuable>((agg, [k, v]) => {
+			return {
+				...agg,
+				[k]: {
+					...v,
+					status
+				}
+			}
+		}, {})
+
+	dispatch(QueueImages(mapped))
+
+}
 
 export const BATCH_SMS = "BATCH_SMS"
 interface SMS {
@@ -212,11 +454,6 @@ interface Queuable {
 	}
 }
 
-export interface QueueAction {
-	type: "QUEUE",
-	payload: Queuable
-}
-
 export const QueueUp = (action: Queuable) => {
 	return {
 		type: QUEUE,
@@ -245,16 +482,8 @@ export const connected = () => (dispatch: Dispatch, getState: GetState, syncr: S
 				}
 			})
 			.then(res => {
-				return syncr.send({
-					type: SYNC,
-					client_type: state.auth.client_type,
-					id: state.auth.id,
-					payload: state.queued,
-					last_snapshot: state.last_snapshot
-				})
-			})
-			.then(resp => {
-				dispatch(resp)
+				syncr.verify()
+				dispatch(Sync(state.queued))
 			})
 			.catch(err => {
 				console.error(err)
@@ -283,6 +512,72 @@ export const submitError = (err: Error, errInfo: React.ErrorInfo) => (dispatch: 
 
 }
 
+interface MutationsQueueable {
+	[path: string]: {
+		action: {
+			type: "MERGE" | "DELETE"
+			path: string[]
+			value?: any
+		}
+		date: number
+	}
+}
+
+interface AnalyticsQueuable {
+	[path: string]: RouteAnalyticsEvent
+}
+
+interface BaseQueueAction {
+	type: "QUEUE"
+	queue_type: string
+}
+
+export interface QueueAnalyticsAction extends BaseQueueAction {
+	queue_type: "analytics"
+	payload: AnalyticsQueuable
+}
+
+export interface QueueMutationsAction extends BaseQueueAction {
+	queue_type: "mutations"
+	payload: MutationsQueueable
+}
+
+export interface QueueImagesAction extends BaseQueueAction {
+	queue_type: "images"
+	payload: ImagesQueuable
+}
+
+export type QueueAction = QueueMutationsAction | QueueAnalyticsAction | QueueImagesAction
+
+export interface ConfirmAnalyticsSyncAction {
+	type: "CONFIRM_ANALYTICS_SYNC"
+	time: number
+}
+
+export const QueueMutations = (action: MutationsQueueable): QueueMutationsAction => {
+	return {
+		type: QUEUE,
+		payload: action,
+		queue_type: "mutations"
+	}
+}
+
+export const QueueAnalytics = (action: AnalyticsQueuable): QueueAnalyticsAction => {
+	return {
+		type: QUEUE,
+		payload: action,
+		queue_type: "analytics"
+	}
+}
+
+export const QueueImages = (action: ImagesQueuable): QueueImagesAction => {
+	return {
+		type: QUEUE,
+		payload: action,
+		queue_type: "images"
+	}
+}
+
 export const disconnected = () => ({ type: ON_DISCONNECT })
 
 export const LOGIN_FAIL = "LOGIN_FAIL"
@@ -302,3 +597,11 @@ export const createLoginSucceed = (id: string, token: string, sync_state: RootRe
 	token,
 	sync_state
 })
+
+export const multiAction = (resp: { key: string; val: any }) => (dispatch: Function) => {
+	for (const action of Object.values(resp)) {
+		if (action) {
+			dispatch(action)
+		}
+	}
+}

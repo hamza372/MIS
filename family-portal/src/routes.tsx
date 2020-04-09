@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import ErrorComponent from 'components/Error'
 
 import InputPage from './pages/input'
+import LoginPage from './pages/login'
 import { submitError } from 'actions/core'
 
 interface P {
@@ -55,6 +56,7 @@ class Routes extends React.Component<P, S> {
 			<BrowserRouter>
 				<Switch>
 					<Route exact path="/" component={InputPage} />
+					<Route exact path="/login" component={LoginPage} />
 				</Switch>
 			</BrowserRouter>
 		</Provider>

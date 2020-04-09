@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-export const saveDB = (db : RootReducerState) => {
+export const saveDB = (db: RootReducerState) => {
 
 	try {
 
@@ -10,7 +10,7 @@ export const saveDB = (db : RootReducerState) => {
 		saveQueue(db.queued)
 	}
 
-	catch(err) {
+	catch (err) {
 		console.error(err);
 	}
 }
@@ -24,21 +24,23 @@ export const clearDB = () => {
 
 export const loadAuth = (): RootReducerState['auth'] => {
 
-	let init_auth : RootReducerState['auth'] = {
+	let init_auth: RootReducerState['auth'] = {
 		id: undefined,
+		phone_number: undefined,
 		token: undefined,
-		client_type: "tech_demo"
+		school_id: undefined,
+		client_type: "family-portal"
 	};
 
 	try {
 		const str = localStorage.getItem("auth")
-		if(str === null) {
+		if (str === null) {
 			return init_auth;
 		}
 
 		return JSON.parse(str);
 	}
-	catch(err) {
+	catch (err) {
 		console.error(err);
 		return init_auth;
 	}
@@ -56,11 +58,11 @@ const loadClientId = () => {
 	return client_id;
 }
 
-const loadSyncState = () : RootReducerState['sync_state'] => {
+const loadSyncState = (): RootReducerState['sync_state'] => {
 
 	const str = localStorage.getItem("sync_state");
 
-	if(str) {
+	if (str) {
 		const curr = JSON.parse(str) as RootReducerState['sync_state']
 		return curr;
 	}
@@ -69,12 +71,12 @@ const loadSyncState = () : RootReducerState['sync_state'] => {
 
 }
 
-const saveSyncState = (sync_state : RootReducerState['sync_state']) => {
+const saveSyncState = (sync_state: RootReducerState['sync_state']) => {
 
 	localStorage.setItem("sync_state", JSON.stringify(sync_state));
 }
 
-const saveQueue = (queue : RootReducerState['queued']) => {
+const saveQueue = (queue: RootReducerState['queued']) => {
 
 	localStorage.setItem("queued", JSON.stringify(queue))
 
@@ -84,7 +86,7 @@ const loadQueue = () => {
 	return JSON.parse(localStorage.getItem("queued") || "{}") as RootReducerState['queued']
 }
 
-const saveSnapshot = (last_snapshot : number) => {
+const saveSnapshot = (last_snapshot: number) => {
 
 	//@ts-ignore
 	localStorage.setItem("last_snapshot", last_snapshot);
@@ -94,7 +96,7 @@ const loadSnapshot = () => {
 	return parseInt(localStorage.getItem("last_snapshot") || "0")
 }
 
-export const loadDB = () : RootReducerState => {
+export const loadDB = (): RootReducerState => {
 
 	return {
 		client_id: loadClientId(),
@@ -103,6 +105,7 @@ export const loadDB = () : RootReducerState => {
 		accept_snapshot: false,
 		last_snapshot: loadSnapshot(),
 		connected: false,
-		sync_state: loadSyncState()
+		sync_state: loadSyncState(),
+		processing_images: false
 	}
 }

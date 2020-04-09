@@ -1,7 +1,6 @@
 import { v4 } from 'node-uuid'
 import requestFS from './requestFS'
 import { defaultExams } from '../modules/Settings';
-import moment from "moment"
 
 const defaultTemplates = () => ({
 	attendance: "$NAME has been marked $STATUS",
