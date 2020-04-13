@@ -10,6 +10,7 @@ import downloadDocument from './svgs/document-download.svg'
 import trashOutlineIcon from './svgs/outline-trash.svg'
 import shareIcon from './svgs/share-wa.svg'
 import phoneIcon from './svgs/phone.svg'
+import coronavirusIcon from './svgs/corona.svg'
 
 
 export const EditIcon = deleteIcon
@@ -24,3 +25,4 @@ export const DocumentDownloadIcon = downloadDocument
 export const TrashOutlineIcon = trashOutlineIcon
 export const ShareIcon = shareIcon
 export const PhoneIcon = phoneIcon
+export const CoronavirusIcon = coronavirusIcon

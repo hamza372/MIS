@@ -29,6 +29,7 @@ import family from "./icons/family/family.svg"
 
 import Help from './icons/Help/help.svg'
 import diary from './icons/Diary/diary.svg'
+import { CoronavirusIcon } from 'assets/icons'
 
 /**
  * line for adding new badge just copy / paste it
@@ -254,8 +255,10 @@ class Landing extends Component {
 							{
 								(user.Admin) &&
 								<div className="badge-container">
-									<img className="new-badge" src={newBadge} />
-									<Link to="/corona" className="button red-shadow">
+									<img className="new-badge" src={newBadge} alt="badge" />
+									<Link to="/corona"  
+										className="button red-shadow"
+										style={{ backgroundImage: `url(${CoronavirusIcon})` }}>
 										Corona
 								</Link>
 								</div>

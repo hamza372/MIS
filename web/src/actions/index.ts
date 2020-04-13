@@ -920,3 +920,14 @@ export const resetFees = (students: MISStudent[]) => (dispatch: Function) => {
 
 	dispatch(createMerges(merges))
 }
+
+export const saveStudentNeedyForm = (student: MISStudent) => (dispatch: Function) => {
+	const merge = [
+		{
+			path: ["db",  "students", student.id],
+			value: student
+		}
+	]
+	
+	dispatch(createMerges(merge))
+}
