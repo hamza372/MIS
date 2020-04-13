@@ -40,7 +40,6 @@ class NeedyModal extends React.Component<P, S> {
 				ReceivedAnyDonation: student.ReceivedAnyDonation || "",
 				ManCNIC: student.ManCNIC || "",
 				Phone: student.Phone || "",
-				FinancialUnstability: student.FinancialUnstability || "",
 			}
 		}
 
@@ -98,15 +97,6 @@ class NeedyModal extends React.Component<P, S> {
 									<option value="">Select option</option>
 									<option value="YES">Yes</option>
 									<option value="NO">No</option>
-									<option value="DONT_KNOW">Don't Know</option>
-								</select>
-							</div>
-							<div className="row">
-								<label>Please select the reason behind their financial unstable condition:</label>
-								<select {...this.former.super_handle(["FinancialUnstability"])}>
-									<option value="">Select option</option>
-									<option value="UNSTABLE_BEFORE_CORONA">They were financially unstable even before the outbreak of Corona</option>
-									<option value="INCOME_AFFTECTED_BY_CORONA">Their income is affected because of Corona</option>
 									<option value="DONT_KNOW">Don't Know</option>
 								</select>
 							</div>
@@ -240,15 +230,7 @@ class NeedyModal extends React.Component<P, S> {
 									<option value="DONT_KNOW">معلوم نہیں</option>
 								</select>
 							</div>
-							<div className="row">
-								<label>اس گھرانے کی آمدن میں کمی کی وجہ منتخب کریں:</label>
-								<select {...this.former.super_handle(["FinancialUnstability"])}>
-									<option value="">انتخاب کریں</option>
-									<option value="UNSTABLE_BEFORE_CORONA">متعدد وجوہات کی بنا پر ان کی آمدن پچھلے کچھ عرصے سے کم ہے</option>
-									<option value="INCOME_AFFTECTED_BY_CORONA">کرونہ کی وجہ سے ان کی آمدن متاثر ہوئی ہے</option>
-									<option value="DONT_KNOW">معلوم نہیں</option>
-								</select>
-							</div>
+
 							<div className="row">
 								<label>اس گھرانے میں کل کتنے افراد رہتے ہیں؟</label>
 								<input type="number" {...this.former.super_handle(["FamilyMembers"])} placeholder="مثلاً 5" />

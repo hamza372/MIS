@@ -115,11 +115,13 @@ class CoronaModule extends React.Component<P, S> {
 						{
 							this.state.language === "en" ?
 								<div>
-									<p>The basic purpose of this module is to collect the information of deserving students' families who are looking for our help in this dire situation. We hope that you will help us to reach them.</p>
+									<p>The basic purpose of this module is to collect the information of deserving needy students' families so that we can provide their information to those organizations which can help.
+									Please remember that we can't assure you that who will be helped because the welfare organizations used this information to help needy. We hope that you will help us to collect the the information of
+									 deserving needy families.</p>
 									<p><strong>Note: </strong>Please fill form with verified information from parents.</p>
 								</div> :
 								<div className="urdu-lang small">
-									<p>اس موڈیول کا بنیادی مقصد ان حقدار طالبِ علموں کے گھرانوں کی معلومات حاصل کرنا ہے جن کو اس مشکل وقت میں ہماری مدد کی ضرورت ہے ہمیں امید ہے کہ آپ ان تک پہنچنے میں ہماری مدد کریں گے</p>
+									<p>اس موڈیول کا مقصد حقدارضرورت مند طالبِ علم کے گھرانوں کی معلومات حاصل کرنا ہے تاکہ ایسے اداروں تک پہنچائیں جو اس مشکل وقت میں اِن کی مدد کریں۔ یاد رکھیں کہ ہم یہ یقین سے نہیں بتاسکتے کہ کس کی مدد کی جائیگی کیوں کہ فلاحی ادارے اس معلومات کے ذریعے مدد کریں گے۔  ہمیں امید ہے کہ آپ حقدار ضرورت مند گھرانوں کی معلومات حاصل کرنے میں ہماری مدد کریں گے.</p>
 									<p><strong>نوٹ:</strong> براہِ مہربانی والدین سے تصدیق شدہ معلومات درج کریں</p>
 								</div>
 						}

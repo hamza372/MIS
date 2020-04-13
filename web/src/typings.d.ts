@@ -262,7 +262,6 @@ interface NeedyForm {
 	IncomeSource?: "GOVT_JOB" | "PRIVATE_JOB" | "SEMI_GOVT" | "BUSINESS" | "FARMING" | "CATTLE_POULTRY" | "DONT_KNOW" | ""
 	Occupation?: "TEACHER" | "SCHOOL_ADMIN" | "GUARD" | "FACTORY_WORKER" | "LABORER" | "MASON" | "CARPENTER" | "PAINTER" | "MECHANIC" | "WELDER" | "OFFICE_BOY" | "DONT_KNOW" | ""
 	JobPlace?: "CURRENT_SCHOOL" | "OTHER_SCHOOL" | "DONT_KNOW" | ""
-	FinancialUnstability?: "UNSTABLE_BEFORE_CORONA" | "INCOME_AFFTECTED_BY_CORONA" | "DONT_KNOW" | ""
 }
 
 interface MISFamilyInfo {
