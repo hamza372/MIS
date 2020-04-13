@@ -202,7 +202,7 @@ interface AugmentedSection {
 	faculty_id?: string
 }
 
-interface MISStudent {
+interface MISStudent extends NeedyForm {
 	id: string
 	Name: string
 	RollNumber: string
@@ -248,8 +248,19 @@ interface MISStudent {
 	certificates: {
 		[id: string]: MISCertificate
 	}
+}
 
-	needy: boolean
+interface NeedyForm {
+	needy?: boolean
+	needyStatus?: "NOT_NEEDY" | "SOMEWHAT_NEEDY" | "EXTREMELY_NEEDY" | "DONT_KNOW" | ""
+	orphan?: "YES" | "NO" | "DONT_KNOW" | ""
+	familyMembers?: string
+	membersWhoEarn?: string
+	approxIncome?: string
+	earnThisMonth?: "YES" | "NO" | "DONT_KNOW" | ""
+	incomeSource?: "GOVT_JOB" | "PRIVATE_JOB" | "SEMI_GOVT" | "BUSINESS" | "FARMING" | "CATTLE_POULTRY" | "DONT_KNOW" | ""
+	occupation?: "TEACHING" | "SCHOOL_ADMIN" | "JANITOR" | "DOCTOR" | "NURSE" | "POLICE" | "WORKER" | "LABORER" | "DONT_KNOW" | ""
+	jobPlace?: "CURRENT_SCHOOL" | "OTHER_SCHOOL" | "DONT_KNOW" | ""
 }
 
 interface MISFamilyInfo {

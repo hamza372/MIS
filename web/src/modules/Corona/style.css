@@ -22,15 +22,74 @@
 
 
 .needy-form {
-	width: 85%;
-	height: 85%;
 	background-color: #fafafa;
-	border-radius: 4px;
+	width: 75%;
+	min-height: 50%;
+	padding: 20px;
+	border-radius: 8px;
+	position: relative;
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 }
 
 .needy-form .form {
 	width: 90%;
+}
+
+@media (max-width: 768px) {
+	.needy-form .close.button {
+		padding: 4px 8px;
+	}
+	.needy-form .title {
+		font-size: 1.5rem;
+	}
+	.needy-form .form {
+		overflow-y: auto;
+	}
+	.needy-form .form.urdu .row * {
+		flex-wrap: wrap;
+	}
+	.needy-form .form.urdu .row>*:last-child {
+		margin-right: 0;
+		width: 100% !important;
+		margin-left: auto !important;
+	}
+}
+
+@media (max-width: 425px) {
+	.needy-form .close.button {
+		font-size: 0.75rem;
+		padding: 2px 6px;
+	}
+	.needy-form .title {
+		font-size: 1.25rem;
+	}
+}
+
+.needy-form .form.urdu .row {
+	direction: rtl;
+}
+
+.needy-form .form.urdu .row * {
+	flex-wrap: wrap-reverse;
+}
+
+.needy-form .form.urdu .row>*:last-child {
+	width: 30%;
+	margin-right: auto;
+	margin-left: 0;
+}
+
+.needy-form .close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.needy-form .title {
+	color: #333;
+	align-self: center;
 }

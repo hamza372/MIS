@@ -2,25 +2,32 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link, RouteComponentProps } from 'react-router-dom'
 
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
+import { saveStudentNeedyForm } from 'actions/index'
 import Layout from 'components/Layout'
 import Modal from 'components/Modal'
 
-import './style.css'
-import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import Former from 'utils/former'
 import NeedyModal from './needy'
+
+import './style.css'
 
 type P = {
 	students: RootDBState['students']
 	classes: RootDBState['classes']
+
+	saveStudentNeedyForm: (student: MISStudent) => void
+
 } & RouteComponentProps
 
 interface S {
 	filter: {
-		section_id: ""
+		section_id: string
 	}
 	modal_active: boolean
 	active_student?: MISStudent
+	language: "en" | "ur"
+	sections: AugmentedSection[]
 }
 
 class CoronaModule extends React.Component<P, S> {
@@ -29,11 +36,18 @@ class CoronaModule extends React.Component<P, S> {
 	constructor(props: P) {
 		super(props)
 
+		const sections = getSectionsFromClasses(this.props.classes)
+			.sort((a, b) => a.classYear - b.classYear)
+
+		const section_id = sections && sections[0] ? sections[0].id : ""
+
 		this.state = {
 			filter: {
-				section_id: ""
+				section_id
 			},
-			modal_active: false
+			sections,
+			modal_active: false,
+			language: "en"
 		}
 
 		this.former = new Former(this, [])
@@ -50,7 +64,7 @@ class CoronaModule extends React.Component<P, S> {
 
 	}
 
-	onModalClose = () => {
+	modalClose = () => {
 
 		// save the active student
 		this.setState({
@@ -58,66 +72,103 @@ class CoronaModule extends React.Component<P, S> {
 		})
 	}
 
+	submitForm = (student: MISStudent) => {
+
+		// save the active student
+		this.setState({
+			modal_active: false
+		})
+
+		// save needy student
+		this.props.saveStudentNeedyForm(student)
+	}
+
+
 	render() {
 
-		const sections = getSectionsFromClasses(this.props.classes)
+		const { sections, language } = this.state
 
 		return <Layout history={this.props.history}>
-			<div className="corona">
-
+			<div className="section-container corona">
 				{
 					this.state.modal_active && <Modal>
 						<NeedyModal
 							student={this.state.active_student}
-							onClose={this.onModalClose}
+							onSubmit={this.submitForm}
+							onClose={this.modalClose}
+							language={language}
 						/>
 					</Modal>
 				}
-
 				<div className="title">Corona Module</div>
-
-				<div className="filters">
-					<div className="row">
-						<label>Section</label>
-						<select {...this.former.super_handle(["filter", "section_id"])}>
-							<option value="">Select Class</option>
-							{
-								sections
-									.sort((a, b) => a.classYear - b.classYear)
-									.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
-							}
-						</select>
+				<div className="section-container">
+					<div className="form">
+						<div className="row">
+							<label>Language</label>
+							<select {...this.former.super_handle(["language"])}>
+								<option value="en">English</option>
+								<option value="ur">Urdu</option>
+							</select>
+						</div>
+					</div>
+					<div dir="auto">
+						{
+							this.state.language === "en" ?
+								<div>
+									<p>The basic purpose of this module is to collect the information of deserving students' families who are looking for our help in this dire situation. We hope that you will help us to reach them.</p>
+									<p><strong>Note: </strong>Please fill form with verified information from parents.</p>
+								</div> :
+								<div>
+									<p>اس موڈیول کا بنیادی مقصد ان حقدار طالبِ علموں کے گھرانوں کی معلومات حاصل کرنا ہے جن کو اس مشکل وقت میں ہماری مدد کی ضرورت ہے ہمیں امید ہے کہ آپ ان تک پہنچنے میں ہماری مدد کریں گے</p>
+									<p><strong>نوٹ:</strong> براہِ مہربانی والدین سے تصدیق شدہ معلومات درج کریں</p>
+								</div>
+						}
 					</div>
 				</div>
-				<table>
-					<thead>
-						<tr>
-							<td>Roll #</td>
-							<td>Name</td>
-							<td>Father Name</td>
-							<td>Needy</td>
-						</tr>
-					</thead>
-					<tbody>
-						{
-							Object.values(this.props.students)
-								.filter(s => this.state.filter.section_id && s.section_id === this.state.filter.section_id)
-								.sort((a, b) => parseInt(a.RollNumber) - parseInt(b.RollNumber))
-								.map(s => {
+				<div className="section-container section">
+					<div className="form">
+						<div className="row">
+							<label>class</label>
+							<select {...this.former.super_handle(["filter", "section_id"])}>
+								<option value="">Select Class</option>
+								{
+									sections
+										.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+								}
+							</select>
+						</div>
+					</div>
+					<div className="table" style={{ marginTop: 15 }}>
+						<table style={{ width: "100%" }}>
+							<thead>
+								<tr>
+									<td>Roll #</td>
+									<td>Name</td>
+									<td>Father Name</td>
+									<td>Needy</td>
+								</tr>
+							</thead>
+							<tbody>
+								{
+									Object.values(this.props.students)
+										.filter(s => this.state.filter.section_id && s.section_id === this.state.filter.section_id)
+										.sort((a, b) => parseInt(a.RollNumber) - parseInt(b.RollNumber))
+										.map(s => {
 
-									return <tr key={s.id}>
-										<td>{s.RollNumber}</td>
-										<td>{<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>}</td>
-										<td>{s.ManName}</td>
-										<td>
-											<input type="checkbox" onChange={this.onCheckboxSelect(s)} />
-										</td>
-									</tr>
-								})
-						}
-					</tbody>
-				</table>
-
+											return <tr key={s.id}>
+												<td>{s.RollNumber}</td>
+												<td>{<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>}</td>
+												<td>{s.ManName}</td>
+												<td>
+													<input type="checkbox" onChange={this.onCheckboxSelect(s)} />
+												</td>
+											</tr>
+										})
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 
 		</Layout>
@@ -128,4 +179,6 @@ class CoronaModule extends React.Component<P, S> {
 export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes
+}), (dispatch: Function) => ({
+	saveStudentNeedyForm: (student: MISStudent) => dispatch(saveStudentNeedyForm(student))
 }))(CoronaModule)
