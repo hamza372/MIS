@@ -202,7 +202,7 @@ interface AugmentedSection {
 	faculty_id?: string
 }
 
-interface MISStudent extends NeedyForm {
+interface MISStudent {
 	id: string
 	Name: string
 	RollNumber: string
@@ -260,7 +260,7 @@ interface NeedyForm {
 	ReceivedAnyDonation?: "YES" | "NO" | "DONT_KNOW" | ""
 	EarnThisMonth?: "YES" | "NO" | "DONT_KNOW" | ""
 	IncomeSource?: "GOVT_JOB" | "PRIVATE_JOB" | "SEMI_GOVT" | "BUSINESS" | "FARMING" | "CATTLE_POULTRY" | "DONT_KNOW" | ""
-	Occupation?: "TEACHER" | "SCHOOL_ADMIN" | "GUARD" | "FACTORY_WORKER" | "LABORER" | "MASON" | "CARPENTER" | "PAINTER" | "MECHANIC" | "WELDER" | "OFFICE_BOY" | "DONT_KNOW" | ""
+	Occupation?: "TEACHER" | "SCHOOL_ADMIN" | "GUARD" | "FACTORY_WORKER" | "LABORER" | "MASON" | "CARPENTER" | "PAINTER" | "MECHANIC" | "WELDER" | "OFFICE_BOY" | "DONT_KNOW" | "OTHER" | ""
 	JobPlace?: "CURRENT_SCHOOL" | "OTHER_SCHOOL" | "DONT_KNOW" | ""
 }
 

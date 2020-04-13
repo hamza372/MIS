@@ -3,8 +3,8 @@ import Former from 'utils/former'
 import Hyphenator from 'utils/Hyphenator'
 
 interface P {
-	student: MISStudent
-	onSubmit: (student: MISStudent) => void
+	student: MISStudent & NeedyForm
+	onSubmit: (needy_form: NeedyForm) => void
 	onClose: () => void
 
 	language?: "en" | "ur"
@@ -48,13 +48,8 @@ class NeedyModal extends React.Component<P, S> {
 
 	submitForm = () => {
 
-		const needy_student = {
-			...this.props.student,
-			...this.state.needy_form
-		}
-
 		// invoke save method
-		this.props.onSubmit(needy_student)
+		this.props.onSubmit(this.state.needy_form)
 	}
 
 	addHyphens = () => {
@@ -141,9 +136,20 @@ class NeedyModal extends React.Component<P, S> {
 										<option value="MECHANIC">Mechanic</option>
 										<option value="WELDER">Welder</option>
 										<option value="OFFICE_BOY">Office job / clerk</option>
+										<option value="OTHER">Other</option>
 										<option value="DONT_KNOW">Don't Know</option>
 									</select>
 								</div>
+							}
+
+							{
+								this.state.needy_form.IncomeSource === "PRIVATE_JOB" &&
+								this.state.needy_form.Occupation === "OTHER" && <>
+									<div className="row">
+										<label>Other</label>
+										<input type="text" {...this.former.super_handle(["Occupation"])} placeholder="e.g. Accountant" />
+									</div>
+								</>
 							}
 
 							{
@@ -223,7 +229,7 @@ class NeedyModal extends React.Component<P, S> {
 							</div>
 							<div className="row">
 								<label>کیا طالبِ علم یتیم ہے؟</label>
-								<select {...this.former.super_handle(["orphan"])}>
+								<select {...this.former.super_handle(["Orphan"])}>
 									<option value="">انتخاب کریں</option>
 									<option value="YES">جی ہاں</option>
 									<option value="NO">نہیں</option>
@@ -268,13 +274,24 @@ class NeedyModal extends React.Component<P, S> {
 										<option value="LABORER">مزدور</option>
 										<option value="MASON">مستری</option>
 										<option value="CARPENTER">کارپینٹر</option>
-										<option value="PAINTER">Painter</option>
+										<option value="PAINTER">نقاش</option>
 										<option value="MECHANIC">میکینک</option>
 										<option value="WELDER">ویلڈنگ</option>
 										<option value="OFFICE_BOY">کلرک</option>
+										<option value="OTHER">کوئی اور</option>
 										<option value="DONT_KNOW">معلوم نہیں</option>
 									</select>
 								</div>
+							}
+
+							{
+								this.state.needy_form.IncomeSource === "PRIVATE_JOB" &&
+								this.state.needy_form.Occupation === "OTHER" && <>
+									<div className="row">
+										<label>کوئی اور</label>
+										<input type="text" {...this.former.super_handle(["Occupation"])} placeholder="مثلاً اکاؤنٹنٹ" />
+									</div>
+								</>
 							}
 
 							{

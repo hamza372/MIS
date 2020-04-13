@@ -16,7 +16,7 @@ type P = {
 	students: RootDBState['students']
 	classes: RootDBState['classes']
 
-	saveStudentNeedyForm: (student: MISStudent) => void
+	saveStudentNeedyForm: (student: MISStudent, needy_form: NeedyForm) => void
 
 } & RouteComponentProps
 
@@ -25,7 +25,7 @@ interface S {
 		section_id: string
 	}
 	modal_active: boolean
-	active_student?: MISStudent
+	active_student?: MISStudent & NeedyForm
 	language: "en" | "ur"
 	sections: AugmentedSection[]
 }
@@ -72,7 +72,7 @@ class CoronaModule extends React.Component<P, S> {
 		})
 	}
 
-	submitForm = (student: MISStudent) => {
+	submitForm = (needy_form: NeedyForm) => {
 
 		// save the active student
 		this.setState({
@@ -80,7 +80,7 @@ class CoronaModule extends React.Component<P, S> {
 		})
 
 		// save needy student
-		this.props.saveStudentNeedyForm(student)
+		this.props.saveStudentNeedyForm(this.state.active_student, needy_form)
 	}
 
 
@@ -182,5 +182,5 @@ export default connect((state: RootReducerState) => ({
 	students: state.db.students,
 	classes: state.db.classes
 }), (dispatch: Function) => ({
-	saveStudentNeedyForm: (student: MISStudent) => dispatch(saveStudentNeedyForm(student))
+	saveStudentNeedyForm: (student: MISStudent, needy_form: NeedyForm) => dispatch(saveStudentNeedyForm(student, needy_form))
 }))(CoronaModule)
