@@ -3,3 +3,13 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+@font-face {
+  font-family: 'Noto-Nastaliq-Urdu';
+  src: local('Noto-Nastaliq-Urdu'), url(./assets/fonts/Noto-Nastaliq-Urdu.ttf.woff) format('woff'),
+      url(./assets/fonts/Noto-Nastaliq-Urdu.ttf.svg#Noto-Nastaliq-Urdu) format('svg'),
+      url(./assets/fonts/Noto-Nastaliq-Urdu.ttf.eot),
+      url(./assets/fonts/Noto-Nastaliq-Urdu.ttf.eot?#iefix) format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
