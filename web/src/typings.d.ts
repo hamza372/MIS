@@ -251,16 +251,18 @@ interface MISStudent extends NeedyForm {
 }
 
 interface NeedyForm {
-	needy?: boolean
-	needyStatus?: "NOT_NEEDY" | "SOMEWHAT_NEEDY" | "EXTREMELY_NEEDY" | "DONT_KNOW" | ""
-	orphan?: "YES" | "NO" | "DONT_KNOW" | ""
-	familyMembers?: string
-	membersWhoEarn?: string
-	approxIncome?: string
-	earnThisMonth?: "YES" | "NO" | "DONT_KNOW" | ""
-	incomeSource?: "GOVT_JOB" | "PRIVATE_JOB" | "SEMI_GOVT" | "BUSINESS" | "FARMING" | "CATTLE_POULTRY" | "DONT_KNOW" | ""
-	occupation?: "TEACHING" | "SCHOOL_ADMIN" | "JANITOR" | "DOCTOR" | "NURSE" | "POLICE" | "WORKER" | "LABORER" | "DONT_KNOW" | ""
-	jobPlace?: "CURRENT_SCHOOL" | "OTHER_SCHOOL" | "DONT_KNOW" | ""
+	Needy?: boolean
+	NeedyStatus?: "SOMEWHAT_NEEDY" | "QUITE_NEEDY" | "VERY_NEEDY" | "DONT_KNOW" | ""
+	Orphan?: "YES" | "NO" | "DONT_KNOW" | ""
+	FamilyMembers?: string // should be number but due to former and empty input field
+	MembersWhoEarn?: string
+	ApproxIncome?: string
+	ReceivedAnyDonation?: "YES" | "NO" | "DONT_KNOW" | ""
+	EarnThisMonth?: "YES" | "NO" | "DONT_KNOW" | ""
+	IncomeSource?: "GOVT_JOB" | "PRIVATE_JOB" | "SEMI_GOVT" | "BUSINESS" | "FARMING" | "CATTLE_POULTRY" | "DONT_KNOW" | ""
+	Occupation?: "TEACHER" | "SCHOOL_ADMIN" | "GUARD" | "FACTORY_WORKER" | "LABORER" | "MASON" | "CARPENTER" | "PAINTER" | "MECHANIC" | "WELDER" | "OFFICE_BOY" | "DONT_KNOW" | ""
+	JobPlace?: "CURRENT_SCHOOL" | "OTHER_SCHOOL" | "DONT_KNOW" | ""
+	FinancialUnstability?: "UNSTABLE_BEFORE_CORONA" | "INCOME_AFFTECTED_BY_CORONA" | "DONT_KNOW" | ""
 }
 
 interface MISFamilyInfo {

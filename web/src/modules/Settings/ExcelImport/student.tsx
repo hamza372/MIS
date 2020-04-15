@@ -402,8 +402,6 @@ const convertCSVToStudents = (studentImportCSV: string) => {
 				exams: {},
 				tags: {},
 				certificates: {},
-
-				needy: false
 			}
 
 			return student

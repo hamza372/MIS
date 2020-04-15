@@ -47,7 +47,7 @@
 }
 
 .needy-form .form {
-	width: 100%;
+	width: 90%;
 	margin: auto;
 	margin-bottom: 2px;
 }
@@ -79,6 +79,29 @@
 	letter-spacing: 1px;
 }
 
+.needy-form .scrollbar {
+	float: left;
+	overflow-y: auto;
+	margin-bottom: 20px;
+}
+
+.needy-form .scrollbar::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 8px;
+	background-color: #F5F5F5;
+}
+
+.needy-form .scrollbar::-webkit-scrollbar {
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+.needy-form .scrollbar::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+
 @media (max-width: 768px) {
 
 	.needy-form .close.button {
@@ -90,10 +113,6 @@
 		font-size: 1.5rem;
 	}
 
-	.needy-form .form {
-		width: 90%;
-	}
-
 	.needy-form .form.urdu .row * {
 		flex-wrap: wrap;
 	}
@@ -102,29 +121,6 @@
 		margin-right: 0;
 		width: 100% !important;
 		margin-left: auto !important;
-	}
-
-	.needy-form .scrollbar {
-		float: left;
-		overflow-y: auto;
-		margin-bottom: 20px;
-	}
-
-	.needy-form .scrollbar::-webkit-scrollbar-track {
-		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-		border-radius: 8px;
-		background-color: #F5F5F5;
-	}
-	
-	.needy-form .scrollbar::-webkit-scrollbar {
-		width: 10px;
-		background-color: #F5F5F5;
-	}
-	
-	.needy-form .scrollbar::-webkit-scrollbar-thumb {
-		border-radius: 8px;
-		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-		background-color: #555;
 	}
 }
 
