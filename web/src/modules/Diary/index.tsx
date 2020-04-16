@@ -11,6 +11,7 @@ import former from 'utils/former'
 import moment from 'moment'
 import getSectionFromId from 'utils/getSectionFromId'
 import DiaryPrintable from 'components/Printable/Diary/diary'
+import ShareButton from 'components/ShareButton'
 
 import './style.css'
 
@@ -383,7 +384,11 @@ class Diary extends Component<propTypes, S> {
 									</div>)
 							}
 
-							{subjects.size > 0 && <div className="button blue" onClick={this.onSave}>Save</div>}
+							{subjects.size > 0 && <div className="row" style={{ justifyContent: "flex-end", marginTop: 20 }}>
+								<div className="button blue" style={{ margin: 2 }} onClick={this.onSave}>Save</div>
+								<div className="button grey" style={{ margin: 2 }} onClick={() => window.print()}>Print</div>
+							</div>
+							}
 
 						</div>
 					}
@@ -393,7 +398,6 @@ class Diary extends Component<propTypes, S> {
 							{
 								settings.sendSMSOption === "SIM" ?
 									<a className="button blue mb"
-										style={{ marginBottom: "12px" }}
 										href={smsIntentLink({
 											messages,
 											return_link: window.location.href
@@ -403,7 +407,10 @@ class Diary extends Component<propTypes, S> {
 									:
 									<div className="row button" onClick={() => sendBatchMessages(messages)} style={{ width: "20%" }}>Send</div>
 							}
-							<div className="button" onClick={() => window.print()}>Print</div>
+							<div className="is-mobile-only" style={{ marginTop: 10 }}>
+								<div className="text-center">Share on Whatsapp</div>
+								<ShareButton text={this.diaryString()} />
+							</div>
 						</div>
 					}
 
