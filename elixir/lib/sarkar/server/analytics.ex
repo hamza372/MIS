@@ -1,161 +1,200 @@
 defmodule Sarkar.Server.Analytics do
-	
-	def init(%{bindings: %{type: "hi"}} = req, state) do
-		IO.puts "wowwww"
-		req = :cowboy_req.reply(200, req)
-		{:ok, req, state}
-		
-	end
+  def init(%{bindings: %{type: "hi"}} = req, state) do
+    IO.puts("wowwww")
+    req = :cowboy_req.reply(200, req)
+    {:ok, req, state}
+  end
 
-	def init(%{bindings: %{type: "devices.csv"}} = req, state) do
-
-		{:ok, data} = case Sarkar.DB.Postgres.query(Sarkar.School.DB,
-		"SELECT school_id, client_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
+  def init(%{bindings: %{type: "devices.csv"}} = req, state) do
+    {:ok, data} =
+      case Sarkar.DB.Postgres.query(
+             Sarkar.School.DB,
+             "SELECT school_id, client_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time)
 		FROM writes
 		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
-		GROUP BY school_id, client_id, date 
+		GROUP BY school_id, client_id, date
 		ORDER BY date desc",
-		[]) do
-				{:ok, resp} -> {:ok, resp.rows}
-				{:error, err} -> {:error, err}
-		end
+             []
+           ) do
+        {:ok, resp} -> {:ok, resp.rows}
+        {:error, err} -> {:error, err}
+      end
 
-		csv = [ ["school_id", "client_id", "date", "writes"] | data ]
-		|> CSV.encode
-		|> Enum.join()
+    csv =
+      [["school_id", "client_id", "date", "writes"] | data]
+      |> CSV.encode()
+      |> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-		{:ok, req, state}
+    {:ok, req, state}
+  end
 
-	end
-
-	def init(%{bindings: %{type: "writes.csv"}} = req, state) do
-
-		{:ok, data} = case Sarkar.DB.Postgres.query(Sarkar.School.DB,
-		"SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time) 
+  def init(%{bindings: %{type: "writes.csv"}} = req, state) do
+    {:ok, data} =
+      case Sarkar.DB.Postgres.query(
+             Sarkar.School.DB,
+             "SELECT school_id, to_timestamp(time/1000)::date::text as date, count(DISTINCT time)
 		FROM writes
 		WHERE NOT (path[4]='payments' and value->>'type'='OWED')
-		GROUP BY school_id, date 
+		GROUP BY school_id, date
 		ORDER BY date desc",
-		[]) do
-				{:ok, resp} -> {:ok, resp.rows}
-				{:error, err} -> {:error, err}
-		end
+             []
+           ) do
+        {:ok, resp} -> {:ok, resp.rows}
+        {:error, err} -> {:error, err}
+      end
 
-		csv = [ ["school_id", "date", "writes"] | data ]
-		|> CSV.encode
-		|> Enum.join()
+    csv =
+      [["school_id", "date", "writes"] | data]
+      |> CSV.encode()
+      |> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-		{:ok, req, state}
+    {:ok, req, state}
+  end
 
-	end
+  def init(%{bindings: %{type: "raw-writes.csv"}} = req, state) do
+    req1 =
+      :cowboy_req.stream_reply(
+        200,
+        %{
+          "content-type" => "text/csv",
+          "cache-control" => "no-cache",
+          "connection" => "keep-alive"
+        },
+        req
+      )
 
-	def init(%{bindings: %{type: "raw-writes.csv"}} = req, state) do
+    :cowboy_req.stream_body(
+      IO.iodata_to_binary(
+        NimbleCSV.RFC4180.dump_to_iodata([
+          ["school_id", "path", "value", "time", "type", "client_id", "sync_time"]
+        ])
+      ),
+      :nofin,
+      req1
+    )
 
-		req1 = :cowboy_req.stream_reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache", "connection" => "keep-alive"},
-			req
-		)
+    Postgrex.transaction(
+      Sarkar.School.DB,
+      fn conn ->
+        stream =
+          Postgrex.stream(
+            conn,
+            "SELECT school_id, path, value, time, type, client_id, sync_time
+				FROM writes",
+            [],
+            pool: DBConnection.Poolboy
+          )
 
-		:cowboy_req.stream_body(
-			IO.iodata_to_binary(NimbleCSV.RFC4180.dump_to_iodata([["school_id", "path", "value", "time", "type", "client_id", "sync_time"]])),
-			:nofin,
-			req1
-		)
+        stream
+        |> Stream.map(fn res ->
+          res.rows
+          |> Enum.map(fn [s, p, v, t, type, cid, st] ->
+            [s, Poison.encode!(p), Poison.encode!(v), t, type, cid, st]
+          end)
+          |> Enum.map(fn row ->
+            :cowboy_req.stream_body(
+              IO.iodata_to_binary(NimbleCSV.RFC4180.dump_to_iodata([row])),
+              :nofin,
+              req1
+            )
+          end)
+        end)
+        |> Enum.to_list()
+      end,
+      pool: DBConnection.Poolboy
+    )
 
-		Postgrex.transaction(Sarkar.School.DB, fn(conn) ->
-			stream = Postgrex.stream(conn,
-				"SELECT school_id, path, value, time, type, client_id, sync_time 
-				FROM writes", [], pool: DBConnection.Poolboy)
+    :cowboy_req.stream_body("", :fin, req1)
 
-			stream
-			|> Stream.map(fn res ->
-				res.rows 
-				|> Enum.map( fn [s, p, v, t, type, cid, st] -> [s, Poison.encode!(p), Poison.encode!(v), t, type, cid, st] end)
-				|> Enum.map(fn row -> :cowboy_req.stream_body(IO.iodata_to_binary(NimbleCSV.RFC4180.dump_to_iodata([row])), :nofin, req1) end)
-			end)
-			|> Enum.to_list
+    {:ok, req, state}
+  end
 
-		end, pool: DBConnection.Poolboy)
-
-		:cowboy_req.stream_body("", :fin, req1)
-
-		{:ok, req, state}
-	end
-
-	def init(%{bindings: %{type: "fees.csv"}} = req, state) do
-
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT 
-				to_timestamp(time/1000)::date::text as d, 
-				school_id, 
+  def init(%{bindings: %{type: "fees.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
+				to_timestamp(time/1000)::date::text as d,
+				school_id,
 				count(distinct path[3]) as unique_students,
-				count(distinct path[5]) as num_payments, 
+				count(distinct path[5]) as num_payments,
 				sum((value->>'amount')::float) as total
-			FROM writes 
+			FROM writes
 			WHERE path[2] = 'students' AND path[4] = 'payments' AND value->>'type' = 'SUBMITTED'
-			GROUP BY d, school_id 
-			ORDER BY d desc", [])
-		
+			GROUP BY d, school_id
+			ORDER BY d desc",
+        []
+      )
 
-		csv = [ ["date", "school_id", "unique_students", "num_payments", "total"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [["date", "school_id", "unique_students", "num_payments", "total"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(%{bindings: %{type: "exams.csv"}} = req, state) do
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT 
+    {:ok, req, state}
+  end
+
+  def init(%{bindings: %{type: "exams.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
 				to_timestamp(time/1000)::date::text as d,
 				school_id,
 				count(distinct path[3]) as students_graded,
-				count(distinct path[5]) as exams 
-			FROM writes 
+				count(distinct path[5]) as exams
+			FROM writes
 			WHERE path[2] = 'students' and path[4] = 'exams'
 			GROUP BY d, school_id
 			ORDER BY d desc",
-			[])
+        []
+      )
 
-		csv = [ ["date", "school_id", "students_graded", "exams"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [["date", "school_id", "students_graded", "exams"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(%{bindings: %{type: "sign_ups.csv"}} = req, state) do
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT
+    {:ok, req, state}
+  end
+
+  def init(%{bindings: %{type: "sign_ups.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
 				form ->> 'name' as Name,
 				form ->> 'schoolName' as School,
 				form ->> 'city' as City,
@@ -163,78 +202,94 @@ defmodule Sarkar.Server.Analytics do
 				form ->> 'phone' as Phone,
 				to_timestamp((form->>'date')::bigint/1000) as Date
 			FROM mischool_sign_ups",
-			[])
+        []
+      )
 
-		csv = [ ["Name", "School", "City", "Package", "Phone", "Date"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [["Name", "School", "City", "Package", "Phone", "Date"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(%{bindings: %{type: "attendance.csv"}} = req, state) do
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT
-				to_timestamp(time/1000)::date::text as d, 
+    {:ok, req, state}
+  end
+
+  def init(%{bindings: %{type: "attendance.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
+				to_timestamp(time/1000)::date::text as d,
 				school_id,
-				count(distinct path[3]) as students_marked 
+				count(distinct path[3]) as students_marked
 			FROM writes
 			WHERE path[2] = 'students' and path[4] = 'attendance'
 			GROUP BY d, school_id
-			ORDER BY d desc", [])
+			ORDER BY d desc",
+        []
+      )
 
-		csv = [ ["date", "school_id", "students_marked"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [["date", "school_id", "students_marked"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(%{bindings: %{type: "teacher_attendance.csv"}} = req, state) do
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT
-				to_timestamp(time/1000)::date::text as d, 
+    {:ok, req, state}
+  end
+
+  def init(%{bindings: %{type: "teacher_attendance.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
+				to_timestamp(time/1000)::date::text as d,
 				school_id,
-				count(distinct path[3]) as teachers_marked 
+				count(distinct path[3]) as teachers_marked
 			FROM writes
 			WHERE path[2] = 'faculty' and path[4] = 'attendance'
 			GROUP BY d, school_id
-			ORDER BY d desc", [])
+			ORDER BY d desc",
+        []
+      )
 
-		csv = [ ["date", "school_id", "teachers_marked"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
+    csv =
+      [["date", "school_id", "teachers_marked"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-		{:ok, req, state}
-	end
+    {:ok, req, state}
+  end
 
-	def init(%{bindings: %{type: "sms.csv"}} = req, state) do
-
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT
-				to_timestamp(time/1000)::date::text as d, 
-				school_id, 
+  def init(%{bindings: %{type: "sms.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
+				to_timestamp(time/1000)::date::text as d,
+				school_id,
 				sum(CASE WHEN value->>'type' = 'ALL_STUDENTS' THEN (value->>'count')::int ELSE 0 END) AS ALL_STUDENTS,
 				sum(CASE WHEN value->>'type' = 'ALL_TEACHERS' THEN (value->>'count')::int ELSE 0 END) AS ALL_TEACHERS,
 				sum(CASE WHEN value->>'type' = 'TEACHER' THEN (value->>'count')::int ELSE 0 END) AS SINGLE_TEACHER,
@@ -249,52 +304,80 @@ defmodule Sarkar.Server.Analytics do
 			FROM writes
 			WHERE path[2] = 'analytics' AND path[3] = 'sms_history'
 			GROUP BY d, school_id
-			ORDER BY d desc", [])
-		
-		csv = [ ["date", "school_id", "ALL_STUDENTS", "ALL_TEACHERS", "SINGLE_TEACHER", "FEE_DEAFULTERS","STUDENT","CLASS","ATTENDANCE","FEE", "EXAM", "PROSPECTIVE", "TOTAL"] | resp.rows] 
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+			ORDER BY d desc",
+        []
+      )
 
-		{:ok, req, state}
-	end
+    csv =
+      [
+        [
+          "date",
+          "school_id",
+          "ALL_STUDENTS",
+          "ALL_TEACHERS",
+          "SINGLE_TEACHER",
+          "FEE_DEAFULTERS",
+          "STUDENT",
+          "CLASS",
+          "ATTENDANCE",
+          "FEE",
+          "EXAM",
+          "PROSPECTIVE",
+          "TOTAL"
+        ]
+        | resp.rows
+      ]
+      |> CSV.encode()
+      |> Enum.join()
 
-	def init(%{bindings: %{type: "expense.csv"}} = req, state) do 
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB,
-			"SELECT 
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
+
+    {:ok, req, state}
+  end
+
+  def init(%{bindings: %{type: "expense.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
 				to_timestamp(time/1000)::date::text as d,
 				school_id,
 				count(distinct path[3]) as unique_expense,
 				sum((value->> 'amount')::float) as total_amount
-			FROM writes 
-			WHERE path[2] = 'expenses' AND value ->> 'type' = 'PAYMENT_GIVEN' 
-			GROUP BY d, school_id 
-			ORDER BY d desc", [])
+			FROM writes
+			WHERE path[2] = 'expenses' AND value ->> 'type' = 'PAYMENT_GIVEN'
+			GROUP BY d, school_id
+			ORDER BY d desc",
+        []
+      )
 
-		csv = [ ["date", "school_id", "unique_expense", "total_amount"] | resp.rows ]
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [["date", "school_id", "unique_expense", "total_amount"] | resp.rows]
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(%{bindings: %{type: "referrals.csv"}} = req, state) do 
+    {:ok, req, state}
+  end
 
-		{:ok, resp} = Sarkar.DB.Postgres.query(Sarkar.School.DB, 
-		"SELECT
+  def init(%{bindings: %{type: "referrals.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
 			to_timestamp(time/1000)::date::text as Date,
 			id,
 			value ->> 'area_manager_name' as name,
@@ -305,33 +388,124 @@ defmodule Sarkar.Server.Analytics do
 			value ->> 'office' as Office,
 			value ->> 'notes' as Notes,
 			value ->> 'owner_name' as owner_name
-		FROM mischool_referrals", [])
+		FROM mischool_referrals",
+        []
+      )
 
-		csv = [["date", "school_id", "area_manager_name", "agent_name", "type", "package", "city", "office", "notes", "owner_name"] | resp.rows]
-			|> Enum.map(fn row -> 
-				Enum.map(row, fn item -> case item do
-						nil -> ""
-						_ -> String.replace(item, ",", "-") 
-					end
-				end)
-			end)
-			|> CSV.encode
-			|> Enum.join()
-		
-		req = :cowboy_req.reply(
-			200,
-			%{"content-type" => "text/csv", "cache-control" => "no-cache"},
-			csv,
-			req
-		)
+    csv =
+      [
+        [
+          "date",
+          "school_id",
+          "area_manager_name",
+          "agent_name",
+          "type",
+          "package",
+          "city",
+          "office",
+          "notes",
+          "owner_name"
+        ]
+        | resp.rows
+      ]
+      |> Enum.map(fn row ->
+        Enum.map(row, fn item ->
+          case item do
+            nil -> ""
+            _ -> String.replace(item, ",", "-")
+          end
+        end)
+      end)
+      |> CSV.encode()
+      |> Enum.join()
 
-		{:ok, req, state}
-	end
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
 
-	def init(req, state) do 
-		req = :cowboy_req.reply(200, req)
-		IO.inspect req
-		{:ok, req, state}
-	end
+    {:ok, req, state}
+  end
 
+  def init(%{bindings: %{type: "needy.csv"}} = req, state) do
+    {:ok, resp} =
+      Sarkar.DB.Postgres.query(
+        Sarkar.School.DB,
+        "SELECT
+          to_timestamp(time/1000)::date::text as date,
+          school_id,
+          value->> 'Name' as Name,
+          value->> 'ManName' as Father_Guardian_Name,
+          value->> 'ManCNIC' as Father_Guardian_CNIC,
+          value->> 'Phone' as Phone,
+          value->> 'NeedyStatus' as NeedyStatus,
+          value->> 'Orphan' as Orphan,
+          value->> 'FamilyMembers' as FamilyMembers,
+          value->> 'MembersWhoEarn' as MembersWhoEarn,
+          value->> 'ApproxIncome' as ApproxIncome,
+          value->> 'ReceivedAnyDonation' as ReceivedAnyDonation,
+          value->> 'EarnThisMonth' as EarnThisMonth,
+          value->> 'IncomeSource' as IncomeSource,
+          value->> 'Occupation' as Occupation,
+          value->> 'JobPlace' as JobPlace,
+          value->> 'FinancialUnstability' as FinancialUnstability
+	      FROM writes
+	      WHERE path[2] = 'students' AND value ->> 'Needy' = 'true'
+	      ORDER BY date desc, school_id asc",
+        []
+      )
+
+    csv =
+      [
+        [
+          "date",
+          "school_id",
+          "Name",
+          "Father_Guardian_Name",
+          "Father_Guardian_CNIC",
+          "Phone",
+          "NeedyStatus",
+          "Orphan",
+          "FamilyMembers",
+          "MembersWhoEarn",
+          "ApproxIncome",
+          "ReceivedAnyDonation",
+          "EarnThisMonth",
+          "IncomeSource",
+          "Occupation",
+          "JobPlace",
+          "FinancialUnstability"
+        ]
+        | resp.rows
+      ]
+      |> Enum.map(fn row ->
+        Enum.map(row, fn item ->
+          case item do
+            nil -> ""
+            _ -> String.replace(item, ",", "-")
+          end
+        end)
+      end)
+      |> CSV.encode()
+      |> Enum.join()
+
+    req =
+      :cowboy_req.reply(
+        200,
+        %{"content-type" => "text/csv", "cache-control" => "no-cache"},
+        csv,
+        req
+      )
+
+    {:ok, req, state}
+  end
+
+  def init(req, state) do
+    req = :cowboy_req.reply(200, req)
+    IO.inspect(req)
+    {:ok, req, state}
+  end
 end
