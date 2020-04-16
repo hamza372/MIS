@@ -1,0 +1,44 @@
+.exams-analytics .date-range {
+	display: flex;
+	justify-content: space-between;
+}
+.exams-analytics .filter-button {
+	margin-bottom: 10px;
+}
+.exams-analytics .filter-button .button {
+	margin-left: auto;
+	width: 120px;
+}
+.exams-analytics .filter-container {
+	width: 100%;
+}
+.exams-analytics .section-container .section.graph-filters {
+	border: none;
+	width: 18%;
+}
+@media (max-width: 820px) {
+	.graph-container {
+		flex-wrap: wrap;
+	}
+	.exams-analytics .section-container .section.graph-filters {
+		width: 100%;
+	}
+}
+.exams-analytics .section-container .graph-filters select {
+	margin-right: auto;
+	width: 100%;
+}
+.grades-graph {
+	margin-top: 20px;
+	margin-left: auto;
+	overflow-y: auto;
+}
+
+.custom-tooltip {
+	background-color: white;
+	width: 300px;
+	max-width: 90%;
+	padding: 25px;
+	border: 2px solid #74aced;
+	border-radius: 4px;
+}

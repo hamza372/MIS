@@ -151,6 +151,22 @@ interface MISSettings {
 		defaultFee: {
 			[class_id: string]: MISStudentFee
 		}
+		feeVoucher?: {
+			dueDays: string
+			feeFine: string
+			notice: string
+			bankInfo: {
+				name: string
+				accountTitle: string
+				accountNo: string
+			}
+			options?: {
+				showDueDays: boolean
+				showFine: boolean
+				showNotice: boolean
+				showBankInfo: boolean
+			}
+		}
 	}
 }
 
@@ -238,8 +254,11 @@ interface MISFamilyInfo {
 	ManName: string
 	Phone: string
 	ManCNIC: string
-	Address: string
+	Address?: string
+	children?: AugmentedSibling[]
 }
+
+type AugmentedSibling = MISStudent & { section?: AugmentedSection }
 
 type AugmentedMISFamily = MISFamilyInfo & { ID: string }
 
@@ -385,11 +404,12 @@ interface StudentMarksSheet {
 	name: MISStudent["Name"]
 	manName: MISStudent["ManName"]
 	rollNo: MISStudent["RollNumber"]
-	marks: { total: number; obtained: number }
-	position: number
-	merge_exams: AugmentedMISExam[]
+	section_id?: MISStudent['section_id']
+	marks?: { total: number; obtained: number }
+	position?: number
+	merge_exams?: AugmentedMISExam[]
 	grade: string
-	remarks: string
+	remarks?: string
 }
 
 type MergeStudentsExams = MISStudent & { merge_exams: AugmentedMISExam[] }
@@ -399,3 +419,5 @@ interface ExamFilter {
 	subject?: string
 	exam_title: string
 }
+
+type MISGrades = RootDBState["settings"]["exams"]["grades"]

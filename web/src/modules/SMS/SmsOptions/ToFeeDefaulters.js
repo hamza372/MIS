@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { smsIntentLink } from 'utils/intent'
 import former from 'utils/former'
+import ShareButton from 'components/ShareButton'
 
 
 class ToFeeDefaulters extends Component {
@@ -122,10 +123,12 @@ class ToFeeDefaulters extends Component {
 				return agg
 			}
 
+			const balance = this.calculateDebt(debt)
+
 			return [...agg, {
 				number: student.Phone,
 				text : this.state.text
-				.replace(/\$BALANCE/g, `${debt}`)
+				.replace(/\$BALANCE/g, `${balance}`)
 				.replace(/\$NAME/g, student.FamilyID || student.Name)
 				.replace(/\$FNAME/g, student.ManName)
 			}]
@@ -150,6 +153,10 @@ class ToFeeDefaulters extends Component {
 
 							<div className="button" onClick={() => sendBatchMessages(messages)}>Can only send using Local SIM</div>
 					}
+				<div className="is-mobile-only" style={{marginTop: 10}}>
+					<div className="text-center">Share on Whatsapp</div>
+					<ShareButton text={this.state.text} />
+				</div>
 			</div>
 		)
   }

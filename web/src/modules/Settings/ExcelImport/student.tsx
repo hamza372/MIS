@@ -1,13 +1,20 @@
 import React, { ChangeEvent } from 'react'
 import { connect } from 'react-redux'
-import moment from 'moment';
-import { v4 } from 'node-uuid';
+import moment from 'moment'
+import { v4 } from 'node-uuid'
 
 import Former from 'utils/former'
-import getSectionsFromClasses from 'utils/getSectionsFromClasses';
+import getSectionsFromClasses from 'utils/getSectionsFromClasses'
 import downloadCSV from 'utils/downloadCSV'
-import { createStudentMerges } from 'actions';
+import { createStudentMerges } from 'actions'
 import Banner from 'components/Banner'
+import toTitleCase from 'utils/toTitleCase'
+import Papa from 'papaparse'
+
+import { DocumentDownloadIcon, TrashOutlineIcon } from 'assets/icons'
+
+import './style.css'
+import Hyphenator from 'utils/Hyphenator'
 
 interface S {
 
@@ -19,6 +26,7 @@ interface S {
 		text?: string
 	}
 	selectedSection: string
+	selectedFileName: string
 }
 
 type P = {
@@ -33,7 +41,7 @@ const studentCSVHeaders = [
 	"BForm",
 	"Gender (M/F)",
 	"Phone",
-	"Active",
+	"Active (Yes/No)",
 	"FatherCNIC",
 	"FatherName",
 	"Birthdate (dd/mm/yyyy)",
@@ -41,6 +49,21 @@ const studentCSVHeaders = [
 	"Notes",
 	"StartDate (dd/mm/yyyy)",
 	"AdmissionNumber"
+]
+
+const studentPreviewTableHeaders = [
+	"B-Form",
+	"Father Name",
+	"Father CNIC",
+	"Active",
+	"Gender",
+	"DOB",
+	"Admission Date",
+	"Admission No.",
+	"Roll No",
+	"Phone",
+	"Address",
+	"Notes"
 ]
 
 class StudentExcelImport extends React.Component<P, S> {
@@ -57,7 +80,8 @@ class StudentExcelImport extends React.Component<P, S> {
 				good: false,
 				text: ""
 			},
-			selectedSection: ""
+			selectedSection: "",
+			selectedFileName: "Choose File..."
 		}
 
 		this.former = new Former(this, [])
@@ -69,15 +93,21 @@ class StudentExcelImport extends React.Component<P, S> {
 	}
 
 	importStudentData = (e: ChangeEvent<HTMLInputElement>) => {
-		
+
 		const file = e.target.files[0]
-		if(file === undefined) {
-			return;
+
+		if (file === undefined) {
+			return
 		}
 
-		const reader = new FileReader();
+		this.setState({
+			selectedFileName: file.name
+		})
+
+		const reader = new FileReader()
 
 		reader.onloadend = () => {
+
 			const text = reader.result as string
 
 			const importedStudents = convertCSVToStudents(text)
@@ -86,8 +116,9 @@ class StudentExcelImport extends React.Component<P, S> {
 
 				const matchingAdmission = s.AdmissionNumber && Object.values(this.props.students)
 					.find(existing => existing.AdmissionNumber && existing.AdmissionNumber === s.AdmissionNumber)
-				
-				if(matchingAdmission) {
+
+				if (matchingAdmission) {
+
 					setTimeout(() => {
 						this.setState({
 							banner: {
@@ -95,6 +126,7 @@ class StudentExcelImport extends React.Component<P, S> {
 							}
 						})
 					}, 5000)
+
 					this.setState({
 						banner: {
 							active: true,
@@ -103,37 +135,35 @@ class StudentExcelImport extends React.Component<P, S> {
 						}
 					})
 
-					return true;
+					return true
 				}
-				
-				/*
-				const matchingRollNumber = s.RollNumber && Object.values(this.props.students)
-					.find(existing => existing.RollNumber && existing.RollNumber === s.RollNumber)
 
-				if(matchingRollNumber) {
-					setTimeout(() => {
-						this.setState({
-							banner: {
-								active: false
-							}
-						})
-					}, 5000)
-					this.setState({
-						banner: {
-							active: true,
-							good: false,
-							text: `A student with Roll Number ${matchingRollNumber.RollNumber} already exists in the data.`
-						}
-					})
+				// const matchingRollNumber = s.RollNumber && Object.values(this.props.students)
+				// 	.find(existing => existing.RollNumber && existing.RollNumber === s.RollNumber)
 
-					return true;
-				}
-				*/
+				// if (matchingRollNumber) {
+				// 	setTimeout(() => {
+				// 		this.setState({
+				// 			banner: {
+				// 				active: false
+				// 			}
+				// 		})
+				// 	}, 5000)
+				// 	this.setState({
+				// 		banner: {
+				// 			active: true,
+				// 			good: false,
+				// 			text: `A student with Roll Number ${matchingRollNumber.RollNumber} already exists in the data.`
+				// 		}
+				// 	})
 
-				return false;
+				// 	return true
+				// }
+
+				return false
 			})
 
-			if(!malformedData) {
+			if (!malformedData) {
 				this.setState({
 					loadingStudentImport: false,
 					importedStudents
@@ -158,194 +188,226 @@ class StudentExcelImport extends React.Component<P, S> {
 	}
 
 	onSave = () => {
-		
-		const classed_students = this.state.importedStudents
+
+		const section_id = this.state.selectedSection
+		const students = this.state.importedStudents
+
+		if (section_id.length === 0) {
+			alert("Please select class first to save students!")
+			return
+		}
+
+		const classed_students = students
 			.map(s => ({
 				...s,
-				section_id: this.state.selectedSection
+				section_id
 			}))
 
-		this.props.saveStudents(classed_students)
+		if (window.confirm(`Are you sure you want to Save ${students.length} Students?`)) {
+
+			this.props.saveStudents(classed_students)
+
+			this.setState({
+				importedStudents: [],
+				selectedFileName: "Choose File...",
+				banner: {
+					active: true,
+					good: true,
+					text: "Students have been saved successfully"
+				}
+			})
+
+			setTimeout(() => { this.setState({ banner: { active: false } }) }, 2000)
+		}
+
+	}
+
+	removeStudent = (id: string): void => {
+
+		if (!window.confirm("Are you sure you want to remove?")) {
+			return
+		}
+
+		const filtered_students = this.state.importedStudents.filter(student => student.id !== id)
 
 		this.setState({
-			importedStudents: []
+			importedStudents: filtered_students
 		})
 
 	}
 
 	render() {
 
-		const student = this.state.importedStudents[0]
+		const students = this.state.importedStudents
 
 		const banner = this.state.banner
 
 		return <React.Fragment>
-			{ banner.active && <Banner isGood={banner.good} text={banner.text} /> }
-			<div className="form" style={{width: "90%"}}>
+			{banner.active && <Banner isGood={banner.good} text={banner.text} />}
+			<div className="section-container excel-import-students" style={{ marginTop: 10 }}>
 				<div className="title">Excel Import</div>
-
-				<div className="row">
-					<label>Student Template CSV</label>
-					<div className="button grey" onClick={this.onStudentImportTemplateClick}>Download Template</div>
-				</div>
-
-				<div className="row">
-					<label>Upload Student Data CSV</label>
-					<div className="fileContainer button green">
-						<div>Upload CSV</div>
-						<input type="file" accept=".csv" onChange={this.importStudentData}/>
+				<div className="row" style={{ justifyContent: "flex-end" }}>
+					<div className="button grey" style={{ display: "flex" }} onClick={this.onStudentImportTemplateClick}>
+						<img width={20} height={20} src={DocumentDownloadIcon} alt="document-download" />
+						<div style={{ marginTop: 2 }}>Download Template</div>
 					</div>
 				</div>
-
-				{ this.state.loadingStudentImport && <div>Loading student import sheet....</div> }
-
-				{ this.state.importedStudents.length > 0 && <div className="row">
-					<label>Add All Students to Class</label>
-					<select {...this.former.super_handle(["selectedSection"])}>
-						<option value="">Select Class</option>
-						{
-							getSectionsFromClasses(this.props.classes)
-								.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
-						}
-					</select>
-				</div>}
-
-				{ this.state.importedStudents.length > 0 && <div className="section">
-					<div className="divider">Student Preview</div>
-
+				<div className="section form" style={{ marginTop: 10 }}>
 					<div className="row">
-						<label>Total Number of Students</label>
-						<div>{this.state.importedStudents.length}</div>
+						<div className="file-upload-container">
+							<label className="file-upload">
+								<input type="file" aria-label="file-browser" onChange={this.importStudentData} accept=".csv" />
+								<span className="file-upload-custom">{this.state.selectedFileName}</span>
+							</label>
+						</div>
 					</div>
-
-					<div style={{textAlign: "center", fontSize: "1.1rem"}}>Example Student</div>
-
-					<div className="row">
-						<label>Name</label>
-						<div>{student.Name}</div>
-					</div>
-
-					<div className="row">
-						<label>Roll Number</label>
-						<div>{student.RollNumber}</div>
-					</div>
-
-					<div className="row">
-						<label>BForm</label>
-						<div>{student.BForm}</div>
-					</div>
-
-					<div className="row">
-						<label>Gender</label>
-						<div>{student.Gender}</div>
-					</div>
-
-					<div className="row">
-						<label>Phone</label>
-						<div>{student.Phone}</div>
-					</div>
-
-					<div className="row">
-						<label>Active</label>
-						<div>{student.Active}</div>
-					</div>
-
-					<div className="row">
-						<label>Father CNIC</label>
-						<div>{student.ManCNIC}</div>
-					</div>
-
-					<div className="row">
-						<label>Father Name</label>
-						<div>{student.ManName}</div>
-					</div>
-
-					<div className="row">
-						<label>Birthdate</label>
-						<div>{student.Birthdate}</div>
-					</div>
-
-					<div className="row">
-						<label>Address</label>
-						<div>{student.Address}</div>
-					</div>
-
-					<div className="row">
-						<label>Notes</label>
-						<div>{student.Notes}</div>
-					</div>
-
-					<div className="row">
-						<label>Start Date</label>
-						<div>{moment(student.StartDate).format("DD/MM/YYYY")}</div>
-					</div>
-
-					<div className="row">
-						<label>Admission Number</label>
-						<div>{student.AdmissionNumber}</div>
-					</div>
-
-				</div> }
-
-				<div className="row">
-					<div className="save button" onClick={this.onSave}>Save</div>
 				</div>
+
+				{this.state.loadingStudentImport && <div>Loading student import sheet....</div>}
+
+				{
+					!this.state.loadingStudentImport && students.length > 0 && <>
+						<div className="divider">Preview Students List</div>
+						<div className="section">
+							<div className="form">
+								<div className="row">
+									<label>Add All Students to Class</label>
+									<select {...this.former.super_handle(["selectedSection"])}>
+										<option value="">Select Class</option>
+										{
+											getSectionsFromClasses(this.props.classes)
+												.sort((a, b) => (a.classYear || 0) - (b.classYear || 0))
+												.map(s => <option key={s.id} value={s.id}>{s.namespaced_name}</option>)
+										}
+									</select>
+								</div>
+
+								<div className="row">
+									<label>Total Students: {students.length}</label>
+									<div />
+								</div>
+
+								<div className="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th></th>
+												{studentPreviewTableHeaders.map(header => <th key={header}> {header}</th>)}
+											</tr>
+										</thead>
+										<tbody>
+											{
+												students.map(student => <tr key={student.id}>
+													<td className="text-left">
+														<div style={{ display: "flex", alignItems: "center" }}>
+															<div className="delete-button">
+																<img src={TrashOutlineIcon} alt="delete" onClick={() => this.removeStudent(student.id)} />
+															</div>
+															<div>{student.Name}</div>
+														</div>
+													</td>
+													<td>{student.BForm}</td>
+													<td className="text-left">{student.ManName}</td>
+													<td>{student.ManCNIC}</td>
+													<td>{student.Active ? "Yes" : "No"}</td>
+													<td>{student.Gender}</td>
+													<td>{student.Birthdate}</td>
+													<td>{moment(student.StartDate).format("DD-MM-YYYY")}</td>
+													<td>{student.AdmissionNumber}</td>
+													<td>{student.RollNumber}</td>
+													<td>{student.Phone}</td>
+													<td className="text-left">{student.Address}</td>
+													<td className="text-left">{student.Notes}</td>
+												</tr>)
+											}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div className="row" style={{ justifyContent: "flex-end" }}>
+							<div className="save button" onClick={this.onSave}>Save Students</div>
+						</div>
+					</>
+				}
 			</div>
 		</React.Fragment>
 	}
 }
 
-const convertCSVToStudents = (studentImportCSV: string ) => {
+const formatCNIC = (cnic: string): string => {
 
-	// naive csv parse, will break on commas.
-	const lines = studentImportCSV.split('\n')
-		.map(x => x.split(',').map(x => x.trim()))
+	if (cnic === "" || cnic.length < 13) {
+		return cnic
+	}
+
+	return Hyphenator(cnic)
+}
+
+const formatPhone = (phone: string): string => {
+
+	if (phone === "" || phone.length >= 11) {
+		return phone
+	}
+
+	// append '0' at start if not present due to auto excel conversion text to number
+	return "0".concat(phone)
+}
+
+const convertCSVToStudents = (studentImportCSV: string) => {
+
+	// // naive csv parse, will break on commas.
+	// const lines = studentImportCSV.split('\n')
+	// 	.map(x => x.split(',').map(x => x.trim()))
+	// 	.filter(x => x.length === studentCSVHeaders.length)
+	// 	.slice(1) // ignore headers
+
+	// papa parse handles CSV parsing gracefully with zero dependency
+	const { data, errors, meta } = Papa.parse(studentImportCSV)
+
+	console.log(data, errors, meta)
+
+	const items: Array<string> = data
 		.filter(x => x.length === studentCSVHeaders.length)
 		.slice(1) // ignore headers
 
-	console.log(studentImportCSV)
-	console.log(lines)
+	// note that this is linked to the headers in the template above. see
+	const students = items
+		.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
 
-	// note that this is linked to the headers in the template above. see 
-	const students = lines.map(([Name, RollNumber, BForm, Gender, Phone, Active, ManCNIC, ManName, Birthdate, Address, Notes, StartDate, AdmissionNumber]) => {
-		const student: MISStudent = {
-			id: v4(),
-			Name,
-			RollNumber,
-			BForm,
-			Gender: Gender.toLowerCase() === "m" ? "male" : ( Gender.toLowerCase() === "f" ? "female" : ""),
-			Phone,
-			Active: Active.toLowerCase() === "y" || Active.toLowerCase() === "yes" || Active.toLowerCase() === "true" || Active.toLowerCase() === "",
-			ManCNIC,
-			ManName,
-			Birthdate,
-			Address,
-			Notes,
-			StartDate: StartDate ? moment(StartDate, "DD/MM/YYYY").unix() * 1000 : new Date().getTime(), // shady...
-			AdmissionNumber,
-			Fee: 0,
+			const student: MISStudent = {
+				id: v4(),
+				Name: toTitleCase(Name),
+				RollNumber,
+				BForm: formatCNIC(BForm),
+				Gender: Gender.toLowerCase() === "m" ? "male" : (Gender.toLowerCase() === "f" ? "female" : ""),
+				Phone: formatPhone(Phone),
+				Active: Active.toLowerCase() === "y" || Active.toLowerCase() === "yes" || Active.toLowerCase() === "true" || Active.toLowerCase() === "",
+				ManCNIC: formatCNIC(ManCNIC),
+				ManName: toTitleCase(ManName),
+				Birthdate,
+				Address,
+				Notes,
+				StartDate: StartDate ? moment(StartDate, "DD/MM/YYYY").unix() * 1000 : new Date().getTime(), // shady...
+				AdmissionNumber,
+				Fee: 0,
 
-			section_id: "",
-			BloodType: "",
-			prospective_section_id: "",
+				section_id: "",
+				BloodType: "",
+				prospective_section_id: "",
 
-			fees: { },
-			payments: { },
-			attendance: { },
-			exams: { },
-			tags: { },
-			certificates: { }
-		}
-	
-		return student;
-	})
+				fees: {},
+				payments: {},
+				attendance: {},
+				exams: {},
+				tags: {},
+				certificates: {}
+			}
 
-	// at this point should show some preview of the students
-	// 
-	console.log(students)
+			return student
+		})
 
-	return students;
-	
+	return students
 }
 
 export default connect((state: RootReducerState) => ({
