@@ -373,12 +373,6 @@ class BulkExam extends Component<P, S> {
 		setTimeout(() => this.setState({ banner: { active: false } }), 3000)
 	}
 
-	editExam = (exam: MISExam): void => {
-		const { class_id, section_id, id } = exam
-		const url = `/reports/${class_id}/${section_id}/exam/${id}`
-		window.location.href = url
-	}
-
 	setQueryParams = (section_id: string, examFilter: ExamFilter) => {
 
 		const { exam_title, year, month } = examFilter
@@ -465,8 +459,7 @@ class BulkExam extends Component<P, S> {
 								<legend>Recent Added Exams</legend>
 								<RecentAddedExams
 									exams={filtered_exams}
-									onDeleteExam={this.deleteExam}
-									onEditExam={this.editExam} />
+									onDeleteExam={this.deleteExam} />
 								<div className="row">
 									<div className="button blue create-exam" onClick={this.toggleCreateExamModal}>Create New Exam</div>
 								</div>
@@ -539,7 +532,7 @@ const ExamScoreSheet: React.FC<ExamScoreSheetProps> = ({ scoreSheet, exams, onSu
 							Object.values(scoreSheet)
 								.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
 								.map(student => <tr key={student.id}>
-									<td title={toTitleCase(student.Name)}><Link to={`/student/${student.id}/profile`}>{student.RollNumber || ""} {toTitleCase(student.Name.substr(0, 15))}</Link></td>
+									<td title={toTitleCase(student.Name)}><Link to={`/student/${student.id}/profile`}>{student.RollNumber || ""} {toTitleCase(student.Name)}</Link></td>
 									{
 										Object.entries(student.scoreSheetExams)
 											.map(([exam_id, exam]) => <td key={`${exam_id}-${student.id}-${exam.section_id}`}>
@@ -562,10 +555,9 @@ const ExamScoreSheet: React.FC<ExamScoreSheetProps> = ({ scoreSheet, exams, onSu
 interface RecentAddExamsProps {
 	exams: MISExam[]
 	onDeleteExam: (exam_id: string) => void
-	onEditExam: (exam: MISExam) => void
 }
 
-const RecentAddedExams: React.FC<RecentAddExamsProps> = ({ exams, onDeleteExam, onEditExam }) => {
+const RecentAddedExams: React.FC<RecentAddExamsProps> = ({ exams, onDeleteExam }) => {
 
 	return <div className="exams-table">
 		<div className="table-row table-header">
@@ -585,7 +577,9 @@ const RecentAddedExams: React.FC<RecentAddExamsProps> = ({ exams, onDeleteExam, 
 					<div className="cell">{moment(exam.date).format("DD/MM")}</div>
 					<div className="cell" style={{ width: "10%" }}>
 						<div className="">
-							<img className="edit-icon" src={EditIcon} onClick={() => onEditExam(exam)} alt="edit" />
+							<Link to={`/reports/${exam.class_id}/${exam.section_id}/exam/${exam.id}`}>
+								<img className="edit-icon" src={EditIcon} alt="edit" />
+							</Link>
 							<img className="delete-icon" src={DeleteIcon} onClick={() => onDeleteExam(exam.id)} alt="delete" />
 						</div>
 					</div>
