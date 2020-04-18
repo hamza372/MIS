@@ -69,15 +69,8 @@ class BulkExam extends Component<P, S> {
 		const pq = queryString.parse(this.props.location.search)
 
 		const section_id = pq.section_id ? pq.section_id.toString() : ''
-		const exam_title = pq.exam_title ? pq.exam_title.toString() : ''
-		const year = pq.year ? pq.year.toString() : moment().format("YYYY")
-		const month = pq.month ? pq.month.toString() : ''
 
-		const examFilter = {
-			exam_title,
-			year,
-			month
-		}
+		const examFilter = this.examFilter()
 
 		const scoreSheet = this.createScoreSheet(students, exams, section_id, examFilter)
 
@@ -95,6 +88,21 @@ class BulkExam extends Component<P, S> {
 		}
 
 		this.former = new Former(this, [])
+	}
+
+	examFilter = (): ExamFilter => {
+
+		const pq = queryString.parse(this.props.location.search)
+
+		const exam_title = pq.exam_title ? pq.exam_title.toString() : ''
+		const year = pq.year ? pq.year.toString() : moment().format("YYYY")
+		const month = pq.month ? pq.month.toString() : ''
+
+		return {
+			exam_title,
+			year,
+			month
+		}
 	}
 
 	// handling score sheet for newly created exams
@@ -145,7 +153,7 @@ class BulkExam extends Component<P, S> {
 		}
 
 		this.setState({ showCreateExam: !this.state.showCreateExam }, () => {
-			if (this.state.showCreateExam === true) {
+			if (this.state.showCreateExam) {
 				document.body.style.position = 'fixed'
 			}
 		})
@@ -193,15 +201,8 @@ class BulkExam extends Component<P, S> {
 
 	getFilteredExams = (exams: RootDBState["exams"], section_id: string, examFilter: ExamFilter): MISExam[] => {
 
-		let filtered_exams: MISExam[] = []
-
-		for (const exam of Object.values(exams)) {
-			if (this.getExamFilterConditions(exam, section_id, examFilter)) {
-				filtered_exams.push(exam)
-			}
-		}
-
-		return filtered_exams
+		return Object.values(exams)
+			.filter(exam => this.getExamFilterConditions(exam, section_id, examFilter))
 	}
 
 	createScoreSheet = (students: RootDBState["students"], exams: RootDBState["exams"], section_id: string, examFilter: ExamFilter): ExamScoreSheet => {
@@ -227,10 +228,8 @@ class BulkExam extends Component<P, S> {
 			return {
 				...aggStudents,
 				[currStudent.id]: {
-					id: currStudent.id,
-					name: currStudent.Name,
-					rollNo: currStudent.RollNumber,
-					exams: student_exams,
+					...currStudent,
+					scoreSheetExams: student_exams,
 				}
 			}
 
@@ -297,7 +296,7 @@ class BulkExam extends Component<P, S> {
 		const { scoreSheet } = this.state
 
 		const student = scoreSheet[student_id]
-		const exam = student.exams[exam_id]
+		const exam = student.scoreSheetExams[exam_id]
 
 		// to handle some old exams with total score of type string
 		const total_marks = exam ? parseFloat(exam.total_score.toString()) || 0 : 0
@@ -311,8 +310,8 @@ class BulkExam extends Component<P, S> {
 				...scoreSheet,
 				[student_id]: {
 					...student,
-					exams: {
-						...student["exams"],
+					scoreSheetExams: {
+						...student["scoreSheetExams"],
 						[exam_id]: {
 							...exam,
 							stats: {
@@ -538,11 +537,11 @@ const ExamScoreSheet: React.FC<ExamScoreSheetProps> = ({ scoreSheet, exams, onSu
 					<tbody>
 						{
 							Object.values(scoreSheet)
-								.sort((a, b) => (parseInt(a.rollNo) || 0) - (parseInt(b.rollNo) || 0))
+								.sort((a, b) => (parseInt(a.RollNumber) || 0) - (parseInt(b.RollNumber) || 0))
 								.map(student => <tr key={student.id}>
-									<td title={toTitleCase(student.name)}><Link to={`/student/${student.id}/profile`}>{student.rollNo || ""} {toTitleCase(student.name.substr(0, 15))}</Link></td>
+									<td title={toTitleCase(student.Name)}><Link to={`/student/${student.id}/profile`}>{student.RollNumber || ""} {toTitleCase(student.Name.substr(0, 15))}</Link></td>
 									{
-										Object.entries(student.exams)
+										Object.entries(student.scoreSheetExams)
 											.map(([exam_id, exam]) => <td key={`${exam_id}-${student.id}-${exam.section_id}`}>
 												<input onBlur={(e) => onSubjectScoreUpdate(student.id, exam_id, e.target.value)} type="text" placeholder="enter marks" defaultValue={exam.stats.score} />
 											</td>)

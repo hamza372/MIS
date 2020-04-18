@@ -734,7 +734,7 @@ export const updateBulkExams = (exam_marks_sheet: ExamScoreSheet) => (dispatch: 
 
 	for(const student of Object.values(exam_marks_sheet)) {
 
-		const exams = student.exams
+		const exams = student.scoreSheetExams
 
 		for(const exam of Object.values(exams)){
 			// only create merges for those students' exams which are updated

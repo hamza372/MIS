@@ -429,11 +429,8 @@ interface MISBanner {
 }
 
 interface ExamScoreSheet {
-	[studentId: string]: {
-		id: string
-		name: string
-		rollNo: string
-		exams: {
+	[studentId: string]: MISStudent & {
+		scoreSheetExams: {
 			[examId: string]: { edited: boolean } & AugmentedMISExam
 		}
 	}
