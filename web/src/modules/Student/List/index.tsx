@@ -37,8 +37,8 @@ type S = {
 	printStudentCard: boolean
 	tag: string
 	section_id: string
-	students_per_page: number
 	student_id: string
+	page_index: number
 }
 
 const CHUNK_SIZE_FOR_LIST = 29
@@ -58,7 +58,7 @@ export class StudentList extends Component<P, S> {
 			tag: "",
 			section_id: "",
 			student_id: "",
-			students_per_page: PAGE_SIZE
+			page_index: 0
 		}
 		this.former = new Former(this, [])
 	}
@@ -141,28 +141,28 @@ export class StudentList extends Component<P, S> {
 
 	onPreviousButton = () => {
 
-		let { students_per_page } = this.state
+		let { page_index } = this.state
 
-		if (students_per_page > PAGE_SIZE) {
-			this.setState({ students_per_page: students_per_page - PAGE_SIZE })
+		if (page_index > 0) {
+			this.setState({ page_index: page_index - 1 })
 		}
 
 	}
 
 	onNextButton = (students: MISStudent[]) => {
 
-		const { students_per_page } = this.state
+		const { page_index } = this.state
 
-		const new_page_size = students_per_page + PAGE_SIZE
+		const new_page_size = (page_index + 1) * PAGE_SIZE
 
 		// check condition to avoid unnecessary state mutation
-		if (students_per_page <= students.length) {
-			this.setState({ students_per_page: new_page_size })
+		if (new_page_size <= students.length) {
+			this.setState({ page_index: page_index + 1 })
 		}
 	}
 
-	resetStudentsPerPage = () => {
-		this.setState({ students_per_page: PAGE_SIZE })
+	resetPageIndex = () => {
+		this.setState({ page_index: 0 })
 	}
 
 	onPrint = () => {
@@ -253,9 +253,9 @@ export class StudentList extends Component<P, S> {
 			createText = "Manage Fees"
 		}
 
-		const { students_per_page, student_id } = this.state
+		const { page_index, student_id } = this.state
 
-		const card_items = items.slice(0, students_per_page)
+		const card_items = items.slice(page_index * PAGE_SIZE, ((page_index + 1) * PAGE_SIZE))
 
 		// filter in case of single student id card print
 		const print_card_items = student_id ? items.filter(student => student.id === student_id) : items
@@ -290,7 +290,7 @@ export class StudentList extends Component<P, S> {
 							</div>
 							</div>
 							<div className="row">
-								<select className="list-select" {...this.former.super_handle(["tag"], () => true, () => this.resetStudentsPerPage())} style={{ marginLeft: 0 }}>
+								<select className="list-select" {...this.former.super_handle(["tag"], () => true, () => this.resetPageIndex())} style={{ marginLeft: 0 }}>
 									<option value="">Select Tag</option>
 									{
 										[...this.uniqueTags(students).keys()]
@@ -299,7 +299,7 @@ export class StudentList extends Component<P, S> {
 											.map(tag => <option key={tag} value={tag}> {tag} </option>)
 									}
 								</select>
-								<select className="list-select" {...this.former.super_handle(["section_id"], () => true, () => this.resetStudentsPerPage())}>
+								<select className="list-select" {...this.former.super_handle(["section_id"], () => true, () => this.resetPageIndex())}>
 									<option value="">Select Class</option>
 									{
 										sections
@@ -315,8 +315,8 @@ export class StudentList extends Component<P, S> {
 			</div>
 			<div className="section-container pagination no-print">
 				<div className="row paginate-button">
-					<div className={`button ${students_per_page <= PAGE_SIZE ? 'grey' : 'green'}`} onClick={() => this.onPreviousButton()}>Previous</div>
-					<div className={`button ${students_per_page > items.length ? 'grey' : 'green'}`} onClick={() => this.onNextButton(items)}>Next</div>
+					<div className={`button ${page_index === 0 ? 'grey' : 'green'}`} onClick={() => this.onPreviousButton()}>Previous</div>
+					<div className={`button ${(page_index + 1) * PAGE_SIZE >= items.length ? 'grey' : 'green'}`} onClick={() => this.onNextButton(items)}>Next</div>
 				</div>
 				<div className="row" style={{ marginTop: 10 }}>
 					<div> Showing <strong>{card_items.length}</strong> of <strong>{items.length}</strong> students</div>
