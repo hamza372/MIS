@@ -25,10 +25,12 @@ interface S {
 		section_id: string
 	}
 	modal_active: boolean
-	active_student?: MISStudent & NeedyForm
+	active_student?: NeedyStudent
 	language: "en" | "ur"
 	sections: AugmentedSection[]
 }
+
+type NeedyStudent = MISStudent & NeedyForm
 
 class CoronaModule extends React.Component<P, S> {
 
@@ -155,14 +157,14 @@ class CoronaModule extends React.Component<P, S> {
 									Object.values(this.props.students)
 										.filter(s => this.state.filter.section_id && s.section_id === this.state.filter.section_id)
 										.sort((a, b) => parseInt(a.RollNumber) - parseInt(b.RollNumber))
-										.map(s => {
+										.map((s: NeedyStudent) => {
 
 											return <tr key={s.id}>
 												<td>{s.RollNumber}</td>
 												<td>{<Link to={`/student/${s.id}/profile`}>{s.Name}</Link>}</td>
 												<td>{s.ManName}</td>
 												<td>
-													<input type="checkbox" onChange={this.onCheckboxSelect(s)} />
+													<input type="checkbox" onChange={this.onCheckboxSelect(s)} checked={s.Needy || false} />
 												</td>
 											</tr>
 										})
