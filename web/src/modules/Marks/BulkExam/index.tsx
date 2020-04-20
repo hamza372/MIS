@@ -105,17 +105,19 @@ class BulkExam extends Component<P, S> {
 		}
 	}
 
-	// handling score sheet for newly created exams
-	UNSAFE_componentWillReceiveProps(nextProps: P) {
+	componentDidUpdate(prevProps: P) {
 
-		const { students, exams } = nextProps
-		const { selectedSection, examFilter } = this.state
+		if (JSON.stringify(prevProps.exams) !== JSON.stringify(this.props.exams)) {
 
-		const score_sheet = this.createScoreSheet(students, exams, selectedSection, examFilter)
+			const { students, exams } = this.props
+			const { selectedSection, examFilter } = this.state
 
-		this.setState({
-			scoreSheet: score_sheet
-		})
+			const score_sheet = this.createScoreSheet(students, exams, selectedSection, examFilter)
+
+			this.setState({
+				scoreSheet: score_sheet
+			})
+		}
 	}
 
 	getClassIdFromSections = (): string => {
