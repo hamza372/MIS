@@ -1,0 +1,68 @@
+.mis-alert {
+	background-color: #fafafa;
+	width: 75%;
+	height: 30%;
+	padding: 20px;
+	border-radius: 8px;
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.mis-alert .section-container {
+	width: 80%;
+}
+
+.mis-alert .title {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.mis-alert .row {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.mis-alert .row .button.cancel {
+	margin-right: 10px;
+}
+
+
+@media (max-width: 768px) {
+	.mis-alert .close.button {
+		padding: 4px 8px;
+	}
+	.mis-alert .title {
+		font-weight: 700;
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 425px) {
+	.mis-alert .close.button {
+		font-size: 14px;
+		padding: 2px 6px;
+	}
+	.mis-alert .title {
+		font-size: 1.2rem;
+	}
+}
+
+.mis-alert .close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.mis-alert .title {
+	color: #333;
+	align-self: center;
+}
+
+.mis-alert .card {
+	padding: 20px;
+	width: 90%;
+}
