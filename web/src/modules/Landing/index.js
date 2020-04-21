@@ -7,6 +7,8 @@ import moment from 'moment'
 import { createLogout, resetTrial, markPurchased } from 'actions'
 import Layout from 'components/Layout'
 import { numberWithCommas } from 'utils/numberWithCommas'
+import Modal from 'components/Modal'
+import { MISPrompt } from 'components/Alert'
 
 import attendanceIcon from './icons/attendance/checklist_1.svg'            //
 import teacherAttendanceIcon from './icons/attendance/Attendance.svg'    //
@@ -44,7 +46,9 @@ class Landing extends Component {
 		super(props);
 
 		this.state = {
-			scroll: 0
+			scroll: 0,
+			showPrompt: false,
+			hasPromptError: false
 		}
 	}
 
@@ -61,18 +65,10 @@ class Landing extends Component {
 		const daysPassesSinceTrial = moment().diff(date, "days")
 
 		if (date !== -1 && !paid && daysPassesSinceTrial > trial_period + 1) {
-
-			const word = window.prompt(`Your Trial has ended (${daysPassesSinceTrial - trial_period} days).Please Enter Purchase or Reset Code or Contact Help Line at.(+923481112004)`, "")
-
-			this.checkMagicWord(word)
-				.then(accepted => {
-					if (accepted) {
-						window.alert("ACCEPTED")
-					} else {
-						window.location.reload()
-					}
-				})
-		}
+			this.setState({
+				showPrompt: true
+			})
+		 }
 
 		this.setState({
 			scroll: container.scrollLeft
@@ -87,7 +83,7 @@ class Landing extends Component {
 		return `/analytics/${stats_type}?start_date=${moment().format('MM-DD-YYYY')}&end_date=${moment().format('MM-DD-YYYY')}&period=Daily`
 	}
 
-	checkMagicWord = async (word) => {
+	verifyCode = async (code) => {
 
 		const { date } = this.props.package_info
 
@@ -95,41 +91,47 @@ class Landing extends Component {
 			return false
 		}
 
-		const reset_password = await hash(`reset-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
+		const reset_code = await hash(`reset-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
 			.then(res => res.substr(0, 4).toLowerCase())
 
-		const purchase_password = await hash(`buy-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
+		const purchase_code = await hash(`buy-${this.props.school_id}-${moment().format("MMDDYYYY")}`)
 			.then(res => res.substr(0, 4).toLowerCase())
 
-		if (word === reset_password) {
+		if (code === reset_code) {
 			this.props.resetTrial()
 			return true
 		}
 
-		if (word === purchase_password) {
+		if (code === purchase_code) {
 			this.props.markPurchased()
 			return true
 		}
 
 		console.log("WRONG CODE")
 		return false
-
 	}
 
-	askForPassword = () => {
+	onActivationCodeModal = () => {
+		this.setState({
+			showPrompt: !this.state.showPrompt
+		})
+	}
 
-		const word = window.prompt("Please Enter Purchase or Reset Code.", "")
-
-		if (word) {
-			this.checkMagicWord(word)
-				.then(accepted => {
-					if (accepted) {
-						window.alert("ACCEPTED")
-					} else {
-						window.alert("WRONG CODE")
-					}
-				})
-		}
+	validateActivationCode = (code) => {
+	
+		this.verifyCode(code)
+			.then(accepted => {
+				if (accepted) {
+					this.setState({
+						showPrompt: false,
+						hasPromptError: false
+					})
+				} else {
+					this.setState({
+						hasPromptError: true
+					})
+				}
+			})
 	}
 
 	getTrialWarningMessage = () => {
@@ -141,8 +143,13 @@ class Landing extends Component {
 			return `Trial ${trial_period - daysPassedSinceTrial} day(s) left`
 		}
 
-		return "Trial Period Ended, Please Contact helpline or You will not be able to use MISchool."
+		return "Trial Period Ended, Please Contact helpline to continue to use MISchool"
+	}
 
+	closePromptModal = () => {
+		this.setState({
+			showPrompt: !this.state.showPrompt
+		})
 	}
 
 	render() {
@@ -206,9 +213,20 @@ class Landing extends Component {
 
 		return <Layout history={this.props.history}>
 			<div className="landing">
-				{!package_info.paid && package_info.date !== -1 && <div onClick={() => this.askForPassword()} className="trial-bar">
+				{!package_info.paid && package_info.date !== -1 && <div onClick={() => this.onActivationCodeModal()} className="trial-bar">
 					{this.getTrialWarningMessage()}
 				</div>}
+
+				{
+					this.state.showPrompt && <Modal>
+						<MISPrompt 
+							title={"MISchool Activation"}
+							text={"Please enter reset trial or purchase code to activate mischoool"}
+							error={this.state.hasPromptError ? "Invalid Code, Please enter correct code" : undefined }
+							onCancel={this.closePromptModal}
+							onSubmit={this.validateActivationCode} />
+					</Modal>
+				}
 
 				<div className="horizontal-scroll-container">
 
