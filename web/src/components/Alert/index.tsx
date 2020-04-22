@@ -14,9 +14,11 @@ type PropsType = {
 
 export const MISPrompt: React.FC<PropsType> = (props) => {
 
-	const [code, setCode] = useState("")
+	const [input, setInput] = useState("")
 
-	// pasing empty array, makes it work like componentDidMount
+	// pasing empty array, makes it works like componentDidMount
+	// making focus this way because react only allow to have focus on initial render
+	// so that autoFocus doesn't work
 	useEffect(() => {
 		document.getElementById("promptinput").focus()
 	}, [])
@@ -31,18 +33,17 @@ export const MISPrompt: React.FC<PropsType> = (props) => {
 				<div className="row">
 					<input type="text"
 						id="promptinput"
-						style={{ width: "100%", paddingLeft: "0.5rem" }}
-						onChange={() => setCode}
+						onChange={(e) => setInput(e.target.value)}
 					/>
 				</div>
 				{
-					props.error && <div className="row" style={{ color: "red" }}>
+					props.error && <div className="row error">
 						<div>{props.error}</div>
 					</div>
 				}
-				<div className="row" style={{ justifyContent: "flex-end" }}>
+				<div className="row actions">
 					<button className="button grey cancel" onClick={props.onCancel}>Cancel</button>
-					<button className="button blue ok" onClick={() => props.onSubmit(code)}>OK</button>
+					<button className="button blue" onClick={() => props.onSubmit(input)}>OK</button>
 				</div>
 			</div>
 		</div>
@@ -58,8 +59,8 @@ export const MISAlert: React.FC<PropsType> = (props) => {
 				<div className="row">
 					<div>{props.text}</div>
 				</div>
-				<div className="row" style={{ justifyContent: "flex-end" }}>
-					<button className="button blue ok" onClick={props.onOK}>OK</button>
+				<div className="row actions">
+					<button className="button blue" onClick={props.onOK}>OK</button>
 				</div>
 			</div>
 		</div>
@@ -75,9 +76,9 @@ export const MISConfirm: React.FC<PropsType> = (props) => {
 				<div className="row">
 					<div>{props.text}</div>
 				</div>
-				<div className="row" style={{ justifyContent: "flex-end" }}>
+				<div className="row actions">
 					<button className="button grey cancel" onClick={props.onCancel}>Cancel</button>
-					<button className="button blue ok" onClick={props.onOK}>OK</button>
+					<button className="button blue" onClick={props.onOK}>OK</button>
 				</div>
 			</div>
 		</div>

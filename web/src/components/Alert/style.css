@@ -1,7 +1,7 @@
 .mis-alert {
 	background-color: #fafafa;
 	width: 75%;
-	height: 30%;
+	height: 40%;
 	padding: 20px;
 	border-radius: 8px;
 	position: relative;
@@ -30,6 +30,18 @@
 	margin-right: 10px;
 }
 
+.mis-alert .row input {
+	width: 100%;
+	padding-left: 0.5rem;
+}
+
+.mis-alert .row.error {
+	color: #fc6171;
+}
+
+.mis-alert .row.actions {
+	justify-content: flex-end;
+}
 
 @media (max-width: 768px) {
 	.mis-alert .close.button {
