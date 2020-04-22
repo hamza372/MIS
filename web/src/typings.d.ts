@@ -419,5 +419,9 @@ interface ExamFilter {
 	subject?: string
 	exam_title: string
 }
+type AugmentedStudent = { 
+	section?: AugmentedSection
+	forwardTo?: string
+} & MISStudent
 
 type MISGrades = RootDBState["settings"]["exams"]["grades"]
