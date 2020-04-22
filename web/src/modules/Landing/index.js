@@ -107,7 +107,6 @@ class Landing extends Component {
 			return true
 		}
 
-		console.log("WRONG CODE")
 		return false
 	}
 
@@ -118,7 +117,7 @@ class Landing extends Component {
 	}
 
 	validateActivationCode = (code) => {
-	
+
 		this.verifyCode(code)
 			.then(accepted => {
 				if (accepted) {
@@ -132,6 +131,13 @@ class Landing extends Component {
 					})
 				}
 			})
+
+		// don't show error message on modal after 3s
+		setTimeout(() => {
+			this.setState({
+				hasPromptError: false
+			})
+		}, 3000)
 	}
 
 	getTrialWarningMessage = () => {
