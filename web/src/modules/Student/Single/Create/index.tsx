@@ -774,7 +774,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<input
 							style={{ width: "100%" }}
 							type="tel"
-							{...this.former.super_handle(["Phone"], (num) => num.length <= 11, this.updateSiblings)}
+							{...this.former.super_handle(["Phone"], (num) => num.length <= 15, this.updateSiblings)}
 							placeholder="Phone Number"
 							disabled={!admin}
 						/>
@@ -788,7 +788,7 @@ class SingleStudent extends Component<propTypes, S> {
 						<input
 							style={{ width: "100%" }}
 							type="tel"
-							{...this.former.super_handle(["AlternatePhone"], (num) => num.length <= 11, this.updateSiblings)}
+							{...this.former.super_handle(["AlternatePhone"], (num) => num.length <= 15, this.updateSiblings)}
 							placeholder="Alternate Phone Number"
 							disabled={!admin}
 						/>
