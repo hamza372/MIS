@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps, Redirect } from 'react-router-dom'
+import { RouteComponentProps, Redirect, Link } from 'react-router-dom'
 import moment from 'moment'
 import { hash } from 'utils'
 
@@ -25,7 +25,8 @@ interface P {
 interface S {
 	code: string
 	isVerified: boolean
-	invalidCode: boolean
+	isPaid: boolean
+	isValidCode: boolean
 }
 
 type PropsType = P & RouteComponentProps
@@ -37,8 +38,9 @@ class MISActivation extends Component<PropsType, S> {
 
 		this.state = {
 			code: "",
-			invalidCode: false,
-			isVerified: false
+			isValidCode: false,
+			isVerified: false,
+			isPaid: false,
 		}
 
 		this.former = new Former(this, [])
@@ -60,7 +62,13 @@ class MISActivation extends Component<PropsType, S> {
 		}
 
 		if (code === purchase_code) {
+
 			this.props.markAsPurchased()
+
+			this.setState({
+				isPaid: true
+			})
+
 			return true
 		}
 
@@ -83,7 +91,7 @@ class MISActivation extends Component<PropsType, S> {
 					})
 				} else {
 					this.setState({
-						invalidCode: true
+						isValidCode: true
 					})
 				}
 			})
@@ -91,18 +99,16 @@ class MISActivation extends Component<PropsType, S> {
 		// don't show error message after 3s
 		setTimeout(() => {
 			this.setState({
-				invalidCode: false
+				isValidCode: false
 			})
 		}, 3000)
 	}
 
 	render() {
 
-		const { isVerified, invalidCode } = this.state
+		const { isVerified, isValidCode, isPaid } = this.state
 
 		const { school_id, initialized } = this.props
-
-		console.log(isVerified)
 
 		return <>
 			{
@@ -124,11 +130,11 @@ class MISActivation extends Component<PropsType, S> {
 									<div className="row">
 										<input type="text" {...this.former.super_handle(["code"])} placeholder="Enter valid code" autoFocus />
 									</div>
-									{invalidCode &&
+									{isValidCode &&
 										<div className="row is-danger" style={{ marginTop: 10 }}>Invalid code, please enter valid code</div>
 									}
-									<div className="" style={{ marginTop: 10 }}>
-										<button className="button blue" onClick={this.onVerifyCode}>Verify Code</button>
+									<div className="row" style={{ marginTop: 15 }}>
+										<div className="button blue" onClick={this.onVerifyCode}>Verify Code</div>
 									</div>
 								</div>
 							</div>
@@ -139,7 +145,19 @@ class MISActivation extends Component<PropsType, S> {
 									<div className="exclamation-icon">
 										<img src={HappyEmojiIcon} alt="exclamation" />
 									</div>
-									<div className="trial-text is-success">Hurrah! Code has been verified</div>
+									<div className="trial-text is-success">
+										<div> Hurrah! <strong>{isPaid ? "Purchase" : "Reset Trial"}</strong> code has been verified.
+											{
+												isPaid ? <span> You have been marked as Paid User.</span> :
+													<span> Your Trial has been reset.</span>
+											}
+										</div>
+									</div>
+								</div>
+								<div className="activation-code" style={{ marginTop: 15 }}>
+									<div className="row">
+										<Link className="button blue" to="/landing">Continue to Use MISchool</Link>
+									</div>
 								</div>
 							</div>
 						}

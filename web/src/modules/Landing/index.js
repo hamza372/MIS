@@ -217,7 +217,7 @@ class Landing extends Component {
 					this.state.showPrompt && <Modal>
 						<MISPrompt 
 							title={"MISchool Activation"}
-							text={"Please enter reset trial or purchase code to activate mischoool"}
+							text={"Please enter reset trial or purchase code to use mischoool"}
 							error={this.state.hasPromptError ? "Invalid Code, Please enter correct code" : undefined }
 							onCancel={this.closePromptModal}
 							onSubmit={this.validateActivationCode} />
