@@ -21,10 +21,14 @@
 	align-items: center;
 }
 
-.filter-container .checkbox-container .checkbox{
+.filter-container .checkbox-container .checkbox {
 	display: flex;
 	align-items: center;
 	margin-right: 4px;
+}
+
+.filter-container .checkbox-container .checkbox input {
+	height: 20px;
 }
 
 .list-select {
@@ -112,4 +116,11 @@
     font-weight: 600;
 	box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);
 	text-decoration: none;
+}
+.pagination .button {
+	width: 70px;
+}
+.pagination .row.paginate-button {
+	margin-top: 20px;
+	justify-content: space-between;
 }
