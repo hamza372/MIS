@@ -1,0 +1,70 @@
+.mis-activation {
+	display: block;
+}
+
+.mis-activation .section-container {
+	width: 80%;
+}
+
+.mis-activation .section {
+	width: 60%;
+	margin: auto;
+	margin-top: 30px;
+}
+
+.mis-activation .trial-alert {
+	display: flex;
+}
+
+.mis-activation .trial-alert .exclamation-icon {
+	margin: 12px;
+}
+
+.mis-activation .trial-alert .exclamation-icon img {
+	width: 44px;
+	height: 44px;
+}
+
+.mis-activation .trial-alert .trial-text {
+	padding-top: 10px;
+	font-size: 1.25rem;
+}
+
+.mis-activation .activation-code {
+	width: 80%;
+	margin:20px auto;
+}
+
+.mis-activation .activation-code input {
+	width: 100%;
+	padding-left: 0.25rem;
+}
+
+.mis-activation .activation-code .button {
+	padding: 10px 15px;
+	width: 100%;
+}
+
+.mis-activation .is-danger {
+	color: #fc6171;
+}
+
+.mis-activation .is-success {
+	color: #5ecdb9;
+}
+
+
+@media (max-width: 572px){
+	.mis-activation .section {
+		width: 90%;
+	}
+
+	.mis-activation .trial-alert .exclamation-icon img {
+		width: 32px;
+		height: 32px;
+	}
+	
+	.mis-activation .trial-alert .trial-text {
+		font-size: 1rem;
+	}
+}

@@ -56,19 +56,9 @@ class Landing extends Component {
 	//Need to do something about that ..
 	componentDidMount() {
 
-		const { paid, trial_period, date } = this.props.package_info
-
 		const container = document.querySelector(".landing .horizontal-scroll-container");
 		container.onscroll = () => this.setState({ scroll: container.scrollLeft })
 		container.scrollTo(window.innerWidth, 0)
-
-		const daysPassesSinceTrial = moment().diff(date, "days")
-
-		if (date !== -1 && !paid && daysPassesSinceTrial > trial_period + 1) {
-			this.setState({
-				showPrompt: true
-			})
-		 }
 
 		this.setState({
 			scroll: container.scrollLeft

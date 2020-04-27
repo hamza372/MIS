@@ -33,11 +33,7 @@ interface RootDBState {
 		schoolLogo: string
 	}
 	max_limit: number
-	package_info: {
-		date: number
-		trial_period: number
-		paid: boolean
-	}
+	package_info: MISPackage
 	diary: MISDiary
 	planner: {
 		// Will be able to add more planner stuff here i.e Teacher/Class shedule e.t.c 
@@ -421,3 +417,9 @@ interface ExamFilter {
 }
 
 type MISGrades = RootDBState["settings"]["exams"]["grades"]
+
+interface MISPackage  {
+	date: number
+	trial_period: number
+	paid: boolean
+}
