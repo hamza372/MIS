@@ -59,7 +59,6 @@ class Accordian extends React.Component<propTypes, S> {
 		const new_school = permissions && permissions.new_school
 		const stats = permissions && permissions.stats
 		const new_user = permissions && permissions.new_user
-		const trials = permissions && permissions.trials
 
 		const admin = role === "ADMIN" ? true : false
 
@@ -74,7 +73,7 @@ class Accordian extends React.Component<propTypes, S> {
 			{visible && <div className="burger">
 				{(new_school || admin) && <Link to={{ pathname: "/", search }} className={current === "/" ? "active" : ""}>New School</Link>}
 				{(stats || admin) && <Link to={{ pathname: "/dashboard/school_id/start_date/end_date/", search }} className={current === "/dashboard/school_id/start_date/end_date/" ? "active" : ""}> Stats</Link>}
-				{(trials || admin) && <Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link>}
+				{<Link to={{ pathname: "/trials", search }} className={current === "/trials" ? "active" : ""}>Trials</Link>}
 				{admin && <Link to={{ pathname: "/admin", search }} className={current === "/admin" ? "active" : ""}>Admin</Link>}
 				{admin && <Link to={{ pathname: "/reset-password", search }} className={current === "/reset-password" ? "active" : ""}>Reset Password</Link>}
 				{(new_user || admin) && <Link to={{ pathname: "/user/new", search }} className={current === "/user/new" ? "active" : ""}>New User</Link>}

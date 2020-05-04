@@ -36,7 +36,7 @@ interface RootReducerState {
 			max_limit: number
 		}
 		meta?: TrialsDataRow["value"]
-	},
+	}
 	trials: TrialsDataRow[]
 	stats: {
 		student_attendance?: {
@@ -68,7 +68,7 @@ interface RootReducerState {
 }
 
 interface SchoolInfoAction {
-	type: "SCHOOL_INFO",
+	type: "SCHOOL_INFO"
 	trial_info: RootReducerState["school_Info"]["trial_info"]
 	student_info: RootReducerState["school_Info"]["student_info"]
 	meta: TrialsDataRow["value"]
@@ -175,6 +175,8 @@ interface TrialsDataRow {
 		overall_status: string
 		user: string
 		school_type: string
+		needy_status: string
+		trustworthiness: string
 	}
 }
 
