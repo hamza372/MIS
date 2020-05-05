@@ -1,3 +1,5 @@
+import Papa from 'papaparse'
+
 const downloadCSV = (data: string[][], name: string) => {
 
 	const csv = data.reduce((agg, curr) => {
@@ -11,4 +13,15 @@ const downloadCSV = (data: string[][], name: string) => {
 	hiddenElem.click();
 }
 
-export default downloadCSV;
+export const downloadAsCSV = (data: any, headers: string[], filename = "mis_csv") => {
+
+	let csv = Papa.unparse({ data: data, fields: headers})
+
+	const hiddenElem = document.createElement("a")
+	hiddenElem.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+	hiddenElem.target = '_blank'
+	hiddenElem.download = `${filename}.csv`
+	hiddenElem.click()
+}
+
+export default downloadCSV
