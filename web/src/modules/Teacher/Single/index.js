@@ -21,7 +21,8 @@ export default class TeacherPage extends Component {
 
 		return <Layout history={this.props.history}>
 			<div className="single-teacher">
-				{ loc === "new" ? false : 
+				{ loc === "new" ? 
+				<div className="title"> Create New Faculty </div> : 
 				<div className="row tabs">
 					<Link className={`button ${loc === "profile" ? "orange" : false}`} to="profile" replace={true}>Profile</Link>
 					<Link className={`button ${loc === "attendance" ? "purple" : false}`} to="attendance" replace={true}>Attendance</Link>
