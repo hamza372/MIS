@@ -12,8 +12,11 @@ import { hash } from 'utils'
 import Hyphenator from 'utils/Hyphenator'
 import Banner from 'components/Banner'
 import checkCompulsoryFields from 'utils/checkCompulsoryFields'
+import { StudentIcon } from 'assets/icons'
 
 import './style.css'
+import Modal from 'components/Modal'
+import FacultyProfilePictureModal from './Modals/profilePictureModal'
 
 const blankTeacher = (isFirst = false): MISTeacher => ({
 	id: v4(),
@@ -57,6 +60,7 @@ interface S {
 		text?: string
 	}
 	tag: string
+	showProfilePictureModal: boolean
 }
 
 interface RouteInfo {
@@ -86,7 +90,8 @@ class CreateTeacher extends Component<propTypes, S> {
 				good: true,
 				text: "Saved!"
 			},
-			tag: ""
+			tag: "",
+			showProfilePictureModal: false
 		}
 
 		this.former = new Former(this, ["profile"])
@@ -245,6 +250,18 @@ class CreateTeacher extends Component<propTypes, S> {
 		return [...tags]
 	}
 
+	toggleProfilePictureModal = () => {
+		this.setState({
+			showProfilePictureModal: !this.state.showProfilePictureModal
+		})
+	}
+
+	closeProfilePictureModal = () => {
+		this.setState({
+			showProfilePictureModal: false
+		})
+	}
+
 	render() {
 
 		if (this.state.redirect) {
@@ -257,10 +274,22 @@ class CreateTeacher extends Component<propTypes, S> {
 		return <div className="single-teacher-create">
 			{this.state.banner.active ? <Banner isGood={this.state.banner.good} text={this.state.banner.text} /> : false}
 
+			{this.state.showProfilePictureModal && <Modal>
+				<FacultyProfilePictureModal onClose={this.closeProfilePictureModal} />
+			</Modal>
+			}
 			<div className="form">
 				<fieldset>
 					<legend>Personal Information</legend>
-
+					<div className="profile-picture-wrapper">
+						<label>Profile Picture</label>
+						<div>
+							<div className="picture text-center" onClick={this.toggleProfilePictureModal}>
+								<img src={StudentIcon} alt="avatar" />
+							</div>
+							<button className="button blue" onClick={this.toggleProfilePictureModal}>Update</button>
+						</div>
+					</div>
 					<div className="row">
 						<label>Full Name</label>
 						<input type="text" {...this.former.super_handle_flex(["Name"], { styles: (val: string) => { return val === "" ? { borderColor: "#fc6171" } : {} } })} placeholder="Full Name" disabled={!canEdit} />
@@ -269,11 +298,6 @@ class CreateTeacher extends Component<propTypes, S> {
 						<label>CNIC</label>
 						<input type="tel" {...this.former.super_handle(["CNIC"], (num) => num.length <= 15, this.addHyphens(["profile", "CNIC"]))} placeholder="CNIC" disabled={!canEdit} />
 					</div>
-					<div className="row">
-						<label>Husband/Father Name</label>
-						<input type="text" {...this.former.super_handle(["ManName"])} placeholder="Father/Husband Name" disabled={!canEdit} />
-					</div>
-
 					<div className="row">
 						<label>Husband/Father CNIC</label>
 						<input type="tel" {...this.former.super_handle(["ManCNIC"], num => num.length <= 15, this.addHyphens(["profile", "ManCNIC"]))} placeholder="Father/Husband CNIC" disabled={!canEdit} />
@@ -287,15 +311,6 @@ class CreateTeacher extends Component<propTypes, S> {
 						</select>
 					</div>
 					<div className="row">
-						<label>Married</label>
-						<select {...this.former.super_handle(["Married"])} disabled={!canEdit}>
-							<option value='' disabled>Please Select Marriage Status</option>
-							<option value="false">Not Married</option>
-							<option value="true">Married</option>
-						</select>
-					</div>
-
-					<div className="row">
 						<label>Date of Birth</label>
 						<input type="date"
 							onChange={this.former.handle(["Birthdate"])}
@@ -303,9 +318,16 @@ class CreateTeacher extends Component<propTypes, S> {
 							placeholder="Date of Birth"
 							disabled={!canEdit} />
 					</div>
-
 					<div className="row">
-						<label>Phone Number</label>
+						<label>Married</label>
+						<select {...this.former.super_handle(["Married"])} disabled={!canEdit}>
+							<option value='' disabled>Please Select Marriage Status</option>
+							<option value="false">Not Married</option>
+							<option value="true">Married</option>
+						</select>
+					</div>
+					<div className="row">
+						<label>Phone No.</label>
 						<input type="tel" {...this.former.super_handle(["Phone"], (num) => num.length <= 15)} placeholder="Phone Number" disabled={!canEdit} />
 					</div>
 					<div className="row">

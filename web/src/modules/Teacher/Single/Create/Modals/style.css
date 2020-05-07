@@ -1,0 +1,49 @@
+.faculty-profile-modal {
+	background-color: #fafafa;
+	width: 75%;
+	min-height: 50%;
+	padding: 20px;
+	border-radius: 8px;
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.faculty-profile-modal video, .faculty-profile-modal img {
+	margin: 25px;
+	border: 2px solid #333;
+	border-radius: 100%;
+}
+
+@media (max-width: 768px) {
+	.faculty-profile-modal .close.button {
+		padding: 4px 8px;
+	}
+	.faculty-profile-modal .title {
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 425px) {
+	.faculty-profile-modal .close.button {
+		font-size: 14px;
+		padding: 2px 6px;
+	}
+	.faculty-profile-modal .title {
+		font-size: 1.2rem;
+	}
+}
+
+.faculty-profile-modal .close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+.faculty-profile-modal .title {
+	color: #333;
+	align-self: center;
+}
